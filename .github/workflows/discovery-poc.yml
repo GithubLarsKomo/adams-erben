@@ -1,0 +1,102 @@
+name: Website Discovery PoC
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - 'scripts/discover-websites.mjs'
+      - 'scripts/discover-websites.test.mjs'
+      - 'scripts/discovery-input.poc.json'
+      - 'scripts/discovery-ground-truth.poc.json'
+      - '.github/workflows/discovery-poc.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  discovery-poc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test discovery scoring and frozen sample contract
+        run: npm run test:discover
+
+      - name: Detect Brave Search secret
+        id: brave
+        env:
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        shell: bash
+        run: |
+          if [ -n "$BRAVE_SEARCH_API_KEY" ]; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+            echo 'Brave Search secret is configured; running real PoC.'
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            echo 'BRAVE_SEARCH_API_KEY is not configured; real provider PoC is skipped.'
+          fi
+
+      - name: Run real 25-club website discovery
+        if: steps.brave.outputs.available == 'true'
+        env:
+          SEARCH_PROVIDER: brave
+          BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+          DISCOVERY_INPUT: scripts/discovery-input.poc.json
+          DISCOVERY_GROUND_TRUTH: scripts/discovery-ground-truth.poc.json
+          DISCOVERY_RESULT_COUNT: '8'
+          DISCOVERY_AUTO_ACCEPT_THRESHOLD: '0.78'
+          DISCOVERY_REVIEW_THRESHOLD: '0.48'
+        run: npm run poc:discover
+
+      - name: Validate real PoC precision gate
+        if: steps.brave.outputs.available == 'true'
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/website-discovery-poc/report.json', 'utf8'));
+          const s = report.summary;
+          if (s.organizations !== 25) throw new Error(`expected 25 organizations, got ${s.organizations}`);
+          if (s.groundTruthKnown !== 25) throw new Error(`expected 25 ground-truth cases, got ${s.groundTruthKnown}`);
+          if (s.groundTruthOfficial !== 19 || s.groundTruthNone !== 5 || s.groundTruthAmbiguous !== 1) {
+            throw new Error(`unexpected truth distribution: ${JSON.stringify(s)}`);
+          }
+          if (s.autoAcceptedWrong !== 0) {
+            throw new Error(`precision gate failed: ${s.autoAcceptedWrong} false/over-aggressive auto-accept(s)`);
+          }
+          console.log(s);
+          NODE
+
+      - name: Add provider result to workflow summary
+        if: steps.brave.outputs.available == 'true'
+        run: cat artifacts/website-discovery-poc/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Explain skipped provider run
+        if: steps.brave.outputs.available != 'true'
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          # Website Discovery PoC
+
+          Static scoring and Ground-Truth contract tests passed.
+
+          The real Brave Search run was not executed because `BRAVE_SEARCH_API_KEY` is not configured as a repository secret.
+          EOF
+
+      - name: Upload public discovery report
+        if: always() && steps.brave.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: website-discovery-poc-report
+          path: artifacts/website-discovery-poc/
+          if-no-files-found: warn
+          retention-days: 14
