@@ -23,6 +23,24 @@ Der API-Key wird ausschließlich als Secret/Environment Variable verwendet und n
 
 Für deterministische Tests steht `SEARCH_PROVIDER=fixture` zur Verfügung.
 
+## Stichprobe erzeugen
+
+Die 25 Fälle werden automatisch aus DRV-Profilen ohne vorhandenen externen Website-Link erzeugt:
+
+```text
+npm run poc:discover:prepare
+```
+
+Default:
+
+- 25 Vereine;
+- mindestens fünf Bundesländer;
+- höchstens fünf Vereine je Bundesland;
+- nur `club`, keine LRV/Schulen/Hochschulen/etc.;
+- Output ausschließlich unter `build-private/website-discovery-input.json`.
+
+Die Stichprobe enthält keine E-Mail-Adressen.
+
 ## Input
 
 Private Datei: `build-private/website-discovery-input.json`
@@ -42,8 +60,6 @@ Private Datei: `build-private/website-discovery-input.json`
   ]
 }
 ```
-
-Die 25 Fälle sollen bevorzugt aus der späteren Registry-Queue `website_missing` stammen und über mehrere Bundesländer verteilt sein.
 
 ## Ground Truth
 
@@ -123,7 +139,7 @@ Das wichtigste Gate ist Precision. Vor dem Vollrollout soll die bekannte Fehlzuo
 
 ## Ablauf
 
-1. 25 `website_missing`-Organisationen aus dem Registry-Import auswählen.
+1. `npm run poc:discover:prepare` erzeugt 25 `website_missing`-Organisationen.
 2. Ground Truth manuell erfassen.
 3. `BRAVE_SEARCH_API_KEY` lokal oder als CI-Secret setzen.
 4. `npm run poc:discover` ausführen.
