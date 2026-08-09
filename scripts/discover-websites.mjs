@@ -32,8 +32,13 @@ function tokenizeName(name) {
   return normalize(name).replace(/[^a-z0-9]+/g, ' ').split(/\s+/).filter((token) => token.length >= 3 && !stop.has(token));
 }
 
-function normalizeHost(value = '') {
-  try { return new URL(value).hostname.toLowerCase().replace(/^www\./, ''); } catch { return ''; }
+export function normalizeHost(value = '') {
+  try {
+    const candidate = /^[a-z][a-z0-9+.-]*:\/\//i.test(String(value)) ? String(value) : `https://${String(value)}`;
+    return new URL(candidate).hostname.toLowerCase().replace(/^www\./, '');
+  } catch {
+    return '';
+  }
 }
 
 function canonicalUrl(value = '') {
@@ -51,7 +56,8 @@ function blockedHost(host) {
 }
 
 export function buildQuery(org) {
-  return `\"${clean(org.name)}\" ${clean(org.city || org.postalCode)} Rudern`;
+  const location = [clean(org.postalCode || ''), clean(org.city || '')].filter(Boolean).join(' ');
+  return [`\"${clean(org.name)}\"`, location, 'Rudern'].filter(Boolean).join(' ');
 }
 
 async function fetchJson(url, options = {}) {
@@ -156,8 +162,30 @@ export function chooseCandidate(org, candidates) {
   return { organizationId: org.organizationId || org.drvId || org.id || org.name, name: org.name, query: buildQuery(org), disposition, reason, best, candidates: scored };
 }
 
-function compareGroundTruth(decisions, truth) {
-  let eligible = 0;
+export function normalizeGroundTruthEntry(raw) {
+  if (raw == null || raw === '') return { status: 'unknown', acceptedHosts: [] };
+  if (typeof raw === 'string') {
+    const host = normalizeHost(raw);
+    return host ? { status: 'official', acceptedHosts: [host] } : { status: 'unknown', acceptedHosts: [] };
+  }
+  if (Array.isArray(raw)) {
+    const acceptedHosts = [...new Set(raw.map(normalizeHost).filter(Boolean))];
+    return { status: acceptedHosts.length ? 'official' : 'unknown', acceptedHosts };
+  }
+  if (typeof raw !== 'object') return { status: 'unknown', acceptedHosts: [] };
+
+  const status = ['official', 'none', 'ambiguous'].includes(raw.status) ? raw.status : 'official';
+  const values = raw.acceptedHosts || raw.domains || raw.urls || raw.url || [];
+  const array = Array.isArray(values) ? values : [values];
+  const acceptedHosts = [...new Set(array.map(normalizeHost).filter(Boolean))];
+  return { status, acceptedHosts, note: clean(raw.note || '') };
+}
+
+export function evaluateGroundTruth(decisions, truth) {
+  let known = 0;
+  let official = 0;
+  let noSite = 0;
+  let ambiguous = 0;
   let correctAuto = 0;
   let wrongAuto = 0;
   let review = 0;
@@ -165,23 +193,44 @@ function compareGroundTruth(decisions, truth) {
   const rows = [];
 
   for (const decision of decisions) {
-    const expected = truth[decision.organizationId] || '';
-    const expectedHost = normalizeHost(expected);
+    const expected = normalizeGroundTruthEntry(truth[decision.organizationId]);
     const chosenHost = normalizeHost(decision.best?.url || '');
-    if (expectedHost) eligible += 1;
+    const truthKnown = expected.status !== 'unknown';
+    if (truthKnown) known += 1;
+    if (expected.status === 'official') official += 1;
+    else if (expected.status === 'none') noSite += 1;
+    else if (expected.status === 'ambiguous') ambiguous += 1;
+
+    let correct = null;
     if (decision.disposition === 'auto-accept') {
-      if (expectedHost && chosenHost === expectedHost) correctAuto += 1;
+      correct = expected.status === 'official' && expected.acceptedHosts.includes(chosenHost);
+      if (correct) correctAuto += 1;
       else wrongAuto += 1;
-    } else if (decision.disposition === 'review') review += 1;
-    else none += 1;
-    rows.push({ organizationId: decision.organizationId, name: decision.name, disposition: decision.disposition, score: decision.best?.score || 0, expectedKnown: Boolean(expectedHost), correct: decision.disposition === 'auto-accept' ? chosenHost === expectedHost : null });
+    } else if (decision.disposition === 'review') {
+      review += 1;
+    } else {
+      none += 1;
+    }
+
+    rows.push({
+      organizationId: decision.organizationId,
+      name: decision.name,
+      disposition: decision.disposition,
+      score: decision.best?.score || 0,
+      truthStatus: expected.status,
+      expectedKnown: truthKnown,
+      correct
+    });
   }
 
   const autoTotal = correctAuto + wrongAuto;
   return {
     summary: {
       organizations: decisions.length,
-      groundTruthKnown: eligible,
+      groundTruthKnown: known,
+      groundTruthOfficial: official,
+      groundTruthNone: noSite,
+      groundTruthAmbiguous: ambiguous,
       autoAccepted: autoTotal,
       autoAcceptedCorrect: correctAuto,
       autoAcceptedWrong: wrongAuto,
@@ -207,7 +256,7 @@ function publicDecision(decision) {
 
 function markdown(summary, rows) {
   const lines = rows.map((row) => `| ${String(row.name).replace(/\|/g, '\\|')} | ${row.disposition} | ${row.topScore.toFixed(3)} | ${row.topHost || '–'} | ${row.candidateCount} |`).join('\n');
-  return `# Website Discovery PoC B\n\n- Organisationen: **${summary.organizations}**\n- Ground Truth vorhanden: **${summary.groundTruthKnown}**\n- Auto-Accept: **${summary.autoAccepted}**\n- davon korrekt: **${summary.autoAcceptedCorrect}**\n- davon falsch: **${summary.autoAcceptedWrong}**\n- Precision Auto-Accept: **${summary.autoAcceptPrecisionPct ?? '–'} %**\n- Review nötig: **${summary.reviewRequired}**\n- kein automatischer Kandidat: **${summary.noAutomaticCandidate}**\n\n| Verein | Entscheidung | Score | Top-Domain | Kandidaten |\n| --- | --- | ---: | --- | ---: |\n${lines}\n`;
+  return `# Website Discovery PoC B\n\n- Organisationen: **${summary.organizations}**\n- Ground Truth vorhanden: **${summary.groundTruthKnown}**\n- davon offizielle Website: **${summary.groundTruthOfficial}**\n- ohne eigenständige Website: **${summary.groundTruthNone}**\n- mehrdeutig/geteilt: **${summary.groundTruthAmbiguous}**\n- Auto-Accept: **${summary.autoAccepted}**\n- davon korrekt: **${summary.autoAcceptedCorrect}**\n- davon falsch/zu aggressiv: **${summary.autoAcceptedWrong}**\n- Precision Auto-Accept: **${summary.autoAcceptPrecisionPct ?? '–'} %**\n- Review nötig: **${summary.reviewRequired}**\n- kein automatischer Kandidat: **${summary.noAutomaticCandidate}**\n\n| Verein | Entscheidung | Score | Top-Domain | Kandidaten |\n| --- | --- | ---: | --- | ---: |\n${lines}\n`;
 }
 
 async function main() {
@@ -223,7 +272,7 @@ async function main() {
     decisions.push(chooseCandidate(org, candidates));
   }
 
-  const evaluation = compareGroundTruth(decisions, truth);
+  const evaluation = evaluateGroundTruth(decisions, truth);
   const publicRows = decisions.map(publicDecision);
   await mkdir(OUTPUT_DIR, { recursive: true });
   await mkdir(path.dirname(PRIVATE_OUTPUT), { recursive: true });
