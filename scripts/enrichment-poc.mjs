@@ -12,7 +12,7 @@ import {
 
 const DIRECTORY_URL = `${DRV_ORIGIN}/service/vereinssuche`;
 const GEONAMES_URL = 'https://download.geonames.org/export/zip/DE.zip';
-const USER_AGENT = process.env.ENRICH_USER_AGENT || 'adams-erben-enrichment-poc/0.2 (+https://github.com/GithubLarsKomo/adams-erben)';
+const USER_AGENT = process.env.ENRICH_USER_AGENT || 'adams-erben-enrichment-poc/0.3 (+https://github.com/GithubLarsKomo/adams-erben)';
 
 const TARGET = Math.max(5, Number(process.env.ENRICH_TARGET || 25));
 const MIN_STATES = Math.max(1, Number(process.env.ENRICH_MIN_STATES || 5));
@@ -23,9 +23,15 @@ const PROFILE_DELAY_MS = Math.max(150, Number(process.env.ENRICH_PROFILE_DELAY_M
 const SITE_CONCURRENCY = Math.max(1, Math.min(3, Number(process.env.ENRICH_SITE_CONCURRENCY || 2)));
 const SITE_DELAY_MS = Math.max(500, Number(process.env.ENRICH_SITE_DELAY_MS || 900));
 const MAX_SITE_PAGES = Math.max(1, Math.min(8, Number(process.env.ENRICH_MAX_SITE_PAGES || 5)));
+const MAX_SITE_ATTEMPTS = Math.max(MAX_SITE_PAGES, Math.min(12, Number(process.env.ENRICH_MAX_SITE_ATTEMPTS || 8)));
 const TIMEOUT_MS = Math.max(5_000, Number(process.env.ENRICH_TIMEOUT_MS || 18_000));
 
 const CONTACT_LINK_PATTERN = /(kontakt|contact|impressum|imprint|vorstand|ansprech|geschäft|geschaeft|verein|über-uns|ueber-uns|team|office|büro|buero)/i;
+const STANDARD_CONTACT_PATHS = [
+  '/kontakt', '/kontakt/', '/kontakt.html',
+  '/impressum', '/impressum/', '/impressum.html',
+  '/ansprechpartner', '/vorstand', '/verein/vorstand'
+];
 const FUNCTIONAL_LOCAL_PARTS = [
   'info', 'kontakt', 'contact', 'mail', 'office', 'buero', 'büro', 'geschaeftsstelle',
   'geschäftsstelle', 'verwaltung', 'sekretariat', 'vorstand', 'presse', 'sport', 'rudern',
@@ -44,6 +50,16 @@ const nowIso = () => new Date().toISOString();
 
 function stableHash(value) {
   return createHash('sha256').update(value).digest('hex');
+}
+
+function normalizedHost(value = '') {
+  return String(value).toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
+}
+
+function sameSiteHost(a, b) {
+  const left = normalizedHost(a);
+  const right = normalizedHost(b);
+  return left === right || left.endsWith(`.${right}`) || right.endsWith(`.${left}`);
 }
 
 async function fetchResponse(url, { accept = 'text/html,application/xhtml+xml,*/*;q=0.8', allow404 = false } = {}) {
@@ -123,7 +139,7 @@ function identityScore(org, html, finalUrl) {
   if (org.city && text.includes(org.city.toLocaleLowerCase('de-DE'))) score += 0.2;
   if (org.postalCode && text.includes(org.postalCode)) score += 0.15;
   try {
-    const host = new URL(finalUrl).hostname.replace(/^www\./, '').toLowerCase();
+    const host = normalizedHost(new URL(finalUrl).hostname);
     if (tokens.some((token) => host.includes(token))) score += 0.15;
   } catch { /* ignore */ }
   return Math.min(1, score);
@@ -224,15 +240,13 @@ function classifyEmail(record, siteHost) {
   const [local, domain = ''] = record.email.split('@');
   const localNorm = local.toLocaleLowerCase('de-DE');
   const functional = FUNCTIONAL_LOCAL_PARTS.some((prefix) => localNorm === prefix || localNorm.startsWith(`${prefix}.`) || localNorm.startsWith(`${prefix}-`) || localNorm.startsWith(`${prefix}_`));
-  const normalizedSiteHost = siteHost.replace(/^www\./, '');
-  const normalizedDomain = domain.replace(/^www\./, '');
-  const sameDomain = normalizedDomain === normalizedSiteHost || normalizedDomain.endsWith(`.${normalizedSiteHost}`) || normalizedSiteHost.endsWith(`.${normalizedDomain}`);
+  const sameDomain = sameSiteHost(domain, siteHost);
   const role = record.context.match(ROLE_PATTERN)?.[0] || '';
   return { ...record, kind: functional ? 'functional' : 'personal', sameDomain, role: clean(role) };
 }
 
 function contactLinkScore(url, text) {
-  const target = `${url.pathname} ${text}`.toLocaleLowerCase('de-DE');
+  const target = `${url.pathname} ${url.search} ${text}`.toLocaleLowerCase('de-DE');
   let score = 0;
   if (/kontakt|contact/.test(target)) score += 100;
   if (/impressum|imprint/.test(target)) score += 90;
@@ -245,27 +259,36 @@ function contactLinkScore(url, text) {
 function candidateContactLinks($, baseUrl) {
   const base = new URL(baseUrl);
   const candidates = new Map();
+  function add(url, score) {
+    url.hash = '';
+    const key = url.toString();
+    if (!candidates.has(key) || candidates.get(key).score < score) candidates.set(key, { url: key, score });
+  }
+
   $('a[href]').each((_, element) => {
     const href = $(element).attr('href');
     if (!href) return;
     try {
       const url = new URL(href, base);
-      if (url.origin !== base.origin || !/^https?:$/.test(url.protocol)) return;
-      url.hash = '';
+      if (!/^https?:$/.test(url.protocol) || !sameSiteHost(url.hostname, base.hostname)) return;
       const text = clean($(element).text());
-      if (!CONTACT_LINK_PATTERN.test(`${url.pathname} ${text}`)) return;
-      const key = url.toString();
-      const score = contactLinkScore(url, text);
-      if (!candidates.has(key) || candidates.get(key).score < score) candidates.set(key, { url: key, score });
+      if (!CONTACT_LINK_PATTERN.test(`${url.pathname} ${url.search} ${text}`)) return;
+      add(url, contactLinkScore(url, text) + 20);
     } catch { /* ignore */ }
   });
+
+  for (const pathname of STANDARD_CONTACT_PATHS) {
+    const url = new URL(pathname, base.origin);
+    add(url, contactLinkScore(url, '') - 5);
+  }
+
   return [...candidates.values()].sort((a, b) => b.score - a.score).map((item) => item.url);
 }
 
 async function enrichOrganization(org) {
   const startedAt = Date.now();
   const initialUrl = org.websiteFromDrv;
-  if (!initialUrl) return { ...org, status: 'website_missing', websiteReachable: false, pagesFetched: 0, contactKind: 'none', emailCount: 0, durationMs: Date.now() - startedAt };
+  if (!initialUrl) return { ...org, status: 'website_missing', websiteReachable: false, pagesFetched: 0, pagesAttempted: 0, contactKind: 'none', emailCount: 0, durationMs: Date.now() - startedAt };
 
   let homepage;
   let homepageResponse;
@@ -273,30 +296,34 @@ async function enrichOrganization(org) {
     const initial = new URL(initialUrl);
     const robots = await getRobots(initial.origin);
     if (!robotsAllowsPath(robots.rules, initial.pathname || '/')) {
-      return { ...org, status: 'robots_blocked', robotsStatus: robots.status, websiteReachable: false, pagesFetched: 0, contactKind: 'none', emailCount: 0, durationMs: Date.now() - startedAt };
+      return { ...org, status: 'robots_blocked', robotsStatus: robots.status, websiteReachable: false, pagesFetched: 0, pagesAttempted: 0, contactKind: 'none', emailCount: 0, durationMs: Date.now() - startedAt };
     }
     ({ text: homepage, response: homepageResponse } = await fetchText(initialUrl));
   } catch (error) {
-    return { ...org, status: 'homepage_fetch_error', error: error.message, websiteReachable: false, pagesFetched: 0, contactKind: 'none', emailCount: 0, durationMs: Date.now() - startedAt };
+    return { ...org, status: 'homepage_fetch_error', error: error.message, websiteReachable: false, pagesFetched: 0, pagesAttempted: 1, contactKind: 'none', emailCount: 0, durationMs: Date.now() - startedAt };
   }
 
   const finalHomeUrl = homepageResponse.url;
-  const finalOrigin = new URL(finalHomeUrl).origin;
-  const robots = await getRobots(finalOrigin);
+  const homeRobots = await getRobots(new URL(finalHomeUrl).origin);
   const score = identityScore(org, homepage, finalHomeUrl);
   const pages = [{ url: finalHomeUrl, html: homepage }];
   const seen = new Set([finalHomeUrl]);
+  let attempts = 0;
+
   for (const url of candidateContactLinks(cheerio.load(homepage), finalHomeUrl)) {
-    if (pages.length >= MAX_SITE_PAGES) break;
+    if (pages.length >= MAX_SITE_PAGES || attempts >= MAX_SITE_ATTEMPTS) break;
     if (seen.has(url)) continue;
     seen.add(url);
+    attempts += 1;
     const parsed = new URL(url);
+    const robots = parsed.origin === new URL(finalHomeUrl).origin ? homeRobots : await getRobots(parsed.origin);
     if (!robotsAllowsPath(robots.rules, parsed.pathname || '/')) continue;
     try {
       await sleep(SITE_DELAY_MS);
       const { text, response } = await fetchText(url);
+      if (!sameSiteHost(new URL(response.url).hostname, new URL(finalHomeUrl).hostname)) continue;
       pages.push({ url: response.url, html: text });
-    } catch { /* page-level errors are coverage data, not fatal */ }
+    } catch { /* bounded page-level misses are coverage data */ }
   }
 
   const emailMap = new Map();
@@ -324,10 +351,11 @@ async function enrichOrganization(org) {
     status: preferred ? (preferred.kind === 'functional' ? 'functional_contact_found' : 'personal_contact_only') : 'no_email_found',
     websiteReachable: true,
     finalWebsite: finalHomeUrl,
-    websiteDomain: siteHost.replace(/^www\./, ''),
+    websiteDomain: normalizedHost(siteHost),
     identityScore: Number(score.toFixed(2)),
-    robotsStatus: robots.status,
+    robotsStatus: homeRobots.status,
     pagesFetched: pages.length,
+    pagesAttempted: attempts,
     contactKind: preferred?.kind || 'none',
     emailCount: classified.length,
     functionalEmailCount: classified.filter((item) => item.kind === 'functional').length,
@@ -424,13 +452,14 @@ function buildSummary(results, scannedProfiles) {
     strongIdentityMatch: strongIdentity.length,
     strongIdentityMatchPct: Number((strongIdentity.length / total * 100).toFixed(1)),
     averagePagesFetched: Number((reachable.length ? reachable.reduce((sum, item) => sum + item.pagesFetched, 0) / reachable.length : 0).toFixed(2)),
+    averagePagesAttempted: Number((reachable.length ? reachable.reduce((sum, item) => sum + (item.pagesAttempted || 0), 0) / reachable.length : 0).toFixed(2)),
     averageDurationMs: Math.round(successful.reduce((sum, item) => sum + (item.durationMs || 0), 0) / total)
   };
 }
 
 function markdownReport(summary, results) {
-  const rows = results.map((item) => `| ${item.name.replace(/\|/g, '\\|')} | ${item.state} | ${item.websiteReachable ? 'ja' : 'nein'} | ${item.identityScore == null ? '–' : item.identityScore.toFixed(2)} | ${item.contactKind} | ${item.emailCount || 0} | ${item.pagesFetched || 0} | ${item.status} |`).join('\n');
-  return `# Enrichment PoC – Coverage Report\n\nStand: ${summary.generatedAt}\n\n## Kennzahlen\n\n- Stichprobe: **${summary.sampleSize} Vereine** in **${summary.stateCount} Bundesländern**\n- Dafür geprüfte DRV-Profile: **${summary.scannedDrvProfiles}**\n- Vereinswebsite erreichbar: **${summary.websiteReachable}/${summary.sampleSize} (${summary.websiteReachablePct} %)**\n- Funktionsadresse gefunden: **${summary.functionalContact}/${summary.sampleSize} (${summary.functionalContactPct} %)**\n- Nur personenbezogene Adresse gefunden: **${summary.personalOnly}/${summary.sampleSize} (${summary.personalOnlyPct} %)**\n- Keine verwendbare E-Mail / Websiteproblem: **${summary.noContact}/${summary.sampleSize} (${summary.noContactPct} %)**\n- robots.txt blockiert: **${summary.robotsBlocked}**\n- Homepage-Fetchfehler: **${summary.homepageFetchErrors}**\n- Starker automatischer Identitätsabgleich (Score >= 0,50): **${summary.strongIdentityMatch}/${summary.sampleSize} (${summary.strongIdentityMatchPct} %)**\n- Ø geprüfte Seiten je erreichbarer Vereinswebsite: **${summary.averagePagesFetched}**\n\n## Einzelergebnisse\n\n| Verein | Bundesland | Website | Identität | Kontaktklasse | Treffer | Seiten | Status |\n| --- | --- | --- | ---: | --- | ---: | ---: | --- |\n${rows}\n\nDer öffentliche Report enthält bewusst keine E-Mail-Adressen.\n`;
+  const rows = results.map((item) => `| ${item.name.replace(/\|/g, '\\|')} | ${item.state} | ${item.websiteReachable ? 'ja' : 'nein'} | ${item.identityScore == null ? '–' : item.identityScore.toFixed(2)} | ${item.contactKind} | ${item.emailCount || 0} | ${item.pagesFetched || 0}/${item.pagesAttempted || 0} | ${item.status} |`).join('\n');
+  return `# Enrichment PoC – Coverage Report\n\nStand: ${summary.generatedAt}\n\n## Kennzahlen\n\n- Stichprobe: **${summary.sampleSize} Vereine** in **${summary.stateCount} Bundesländern**\n- Dafür geprüfte DRV-Profile: **${summary.scannedDrvProfiles}**\n- Vereinswebsite erreichbar: **${summary.websiteReachable}/${summary.sampleSize} (${summary.websiteReachablePct} %)**\n- Funktionsadresse gefunden: **${summary.functionalContact}/${summary.sampleSize} (${summary.functionalContactPct} %)**\n- Nur personenbezogene Adresse gefunden: **${summary.personalOnly}/${summary.sampleSize} (${summary.personalOnlyPct} %)**\n- Keine verwendbare E-Mail / Websiteproblem: **${summary.noContact}/${summary.sampleSize} (${summary.noContactPct} %)**\n- robots.txt blockiert: **${summary.robotsBlocked}**\n- Homepage-Fetchfehler: **${summary.homepageFetchErrors}**\n- Starker automatischer Identitätsabgleich (Score >= 0,50): **${summary.strongIdentityMatch}/${summary.sampleSize} (${summary.strongIdentityMatchPct} %)**\n- Ø erfolgreiche Seiten je erreichbarer Vereinswebsite: **${summary.averagePagesFetched}**\n- Ø zusätzliche Seitenversuche je erreichbarer Vereinswebsite: **${summary.averagePagesAttempted}**\n\n## Einzelergebnisse\n\n| Verein | Bundesland | Website | Identität | Kontaktklasse | Treffer | Seiten/Versuche | Status |\n| --- | --- | --- | ---: | --- | ---: | ---: | --- |\n${rows}\n\nDer öffentliche Report enthält bewusst keine E-Mail-Adressen.\n`;
 }
 
 console.log(`[poc] target=${TARGET}, minStates=${MIN_STATES}, maxPerState=${MAX_PER_STATE}`);
@@ -448,7 +477,7 @@ const enriched = await mapWithConcurrency(selected, SITE_CONCURRENCY, SITE_DELAY
 });
 
 const results = enriched.map((item, index) => item?.error
-  ? { ...selected[index], status: 'unexpected_error', error: item.error.message, websiteReachable: false, pagesFetched: 0, contactKind: 'none', emailCount: 0, durationMs: 0 }
+  ? { ...selected[index], status: 'unexpected_error', error: item.error.message, websiteReachable: false, pagesFetched: 0, pagesAttempted: 0, contactKind: 'none', emailCount: 0, durationMs: 0 }
   : item);
 
 const summary = buildSummary(results, scanned);
