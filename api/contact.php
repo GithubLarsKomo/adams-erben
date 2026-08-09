@@ -15,6 +15,10 @@ function respond(int $status, array $body): never {
     exit;
 }
 
+if (getenv('PREVIEW_MODE') === '1') {
+    respond(409, ['error' => 'Der Kontaktversand ist in der öffentlichen Vorschau deaktiviert.']);
+}
+
 function envRequired(string $key): string {
     $value = trim((string) getenv($key));
     if ($value === '') {
