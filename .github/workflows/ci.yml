@@ -30,7 +30,7 @@ jobs:
           node --check scripts/sync-drv.mjs
           node --check src/assets/app.js
 
-      - name: Build with checked-in seed
+      - name: Build production-safe seed fallback
         env:
           SKIP_DRV_SYNC: '1'
         run: npm run build
@@ -46,6 +46,25 @@ jobs:
       - name: Validate generated search data
         run: |
           node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); console.log('organizations:',d.organizations.length)"
+
+      - name: Build explicit public preview
+        env:
+          PREVIEW_MODE: '1'
+          SKIP_DRV_SYNC: '0'
+          REQUIRE_DRV_SYNC: '1'
+        run: npm run build
+
+      - name: Validate preview invariants
+        shell: bash
+        run: |
+          grep -q 'content="preview"' dist/index.html
+          grep -q 'preview.css' dist/index.html
+          grep -q 'Prototyp' dist/index.html
+          grep -q '"preview": true' build-private/recipients.json
+          if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
+            echo 'Preview browser data must not contain email addresses.' >&2
+            exit 1
+          fi
 
       - name: PHP syntax
         run: |
