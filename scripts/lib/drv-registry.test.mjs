@@ -120,8 +120,8 @@ const missing = parseDrvRegistryProfile(
 assert.equal(missing.websiteFromDrv, '');
 assert.equal(missing.websiteStatus, 'missing');
 assert.equal(missing.organizationId, '19999');
-assert.equal(missing.city, 'Hannover');
-assert.equal(missing.citySource, 'geonames-postcode');
+assert.equal(missing.city, 'Musterstadt');
+assert.equal(missing.citySource, 'drv-text');
 assert.equal(isApprovedRegistryDirectContact(missing), false);
 
 // Real DRV pages render address lines as separate nodes. Preserve a locality even
