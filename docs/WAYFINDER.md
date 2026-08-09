@@ -8,213 +8,211 @@ Repository: `GithubLarsKomo/adams-erben`
 
 Immutable Ausgangs-SHA: `9ce485cdb5a9cef1bae60184589012c4c613ca9a`
 
+Arbeitsbranch: `feat/mvp-wayfinder`
+
 ## Bestätigte Fakten
 
-- Der Deutsche Ruderverband (DRV) beschreibt sich mit über 83.000 Mitgliedern in rund 600 Mitgliedsvereinen und stellt eine öffentliche Vereinssuche bereit.
-- Die DRV-Vereinssuche liefert Organisationsnamen, Anschriften und stabile DRV-Profile; Detailseiten enthalten je nach Eintrag Website, öffentliche E-Mail-Adresse, Telefon, DRV-ID und Sportangebote.
-- Direkte Rückmeldung des DRV vom 09.08.2026: Der DRV kann die benötigten Daten nicht vollständig in gewünschter Form liefern. Insbesondere sind URLs der Vereinswebseiten sowie Ansprechpartner bzw. deren E-Mail-Adressen dort nur teilweise bekannt.
-- Damit ist ein vollständiger offizieller CSV/JSON/API-Export mit Website- und Kontaktabdeckung kein realistischer Primärpfad.
-- Die öffentliche DRV-Vereinssuche bleibt dennoch die beste Seed-/Verzeichnisquelle für den Organisationsbestand und die jeweils vorhandenen Basisdaten.
-- Fehlende Website- und Kontaktinformationen müssen in einem separaten Enrichment-Schritt auf den offiziellen Vereinswebseiten ermittelt werden.
-- Der Ratzeburger Ruderclub e.V. besitzt eine öffentliche DRV-Profilseite und wird als hervorgehobener Eintrag benötigt.
-- „Adams Acht“ startet laut offizieller Filmseite/filmportal.de am 17.09.2026 in Deutschland.
-- Für die Filmkommunikation wird kein Filmplakat, Filmstill, Film-Logo oder anderes geschütztes Asset ohne ausdrückliche Lizenz verwendet.
-- Gewünscht ist eine statische, clientseitig durchsuchbare Website; nur der Mailversand benötigt einen kleinen serverseitigen Endpunkt.
-- Kontakt-Routing bleibt: öffentliche Vereinsadresse → zuständiger Landesruderverband → DRV.
-- Produktionsziel: Hetzner/Coolify und `adams-erben.de`; `preview.adams-erben.de` dient als getrennte Vorschau mit Seed-Daten.
+- Der DRV stellt eine öffentliche Vereinssuche mit dem deutschen Organisationsbestand bereit.
+- DRV-Profile enthalten zuverlässig Namen/Profil-URLs und je nach Eintrag DRV-ID, Anschrift, Website, E-Mail, Telefon und Ansprechpartner.
+- Direkte DRV-Rückmeldung vom 09.08.2026: Ein vollständiger strukturierter Export mit Website, Ansprechpartner und E-Mail kann nicht geliefert werden; diese Angaben sind beim DRV nur teilweise vorhanden.
+- Damit ist der DRV **Registry-/Seed-Quelle**, nicht vollständige Kontaktquelle.
+- Fehlende Website-/Kontaktdaten werden auf den offiziellen Vereinswebseiten angereichert.
+- Nutzungsrechte sind nach aktueller Projekteinschätzung kein technischer Blocker; verbleibende Punkte werden formal parallel geklärt und dokumentiert.
+- Öffentliche E-Mail-Adressen werden nicht als aggregierter Browserdatensatz veröffentlicht.
+- Routingziel bleibt: Verein -> LRV -> DRV.
+- Der Ratzeburger Ruderclub wird als zentraler Ort des Filmbezugs hervorgehoben.
+- Filmassets werden ohne Freigabe nicht übernommen; die Website bleibt als unabhängige Initiative gekennzeichnet.
+- Preview und Produktion sind getrennt: `preview.adams-erben.de` arbeitet mit Seed-Daten und ohne echten Mailversand.
 
-## Architekturentscheidung – zweistufige Datengewinnung
+## Architekturentscheidung – getrennte Pipelines
 
-### Layer A – DRV Seed / Registry
+### A. Acquisition Pipeline
 
-Der DRV liefert den Ausgangsbestand der Organisationen:
+```text
+DRV Registry
+  -> Website Resolution
+  -> Vereinswebsite-Crawl
+  -> Kontaktklassifikation
+  -> Review / Quality Gate
+  -> freigegebener Snapshot
+```
 
-- DRV-ID bzw. stabile Profilkennung
-- Vereins-/Organisationsname
-- Anschrift, PLZ, Ort
-- Landes-/Verbandszuordnung soweit ermittelbar
-- DRV-Profil-URL
-- vorhandene externe Vereinswebsite
-- vorhandene öffentliche Kontaktangaben
+### B. Web Deployment Pipeline
 
-Ein fehlender Website- oder E-Mail-Wert ist **kein Importfehler**, sondern ein Enrichment-Status.
+```text
+freigegebener Snapshot
+  -> public clubs.json
+  -> private recipients.json
+  -> Build
+  -> Coolify
+```
 
-### Layer B – Vereinswebsite-Enrichment
+**Wichtig:** Ein Website-Deployment crawlt niemals live DRV- oder Vereinsseiten. Datenakquise und Veröffentlichung sind zeitlich und technisch getrennt.
 
-Für Einträge mit fehlenden oder unvollständigen Kontakten:
+## Datenlayer
 
-1. vorhandene DRV-Website-URL validieren;
-2. falls keine belastbare URL vorhanden ist: gezielte Websuche mit Vereinsname + Ort/PLZ;
-3. Kandidatendomain gegen Vereinsname, Ort, Impressum/Anschrift und weitere Identitätsmerkmale plausibilisieren;
-4. nur die bestätigte offizielle Vereinsdomain untersuchen;
-5. Startseite und wenige kontaktnahe Seiten prüfen (`Kontakt`, `Impressum`, `Vorstand`, `Ansprechpartner`, funktional äquivalente Seiten);
-6. Funktionsadressen bevorzugen;
-7. personenbezogene Ansprechpartner/E-Mails gesondert klassifizieren und erst nach INV-6 produktiv als Routingziel zulassen;
-8. fehlt weiterhin eine öffentliche Mail-Adresse: LRV → DRV.
+### Layer 1 – DRV Registry
 
-## Annahmen
+Mindestens:
 
-- Die sachliche Nennung des Filmtitels und Links zur offiziellen Filmseite bzw. zum offiziellen Trailer werden nominativ genutzt; eine offizielle Kooperation wird ausdrücklich nicht behauptet.
-- Die Kommunikation mit dem DRV dokumentiert, dass der Versuch eines offiziellen Datenwegs erfolgt ist. Ob und in welchem Umfang die Rückmeldung zugleich eine Zustimmung zur Weiterverwendung der öffentlich sichtbaren DRV-Daten darstellt, muss aus der konkreten Kommunikation dokumentiert werden; sie wird nicht automatisch unterstellt.
-- Organisationsdaten und Funktionsadressen werden datenschutzrechtlich anders bewertet als personenbezogene Ansprechpartner bzw. personalisierte E-Mail-Adressen.
-- Öffentliche E-Mail-Adressen werden nicht in den clientseitigen JSON-Datensatz übernommen, um keine aggregierte Spam-Liste zu erzeugen.
-- Das Website-Enrichment erfolgt domain-schonend, mit niedriger Parallelität, Host-basiertem Rate-Limit und ohne Umgehung technischer Schutzmaßnahmen.
+- stabile Organisations-ID / DRV-ID
+- Name
+- Typ
+- PLZ, Ort, Bundesland
+- DRV-Profil
+- vorhandene Website
+- vorhandene öffentliche E-Mail nur für private Pipeline
+- Feld-Provenienz + Fetch-/Parser-Version
 
-## Kritische Unbekannte / Blocker
+Fehlende Werte erzeugen einen Status, keinen Importfehler.
 
-1. **DRV-Nutzungsbasis:** Die DRV-Nutzungsbedingungen verlangen vor Weiterverwendung eine Rücksprache. Die konkrete DRV-Antwort muss als Projektnachweis abgelegt und hinsichtlich der erlaubten Nutzung des öffentlichen Verzeichnisses eingeordnet werden.
-2. **Website-Discovery-Qualität:** Wie zuverlässig lässt sich bei fehlendem DRV-Link die offizielle Vereinsdomain automatisiert identifizieren?
-3. **Kontakt-Extraktion:** Welche Abdeckung erreichen wir für Funktionsadressen, ohne aggressive oder flächige Crawls?
-4. **Personenbezogene Kontakte:** Welche öffentlich publizierten Ansprechpartner/personalisierten E-Mails dürfen für die nutzerinitiierte Kontaktvermittlung verarbeitet werden und welche Transparenz-/Opt-out-Regeln brauchen wir?
-5. **Film-/Markenfreigabe:** Gibt es seitens Produktion/Verleih Vorgaben für die nominative Verwendung von „Adams Acht“ und die Formulierung des Filmbezugs?
-6. **Betreiberangaben:** Name/ladungsfähige Anschrift/E-Mail für Impressum und Verantwortlichkeit fehlen noch.
-7. **Mail-Infrastruktur:** SMTP-Provider und Absenderdomain/-adresse sind noch nicht festgelegt.
-8. **Deployment-Zugang:** Coolify-Projekt/Server und DNS-Ziel für `adams-erben.de` müssen für die Produktivsetzung verfügbar sein.
+### Layer 2 – Website Resolution
 
-## Untersuchungen
+1. DRV-Website-URL validieren.
+2. Redirects verfolgen.
+3. Domainidentität mit Name + Ort/PLZ + Impressum/Adresse prüfen.
+4. Fehlt die URL: gezielte Suchprovider-Abfrage.
+5. Unsichere/mehrdeutige Kandidaten -> Review Queue.
 
-### INV-1 – DRV als Seed-Verzeichnis
+### Layer 3 – Website Enrichment
 
-**Frage:** Wie erhalten wir reproduzierbar den vollständigen Organisationsbestand samt stabilen IDs und übergeben unvollständige Website-/Kontaktdaten sauber an das Enrichment?
+- nur bestätigte offizielle Domain;
+- Startseite + wenige kontaktnahe Seiten;
+- `robots.txt` beachten;
+- niedrige Parallelität und hostbasiertes Rate-Limit;
+- kein Login/Captcha-/Cloudflare-Bypass;
+- keine automatische Nutzung externer Kontaktformulare;
+- E-Mail + Kontext + Quelle + Rolle extrahieren.
 
-**Evidenz:** DRV-Vereinssuche, Detailseiten, Rückmeldung DRV, DRV-Nutzungsbedingungen, Parser-/Coverage-Messung.
+### Layer 4 – Kontaktklassifikation
 
-**Stop-Bedingung:** Ein reproduzierbarer Seed-Import mit stabiler ID-Strategie, Feld-Provenienz und deterministischer Übergabe unvollständiger Einträge an INV-5 ist an einer repräsentativen Stichprobe validiert.
+- `functional`: bevorzugtes Routingziel (`info@`, `kontakt@`, `buero@`, `vorstand@` usw.)
+- `personal`: gesonderte Datenklasse mit Governance/Review
+- `none`: Fallback LRV -> DRV
 
-**Nicht-Ziele:** DRV als vollständige Kontaktquelle behandeln; keine massenhafte Veröffentlichung von E-Mail-Adressen; keine Mitglieder-/Personendaten aus nichtöffentlichen Quellen.
+## Laufende Untersuchungen
 
-**Ausgabe:** DRV-Seed-Schema + Synchronisations-/Parservertrag + Übergabeschema an Website-Enrichment.
+### INV-1 – DRV Registry / Seed
+
+**Frage:** Wie stabil und vollständig können wir Organisationsbestand und Basisdaten reproduzierbar importieren?
+
+**Stop-Bedingung:** stabile ID-Strategie, >=95 % technisch parsebare DRV-Profile, Feld-Provenienz und deterministische Enrichment-Queue.
+
+**Ausgabe:** Registry-Schema + Parservertrag.
 
 ### INV-2 – Film-/Brand-Safe Copy
 
-**Frage:** Welche filmbezogenen Bezeichnungen und Verlinkungen können wir verwenden, ohne eine offizielle Partnerschaft zu suggerieren oder geschützte Assets zu übernehmen?
+**Frage:** Welche filmbezogenen Bezeichnungen und Links verwenden wir ohne falsche Affiliation oder ungeklärte Asset-Nutzung?
 
-**Evidenz:** offizielle Filmseite, Filmverleih/Produktion, ggf. Rechtefreigabe.
-
-**Stop-Bedingung:** Copy-/Asset-Regeln sind dokumentiert.
-
-**Nicht-Ziele:** Keine Rechtsberatung ersetzen; keine Nutzung von Postern/Stills/Logos ohne Freigabe.
+**Stop-Bedingung:** Copy-/Asset-Regeln dokumentiert.
 
 **Ausgabe:** `docs/BRAND-GUIDELINES.md`.
 
-### INV-3 – Kontakt-Routing, Datenschutz, Anti-Abuse
+### INV-3 – Kontakt-Routing / Datenschutz / Anti-Abuse
 
-**Frage:** Wie kann das Formular zuverlässig und missbrauchsarm an genau einen whitelisted Empfänger routen?
+**Frage:** Wie wird genau ein whitelisted Empfänger missbrauchsarm erreicht?
 
-**Evidenz:** SMTP-Konfiguration, serverseitige Empfängerauflösung, Rate Limits, keine Speicherung, Datenschutzhinweise.
+**Stop-Bedingung:** Testversand, feste Empfängerauflösung, Rate Limit, Datenschutztext.
 
-**Stop-Bedingung:** Versand funktioniert gegen Testempfänger, kein frei wählbarer Empfänger möglich, Rate Limit greift.
+### INV-4 – Hetzner/Coolify + Domains
 
-**Nicht-Ziele:** Kein Newsletter, kein CRM, keine Kontakt-Datenbank.
+**Frage:** Wie werden Preview und Produktion reproduzierbar deployed?
 
-**Ausgabe:** minimaler `/api/contact`-Endpunkt + Datenschutztext.
+**Stop-Bedingung:** HTTPS, Healthcheck und Testmail für Produktion.
 
-### INV-4 – Hetzner/Coolify + Domain
+### INV-5 – Vereinswebsite-Enrichment
 
-**Frage:** Welcher minimale Deploymentpfad bringt statische Assets + Kontakt-Endpunkt reproduzierbar unter `adams-erben.de` online?
+**Frage:** Wie zuverlässig finden wir auf einer bestätigten Vereinswebsite eine für die Vermittlung geeignete Kontaktmöglichkeit?
 
-**Evidenz:** Docker-Build, Healthcheck, Coolify-Konfiguration, DNS A/AAAA, TLS, Secrets.
+**Aktueller PoC A:**
 
-**Stop-Bedingung:** HTTPS-Produktions-URL liefert Healthcheck und Website; Testmail erfolgreich.
+- 25 Vereine;
+- mindestens fünf Bundesländer;
+- maximal fünf je Bundesland;
+- Ratzeburger Ruderclub bevorzugt;
+- zunächst nur Vereine mit DRV-Weblink, um Crawl-/Extraktionsqualität isoliert zu messen;
+- maximal fünf relevante Seiten je Domain;
+- Klassifikation `functional | personal | none`;
+- adressfreier Coverage-Report;
+- tatsächliche Kontakte nur unter `build-private/`.
 
-**Nicht-Ziele:** Keine neue Plattform, solange vorhandenes Hetzner/Coolify ausreichend ist.
+Implementierung: `scripts/enrichment-poc.mjs`.
 
-**Ausgabe:** Dockerfile, Deployment-Runbook, Produktionscheckliste.
+**Stop-Bedingung PoC A:** Coverage-/Fehlermuster dokumentiert und Crawl-Budget bewertet.
 
-### INV-5 – Vereinswebseiten finden und Kontakte anreichern
+**Danach PoC B:** 25 Fälle ohne belastbaren DRV-Weblink zur Messung der Website-Discovery.
 
-**Frage:** Wie finden wir die offizielle Website eines DRV-Eintrags und extrahieren möglichst schonend eine öffentlich vorgesehene Kontaktadresse?
+### INV-6 – Governance angereicherter Kontakte
 
-**Evidenz:** DRV-Website-Link, gezielte Suchergebnisse, Vereins-Impressum/Kontaktseiten, robots.txt, erkennbare Nutzungsbedingungen, Stichproben gegen manuelle Prüfung.
+**Frage:** Wie behandeln wir Funktionskontakte versus personalisierte Ansprechpartner?
 
-**Crawl-Leitplanken:**
+**Stop-Bedingung:** Allow-/Deny-Regeln, Transparenz/Korrektur/Opt-out und technische Filter dokumentiert.
 
-- nur bestätigte Vereinsdomains;
-- `robots.txt` und erkennbare Nutzungsbedingungen respektieren;
-- niedrige Parallelität und Host-basiertes Rate-Limit;
-- nur wenige kontaktnahe Seiten pro Domain;
-- kein Login, kein Captcha-/Cloudflare-Bypass, keine technischen Umgehungsversuche;
-- keine automatisierte Benutzung fremder Kontaktformulare;
-- JavaScript-only/gesperrte/mehrdeutige Fälle → Review-Queue.
+## Formale Nutzungs-/Rechteklärung
 
-**Stop-Bedingung:** Website-Discovery und Kontakt-Extraktion funktionieren an einer repräsentativen Stichprobe mit dokumentierter Coverage/Fehlerquote; unsichere Fälle landen deterministisch in einer Review-Queue.
+Kein Engineering-Blocker mehr. Parallel zu dokumentieren:
 
-**Nicht-Ziele:** Kein webweites Crawling, kein Social-Media-Profiling, keine öffentliche E-Mail-Aggregation.
+- DRV-Kommunikation / Freigabeumfang;
+- gewünschte Quellenangabe;
+- ggf. technische Abrufparameter;
+- Korrektur-/Opt-out-Kanal.
 
-**Ausgabe:** Website-Discovery-Modul + Kontakt-Crawler + Provenienz-/Review-Schema + Coverage-Report.
+Die formalen Punkte werden vor Produktion geschlossen, aber die PoC-/Pipeline-Entwicklung läuft weiter.
 
-### INV-6 – Datenschutz/Nutzungsregeln für angereicherte Kontakte
+## PoC A – Messgrößen
 
-**Frage:** Welche öffentlich publizierten Kontaktinformationen dürfen wir für die nutzerinitiierte Vereinsvermittlung verarbeiten und wie trennen wir Funktionsadressen von personenbezogenen Kontakten?
+Der Test misst:
 
-**Datenklassen:**
+- erreichbare Website;
+- automatischen Identitätsscore;
+- gefundene Funktionsadresse;
+- ausschließlich personenbezogene Kontakte;
+- keine Mail gefunden;
+- robots-/HTTP-/TLS-/Redirect-Probleme;
+- Seitenzahl;
+- Laufzeit;
+- Übereinstimmung einer DRV-Mail mit der Vereinswebsite intern, ohne E-Mail im Report zu veröffentlichen.
 
-- Organisationsdaten
-- Funktionsadressen (`info@`, `kontakt@`, `geschaeftsstelle@`, `vorstand@` etc.)
-- personenbezogene Ansprechpartner/personalisierte E-Mails
+Öffentlicher Report:
 
-**Evidenz:** öffentliche Vereinsseiten, Datenschutzrecht, Website-Nutzungsbedingungen, Opt-out-/Korrekturfälle.
+- `artifacts/enrichment-poc/report.json`
+- `artifacts/enrichment-poc/report.md`
 
-**Stop-Bedingung:** Dokumentierte Allow-/Deny-Regeln pro Datenklasse, Transparenz-/Opt-out-Prozess und technische Filter sind festgelegt.
+Private Treffer:
 
-**Nicht-Ziele:** Keine Sammlung privater Kontaktdaten, kein Marketingprofiling, keine Weitergabe des Kontaktbestands.
+- `build-private/enrichment-poc-contacts.json`
 
-**Ausgabe:** `docs/DATA-GOVERNANCE.md` + technische Filter-/Löschregeln.
+## Vollständiger Rollout – vorgesehene Stufen
 
-## Datenmodell / Provenienz
+1. **PoC A / 25 bekannte Websites** – Extraktion messen.
+2. **PoC B / 25 fehlende Websites** – Website-Discovery messen.
+3. **Pilot / 100 Vereine** – stratifiziert über Regionen, Website-Typen und Kontaktmuster.
+4. **Vollbestand** – erst nach Precision-/Review-Gates.
+5. **Approved Snapshot** – keine Live-Crawls im Deployment.
+6. **Betrieb** – Registry monatlich, Kontakt-Enrichment etwa alle 90 Tage, Fehler priorisiert.
 
-Jeder angereicherte Datensatz soll mindestens tragen:
+Vollständige Planung: `docs/DATA-ACQUISITION-PLAN.md`.
 
-- `organizationId` / DRV-ID
-- `name`
-- `postalCode`, `city`, `state`
-- `drvProfileUrl`
-- `officialWebsite`
-- `contactEmail`
-- `contactKind`: `functional | personal | none`
-- optional `contactName`, `contactRole`
-- `sourceUrl`
-- `sourceType`: `drv | club-site | search | manual`
-- `discoveryMethod`
-- `fetchedAt` / `verifiedAt`
-- `confidence`
-- `httpStatus`
-- Parser-/Extractor-Version
-- Reviewstatus / Fehlercode
+## Quality Gates vor Vollbestand
 
-Damit können wir Felder unabhängig aktualisieren, korrigieren und bei Beschwerden nachvollziehen, woher ein Wert stammt.
-
-## Abhängigkeiten
-
-- INV-1 liefert den Organisationsbestand und die Queue für INV-5.
-- INV-5 liefert Website-/Kontaktkandidaten an INV-6 und danach an das Routing aus INV-3.
-- INV-6 entscheidet, welche Kontaktklassen produktiv als Routingziel zugelassen werden.
-- INV-2 blockiert nicht das neutrale UI, aber filmbezogene Assets/Marketingcopy.
-- INV-3 benötigt Betreiber-/Datenschutzangaben und SMTP-Secrets vor Produktion.
-- INV-4 benötigt fertigen Container und Secrets; DNS/TLS sind letzter Schritt.
-
-## Sichere Reihenfolge
-
-1. DRV als Seed-/Registry-Layer stabilisieren und Feld-Provenienz ergänzen.
-2. Website-Discovery + Kontakt-Enrichment zunächst nur als begrenzten Stichproben-PoC entwickeln.
-3. Coverage, Fehlklassifikationen und Review-Quote messen; Discovery-Regeln daraus schärfen.
-4. Datenschutz-/Nutzungsregeln für Funktions- versus Personenkontakte festlegen.
-5. Erst danach Enrichment auf den Gesamtbestand ausrollen und Routingdaten erzeugen.
-6. Kontakt-Endpunkt mit freigegebenen Empfängerklassen testen.
-7. Brand-/Legal-Texte finalisieren; Betreiberangaben einsetzen.
-8. Container/Coolify/DNS für Produktion freigeben.
+- Registry >=95 % technisch parsebar;
+- 100 % stabile ID + Routing-Fallback;
+- Domain-Fehlzuordnung nach Pilot <1 %;
+- jeder direkte Empfänger besitzt Provenienz + `verifiedAt`;
+- keine E-Mail im öffentlichen Datensatz;
+- personalisierte Kontakte nur nach finaler Governance-Regel;
+- unklare Datensätze landen in Review und werden nicht automatisch direkt geroutet.
 
 ## Risiken
 
-- DRV-HTML oder Vereinswebseiten ändern Struktur; deshalb Feld-Provenienz, Parser-Version und Review-Queue.
-- Falsche Domainzuordnung führt zu falschem Empfänger; deshalb Multi-Signal-Verifikation und keine automatische Annahme bei Mehrdeutigkeit.
-- Personalisierte Vereins-E-Mails können personenbezogene Daten sein; deshalb getrennte Datenklasse und Produktions-Gate über INV-6.
-- Öffentliche Kontaktadressen werden durch Aggregation missbrauchbarer; deshalb keine clientseitige E-Mail-Liste und keine Weitergabe des Kontaktbestands.
-- Website-Crawling kann Nutzungsbedingungen oder technische Vorgaben verletzen; deshalb robots-/terms-aware, host-schonend und ohne Umgehung von Sperren.
-- Kontaktformular kann als Spam-Relay missbraucht werden; deshalb feste Empfängerauflösung, Limits, Honeypot, Origin-Prüfung und Längenlimits.
-- Filmbezug kann als offizieller Auftritt missverstanden werden; deshalb eigene Marke „Adams Erben“, prominenter Unabhängigkeits-Hinweis und keine Filmassets ohne Lizenz.
-- Unvollständiges Impressum/Datenschutz darf nicht produktiv veröffentlicht werden.
+- HTML-Struktur ändert sich -> Fixtures + Parser-Version.
+- falsche Domain -> Multi-Signal-Scoring + Review.
+- fremde Website blockiert Crawler -> kein Bypass, stattdessen Review/Fallback.
+- ausschließlich JavaScript-gerenderte Kontakte -> zweite Ausbaustufe/Review statt aggressiver Umgehung.
+- personenbezogene Mail -> eigene Datenklasse.
+- öffentliche E-Mail-Aggregation -> ausschließlich private Routingartefakte.
+- Spam-Relay -> whitelisted Empfänger, Rate Limit, Honeypot, Origin-Check.
 
 ## Nächste ausführbare Aktion
 
-Einen **begrenzten Enrichment-PoC für 25 DRV-Einträge aus mindestens fünf Bundesländern** implementieren: DRV-Seed → Website-Discovery → robots-/terms-aware Kontaktseiten-Crawl → Klassifikation `functional | personal | none` → Provenienz- und Coverage-Report. Keine personenbezogenen Kontakte produktiv routen und noch keinen Vollcrawl starten.
+**PoC A ausführen und Coverage-Report auswerten.** Danach werden konkrete Thresholds für Crawl-Seitenzahl, Funktionsadress-Abdeckung und die Notwendigkeit eines zweiten Passes festgelegt; erst dann folgt PoC B für fehlende Vereinswebsites.
