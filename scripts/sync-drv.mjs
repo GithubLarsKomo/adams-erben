@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   DRV_ORIGIN,
   DRV_REGISTRY_PARSER_VERSION,
+  LRV_PROFILES,
   clean,
   discoveryRecordFromRegistry,
   extractProfileLinks,
@@ -120,23 +121,31 @@ async function mapWithConcurrency(items, worker) {
   return results;
 }
 
-function buildRegistryReport(profileUrls, registry, failures, generatedAt) {
+function buildRegistryReport({ directoryProfileCount, profileUrls, registry, failures, generatedAt }) {
   const clubs = registry.filter((item) => item.type === 'club');
+  const lrvs = registry.filter((item) => item.type === 'lrv');
   const websitePresent = clubs.filter((item) => item.websiteStatus === 'present').length;
   const websiteMissing = clubs.filter((item) => item.websiteStatus === 'missing').length;
   const emailPresent = clubs.filter((item) => Boolean(item.emailFromDrv)).length;
   const emailApproved = clubs.filter(isApprovedRegistryDirectContact).length;
   const coverage = profileUrls.length ? registry.length / profileUrls.length : 0;
+  const lrvIds = new Set(lrvs.map((item) => item.drvId));
+  const missingLrvIds = LRV_PROFILES.filter((item) => !lrvIds.has(item.drvId)).map((item) => item.drvId);
   return {
     generatedAt,
     source: DIRECTORY_URL,
     parserVersion: DRV_REGISTRY_PARSER_VERSION,
+    directoryProfiles: directoryProfileCount,
+    supplementalLrvProfiles: profileUrls.length - directoryProfileCount,
     discoveredProfiles: profileUrls.length,
     parsedProfiles: registry.length,
     coveragePct: Number((coverage * 100).toFixed(1)),
     failedProfiles: failures.length,
     clubs: clubs.length,
-    lrv: registry.filter((item) => item.type === 'lrv').length,
+    lrv: lrvs.length,
+    expectedLrv: LRV_PROFILES.length,
+    lrvCoveragePct: Number((lrvs.length / LRV_PROFILES.length * 100).toFixed(1)),
+    missingLrvIds,
     otherMembers: registry.filter((item) => item.type === 'member').length,
     clubsWithWebsiteFromDrv: websitePresent,
     clubsMissingWebsiteFromDrv: websiteMissing,
@@ -147,17 +156,18 @@ function buildRegistryReport(profileUrls, registry, failures, generatedAt) {
 }
 
 function registryReportMarkdown(report) {
-  return `# DRV Registry – Quality Report\n\nStand: ${report.generatedAt}\n\n- Parser-Version: **${report.parserVersion}**\n- gefundene DRV-Profile: **${report.discoveredProfiles}**\n- erfolgreich geparst: **${report.parsedProfiles} (${report.coveragePct} %)**\n- fehlgeschlagen: **${report.failedProfiles}**\n- Vereine: **${report.clubs}**\n- Landesruderverbände: **${report.lrv}**\n- sonstige Mitglieder: **${report.otherMembers}**\n- Vereine mit DRV-Weblink: **${report.clubsWithWebsiteFromDrv}**\n- Vereine ohne DRV-Weblink: **${report.clubsMissingWebsiteFromDrv}**\n- Vereine mit irgendeiner DRV-E-Mail: **${report.clubsWithEmailFromDrv}**\n- davon konservativ Auto-Direct-fähig: **${report.clubsWithAutoApprovedDrvEmail}**\n\nDer Report enthält bewusst keine E-Mail-Adressen. Eine im DRV-Profil gefundene Adresse ist nur ein Kandidat und wird nicht automatisch Direct Route.\n`;
+  return `# DRV Registry – Quality Report\n\nStand: ${report.generatedAt}\n\n- Parser-Version: **${report.parserVersion}**\n- Profile aus Vereinssuche: **${report.directoryProfiles}**\n- zusätzliche offizielle LRV-Profile: **${report.supplementalLrvProfiles}**\n- Registry-Profile gesamt: **${report.discoveredProfiles}**\n- erfolgreich geparst: **${report.parsedProfiles} (${report.coveragePct} %)**\n- fehlgeschlagen: **${report.failedProfiles}**\n- Vereine: **${report.clubs}**\n- Landesruderverbände: **${report.lrv}/${report.expectedLrv} (${report.lrvCoveragePct} %)**\n- sonstige Mitglieder: **${report.otherMembers}**\n- Vereine mit DRV-Weblink: **${report.clubsWithWebsiteFromDrv}**\n- Vereine ohne DRV-Weblink: **${report.clubsMissingWebsiteFromDrv}**\n- Vereine mit irgendeiner DRV-E-Mail: **${report.clubsWithEmailFromDrv}**\n- davon konservativ Auto-Direct-fähig: **${report.clubsWithAutoApprovedDrvEmail}**\n\nDer Report enthält bewusst keine E-Mail-Adressen. Eine im DRV-Profil gefundene Adresse ist nur ein Kandidat und wird nicht automatisch Direct Route.\n`;
 }
 
 await assertRobotsPermission();
 const postalStates = await loadPostalStateMap();
 const directoryHtml = await fetchText(DIRECTORY_URL);
-let profileUrls = extractProfileLinks(directoryHtml);
+const directoryProfileUrls = extractProfileLinks(directoryHtml);
+let profileUrls = [...new Set([...directoryProfileUrls, ...LRV_PROFILES.map((item) => item.url)])];
 if (LIMIT > 0) profileUrls = profileUrls.slice(0, LIMIT);
-if (!profileUrls.length) throw new Error('No DRV profile links found in Vereinssuche');
+if (!profileUrls.length) throw new Error('No DRV profile links found');
 
-console.log(`[sync] ${profileUrls.length} DRV profiles discovered; concurrency=${CONCURRENCY}, delay=${DELAY_MS}ms`);
+console.log(`[sync] ${directoryProfileUrls.length} directory profiles + ${profileUrls.length - directoryProfileUrls.length} supplemental LRV profiles; concurrency=${CONCURRENCY}, delay=${DELAY_MS}ms`);
 
 const rawResults = await mapWithConcurrency(profileUrls, async (url, index) => {
   if ((index + 1) % 50 === 0) console.log(`[sync] ${index + 1}/${profileUrls.length}`);
@@ -168,17 +178,25 @@ const rawResults = await mapWithConcurrency(profileUrls, async (url, index) => {
 const failures = rawResults.filter((item) => item?.error);
 const registry = rawResults.filter((item) => item && !item.error && item.name);
 const coverage = registry.length / profileUrls.length;
+const lrvIds = new Set(registry.filter((item) => item.type === 'lrv').map((item) => item.drvId));
+const missingLrvProfiles = LRV_PROFILES.filter((item) => !lrvIds.has(item.drvId));
 if (REQUIRE && coverage < REQUIRED_COVERAGE) {
   throw new Error(`DRV sync coverage ${(coverage * 100).toFixed(1)}% is below required ${(REQUIRED_COVERAGE * 100).toFixed(1)}% (${failures.length} failures)`);
+}
+if (REQUIRE && missingLrvProfiles.length) {
+  throw new Error(`LRV registry incomplete: missing DRV IDs ${missingLrvProfiles.map((item) => item.drvId).join(', ')}`);
 }
 
 const lrvRoutes = new Map();
 for (const item of registry) {
-  if (item.type === 'lrv' && item.state && isApprovedRegistryDirectContact(item)) {
-    lrvRoutes.set(item.state, {
+  if (item.type !== 'lrv' || !isApprovedRegistryDirectContact(item)) continue;
+  for (const state of item.states || []) {
+    lrvRoutes.set(state, {
       email: item.emailFromDrv,
       sourceUrl: item.sourceUrl,
-      verifiedAt: item.fetchedAt
+      verifiedAt: item.fetchedAt,
+      organizationId: item.organizationId,
+      organizationName: item.name
     });
   }
 }
@@ -196,25 +214,34 @@ const organizations = registry.map((item) => {
   let resolvedEmail = drv.email;
   let routeSourceUrl = drv.sourceUrl;
   let verifiedAt = item.fetchedAt;
+  let fallbackOrganizationId = 'drv';
+  let fallbackOrganizationName = drv.name;
 
   if (approvedDirect) {
     routeLevel = item.type === 'lrv' ? 'lrv' : 'club';
     resolvedEmail = item.emailFromDrv;
     routeSourceUrl = item.sourceUrl;
-  } else if (item.state && lrvRoutes.get(item.state)) {
+    fallbackOrganizationId = item.organizationId;
+    fallbackOrganizationName = item.name;
+  } else if (item.type === 'club' && item.state && lrvRoutes.get(item.state)) {
     const lrv = lrvRoutes.get(item.state);
     routeLevel = 'lrv';
     resolvedEmail = lrv.email;
     routeSourceUrl = lrv.sourceUrl;
     verifiedAt = lrv.verifiedAt;
+    fallbackOrganizationId = lrv.organizationId;
+    fallbackOrganizationName = lrv.organizationName;
   }
 
   recipients[item.id] = {
     organizationName: item.name,
     organizationId: item.organizationId,
     state: item.state,
+    states: item.states,
     routeLevel,
     email: resolvedEmail,
+    routeOrganizationId: fallbackOrganizationId,
+    routeOrganizationName: fallbackOrganizationName,
     sourceUrl: routeSourceUrl,
     verifiedAt,
     drvEmailCandidatePresent: Boolean(item.emailFromDrv),
@@ -232,6 +259,7 @@ organizations.push({
   city: 'Hannover',
   postalCode: '30169',
   state: 'Niedersachsen',
+  states: ['Niedersachsen'],
   website: 'https://www.rudern.de/',
   profileUrl: drv.sourceUrl,
   websiteStatus: 'present',
@@ -243,8 +271,11 @@ recipients['deutscher-ruderverband'] = {
   organizationName: drv.name,
   organizationId: 'drv',
   state: 'Niedersachsen',
+  states: ['Niedersachsen'],
   routeLevel: 'drv',
   email: drv.email,
+  routeOrganizationId: 'drv',
+  routeOrganizationName: drv.name,
   sourceUrl: drv.sourceUrl,
   verifiedAt: new Date().toISOString(),
   drvEmailCandidatePresent: true,
@@ -262,7 +293,7 @@ const generatedAt = new Date().toISOString();
 const websiteMissing = registry
   .filter((item) => item.type === 'club' && item.websiteStatus === 'missing')
   .map(discoveryRecordFromRegistry);
-const report = buildRegistryReport(profileUrls, registry, failures, generatedAt);
+const report = buildRegistryReport({ directoryProfileCount: directoryProfileUrls.length, profileUrls, registry, failures, generatedAt });
 
 const root = process.cwd();
 await mkdir(path.join(root, 'dist', 'data'), { recursive: true });
@@ -272,7 +303,7 @@ await mkdir(path.join(root, 'artifacts', 'drv-registry'), { recursive: true });
 await writeFile(path.join(root, 'dist', 'data', 'clubs.json'), JSON.stringify({
   generatedAt,
   source: DIRECTORY_URL,
-  sourceLabel: 'Deutscher Ruderverband – Vereinssuche',
+  sourceLabel: 'Deutscher Ruderverband – Vereinssuche + Länderrat/LRV-Profile',
   parserVersion: DRV_REGISTRY_PARSER_VERSION,
   count: organizations.length,
   organizations
@@ -303,5 +334,5 @@ await writeFile(path.join(root, 'build-private', 'website-missing.json'), JSON.s
 await writeFile(path.join(root, 'artifacts', 'drv-registry', 'report.json'), JSON.stringify(report, null, 2));
 await writeFile(path.join(root, 'artifacts', 'drv-registry', 'report.md'), registryReportMarkdown(report));
 
-console.log(`[sync] registry=${registry.length}/${profileUrls.length} (${report.coveragePct}%); clubs=${report.clubs}; website-missing=${websiteMissing.length}; approved-drv-direct=${report.clubsWithAutoApprovedDrvEmail}; failures=${failures.length}`);
+console.log(`[sync] registry=${registry.length}/${profileUrls.length} (${report.coveragePct}%); clubs=${report.clubs}; lrv=${report.lrv}/${report.expectedLrv}; website-missing=${websiteMissing.length}; approved-drv-direct=${report.clubsWithAutoApprovedDrvEmail}; failures=${failures.length}`);
 console.log('[sync] emails remain server-private; public registry report contains no addresses');
