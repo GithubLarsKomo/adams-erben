@@ -7,6 +7,7 @@
     "build": "node scripts/build.mjs",
     "sync:drv": "node scripts/sync-drv.mjs",
     "test:drv-registry": "node scripts/lib/drv-registry.test.mjs && node scripts/lib/drv-registry-school.test.mjs && node scripts/lib/drv-registry-website.test.mjs",
+    "test:contact-governance": "node scripts/lib/contact-governance.test.mjs",
     "poc:enrich": "node scripts/enrichment-poc.mjs",
     "poc:enrich:review": "node scripts/review-enrichment-poc.mjs",
     "poc:enrich:diagnose": "node scripts/diagnose-enrichment-fallbacks.mjs",
