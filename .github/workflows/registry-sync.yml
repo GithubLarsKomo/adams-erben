@@ -79,8 +79,14 @@ jobs:
           const missing = JSON.parse(fs.readFileSync('build-private/website-missing.json', 'utf8'));
           const sample = JSON.parse(fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8'));
           if (report.coveragePct < 95) throw new Error(`registry coverage below 95%: ${report.coveragePct}`);
-          if (report.discoveredProfiles < 400) throw new Error(`unexpectedly small DRV directory: ${report.discoveredProfiles}`);
+          if (report.discoveredProfiles < 400) throw new Error(`unexpectedly small DRV registry: ${report.discoveredProfiles}`);
           if (report.clubs < 300) throw new Error(`unexpectedly small club count: ${report.clubs}`);
+          if (report.lrv !== report.expectedLrv || report.expectedLrv !== 15) {
+            throw new Error(`LRV registry incomplete: ${report.lrv}/${report.expectedLrv}`);
+          }
+          if (report.lrvCoveragePct !== 100 || (report.missingLrvIds || []).length) {
+            throw new Error(`LRV coverage invalid: ${report.lrvCoveragePct}% missing=${(report.missingLrvIds || []).join(',')}`);
+          }
           if (!Array.isArray(missing.organizations)) throw new Error('website-missing queue missing');
           if (missing.organizations.length !== report.clubsMissingWebsiteFromDrv) {
             throw new Error(`website-missing mismatch: ${missing.organizations.length} != ${report.clubsMissingWebsiteFromDrv}`);
