@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="adams-erben-mode" content="__APP_MODE__">
   <title>Adams Erben – Finde deinen Ruderverein</title>
   <meta name="description" content="Finde Rudervereine, Landesruderverbände und den Deutschen Ruderverband – unabhängig zum Kinostart von Adams Acht.">
   <meta name="theme-color" content="#0b2336">
@@ -10,6 +11,10 @@
   <script src="/assets/app.js" defer></script>
 </head>
 <body>
+  <div class="preview-banner" id="preview-banner" hidden>
+    <strong>Prototyp</strong>
+    <span>Diese Vorschau nutzt einen kleinen Testdatensatz. Der Kontaktversand ist deaktiviert.</span>
+  </div>
   <a class="skip-link" href="#vereine">Zur Vereinssuche springen</a>
 
   <header class="site-header">
@@ -158,6 +163,7 @@
       <h2 id="contact-title">Anfrage senden</h2>
       <p id="contact-target" class="contact-target"></p>
       <p class="routing-note">Die Empfängeradresse wird ausschließlich serverseitig aus dem gewählten Verein bestimmt und kann nicht frei eingegeben werden.</p>
+      <p class="preview-contact-note" id="preview-contact-note" hidden><strong>Preview:</strong> Das Formular demonstriert nur den geplanten Ablauf. Es werden keine Daten versendet.</p>
 
       <form id="contact-form">
         <input type="hidden" name="organization" id="contact-organization">
