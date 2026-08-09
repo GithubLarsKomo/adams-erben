@@ -9,6 +9,7 @@
     "poc:enrich": "node scripts/enrichment-poc.mjs",
     "poc:enrich:review": "node scripts/review-enrichment-poc.mjs",
     "test:enrich-review": "node scripts/review-enrichment-poc.test.mjs",
+    "poc:discover:prepare": "node scripts/prepare-discovery-poc.mjs",
     "poc:discover": "node scripts/discover-websites.mjs",
     "test:discover": "node scripts/discover-websites.test.mjs"
   },
