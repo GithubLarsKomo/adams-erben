@@ -1,9 +1,16 @@
 import AdmZip from 'adm-zip';
-import * as cheerio from 'cheerio';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import {
+  DRV_ORIGIN,
+  DRV_REGISTRY_PARSER_VERSION,
+  clean,
+  discoveryRecordFromRegistry,
+  extractProfileLinks,
+  parseDrvRegistryProfile,
+  publicOrganizationFromRegistry
+} from './lib/drv-registry.mjs';
 
-const DRV_ORIGIN = 'https://www.rudern.de';
 const DIRECTORY_URL = `${DRV_ORIGIN}/service/vereinssuche`;
 const ROBOTS_URL = `${DRV_ORIGIN}/robots.txt`;
 const GEONAMES_URL = 'https://download.geonames.org/export/zip/DE.zip';
@@ -12,39 +19,18 @@ const CONCURRENCY = Math.max(1, Math.min(6, Number(process.env.DRV_SYNC_CONCURRE
 const DELAY_MS = Math.max(100, Number(process.env.DRV_SYNC_DELAY_MS || 250));
 const LIMIT = Number(process.env.DRV_SYNC_LIMIT || 0);
 const REQUIRE = process.env.REQUIRE_DRV_SYNC === '1';
-
-const LRV_BY_DRV_ID = new Map([
-  ['30010', 'Baden-Württemberg'],
-  ['30011', 'Bayern'],
-  ['30012', 'Berlin'],
-  ['30013', 'Brandenburg'],
-  ['30014', 'Bremen'],
-  ['30015', 'Hamburg'],
-  ['30016', 'Hessen'],
-  ['30017', 'Mecklenburg-Vorpommern'],
-  ['30018', 'Niedersachsen'],
-  ['30019', 'Nordrhein-Westfalen'],
-  ['30020', 'Rheinland-Pfalz'],
-  ['30021', 'Saarland'],
-  ['30022', 'Sachsen'],
-  ['30023', 'Sachsen-Anhalt'],
-  ['30024', 'Schleswig-Holstein'],
-  ['30025', 'Thüringen']
-]);
-
-const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend)/i;
+const REQUIRED_COVERAGE = Math.max(0, Math.min(1, Number(process.env.DRV_SYNC_REQUIRED_COVERAGE || 0.95)));
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const clean = (value = '') => value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
 
-async function fetchResponse(url, { allow404 = false } = {}) {
+async function fetchResponse(url, { allow404 = false, accept = 'text/html,application/xhtml+xml,*/*;q=0.8' } = {}) {
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt += 1) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20_000);
     try {
       const response = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT, Accept: 'text/html,application/xhtml+xml,*/*;q=0.8' },
+        headers: { 'User-Agent': USER_AGENT, Accept: accept },
         signal: controller.signal,
         redirect: 'follow'
       });
@@ -90,14 +76,13 @@ async function assertRobotsPermission() {
 
 async function loadPostalStateMap() {
   try {
-    const response = await fetchResponse(GEONAMES_URL);
+    const response = await fetchResponse(GEONAMES_URL, { accept: 'application/zip,*/*' });
     const buffer = Buffer.from(await response.arrayBuffer());
     const zip = new AdmZip(buffer);
     const entry = zip.getEntry('DE.txt') || zip.getEntries().find((item) => item.entryName.endsWith('/DE.txt'));
     if (!entry) throw new Error('DE.txt missing in GeoNames archive');
-    const rows = entry.getData().toString('utf8').split(/\r?\n/);
     const map = new Map();
-    for (const row of rows) {
+    for (const row of entry.getData().toString('utf8').split(/\r?\n/)) {
       if (!row) continue;
       const cols = row.split('\t');
       const postalCode = cols[1];
@@ -115,96 +100,6 @@ async function loadPostalStateMap() {
   }
 }
 
-function extractProfileLinks(html) {
-  const $ = cheerio.load(html);
-  const urls = new Set();
-  $('a[href]').each((_, element) => {
-    const href = $(element).attr('href');
-    if (!href) return;
-    let url;
-    try { url = new URL(href, DRV_ORIGIN); } catch { return; }
-    if (url.origin === DRV_ORIGIN && /^\/service\/vereine\/[a-z0-9-]+\/?$/i.test(url.pathname)) {
-      urls.add(url.toString().replace(/\/$/, ''));
-    }
-  });
-  return [...urls];
-}
-
-function extractPostalSection(text) {
-  for (const marker of ['Bootshaus', 'Anschriften', 'Anschrift']) {
-    const index = text.indexOf(marker);
-    if (index < 0) continue;
-    const section = text.slice(index, index + 500);
-    const zipMatch = section.match(/\b(\d{5})\b/);
-    if (!zipMatch) continue;
-    const postalCode = zipMatch[1];
-    const before = section.slice(0, zipMatch.index).replace(/Route planen.*$/i, '').trim();
-    const cityMatch = before.match(/([A-ZÄÖÜ][\p{L}ÄÖÜäöüß.'’()\/-]*(?:\s+[\p{L}ÄÖÜäöüß.'’()\/-]+){0,4})\s*$/u);
-    return { postalCode, parsedCity: clean(cityMatch?.[1] || '') };
-  }
-  return { postalCode: '', parsedCity: '' };
-}
-
-function firstPublicEmail($) {
-  const anchors = $('a[href^="mailto:"]').toArray();
-  for (const element of anchors) {
-    const href = $(element).attr('href') || '';
-    const raw = href.slice('mailto:'.length).split('?')[0];
-    let email = raw;
-    try { email = decodeURIComponent(raw); } catch { /* keep raw */ }
-    email = clean(email).toLowerCase();
-    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return email;
-  }
-  return '';
-}
-
-function firstExternalWebsite($) {
-  for (const element of $('a[href]').toArray()) {
-    const href = $(element).attr('href');
-    if (!href || !/^https?:/i.test(href)) continue;
-    try {
-      const url = new URL(href);
-      if (url.hostname.endsWith('rudern.de')) continue;
-      if (/google\.|openstreetmap|maps\./i.test(url.hostname)) continue;
-      return url.toString();
-    } catch { /* ignore malformed links */ }
-  }
-  return '';
-}
-
-function parseProfile(url, html, postalStates) {
-  const $ = cheerio.load(html);
-  const name = clean($('h1').first().text());
-  const text = clean($('body').text());
-  const drvId = text.match(/DRV-ID\s+(\d{4,6})/i)?.[1] || '';
-  const { postalCode, parsedCity } = extractPostalSection(text);
-  const postalInfo = postalStates.get(postalCode);
-  const state = LRV_BY_DRV_ID.get(drvId) || postalInfo?.state || '';
-  const city = parsedCity || postalInfo?.places?.[0] || '';
-  const email = firstPublicEmail($);
-  const website = firstExternalWebsite($);
-  const slug = new URL(url).pathname.split('/').filter(Boolean).pop();
-  const featured = slug === 'ratzeburger-ruderclub-ev' || drvId === '12420';
-  const type = LRV_BY_DRV_ID.has(drvId) ? 'lrv' : (OTHER_MEMBER_PATTERN.test(name) ? 'member' : 'club');
-
-  return {
-    public: {
-      id: slug,
-      name,
-      drvId,
-      type,
-      city,
-      postalCode,
-      state,
-      website,
-      profileUrl: url,
-      hasDirectContact: Boolean(email),
-      featured
-    },
-    email
-  };
-}
-
 async function mapWithConcurrency(items, worker) {
   const results = new Array(items.length);
   let cursor = 0;
@@ -215,13 +110,41 @@ async function mapWithConcurrency(items, worker) {
       try {
         results[index] = await worker(items[index], index);
       } catch (error) {
-        results[index] = { error };
+        results[index] = { error, sourceUrl: items[index] };
       }
       await sleep(DELAY_MS);
     }
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, run));
   return results;
+}
+
+function buildRegistryReport(profileUrls, registry, failures, generatedAt) {
+  const clubs = registry.filter((item) => item.type === 'club');
+  const websitePresent = clubs.filter((item) => item.websiteStatus === 'present').length;
+  const websiteMissing = clubs.filter((item) => item.websiteStatus === 'missing').length;
+  const emailPresent = clubs.filter((item) => Boolean(item.emailFromDrv)).length;
+  const coverage = profileUrls.length ? registry.length / profileUrls.length : 0;
+  return {
+    generatedAt,
+    source: DIRECTORY_URL,
+    parserVersion: DRV_REGISTRY_PARSER_VERSION,
+    discoveredProfiles: profileUrls.length,
+    parsedProfiles: registry.length,
+    coveragePct: Number((coverage * 100).toFixed(1)),
+    failedProfiles: failures.length,
+    clubs: clubs.length,
+    lrv: registry.filter((item) => item.type === 'lrv').length,
+    otherMembers: registry.filter((item) => item.type === 'member').length,
+    clubsWithWebsiteFromDrv: websitePresent,
+    clubsMissingWebsiteFromDrv: websiteMissing,
+    clubsWithEmailFromDrv: emailPresent,
+    failures: failures.map((item) => ({ sourceUrl: item.sourceUrl || '', error: item.error?.message || 'unknown error' }))
+  };
+}
+
+function registryReportMarkdown(report) {
+  return `# DRV Registry – Quality Report\n\nStand: ${report.generatedAt}\n\n- Parser-Version: **${report.parserVersion}**\n- gefundene DRV-Profile: **${report.discoveredProfiles}**\n- erfolgreich geparst: **${report.parsedProfiles} (${report.coveragePct} %)**\n- fehlgeschlagen: **${report.failedProfiles}**\n- Vereine: **${report.clubs}**\n- Landesruderverbände: **${report.lrv}**\n- sonstige Mitglieder: **${report.otherMembers}**\n- Vereine mit DRV-Weblink: **${report.clubsWithWebsiteFromDrv}**\n- Vereine ohne DRV-Weblink: **${report.clubsMissingWebsiteFromDrv}**\n- Vereine mit DRV-E-Mail: **${report.clubsWithEmailFromDrv}**\n\nDer Report enthält bewusst keine E-Mail-Adressen.\n`;
 }
 
 await assertRobotsPermission();
@@ -236,19 +159,19 @@ console.log(`[sync] ${profileUrls.length} DRV profiles discovered; concurrency=$
 const rawResults = await mapWithConcurrency(profileUrls, async (url, index) => {
   if ((index + 1) % 50 === 0) console.log(`[sync] ${index + 1}/${profileUrls.length}`);
   const html = await fetchText(url);
-  return parseProfile(url, html, postalStates);
+  return parseDrvRegistryProfile(url, html, postalStates);
 });
 
 const failures = rawResults.filter((item) => item?.error);
-const parsed = rawResults.filter((item) => item && !item.error && item.public?.name);
-const coverage = parsed.length / profileUrls.length;
-if (REQUIRE && coverage < 0.9) {
-  throw new Error(`DRV sync coverage ${(coverage * 100).toFixed(1)}% is below required 90% (${failures.length} failures)`);
+const registry = rawResults.filter((item) => item && !item.error && item.name);
+const coverage = registry.length / profileUrls.length;
+if (REQUIRE && coverage < REQUIRED_COVERAGE) {
+  throw new Error(`DRV sync coverage ${(coverage * 100).toFixed(1)}% is below required ${(REQUIRED_COVERAGE * 100).toFixed(1)}% (${failures.length} failures)`);
 }
 
 const lrvEmails = new Map();
-for (const item of parsed) {
-  if (item.public.type === 'lrv' && item.public.state && item.email) lrvEmails.set(item.public.state, item.email);
+for (const item of registry) {
+  if (item.type === 'lrv' && item.state && item.emailFromDrv) lrvEmails.set(item.state, item.emailFromDrv);
 }
 
 const drv = {
@@ -257,27 +180,31 @@ const drv = {
 };
 
 const recipients = {};
-const organizations = parsed.map((item) => {
+const organizations = registry.map((item) => {
   let routeLevel = 'drv';
   let resolvedEmail = drv.email;
-  if (item.email) {
-    routeLevel = item.public.type === 'lrv' ? 'lrv' : 'club';
-    resolvedEmail = item.email;
-  } else if (item.public.state && lrvEmails.get(item.public.state)) {
+  if (item.emailFromDrv) {
+    routeLevel = item.type === 'lrv' ? 'lrv' : 'club';
+    resolvedEmail = item.emailFromDrv;
+  } else if (item.state && lrvEmails.get(item.state)) {
     routeLevel = 'lrv';
-    resolvedEmail = lrvEmails.get(item.public.state);
+    resolvedEmail = lrvEmails.get(item.state);
   }
-  recipients[item.public.id] = {
-    organizationName: item.public.name,
-    state: item.public.state,
+  recipients[item.id] = {
+    organizationName: item.name,
+    organizationId: item.organizationId,
+    state: item.state,
     routeLevel,
-    email: resolvedEmail
+    email: resolvedEmail,
+    sourceUrl: item.sourceUrl,
+    verifiedAt: item.fetchedAt
   };
-  return { ...item.public, contactRouteLevel: routeLevel };
+  return publicOrganizationFromRegistry(item, routeLevel);
 });
 
 organizations.push({
   id: 'deutscher-ruderverband',
+  organizationId: 'drv',
   name: drv.name,
   drvId: '',
   type: 'drv',
@@ -286,15 +213,19 @@ organizations.push({
   state: 'Niedersachsen',
   website: 'https://www.rudern.de/',
   profileUrl: 'https://www.rudern.de/verband/geschaeftsstelle',
+  websiteStatus: 'present',
   hasDirectContact: true,
   contactRouteLevel: 'drv',
   featured: false
 });
 recipients['deutscher-ruderverband'] = {
   organizationName: drv.name,
+  organizationId: 'drv',
   state: 'Niedersachsen',
   routeLevel: 'drv',
-  email: drv.email
+  email: drv.email,
+  sourceUrl: 'https://www.rudern.de/verband/geschaeftsstelle',
+  verifiedAt: new Date().toISOString()
 };
 
 organizations.sort((a, b) => {
@@ -304,23 +235,50 @@ organizations.sort((a, b) => {
   return a.name.localeCompare(b.name, 'de');
 });
 
+const generatedAt = new Date().toISOString();
+const websiteMissing = registry
+  .filter((item) => item.type === 'club' && item.websiteStatus === 'missing')
+  .map(discoveryRecordFromRegistry);
+const report = buildRegistryReport(profileUrls, registry, failures, generatedAt);
+
 const root = process.cwd();
 await mkdir(path.join(root, 'dist', 'data'), { recursive: true });
 await mkdir(path.join(root, 'build-private'), { recursive: true });
+await mkdir(path.join(root, 'artifacts', 'drv-registry'), { recursive: true });
 
 await writeFile(path.join(root, 'dist', 'data', 'clubs.json'), JSON.stringify({
-  generatedAt: new Date().toISOString(),
+  generatedAt,
   source: DIRECTORY_URL,
   sourceLabel: 'Deutscher Ruderverband – Vereinssuche',
+  parserVersion: DRV_REGISTRY_PARSER_VERSION,
   count: organizations.length,
   organizations
 }, null, 2));
 
 await writeFile(path.join(root, 'build-private', 'recipients.json'), JSON.stringify({
-  generatedAt: new Date().toISOString(),
+  generatedAt,
   source: DIRECTORY_URL,
+  parserVersion: DRV_REGISTRY_PARSER_VERSION,
   recipients,
   drv
 }, null, 2));
 
-console.log(`[sync] wrote ${organizations.length} public organizations; ${failures.length} profile failures; emails kept server-private`);
+await writeFile(path.join(root, 'build-private', 'drv-registry.json'), JSON.stringify({
+  generatedAt,
+  source: DIRECTORY_URL,
+  parserVersion: DRV_REGISTRY_PARSER_VERSION,
+  organizations: registry
+}, null, 2));
+
+await writeFile(path.join(root, 'build-private', 'website-missing.json'), JSON.stringify({
+  generatedAt,
+  source: DIRECTORY_URL,
+  parserVersion: DRV_REGISTRY_PARSER_VERSION,
+  organizations: websiteMissing
+}, null, 2));
+
+await writeFile(path.join(root, 'artifacts', 'drv-registry', 'report.json'), JSON.stringify(report, null, 2));
+await writeFile(path.join(root, 'artifacts', 'drv-registry', 'report.md'), registryReportMarkdown(report));
+
+console.log(`[sync] registry=${registry.length}/${profileUrls.length} (${report.coveragePct}%); clubs=${report.clubs}; website-missing=${websiteMissing.length}; failures=${failures.length}`);
+console.log('[sync] emails remain server-private; public registry report contains no addresses');
