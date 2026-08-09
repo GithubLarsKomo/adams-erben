@@ -5,7 +5,7 @@
 - Browser: ausschließlich statisches HTML/CSS/JavaScript und `data/clubs.json`.
 - Server: zwei kleine PHP-Endpunkte (`/api/contact.php`, `/api/health.php`) sowie Impressum/Datenschutz, damit rechtliche Betreiberangaben und SMTP-Secrets nicht in den Build müssen.
 - Versand: ausschließlich über authentifizierten SMTP-Relay. Kein direkter Mailversand von der Hetzner-IP.
-- Empfänger: beim Docker-Build serverseitig aus öffentlichen DRV-Profilen erzeugt und außerhalb des Webroots gespeichert.
+- Empfänger: nach Freigabe des Datenwegs beim Build serverseitig aus der vereinbarten DRV-Datenquelle erzeugt und außerhalb des Webroots gespeichert.
 
 ## 1. DNS
 
@@ -27,7 +27,18 @@ Nach DNS-Propagation vor dem Go-live mit `dig`/`nslookup` prüfen.
 6. Optional `www.adams-erben.de` hinzufügen und auf die kanonische Domain umleiten.
 7. TLS/Let's Encrypt durch Coolify aktivieren.
 
-Der Docker-Build führt standardmäßig den vollständigen DRV-Sync aus (`REQUIRE_DRV_SYNC=1`). Wenn weniger als 90 % der entdeckten Profile gelesen werden können, schlägt ein Produktionsbuild absichtlich fehl statt eine deutlich unvollständige Liste auszuliefern.
+### Daten-Sync ist absichtlich opt-in
+
+Die DRV-Nutzungshinweise verlangen für eine Weiterverwendung von Seiteninhalten eine vorherige Rücksprache. Deshalb baut das Dockerfile standardmäßig **nur den kleinen Seed-Datensatz** und startet keinen Vollcrawl.
+
+Erst wenn Issue #1 durch einen abgestimmten Datenweg (bevorzugt Export/API, hilfsweise ausdrücklich akzeptierter Abruf) geschlossen ist, werden in Coolify beim Build explizit gesetzt:
+
+```text
+SKIP_DRV_SYNC=0
+REQUIRE_DRV_SYNC=1
+```
+
+Dann bricht der Build bei weniger als 90 % erfolgreich gelesenen Profilen ab, statt eine deutlich unvollständige Deutschland-Liste auszuliefern.
 
 ## 3. Runtime-Secrets / Environment
 
@@ -65,7 +76,8 @@ Damit wird kein beliebiger Absender gefälscht und der Verein erkennt die Quelle
 
 Vor öffentlicher Freigabe prüfen:
 
-- Suche liefert Größenordnung ~600 DRV-Mitgliedsorganisationen.
+- Issue #1: DRV-Datenweg ist abgestimmt und dokumentiert.
+- Suche liefert die erwartete Größenordnung der DRV-Mitgliedsorganisationen.
 - Ratzeburger Ruderclub wird hervorgehoben.
 - Suche nach Ort/PLZ/Verein/Bundesland funktioniert mobil und desktop.
 - Testanfrage an einen Verein mit eigener Mailadresse kommt an.
@@ -74,12 +86,12 @@ Vor öffentlicher Freigabe prüfen:
 - Reply-To antwortet an die anfragende Person.
 - Rate Limit blockiert wiederholte Testanfragen.
 - Impressum enthält reale Betreiberangaben.
-- Datenschutz nennt den tatsächlich verwendeten SMTP-Anbieter.
+- Datenschutz nennt den tatsächlich verwendeten SMTP-Anbieter und die reale Logging-Konfiguration.
 - Filmplakat/-stills/-logos sind nicht vorhanden, solange keine Rechtefreigabe dokumentiert ist.
 - TLS-Zertifikat ist gültig; HTTP wird auf HTTPS umgeleitet.
 
 ## 6. Datenaktualisierung
 
-Die Vereinsdaten werden beim Image-Build aus der öffentlichen DRV-Vereinssuche synchronisiert. Für den Launch reicht daher ein frischer Build kurz vor Veröffentlichung. Für den späteren Betrieb empfiehlt sich ein kontrollierter Rebuild etwa monatlich oder nach Rückmeldung des DRV – nicht ein permanenter Crawler.
+Nach Freigabe des Datenwegs kann der Vereinsdatensatz kontrolliert bei einem neuen Image-Build aktualisiert werden. Für den Launch reicht ein frischer, überprüfter Build kurz vor Veröffentlichung. Für den späteren Betrieb sollte der Aktualisierungsrhythmus mit dem DRV abgestimmt werden – kein permanenter Crawler.
 
-Vor einer regelmäßigen Vollsynchronisation sollte Issue #1 (Datenquelle/Nutzungsfreigabe) abgeschlossen werden. Ein offizieller Export oder eine Schnittstelle des DRV wäre dem HTML-Scraping vorzuziehen.
+Ein offizieller Export oder eine Schnittstelle des DRV ist dem HTML-Scraping vorzuziehen.
