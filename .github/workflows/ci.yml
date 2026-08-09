@@ -70,8 +70,22 @@ jobs:
         run: |
           grep -q 'content="preview"' dist/index.html
           grep -q 'preview.css' dist/index.html
+          grep -q 'noindex,nofollow' dist/index.html
           grep -q 'Prototyp' dist/index.html
+          grep -q 'Drei Schritte vom Film zum ersten Ruderschlag' dist/index.html
+          grep -q 'Demo-Anfrage absenden' dist/assets/app.js
+          grep -q 'Es wurden keine Daten an den Server übertragen' dist/assets/app.js
           grep -q '"preview": true' build-private/recipients.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
+          if (d.organizations.length < 12) throw new Error('preview demo dataset too small');
+          const states = new Set(d.organizations.map((x) => x.state).filter(Boolean));
+          if (states.size < 8) throw new Error('preview demo dataset lacks geographic spread');
+          const lrv = d.organizations.find((x) => x.id === 'landesruderverband-schleswig-holstein');
+          if (!lrv || lrv.contactRouteLevel !== 'lrv') throw new Error('LRV demo routing invalid');
+          if (!d.organizations.some((x) => x.demo === true)) throw new Error('demo entries not marked');
+          NODE
           if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
             echo 'Preview browser data must not contain email addresses.' >&2
             exit 1
