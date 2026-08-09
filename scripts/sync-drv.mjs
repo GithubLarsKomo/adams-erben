@@ -7,6 +7,7 @@ import {
   clean,
   discoveryRecordFromRegistry,
   extractProfileLinks,
+  isApprovedRegistryDirectContact,
   parseDrvRegistryProfile,
   publicOrganizationFromRegistry
 } from './lib/drv-registry.mjs';
@@ -124,6 +125,7 @@ function buildRegistryReport(profileUrls, registry, failures, generatedAt) {
   const websitePresent = clubs.filter((item) => item.websiteStatus === 'present').length;
   const websiteMissing = clubs.filter((item) => item.websiteStatus === 'missing').length;
   const emailPresent = clubs.filter((item) => Boolean(item.emailFromDrv)).length;
+  const emailApproved = clubs.filter(isApprovedRegistryDirectContact).length;
   const coverage = profileUrls.length ? registry.length / profileUrls.length : 0;
   return {
     generatedAt,
@@ -139,12 +141,13 @@ function buildRegistryReport(profileUrls, registry, failures, generatedAt) {
     clubsWithWebsiteFromDrv: websitePresent,
     clubsMissingWebsiteFromDrv: websiteMissing,
     clubsWithEmailFromDrv: emailPresent,
+    clubsWithAutoApprovedDrvEmail: emailApproved,
     failures: failures.map((item) => ({ sourceUrl: item.sourceUrl || '', error: item.error?.message || 'unknown error' }))
   };
 }
 
 function registryReportMarkdown(report) {
-  return `# DRV Registry – Quality Report\n\nStand: ${report.generatedAt}\n\n- Parser-Version: **${report.parserVersion}**\n- gefundene DRV-Profile: **${report.discoveredProfiles}**\n- erfolgreich geparst: **${report.parsedProfiles} (${report.coveragePct} %)**\n- fehlgeschlagen: **${report.failedProfiles}**\n- Vereine: **${report.clubs}**\n- Landesruderverbände: **${report.lrv}**\n- sonstige Mitglieder: **${report.otherMembers}**\n- Vereine mit DRV-Weblink: **${report.clubsWithWebsiteFromDrv}**\n- Vereine ohne DRV-Weblink: **${report.clubsMissingWebsiteFromDrv}**\n- Vereine mit DRV-E-Mail: **${report.clubsWithEmailFromDrv}**\n\nDer Report enthält bewusst keine E-Mail-Adressen.\n`;
+  return `# DRV Registry – Quality Report\n\nStand: ${report.generatedAt}\n\n- Parser-Version: **${report.parserVersion}**\n- gefundene DRV-Profile: **${report.discoveredProfiles}**\n- erfolgreich geparst: **${report.parsedProfiles} (${report.coveragePct} %)**\n- fehlgeschlagen: **${report.failedProfiles}**\n- Vereine: **${report.clubs}**\n- Landesruderverbände: **${report.lrv}**\n- sonstige Mitglieder: **${report.otherMembers}**\n- Vereine mit DRV-Weblink: **${report.clubsWithWebsiteFromDrv}**\n- Vereine ohne DRV-Weblink: **${report.clubsMissingWebsiteFromDrv}**\n- Vereine mit irgendeiner DRV-E-Mail: **${report.clubsWithEmailFromDrv}**\n- davon konservativ Auto-Direct-fähig: **${report.clubsWithAutoApprovedDrvEmail}**\n\nDer Report enthält bewusst keine E-Mail-Adressen. Eine im DRV-Profil gefundene Adresse ist nur ein Kandidat und wird nicht automatisch Direct Route.\n`;
 }
 
 await assertRobotsPermission();
@@ -169,37 +172,55 @@ if (REQUIRE && coverage < REQUIRED_COVERAGE) {
   throw new Error(`DRV sync coverage ${(coverage * 100).toFixed(1)}% is below required ${(REQUIRED_COVERAGE * 100).toFixed(1)}% (${failures.length} failures)`);
 }
 
-const lrvEmails = new Map();
+const lrvRoutes = new Map();
 for (const item of registry) {
-  if (item.type === 'lrv' && item.state && item.emailFromDrv) lrvEmails.set(item.state, item.emailFromDrv);
+  if (item.type === 'lrv' && item.state && isApprovedRegistryDirectContact(item)) {
+    lrvRoutes.set(item.state, {
+      email: item.emailFromDrv,
+      sourceUrl: item.sourceUrl,
+      verifiedAt: item.fetchedAt
+    });
+  }
 }
 
 const drv = {
   name: 'Deutscher Ruderverband e.V.',
-  email: process.env.DRV_FALLBACK_EMAIL || 'info@rudern.de'
+  email: process.env.DRV_FALLBACK_EMAIL || 'info@rudern.de',
+  sourceUrl: 'https://www.rudern.de/verband/geschaeftsstelle'
 };
 
 const recipients = {};
 const organizations = registry.map((item) => {
+  const approvedDirect = isApprovedRegistryDirectContact(item);
   let routeLevel = 'drv';
   let resolvedEmail = drv.email;
-  if (item.emailFromDrv) {
+  let routeSourceUrl = drv.sourceUrl;
+  let verifiedAt = item.fetchedAt;
+
+  if (approvedDirect) {
     routeLevel = item.type === 'lrv' ? 'lrv' : 'club';
     resolvedEmail = item.emailFromDrv;
-  } else if (item.state && lrvEmails.get(item.state)) {
+    routeSourceUrl = item.sourceUrl;
+  } else if (item.state && lrvRoutes.get(item.state)) {
+    const lrv = lrvRoutes.get(item.state);
     routeLevel = 'lrv';
-    resolvedEmail = lrvEmails.get(item.state);
+    resolvedEmail = lrv.email;
+    routeSourceUrl = lrv.sourceUrl;
+    verifiedAt = lrv.verifiedAt;
   }
+
   recipients[item.id] = {
     organizationName: item.name,
     organizationId: item.organizationId,
     state: item.state,
     routeLevel,
     email: resolvedEmail,
-    sourceUrl: item.sourceUrl,
-    verifiedAt: item.fetchedAt
+    sourceUrl: routeSourceUrl,
+    verifiedAt,
+    drvEmailCandidatePresent: Boolean(item.emailFromDrv),
+    drvEmailCandidateApproved: approvedDirect
   };
-  return publicOrganizationFromRegistry(item, routeLevel);
+  return publicOrganizationFromRegistry(item, routeLevel, approvedDirect);
 });
 
 organizations.push({
@@ -212,7 +233,7 @@ organizations.push({
   postalCode: '30169',
   state: 'Niedersachsen',
   website: 'https://www.rudern.de/',
-  profileUrl: 'https://www.rudern.de/verband/geschaeftsstelle',
+  profileUrl: drv.sourceUrl,
   websiteStatus: 'present',
   hasDirectContact: true,
   contactRouteLevel: 'drv',
@@ -224,8 +245,10 @@ recipients['deutscher-ruderverband'] = {
   state: 'Niedersachsen',
   routeLevel: 'drv',
   email: drv.email,
-  sourceUrl: 'https://www.rudern.de/verband/geschaeftsstelle',
-  verifiedAt: new Date().toISOString()
+  sourceUrl: drv.sourceUrl,
+  verifiedAt: new Date().toISOString(),
+  drvEmailCandidatePresent: true,
+  drvEmailCandidateApproved: true
 };
 
 organizations.sort((a, b) => {
@@ -280,5 +303,5 @@ await writeFile(path.join(root, 'build-private', 'website-missing.json'), JSON.s
 await writeFile(path.join(root, 'artifacts', 'drv-registry', 'report.json'), JSON.stringify(report, null, 2));
 await writeFile(path.join(root, 'artifacts', 'drv-registry', 'report.md'), registryReportMarkdown(report));
 
-console.log(`[sync] registry=${registry.length}/${profileUrls.length} (${report.coveragePct}%); clubs=${report.clubs}; website-missing=${websiteMissing.length}; failures=${failures.length}`);
+console.log(`[sync] registry=${registry.length}/${profileUrls.length} (${report.coveragePct}%); clubs=${report.clubs}; website-missing=${websiteMissing.length}; approved-drv-direct=${report.clubsWithAutoApprovedDrvEmail}; failures=${failures.length}`);
 console.log('[sync] emails remain server-private; public registry report contains no addresses');
