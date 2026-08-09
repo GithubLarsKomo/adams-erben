@@ -1,11 +1,8 @@
 import * as cheerio from 'cheerio';
 
-export const DRV_REGISTRY_PARSER_VERSION = '1.1.3';
+export const DRV_REGISTRY_PARSER_VERSION = '1.1.4';
 export const DRV_ORIGIN = 'https://www.rudern.de';
 
-// Current Länderrat roster represented by the corresponding official DRV profiles.
-// The geographic Vereinssuche does not surface every LRV, so these profiles are
-// an explicit second registry source and a completeness gate.
 export const LRV_PROFILES = [
   { drvId: '30010', states: ['Baden-Württemberg'], path: '/service/vereine/landesruderverband-baden-wuerttemberg-ev' },
   { drvId: '30011', states: ['Bayern'], path: '/service/vereine/bayerischer-ruderverband-ev' },
@@ -66,9 +63,11 @@ function domainsRelated(a, b) {
 
 function normalizedExternalUrl(rawHref) {
   if (!rawHref) return '';
-  let candidate = rawHref;
-  if (/^www\./i.test(candidate)) candidate = `https://${candidate}`;
-  if (!/^https?:/i.test(candidate)) return '';
+  let candidate = clean(rawHref);
+  if (/^\/\//.test(candidate)) candidate = `https:${candidate}`;
+  else if (/^www\./i.test(candidate)) candidate = `https://${candidate}`;
+  else if (!/^https?:\/\//i.test(candidate) && /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(?:\/.*)?$/i.test(candidate)) candidate = `https://${candidate}`;
+  if (!/^https?:\/\//i.test(candidate)) return '';
   try {
     const url = new URL(candidate);
     if (url.hostname.endsWith('rudern.de')) return '';
@@ -86,13 +85,7 @@ function labeledWebsiteCandidate($) {
     if (selected) return;
     const label = clean($(element).clone().children().remove().end().text());
     if (!/^(website|homepage)$/i.test(label)) return;
-
-    const scopes = [
-      $(element).parent(),
-      $(element).next(),
-      $(element).parent().next(),
-      $(element).closest('[class*="field"], dl, tr, section')
-    ];
+    const scopes = [$(element).parent(), $(element).next(), $(element).parent().next(), $(element).closest('[class*="field"], dl, tr, section')];
     for (const scope of scopes) {
       if (!scope?.length) continue;
       for (const anchor of scope.find('a[href]').toArray()) {
@@ -126,9 +119,7 @@ export function extractProfileLinks(html) {
     if (!href) return;
     try {
       const url = new URL(href, DRV_ORIGIN);
-      if (url.origin === DRV_ORIGIN && /^\/service\/vereine\/[a-z0-9-]+\/?$/i.test(url.pathname)) {
-        urls.add(url.toString().replace(/\/$/, ''));
-      }
+      if (url.origin === DRV_ORIGIN && /^\/service\/vereine\/[a-z0-9-]+\/?$/i.test(url.pathname)) urls.add(url.toString().replace(/\/$/, ''));
     } catch { /* ignore malformed URL */ }
   });
   return [...urls];
@@ -153,8 +144,6 @@ function collectTextNodePostalCandidates(node, out) {
   for (const child of node.children || []) collectTextNodePostalCandidates(child, out);
 }
 
-// Prefer the smallest DOM text unit around "city postcode". The flattened DRV body
-// may concatenate street, organization and city into one regex candidate.
 export function extractPostalSectionFromDom($) {
   const headings = $('h1,h2,h3,h4,h5,h6').toArray();
   for (const marker of ['Bootshäuser', 'Bootshaus', 'Anschriften', 'Anschrift']) {
@@ -186,31 +175,19 @@ export function extractPostalSection(text) {
   return { postalCode: '', parsedCity: '' };
 }
 
-// Validate DRV city text against places known for the postcode. If GeoNames lacks
-// a district/locality that the DRV explicitly gives, retain a clean DRV candidate.
 export function resolvePostalCity(parsedCity, postalInfo) {
   const candidate = clean(parsedCity);
   const places = [...new Set((postalInfo?.places || []).map(clean).filter(Boolean))];
-
-  if (!places.length) {
-    return { city: candidate, citySource: candidate ? 'drv-text-unverified' : 'missing' };
-  }
-
+  if (!places.length) return { city: candidate, citySource: candidate ? 'drv-text-unverified' : 'missing' };
   const candidateNorm = normalizePlace(candidate);
   if (candidateNorm) {
-    const match = [...places]
-      .sort((a, b) => normalizePlace(b).length - normalizePlace(a).length)
-      .find((place) => {
-        const placeNorm = normalizePlace(place);
-        return candidateNorm === placeNorm || candidateNorm.endsWith(` ${placeNorm}`);
-      });
+    const match = [...places].sort((a, b) => normalizePlace(b).length - normalizePlace(a).length).find((place) => {
+      const placeNorm = normalizePlace(place);
+      return candidateNorm === placeNorm || candidateNorm.endsWith(` ${placeNorm}`);
+    });
     if (match) return { city: match, citySource: 'drv-text+geonames-postcode' };
   }
-
-  if (plausibleCityCandidate(candidate)) {
-    return { city: candidate, citySource: 'drv-text' };
-  }
-
+  if (plausibleCityCandidate(candidate)) return { city: candidate, citySource: 'drv-text' };
   return { city: places[0], citySource: 'geonames-postcode' };
 }
 
@@ -219,7 +196,6 @@ export function firstPublicEmail($) {
   const text = clean(body.text());
   const emailLabelIndex = text.search(/\bE-Mail\b/i);
   const candidates = [];
-
   for (const element of body.find('a[href^="mailto:"]').toArray()) {
     const href = $(element).attr('href') || '';
     const raw = href.slice('mailto:'.length).split('?')[0];
@@ -232,13 +208,10 @@ export function firstPublicEmail($) {
     if (emailLabelIndex >= 0) score += 5;
     candidates.push({ email, score });
   }
-
   candidates.sort((a, b) => b.score - a.score);
   if (candidates[0]?.score >= 100) return candidates[0].email;
-
   const fieldMatch = text.match(/\bE-Mail\b\s*([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/i);
-  if (fieldMatch) return fieldMatch[1].toLowerCase();
-  return '';
+  return fieldMatch ? fieldMatch[1].toLowerCase() : '';
 }
 
 export function firstExternalWebsite($) {
@@ -259,7 +232,11 @@ export function firstExternalWebsite($) {
     candidates.push({ url, score });
   }
   candidates.sort((a, b) => b.score - a.score);
-  return candidates[0]?.score >= 80 ? candidates[0].url : '';
+  if (candidates[0]?.score >= 80) return candidates[0].url;
+
+  const bodyText = clean($('body').text());
+  const fieldMatch = bodyText.match(/\b(?:Website|Homepage)\b\s*((?:(?:https?:)?\/\/|www\.)?[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(?:\/[^\s]*)?)/i);
+  return fieldMatch ? normalizedExternalUrl(fieldMatch[1]) : '';
 }
 
 export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fetchedAt = new Date().toISOString()) {
@@ -279,28 +256,7 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
   const organizationId = drvId || slug;
   const featured = slug === 'ratzeburger-ruderclub-ev' || drvId === '12420';
   const type = lrvProfile ? 'lrv' : (OTHER_MEMBER_PATTERN.test(name) ? 'member' : 'club');
-
-  return {
-    organizationId,
-    id: slug,
-    drvId,
-    name,
-    type,
-    city,
-    citySource,
-    postalCode,
-    state,
-    states,
-    drvProfileUrl: url,
-    websiteFromDrv,
-    websiteStatus: websiteFromDrv ? 'present' : 'missing',
-    emailFromDrv,
-    featured,
-    fetchedAt,
-    sourceType: lrvProfile ? 'drv-lrv-profile' : 'drv-profile',
-    sourceUrl: url,
-    parserVersion: DRV_REGISTRY_PARSER_VERSION
-  };
+  return { organizationId, id: slug, drvId, name, type, city, citySource, postalCode, state, states, drvProfileUrl: url, websiteFromDrv, websiteStatus: websiteFromDrv ? 'present' : 'missing', emailFromDrv, featured, fetchedAt, sourceType: lrvProfile ? 'drv-lrv-profile' : 'drv-profile', sourceUrl: url, parserVersion: DRV_REGISTRY_PARSER_VERSION };
 }
 
 export function isApprovedRegistryDirectContact(record) {
@@ -309,48 +265,13 @@ export function isApprovedRegistryDirectContact(record) {
   const [local, emailDomain = ''] = email.split('@');
   if (ROLE_LOCAL_PART.test(local)) return true;
   if (!GENERIC_FUNCTIONAL_LOCAL_PART.test(local) || !record.websiteFromDrv) return false;
-  try {
-    return domainsRelated(emailDomain, new URL(record.websiteFromDrv).hostname);
-  } catch {
-    return false;
-  }
+  try { return domainsRelated(emailDomain, new URL(record.websiteFromDrv).hostname); } catch { return false; }
 }
 
 export function publicOrganizationFromRegistry(record, contactRouteLevel = 'drv', hasDirectContact = Boolean(record.emailFromDrv)) {
-  return {
-    id: record.id,
-    organizationId: record.organizationId,
-    name: record.name,
-    drvId: record.drvId,
-    type: record.type,
-    city: record.city,
-    postalCode: record.postalCode,
-    state: record.state,
-    states: record.states,
-    website: record.websiteFromDrv,
-    profileUrl: record.drvProfileUrl,
-    websiteStatus: record.websiteStatus,
-    hasDirectContact,
-    contactRouteLevel,
-    featured: record.featured
-  };
+  return { id: record.id, organizationId: record.organizationId, name: record.name, drvId: record.drvId, type: record.type, city: record.city, postalCode: record.postalCode, state: record.state, states: record.states, website: record.websiteFromDrv, profileUrl: record.drvProfileUrl, websiteStatus: record.websiteStatus, hasDirectContact, contactRouteLevel, featured: record.featured };
 }
 
 export function discoveryRecordFromRegistry(record) {
-  return {
-    organizationId: record.organizationId,
-    drvId: record.drvId,
-    name: record.name,
-    type: record.type,
-    postalCode: record.postalCode,
-    city: record.city,
-    citySource: record.citySource,
-    state: record.state,
-    states: record.states,
-    drvProfileUrl: record.drvProfileUrl,
-    websiteFromDrv: record.websiteFromDrv,
-    websiteStatus: record.websiteStatus,
-    fetchedAt: record.fetchedAt,
-    parserVersion: record.parserVersion
-  };
+  return { organizationId: record.organizationId, drvId: record.drvId, name: record.name, type: record.type, postalCode: record.postalCode, city: record.city, citySource: record.citySource, state: record.state, states: record.states, drvProfileUrl: record.drvProfileUrl, websiteFromDrv: record.websiteFromDrv, websiteStatus: record.websiteStatus, fetchedAt: record.fetchedAt, parserVersion: record.parserVersion };
 }
