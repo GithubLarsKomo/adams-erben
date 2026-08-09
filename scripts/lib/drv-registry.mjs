@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 
-export const DRV_REGISTRY_PARSER_VERSION = '1.1.1';
+export const DRV_REGISTRY_PARSER_VERSION = '1.1.2';
 export const DRV_ORIGIN = 'https://www.rudern.de';
 
 // Current Länderrat roster represented by the corresponding official DRV profiles.
@@ -30,6 +30,7 @@ const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Sc
 const NON_OFFICIAL_SITE_HOST = /(google\.|openstreetmap|maps\.|facebook\.|instagram\.|youtube\.|youtu\.be|linkedin\.|x\.com$|twitter\.|ruder-bundesliga\.de$|rudersport-magazin\.de$)/i;
 const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz\w*|vorstand|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*)$/i;
 const GENERIC_FUNCTIONAL_LOCAL_PART = /^(?:info|kontakt|contact|office|buero|büro|mail|post|anfrage|service|verein|webmaster)(?:[._-].*)?$/i;
+const NOISY_CITY_PATTERN = /\b(?:bootshaus|anschrift|ruder\w*|verein\w*|club|gesellschaft|abteilung|abt\.?|e\.?\s*v\.?|straße|str\.?|weg|allee|ufer|promenade|hafen|seeweg|fähre)\b/i;
 
 export const clean = (value = '') => String(value).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -45,6 +46,15 @@ function normalizePlace(value = '') {
     .replace(/ß/g, 'ss')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+function plausibleCityCandidate(value = '') {
+  const candidate = clean(value);
+  if (!candidate || candidate.length > 70) return false;
+  if (NOISY_CITY_PATTERN.test(candidate)) return false;
+  if (/^(?:v\.?|ev\.?|e\.\s*v\.?)\s+/i.test(candidate)) return false;
+  const tokens = candidate.split(/\s+/).filter(Boolean);
+  return tokens.length >= 1 && tokens.length <= 6;
 }
 
 function domainsRelated(a, b) {
@@ -124,6 +134,43 @@ export function extractProfileLinks(html) {
   return [...urls];
 }
 
+function cityPostalFromTextNode(value = '') {
+  const text = clean(value);
+  const match = text.match(/(.+?)\s+(\d{5})(?:\s|$)/u);
+  if (!match) return null;
+  const parsedCity = clean(match[1].replace(/^[,|·•\-–—\s]+/, ''));
+  if (!parsedCity) return null;
+  return { postalCode: match[2], parsedCity };
+}
+
+function collectTextNodePostalCandidates(node, out) {
+  if (!node) return;
+  if (node.type === 'text') {
+    const candidate = cityPostalFromTextNode(node.data || '');
+    if (candidate) out.push(candidate);
+    return;
+  }
+  for (const child of node.children || []) collectTextNodePostalCandidates(child, out);
+}
+
+// Prefer the smallest DOM text unit around "city postcode". The flattened DRV body
+// may concatenate street, organization and city into one regex candidate.
+export function extractPostalSectionFromDom($) {
+  const headings = $('h1,h2,h3,h4,h5,h6').toArray();
+  for (const marker of ['Bootshäuser', 'Bootshaus', 'Anschriften', 'Anschrift']) {
+    const heading = headings.find((element) => clean($(element).text()).toLocaleLowerCase('de-DE') === marker.toLocaleLowerCase('de-DE'));
+    if (!heading) continue;
+    const candidates = [];
+    let current = $(heading).next();
+    while (current.length && !/^h[1-6]$/i.test(current[0]?.tagName || '')) {
+      collectTextNodePostalCandidates(current[0], candidates);
+      current = current.next();
+    }
+    if (candidates.length) return candidates[0];
+  }
+  return null;
+}
+
 export function extractPostalSection(text) {
   for (const marker of ['Bootshäuser', 'Bootshaus', 'Anschriften', 'Anschrift']) {
     const index = text.indexOf(marker);
@@ -139,13 +186,11 @@ export function extractPostalSection(text) {
   return { postalCode: '', parsedCity: '' };
 }
 
-// DRV address text is flattened and may prepend club/boathouse labels to the city
-// (e.g. "Bootshaus Seeweg-Süd Dießen am Ammersee"). GeoNames is already loaded
-// for postcode→state resolution, so use the postcode places as a validation layer.
+// Validate DRV city text against places known for the postcode. If GeoNames lacks
+// a district/locality that the DRV explicitly gives, retain a clean DRV candidate.
 export function resolvePostalCity(parsedCity, postalInfo) {
   const candidate = clean(parsedCity);
-  const places = [...new Set((postalInfo?.places || []).map(clean).filter(Boolean))]
-    .sort((a, b) => normalizePlace(b).length - normalizePlace(a).length);
+  const places = [...new Set((postalInfo?.places || []).map(clean).filter(Boolean))];
 
   if (!places.length) {
     return { city: candidate, citySource: candidate ? 'drv-text-unverified' : 'missing' };
@@ -153,11 +198,17 @@ export function resolvePostalCity(parsedCity, postalInfo) {
 
   const candidateNorm = normalizePlace(candidate);
   if (candidateNorm) {
-    const match = places.find((place) => {
-      const placeNorm = normalizePlace(place);
-      return candidateNorm === placeNorm || candidateNorm.endsWith(` ${placeNorm}`);
-    });
+    const match = [...places]
+      .sort((a, b) => normalizePlace(b).length - normalizePlace(a).length)
+      .find((place) => {
+        const placeNorm = normalizePlace(place);
+        return candidateNorm === placeNorm || candidateNorm.endsWith(` ${placeNorm}`);
+      });
     if (match) return { city: match, citySource: 'drv-text+geonames-postcode' };
+  }
+
+  if (plausibleCityCandidate(candidate)) {
+    return { city: candidate, citySource: 'drv-text' };
   }
 
   return { city: places[0], citySource: 'geonames-postcode' };
@@ -217,7 +268,7 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
   const text = clean($('body').text());
   const drvId = text.match(/DRV-ID\s+(\d{4,6})/i)?.[1] || '';
   const lrvProfile = LRV_BY_DRV_ID.get(drvId);
-  const { postalCode, parsedCity } = extractPostalSection(text);
+  const { postalCode, parsedCity } = extractPostalSectionFromDom($) || extractPostalSection(text);
   const postalInfo = postalStates.get(postalCode);
   const { city, citySource } = resolvePostalCity(parsedCity, postalInfo);
   const states = lrvProfile?.states || (postalInfo?.state ? [postalInfo.state] : []);
