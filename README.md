@@ -68,3 +68,4 @@ Für den produktiven Betrieb werden die Variablen aus `.env.example` als Runtime
 Siehe Issues #1–#4 für die Wayfinder-Untersuchungen.
 
 <!-- coolify-auto-deploy-check: 2026-08-10 -->
+<!-- coolify-auto-deploy-check-2: 2026-08-10 -->
