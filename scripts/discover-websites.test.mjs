@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   buildQuery,
   chooseCandidate,
@@ -111,5 +112,22 @@ assert.equal(evaluation.summary.autoAcceptedCorrect, 1);
 assert.equal(evaluation.summary.autoAcceptedWrong, 1);
 assert.equal(evaluation.summary.autoAcceptPrecisionPct, 50);
 assert.equal(evaluation.summary.reviewRequired, 1);
+
+// Frozen real PoC-B sample and manual truth must remain a one-to-one contract.
+const input = JSON.parse(readFileSync('scripts/discovery-input.poc.json', 'utf8'));
+const truth = JSON.parse(readFileSync('scripts/discovery-ground-truth.poc.json', 'utf8'));
+const inputIds = input.organizations.map((item) => item.organizationId).sort();
+const truthIds = Object.keys(truth).sort();
+assert.equal(input.organizations.length, 25);
+assert.equal(truthIds.length, 25);
+assert.deepEqual(inputIds, truthIds);
+assert.equal(new Set(inputIds).size, 25);
+assert.equal(input.organizations.every((item) => item.postalCode && item.city), true);
+
+const truthEntries = Object.values(truth).map(normalizeGroundTruthEntry);
+assert.equal(truthEntries.filter((item) => item.status === 'official').length, 19);
+assert.equal(truthEntries.filter((item) => item.status === 'none').length, 5);
+assert.equal(truthEntries.filter((item) => item.status === 'ambiguous').length, 1);
+assert.equal(truthEntries.every((item) => item.status !== 'official' || item.acceptedHosts.length > 0), true);
 
 console.log('discover-websites tests passed');
