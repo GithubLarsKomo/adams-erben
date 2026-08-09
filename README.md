@@ -66,3 +66,5 @@ Für den produktiven Betrieb werden die Variablen aus `.env.example` als Runtime
 5. Coolify-App und DNS für `adams-erben.de` konfigurieren
 
 Siehe Issues #1–#4 für die Wayfinder-Untersuchungen.
+
+<!-- coolify-auto-deploy-check: 2026-08-10 -->
