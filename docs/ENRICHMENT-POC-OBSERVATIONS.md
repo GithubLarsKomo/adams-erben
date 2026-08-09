@@ -1,12 +1,47 @@
 # Enrichment PoC – Beobachtungen
 
-Stand: 2026-08-09
+Stand: 2026-08-10
 
 ## Status
 
-Der reproduzierbare 25er-PoC ist in `scripts/enrichment-poc.mjs` implementiert. Zusätzlich wurde vor der automatisierten Gesamtauswertung eine manuelle Gegenprobe an realen Vereinswebseiten durchgeführt, um typische Extraktionsmuster und False-Positive-Risiken früh zu erkennen.
+Der reproduzierbare 25er-PoC ist in `scripts/enrichment-poc.mjs` implementiert und real über GitHub Actions ausgeführt. PoC A verwendet ausschließlich DRV-Einträge mit vorhandener Vereinswebsite, damit Crawl-/Extraktionsqualität unabhängig von der Search-Discovery gemessen wird.
 
-Diese Beobachtungen sind **keine Ersatzmetrik** für den maschinell erzeugten 25er-Coverage-Report, sondern dienen der Schärfung der Extraktionsregeln.
+## Wichtige Regression aus dem ersten Lauf
+
+Der erste automatische Lauf war nicht auswertbar: Die damalige DRV-Linkauswahl nahm den ersten externen Link auf einer Profilseite und interpretierte dadurch einen globalen Navigationslink (`ruder-bundesliga.de`) als Vereinswebsite.
+
+Konsequenz:
+
+- DRV-Website-Erkennung ist seit Parser 1.0.1 feld-/kontextbezogen;
+- der globale Bundesliga-Link ist Regressionstest;
+- `sync:drv` und PoC A verwenden denselben Registry-Parser.
+
+## Korrigierter 25er-Real-Lauf
+
+Stichprobe:
+
+- 25 Vereine;
+- 12 Bundesländer;
+- 33 DRV-Profile mussten für die stratifizierte Stichprobe geprüft werden.
+
+Ergebnisse:
+
+- Vereinswebsite erreichbar: **24/25 (96 %)**;
+- Funktionskontakt gefunden: **17/25 (68 %)**;
+- ausschließlich personenbezogener Kontakt: **1/25 (4 %)**;
+- kein geeigneter Kontakt / technischer Fallback: **7/25 (28 %)**;
+- `robots.txt` blockiert: **1/25**;
+- Homepage-Fetchfehler: **0**;
+- durchschnittlich **3,58** erfolgreich geladene Seiten je erreichbarer Vereinswebsite.
+
+Conservative Review:
+
+- **17/25 (68 %) Auto-Direct**;
+- **1/25 (4 %) Review**;
+- **7/25 (28 %) Fallback LRV/DRV**;
+- bei zwei Vereinen wurden verdächtige Drittanbieter-Kandidaten erkannt und nicht automatisch als Vereinskontakt verwendet.
+
+Damit ist bereits mit einem sehr begrenzten Crawl eine direkte, konservativ freigabefähige Vereinsroute für rund zwei Drittel der Stichprobe erreichbar. Die restlichen Fälle bleiben vollständig routbar über LRV/DRV.
 
 ## Bestätigte Muster
 
@@ -30,7 +65,7 @@ Konsequenz: `[at]`, `(at)`, `[dot]`, `(dot)` und eng verwandte einfache Variante
 
 ### 4. Spezielle Anti-Spam-Schreibweisen existieren
 
-Beispielmuster wie `adresse@dont-want-spam domain.de` können vorkommen. Häufig existiert auf einer anderen Kontakt-/Vorstandsseite derselben Domain zusätzlich eine klarere Darstellung.
+Ungewöhnlichere Anti-Spam-Schreibweisen können vorkommen. Häufig existiert auf einer anderen Kontakt-/Vorstandsseite derselben Domain zusätzlich eine klarere Darstellung.
 
 Konsequenz: Standardpass nicht überkomplizieren. Zuerst mehrere priorisierte Kontaktseiten prüfen; ungewöhnliche Obfuskation nur in einem zweiten Extractor-Pass oder Review behandeln.
 
@@ -60,29 +95,52 @@ Konsequenz: Seitenfehler sind pro Seite zu behandeln; nicht die ganze Domain als
 
 ### 8. Kontaktformulare sind kein Ersatz für die eigene Routing-Mail
 
-Einige Vereine bieten primär ein externes Formular oder laden dieses erst nach Consent/JavaScript. Der PoC soll solche Formulare nicht automatisiert benutzen.
+Einige Vereine bieten primär ein Formular oder laden dieses erst nach Consent/JavaScript. Der PoC soll solche Formulare nicht automatisiert benutzen.
 
 Konsequenz: Gibt es keine extrahierbare geeignete Mail, bleibt der LRV-/DRV-Fallback erhalten. Optional kann die öffentliche Vereins-Kontaktseite zusätzlich als Link angezeigt werden.
 
-## Änderungen für die nächste Extractor-Version
+## Offene Frage aus PoC A: reichen fünf Seiten?
 
-Vor PoC B bzw. spätestens vor dem 100er-Pilot:
+Sechs erreichbare Vereinswebsites endeten mit `no_email_found`. Mehrere davon hatten nur 1–3 erfolgreich geladene Seiten. Aus der bloßen Zahl kann noch nicht abgeleitet werden, ob die Website tatsächlich keine Mail veröffentlicht oder die kontaktnahe Linkauswahl zu eng ist.
 
-- Rollenalias-Liste erweitern (`vorsitz*`, `vorstand`, `wart`, `verwaltung`, `leitung`, `trainer`, `presse`, `jugend`, `mitglieder`, `aufnahme` ...);
-- E-Mail-Auswahl um Domain-/Kontext-Ranking ergänzen;
-- Drittanbieter-Kontext (`gastronomie`, `catering`, `restaurant`, `event`, `vermietung`, `partyservice`) als Ausschluss-/Malusregel aufnehmen;
-- unbekannte externe Maildomains nur bei klarer Vereinsrolle akzeptieren;
-- pro Treffer Begründung/Score speichern (`sameDomain`, `roleSignal`, `negativeContext`, `sourcePage`);
-- Review Queue für widersprüchliche Top-Kandidaten.
+Deshalb wird die Crawl-Tiefe **nicht pauschal erhöht**.
 
-## Erwartete Entscheidung nach automatisiertem PoC A
+Neu: `scripts/diagnose-enrichment-fallbacks.mjs`.
 
-Der maschinelle 25er-Report entscheidet quantitativ:
+Der adressfreie Diagnosepass protokolliert für die erreichbaren `no_email_found`-Fälle:
 
-- ob maximal fünf Seiten je Domain ausreichend sind;
-- wie hoch die direkte Funktionskontakt-Abdeckung ist;
-- wie oft ausschließlich Personenkontakte vorkommen;
-- wie oft technische Probleme auftreten;
-- wie groß der zweite Extractor-Pass sein muss.
+- kontaktnahe Links auf der Homepage;
+- zusätzliche Standardpfade;
+- HTTP-/Fetch-Ergebnisse;
+- Redirect-/Same-Site-Status;
+- robots-Entscheidung;
+- nur `E-Mail-Signal ja/nein`, niemals die konkrete Adresse.
 
-Danach folgt PoC B mit gezielter Website-Discovery für 25 DRV-Einträge ohne belastbaren Weblink.
+Erst nach dieser Diagnose wird entschieden:
+
+1. fünf Seiten bleiben Standard und Fallback ist fachlich korrekt; oder
+2. ein gezielter zweiter Pass für bestimmte Pfadmuster bringt messbaren Zusatznutzen.
+
+## Änderungen vor dem 100er-Pilot
+
+Bereits umgesetzt:
+
+- Rollenalias-Liste erweitert;
+- Domain-/Kontext-Ranking;
+- Drittanbieter-Kontext im Conservative Review;
+- unbekannte externe Maildomains nur mit klarer Vereinsrolle;
+- Begründung pro Review-Entscheidung;
+- DRV-Profil-E-Mail ist Kandidat, nicht automatisch Direct Route.
+
+Noch zu entscheiden:
+
+- Ergebnis des Fallback-Diagnosepasses;
+- Identitätsscore: derzeit nur Diagnosemetrik bei DRV-bekannten Domains; für Search-Discovery wird ein eigenes, strengeres Domain-Precision-Gate verwendet;
+- Umfang eines eventuellen zweiten Crawl-Passes.
+
+## Nächster Wayfinder-Schritt
+
+1. Fallback-Diagnostik des korrigierten PoC-Laufs auswerten.
+2. PoC A danach abschließen oder gezielt einen zweiten Pass ergänzen.
+3. Parallel Registry-Voll-/repräsentativen Lauf mit >=95 % Parser-Coverage bestätigen.
+4. Danach PoC B mit 25 `website_missing`-Fällen und manueller Ground Truth ausführen.
