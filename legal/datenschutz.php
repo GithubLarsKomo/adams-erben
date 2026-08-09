@@ -53,20 +53,23 @@ $smtpAddress = cfg('SMTP_PROVIDER_ADDRESS', '[SMTP_PROVIDER_ADDRESS]');
     <p>Die Website wird bei <?= h($hosting) ?>, <?= h($hostingAddress) ?>, betrieben. Beim Abruf der Website werden technisch insbesondere IP-Adresse, Zeitpunkt, angeforderte Ressource, Browser-/Geräteinformationen und Übertragungsstatus verarbeitet. Webserver, Container-Plattform und Hostinganbieter können diese Angaben in technischen Zugriffs- und Sicherheitsprotokollen verarbeiten.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Das berechtigte Interesse liegt im sicheren und zuverlässigen Betrieb der Website.</p>
 
-    <h2>5. Vereinssuche</h2>
+    <h2>5. Vereinssuche und Vereinskontaktdaten</h2>
     <?php if ($preview): ?>
-      <p>Die Vorschau verwendet einen kleinen, klar als Demo gekennzeichneten Datensatz. Neben wenigen realen Referenzeinträgen enthält er fiktive Demo-Rudervereine, damit Suche, Filter und Routinglogik gezeigt werden können. Er ist ausdrücklich kein vollständiger DRV-Datenbestand.</p>
+      <p>Die Vorschau verwendet einen kleinen, klar als Demo gekennzeichneten Datensatz. Neben wenigen realen Referenzeinträgen enthält er fiktive Demo-Rudervereine, damit Suche, Filter und Routinglogik gezeigt werden können. Er ist ausdrücklich kein vollständiger DRV-Datenbestand. Im Preview-Modus werden keine angereicherten Vereins-E-Mail-Adressen für einen Versand verwendet.</p>
     <?php else: ?>
-      <p>Für die clientseitige Suche werden Organisationsdaten aus der freigegebenen Datenquelle des Deutschen Ruderverbands bereitgestellt, insbesondere Vereins-/Verbandsname, Ort, Postleitzahl, Bundesland, DRV-ID, Website und Link zum DRV-Profil. Öffentliche E-Mail-Adressen werden bewusst nicht als aggregierte Liste an den Browser ausgeliefert.</p>
+      <p>Für die Vereinssuche werden öffentlich zugängliche Organisationsdaten aus dem Vereinsverzeichnis des Deutschen Ruderverbands und – soweit dort Angaben fehlen oder überprüft werden müssen – aus den öffentlich zugänglichen offiziellen Webseiten der jeweiligen Vereine und Verbände zusammengeführt. Dazu gehören insbesondere Vereins-/Verbandsname, Ort, Postleitzahl, Bundesland, DRV-ID, Website und Link zum DRV-Profil.</p>
+      <p>Öffentlich vorgesehene Funktions- und Rollenadressen können serverseitig als Routingkontakt verarbeitet werden. E-Mail-Adressen werden nicht als aggregierte Liste an den Browser ausgeliefert. Personalisierte E-Mail-Adressen einzelner Funktionsträger werden nach der technischen Governance nicht automatisch als direkte Empfänger freigegeben; wenn kein geeigneter Funktionskontakt vorliegt, verwendet das System den zuständigen Landesruderverband bzw. den Deutschen Ruderverband als Fallback.</p>
+      <p>Für jeden automatischen Direktkontakt werden Quelle und Zeitpunkt der letzten Verifikation geführt. Veraltete, widersprüchliche, unterdrückte oder nicht eindeutig dem Verein zuzuordnende Kontakte werden nicht automatisch verwendet.</p>
     <?php endif; ?>
+    <p>Vereine und betroffene Funktionsträger können über die oben genannte E-Mail-Adresse des Verantwortlichen die Berichtigung oder Entfernung von Vereins- und Routingdaten sowie die Unterdrückung einer erneuten automatischen Aufnahme verlangen. Eine solche Korrektur hat Vorrang vor späteren automatischen Crawling-Ergebnissen.</p>
 
     <h2>6. Kontaktformular</h2>
     <?php if ($preview): ?>
       <p>Im Preview-Modus findet kein Kontaktversand statt. Die Eingaben verbleiben im Browser und werden beim Demo-Absenden nicht per HTTP an den Server übertragen. Die serverseitige Kontakt-API blockiert den Versand zusätzlich im Preview-Modus.</p>
     <?php else: ?>
       <p>Wenn du das Kontaktformular verwendest, verarbeiten wir deinen Namen, deine E-Mail-Adresse, optional deine Postleitzahl, den ausgewählten Verein bzw. Verband und den Nachrichtentext. Diese Daten werden ausschließlich verwendet, um die von dir gewünschte Anfrage zu versenden.</p>
-      <p>Die Empfängeradresse ist nicht frei wählbar. Das System verwendet eine beim Website-Build erzeugte, serverseitige Routingliste. Soweit eine öffentliche Kontaktadresse des gewählten Vereins vorliegt, geht die Nachricht dorthin. Anderenfalls erfolgt die Weiterleitung an den zuständigen Landesruderverband und, wenn auch dort keine Adresse verfügbar ist, an den Deutschen Ruderverband.</p>
-      <p>Rechtsgrundlage für den Versand ist deine Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO.</p>
+      <p>Die Empfängeradresse ist nicht frei wählbar. Das System verwendet eine beim Website-Build erzeugte, serverseitige Routingliste. Soweit ein freigegebener Funktionskontakt des gewählten Vereins vorliegt, geht die Nachricht dorthin. Anderenfalls erfolgt die Weiterleitung an den zuständigen Landesruderverband und, wenn auch dort keine geeignete Adresse verfügbar ist, an den Deutschen Ruderverband.</p>
+      <p>Rechtsgrundlage für den Versand deiner Formularinhalte ist deine Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO.</p>
     <?php endif; ?>
 
     <?php if (!$preview): ?>
