@@ -1,10 +1,15 @@
 import AdmZip from 'adm-zip';
-import * as cheerio from 'cheerio';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import {
+  DRV_ORIGIN,
+  clean,
+  discoveryRecordFromRegistry,
+  extractProfileLinks,
+  parseDrvRegistryProfile
+} from './lib/drv-registry.mjs';
 
-const DRV_ORIGIN = 'https://www.rudern.de';
 const DIRECTORY_URL = `${DRV_ORIGIN}/service/vereinssuche`;
 const GEONAMES_URL = 'https://download.geonames.org/export/zip/DE.zip';
 const TARGET = Math.max(5, Number(process.env.DISCOVERY_SAMPLE_TARGET || 25));
@@ -13,12 +18,9 @@ const MAX_PER_STATE = Math.max(1, Number(process.env.DISCOVERY_SAMPLE_MAX_PER_ST
 const MAX_SCANS = Math.max(TARGET, Number(process.env.DISCOVERY_SAMPLE_MAX_SCANS || 250));
 const DELAY_MS = Math.max(250, Number(process.env.DISCOVERY_SAMPLE_DELAY_MS || 400));
 const OUTPUT = process.env.DISCOVERY_INPUT || 'build-private/website-discovery-input.json';
+const REGISTRY_QUEUE = process.env.DISCOVERY_REGISTRY_QUEUE || 'build-private/website-missing.json';
 const USER_AGENT = process.env.ENRICH_USER_AGENT || 'adams-erben-discovery-prep/0.1 (+https://github.com/GithubLarsKomo/adams-erben)';
 
-const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend)/i;
-const LRV_IDS = new Set(['30010','30011','30012','30013','30014','30015','30016','30017','30018','30019','30020','30021','30022','30023','30024','30025']);
-
-const clean = (value = '') => String(value).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function fetchResponse(url) {
@@ -31,67 +33,20 @@ async function loadPostalStates() {
   const response = await fetchResponse(GEONAMES_URL);
   const zip = new AdmZip(Buffer.from(await response.arrayBuffer()));
   const entry = zip.getEntry('DE.txt') || zip.getEntries().find((item) => item.entryName.endsWith('/DE.txt'));
+  if (!entry) throw new Error('DE.txt missing in GeoNames archive');
   const map = new Map();
   for (const row of entry.getData().toString('utf8').split(/\r?\n/)) {
     if (!row) continue;
     const cols = row.split('\t');
-    if (/^\d{5}$/.test(cols[1]) && cols[3]) map.set(cols[1], clean(cols[3]));
+    const postalCode = cols[1];
+    const place = clean(cols[2]);
+    const state = clean(cols[3]);
+    if (!/^\d{5}$/.test(postalCode) || !state) continue;
+    const current = map.get(postalCode) || { state, places: [] };
+    if (place && !current.places.includes(place)) current.places.push(place);
+    map.set(postalCode, current);
   }
   return map;
-}
-
-function extractProfileLinks(html) {
-  const $ = cheerio.load(html);
-  const links = new Set();
-  $('a[href]').each((_, element) => {
-    const href = $(element).attr('href');
-    if (!href) return;
-    try {
-      const url = new URL(href, DRV_ORIGIN);
-      if (url.origin === DRV_ORIGIN && /^\/service\/vereine\/[a-z0-9-]+\/?$/i.test(url.pathname)) links.add(url.toString().replace(/\/$/, ''));
-    } catch { /* ignore */ }
-  });
-  return [...links];
-}
-
-function externalWebsite($) {
-  for (const element of $('a[href]').toArray()) {
-    const href = $(element).attr('href');
-    if (!href) continue;
-    let candidate = href;
-    if (/^www\./i.test(candidate)) candidate = `https://${candidate}`;
-    if (!/^https?:/i.test(candidate)) continue;
-    try {
-      const url = new URL(candidate);
-      if (url.hostname.endsWith('rudern.de')) continue;
-      if (/google\.|openstreetmap|maps\.|facebook\.|instagram\.|youtube\.|youtu\.be/i.test(url.hostname)) continue;
-      return url.toString();
-    } catch { /* ignore */ }
-  }
-  return '';
-}
-
-function parseProfile(url, html, postalStates) {
-  const $ = cheerio.load(html);
-  const name = clean($('h1').first().text());
-  const text = clean($('body').text());
-  const drvId = text.match(/DRV-ID\s+(\d{4,6})/i)?.[1] || '';
-  const zip = text.match(/\b(\d{5})\b/)?.[1] || '';
-  const state = postalStates.get(zip) || '';
-  const cityMatch = text.match(new RegExp(`${zip}\\s+([A-ZÄÖÜ][\\p{L}ÄÖÜäöüß.'’()\\/-]*(?:\\s+[\\p{L}ÄÖÜäöüß.'’()\\/-]+){0,4})`, 'u'));
-  const city = clean(cityMatch?.[1] || '');
-  const type = LRV_IDS.has(drvId) ? 'lrv' : (OTHER_MEMBER_PATTERN.test(name) ? 'member' : 'club');
-  return {
-    organizationId: drvId || new URL(url).pathname.split('/').filter(Boolean).pop(),
-    drvId,
-    name,
-    type,
-    postalCode: zip,
-    city,
-    state,
-    drvProfileUrl: url,
-    websiteFromDrv: externalWebsite($)
-  };
 }
 
 export function chooseMissingWebsiteSample(items, { target = TARGET, minStates = MIN_STATES, maxPerState = MAX_PER_STATE } = {}) {
@@ -122,7 +77,19 @@ export function chooseMissingWebsiteSample(items, { target = TARGET, minStates =
   return selected;
 }
 
-async function main() {
+async function loadRegistryQueue() {
+  try {
+    const parsed = JSON.parse(await readFile(REGISTRY_QUEUE, 'utf8'));
+    if (!Array.isArray(parsed.organizations)) return [];
+    return parsed.organizations;
+  } catch (error) {
+    if (error?.code !== 'ENOENT') console.warn(`[prepare-discovery] registry queue unavailable: ${error.message}`);
+    return [];
+  }
+}
+
+async function scanDrvFallback() {
+  console.warn(`[prepare-discovery] ${REGISTRY_QUEUE} not found; falling back to a bounded DRV profile scan`);
   const postalStates = await loadPostalStates();
   const directory = await (await fetchResponse(DIRECTORY_URL)).text();
   const links = extractProfileLinks(directory).slice(0, MAX_SCANS);
@@ -130,16 +97,32 @@ async function main() {
   for (let i = 0; i < links.length; i += 1) {
     try {
       const html = await (await fetchResponse(links[i])).text();
-      parsed.push(parseProfile(links[i], html, postalStates));
+      const record = parseDrvRegistryProfile(links[i], html, postalStates);
+      if (record.type === 'club' && record.websiteStatus === 'missing') parsed.push(discoveryRecordFromRegistry(record));
     } catch (error) {
       console.warn(`[prepare-discovery] ${links[i]}: ${error.message}`);
     }
     await sleep(DELAY_MS);
   }
-  const selected = chooseMissingWebsiteSample(parsed);
+  return parsed;
+}
+
+async function main() {
+  let candidates = await loadRegistryQueue();
+  let source = REGISTRY_QUEUE;
+  if (!candidates.length) {
+    candidates = await scanDrvFallback();
+    source = DIRECTORY_URL;
+  }
+
+  const selected = chooseMissingWebsiteSample(candidates);
   await mkdir(path.dirname(OUTPUT), { recursive: true });
-  await writeFile(OUTPUT, JSON.stringify({ generatedAt: new Date().toISOString(), source: DIRECTORY_URL, organizations: selected }, null, 2));
-  console.log(`[prepare-discovery] selected ${selected.length} clubs across ${new Set(selected.map((item) => item.state)).size} states -> ${OUTPUT}`);
+  await writeFile(OUTPUT, JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    source,
+    organizations: selected
+  }, null, 2));
+  console.log(`[prepare-discovery] selected ${selected.length} clubs across ${new Set(selected.map((item) => item.state)).size} states from ${source} -> ${OUTPUT}`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
