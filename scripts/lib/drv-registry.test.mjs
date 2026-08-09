@@ -36,14 +36,24 @@ assert.deepEqual(
   { city: 'Leipzig', citySource: 'drv-text+geonames-postcode' }
 );
 assert.deepEqual(
-  resolvePostalCity('unbrauchbarer Freitext', { places: ['Köln'] }),
+  resolvePostalCity('Enderndorf', { places: ['Spalt'] }),
+  { city: 'Enderndorf', citySource: 'drv-text' }
+);
+assert.deepEqual(
+  resolvePostalCity('Bootshaus Uferweg Köln', { places: ['Köln'] }),
+  { city: 'Köln', citySource: 'drv-text+geonames-postcode' }
+);
+assert.deepEqual(
+  resolvePostalCity('Bootshaus Uferweg Musterort', { places: ['Köln'] }),
   { city: 'Köln', citySource: 'geonames-postcode' }
 );
 
 const postalStates = new Map([
   ['23909', { state: 'Schleswig-Holstein', places: ['Ratzeburg'] }],
   ['30169', { state: 'Niedersachsen', places: ['Hannover'] }],
-  ['55130', { state: 'Rheinland-Pfalz', places: ['Mainz'] }]
+  ['55130', { state: 'Rheinland-Pfalz', places: ['Mainz'] }],
+  ['91174', { state: 'Bayern', places: ['Spalt'] }],
+  ['04178', { state: 'Sachsen', places: ['Burghausen'] }]
 ]);
 
 const clubHtml = `
@@ -113,6 +123,40 @@ assert.equal(missing.organizationId, '19999');
 assert.equal(missing.city, 'Hannover');
 assert.equal(missing.citySource, 'geonames-postcode');
 assert.equal(isApprovedRegistryDirectContact(missing), false);
+
+// Real DRV pages render address lines as separate nodes. Preserve a locality even
+// if GeoNames only exposes the municipality for that postcode.
+const enderndorfHtml = `
+<html><body>
+<h1>Ruderverein Brombachsee e.V.</h1><div>DRV-ID 11150</div>
+<h2>Bootshaus</h2><div><div>Am Segelhafen 1</div><div>Enderndorf 91174</div></div>
+<h2>Vereine in der Umgebung</h2>
+</body></html>`;
+const enderndorf = parseDrvRegistryProfile(
+  'https://www.rudern.de/service/vereine/ruderverein-brombachsee-ev',
+  enderndorfHtml,
+  postalStates,
+  '2026-08-10T00:00:00.000Z'
+);
+assert.equal(enderndorf.city, 'Enderndorf');
+assert.equal(enderndorf.citySource, 'drv-text');
+assert.equal(enderndorf.postalCode, '91174');
+
+const leipzigHtml = `
+<html><body>
+<h1>SC DHfK Leipzig e.V., Abteilung Rudern</h1><div>DRV-ID 12211</div>
+<h2>Anschrift</h2><div><div>Am Elsterwehr 1</div><div>SC DHfK Leipzig, Abt. Rudern</div><div>Leipzig 04178</div></div>
+<h2>Vereine in der Umgebung</h2>
+</body></html>`;
+const leipzig = parseDrvRegistryProfile(
+  'https://www.rudern.de/service/vereine/sc-dhfk-leipzig-ev-abteilung-rudern',
+  leipzigHtml,
+  postalStates,
+  '2026-08-10T00:00:00.000Z'
+);
+assert.equal(leipzig.city, 'Leipzig');
+assert.equal(leipzig.citySource, 'drv-text');
+assert.equal(leipzig.postalCode, '04178');
 
 const lrvHtml = `
 <html><body>
