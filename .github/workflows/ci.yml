@@ -28,12 +28,22 @@ jobs:
         run: |
           node --check scripts/build.mjs
           node --check scripts/sync-drv.mjs
+          node --check scripts/lib/drv-registry.mjs
+          node --check scripts/lib/drv-registry.test.mjs
           node --check scripts/enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.test.mjs
+          node --check scripts/prepare-discovery-poc.mjs
+          node --check scripts/prepare-discovery-poc.test.mjs
           node --check scripts/discover-websites.mjs
           node --check scripts/discover-websites.test.mjs
           node --check src/assets/app.js
+
+      - name: Test DRV registry parser
+        run: npm run test:drv-registry
+
+      - name: Test discovery sample stratification
+        run: npm run test:discover-prepare
 
       - name: Test conservative contact review rules
         run: npm run test:enrich-review
