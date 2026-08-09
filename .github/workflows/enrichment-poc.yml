@@ -8,6 +8,11 @@ on:
       - 'scripts/enrichment-poc.mjs'
       - 'package.json'
       - '.github/workflows/enrichment-poc.yml'
+  pull_request:
+    paths:
+      - 'scripts/enrichment-poc.mjs'
+      - 'package.json'
+      - '.github/workflows/enrichment-poc.yml'
 
 permissions:
   contents: read
