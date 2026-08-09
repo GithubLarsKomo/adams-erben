@@ -2,6 +2,7 @@ import AdmZip from 'adm-zip';
 import * as cheerio from 'cheerio';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const DRV_ORIGIN = 'https://www.rudern.de';
 const DIRECTORY_URL = `${DRV_ORIGIN}/service/vereinssuche`;
@@ -141,4 +142,5 @@ async function main() {
   console.log(`[prepare-discovery] selected ${selected.length} clubs across ${new Set(selected.map((item) => item.state)).size} states -> ${OUTPUT}`);
 }
 
-if (process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/\\/g, '/'))) await main();
+const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+if (invokedDirectly) await main();
