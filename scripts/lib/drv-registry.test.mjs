@@ -1,14 +1,23 @@
 import assert from 'node:assert/strict';
 import {
+  LRV_PROFILES,
   discoveryRecordFromRegistry,
   isApprovedRegistryDirectContact,
   parseDrvRegistryProfile,
   publicOrganizationFromRegistry
 } from './drv-registry.mjs';
 
+assert.equal(LRV_PROFILES.length, 15);
+assert.deepEqual(
+  LRV_PROFILES.find((item) => item.drvId === '30020')?.states,
+  ['Rheinland-Pfalz', 'Saarland']
+);
+assert.equal(LRV_PROFILES.some((item) => item.drvId === '30021'), false);
+
 const postalStates = new Map([
   ['23909', { state: 'Schleswig-Holstein', places: ['Ratzeburg'] }],
-  ['30169', { state: 'Niedersachsen', places: ['Hannover'] }]
+  ['30169', { state: 'Niedersachsen', places: ['Hannover'] }],
+  ['55130', { state: 'Rheinland-Pfalz', places: ['Mainz'] }]
 ]);
 
 const clubHtml = `
@@ -33,6 +42,7 @@ assert.equal(club.organizationId, '12420');
 assert.equal(club.id, 'ratzeburger-ruderclub-ev');
 assert.equal(club.type, 'club');
 assert.equal(club.state, 'Schleswig-Holstein');
+assert.deepEqual(club.states, ['Schleswig-Holstein']);
 assert.equal(club.websiteFromDrv, 'http://www.rrc-online.de/');
 assert.equal(club.websiteStatus, 'present');
 assert.equal(club.emailFromDrv, 'info@rrc-online.de');
@@ -76,11 +86,10 @@ assert.equal(isApprovedRegistryDirectContact(missing), false);
 const lrvHtml = `
 <html><body>
 <nav><a href="https://www.ruder-bundesliga.de/">Ruder-Bundesliga</a></nav>
-<h1>Landesruderverband Niedersachsen e.V.</h1>
+<h1>Landesruderverband Niedersachsen</h1>
 <div>DRV-ID 30018</div>
-<section>Anschrift Maschstraße 20 Hannover 30169</section>
-<div class="field field--website"><span>Website</span><a href="https://www.lrvn.de/">https://www.lrvn.de/</a></div>
-<div class="field field--email"><span>E-Mail</span><a href="mailto:geschaeftsstelle@lrvn.de">geschaeftsstelle@lrvn.de</a></div>
+<section>Anschrift Rakampshöhe 6 b Deutsch Evern 21407</section>
+<div class="field field--email"><span>E-Mail</span><a href="mailto:info@lrvn.de">info@lrvn.de</a></div>
 </body></html>`;
 const lrv = parseDrvRegistryProfile(
   'https://www.rudern.de/service/vereine/landesruderverband-niedersachsen',
@@ -90,8 +99,27 @@ const lrv = parseDrvRegistryProfile(
 );
 assert.equal(lrv.type, 'lrv');
 assert.equal(lrv.state, 'Niedersachsen');
-assert.equal(lrv.websiteFromDrv, 'https://www.lrvn.de/');
-assert.equal(isApprovedRegistryDirectContact(lrv), true);
+assert.deepEqual(lrv.states, ['Niedersachsen']);
+assert.equal(lrv.sourceType, 'drv-lrv-profile');
+
+const suedwestHtml = `
+<html><body>
+<h1>Ruderverband Südwest e.V.</h1>
+<div>DRV-ID 30020</div>
+<section>Anschrift Am Edelmann 25 Mainz 55130</section>
+<div class="field field--website"><span>Website</span><a href="https://www.ruderverband-suedwest.de/">Website</a></div>
+<div class="field field--email"><span>E-Mail</span><a href="mailto:geschaeftsstelle@ruderverband-suedwest.de">E-Mail</a></div>
+</body></html>`;
+const suedwest = parseDrvRegistryProfile(
+  'https://www.rudern.de/service/vereine/ruderverband-suedwest-ev',
+  suedwestHtml,
+  postalStates,
+  '2026-08-10T00:00:00.000Z'
+);
+assert.equal(suedwest.type, 'lrv');
+assert.equal(suedwest.state, 'Rheinland-Pfalz / Saarland');
+assert.deepEqual(suedwest.states, ['Rheinland-Pfalz', 'Saarland']);
+assert.equal(isApprovedRegistryDirectContact(suedwest), true);
 
 assert.equal(isApprovedRegistryDirectContact({
   emailFromDrv: 'info@gmail.com',
