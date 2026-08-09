@@ -1,4 +1,6 @@
 const PAGE_SIZE = 60;
+const APP_MODE = document.querySelector('meta[name="adams-erben-mode"]')?.content || 'production';
+const PREVIEW_MODE = APP_MODE === 'preview';
 
 const searchInput = document.querySelector('#search');
 const typeFilter = document.querySelector('#type-filter');
@@ -13,9 +15,17 @@ const contactTarget = document.querySelector('#contact-target');
 const contactOrganization = document.querySelector('#contact-organization');
 const contactStartedAt = document.querySelector('#contact-started-at');
 const contactStatus = document.querySelector('#contact-status');
+const previewBanner = document.querySelector('#preview-banner');
+const previewContactNote = document.querySelector('#preview-contact-note');
 
 let organizations = [];
 let visibleCount = PAGE_SIZE;
+
+if (PREVIEW_MODE) {
+  previewBanner.hidden = false;
+  previewContactNote.hidden = false;
+  document.body.classList.add('is-preview');
+}
 
 function normalize(value = '') {
   return value
@@ -81,6 +91,7 @@ function clubCard(org) {
     ? `<a href="${escaped(org.profileUrl)}" target="_blank" rel="noopener noreferrer">DRV-Profil</a>`
     : '';
   const links = [website, profile].filter(Boolean).join('<span aria-hidden="true"> · </span>');
+  const contactLabel = PREVIEW_MODE ? 'Kontakt (Demo)' : 'Kontakt';
 
   return `
     <article class="club-card ${org.featured ? 'club-card-featured' : ''}">
@@ -92,7 +103,7 @@ function clubCard(org) {
       <p class="club-location">${escaped(meta || 'Standort siehe DRV-Profil')}</p>
       <p class="club-route">Kontakt ${escaped(routeText(org.contactRouteLevel))}</p>
       <div class="club-card-actions">
-        <button class="button button-primary button-small" type="button" data-contact="${escaped(org.id)}">Kontakt</button>
+        <button class="button button-primary button-small" type="button" data-contact="${escaped(org.id)}">${contactLabel}</button>
         ${links ? `<span class="text-links">${links}</span>` : ''}
       </div>
     </article>`;
@@ -121,18 +132,33 @@ function openContact(id) {
   const org = organizations.find((item) => item.id === id);
   if (!org || !contactDialog) return;
   contactTarget.textContent = org.name;
-  contactOrganization.value = org.id;
-  contactStartedAt.value = String(Date.now());
-  contactStatus.textContent = `Deine Nachricht wird ${routeText(org.contactRouteLevel)} weitergeleitet.`;
   contactForm.reset();
   contactOrganization.value = org.id;
   contactStartedAt.value = String(Date.now());
+  contactStatus.textContent = PREVIEW_MODE
+    ? `Demo: Später würde die Nachricht ${routeText(org.contactRouteLevel)} weitergeleitet. In dieser Vorschau wird nichts versendet.`
+    : `Deine Nachricht wird ${routeText(org.contactRouteLevel)} weitergeleitet.`;
+
+  const submitButton = contactForm.querySelector('button[type="submit"]');
+  if (PREVIEW_MODE) {
+    submitButton.disabled = true;
+    submitButton.textContent = 'Versand in Preview deaktiviert';
+  } else {
+    submitButton.disabled = false;
+    submitButton.textContent = 'Anfrage senden';
+  }
+
   contactDialog.showModal();
   contactForm.querySelector('[name="name"]').focus();
 }
 
 async function submitContact(event) {
   event.preventDefault();
+  if (PREVIEW_MODE) {
+    contactStatus.textContent = 'Der Versand ist in dieser öffentlichen Vorschau deaktiviert.';
+    return;
+  }
+
   const button = contactForm.querySelector('button[type="submit"]');
   button.disabled = true;
   contactStatus.textContent = 'Anfrage wird gesendet …';
@@ -169,7 +195,9 @@ async function init() {
     const dateText = sourceDate && !Number.isNaN(sourceDate.valueOf())
       ? sourceDate.toLocaleDateString('de-DE')
       : 'unbekannt';
-    dataStatus.textContent = `${organizations.length.toLocaleString('de-DE')} Einträge · Stand ${dateText}`;
+    dataStatus.textContent = PREVIEW_MODE
+      ? `${organizations.length.toLocaleString('de-DE')} Testeinträge · Prototyp`
+      : `${organizations.length.toLocaleString('de-DE')} Einträge · Stand ${dateText}`;
   } catch (error) {
     dataStatus.textContent = 'Vereinsdaten konnten nicht geladen werden.';
     resultSummary.textContent = 'Bitte nutze vorübergehend die Vereinssuche auf rudern.de.';
