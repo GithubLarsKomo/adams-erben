@@ -149,6 +149,7 @@ export function discoveryRecordFromRegistry(record) {
     organizationId: record.organizationId,
     drvId: record.drvId,
     name: record.name,
+    type: record.type,
     postalCode: record.postalCode,
     city: record.city,
     state: record.state,
