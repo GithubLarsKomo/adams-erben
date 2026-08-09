@@ -7,13 +7,20 @@
   <title>Adams Erben – Finde deinen Ruderverein</title>
   <meta name="description" content="Finde Rudervereine, Landesruderverbände und den Deutschen Ruderverband – unabhängig zum Kinostart von Adams Acht.">
   <meta name="theme-color" content="#0b2336">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:site_name" content="Adams Erben">
+  <meta property="og:title" content="Adams Erben – Finde deinen Ruderverein">
+  <meta property="og:description" content="Vom Kinosaal ins Boot: Finde einen Ruderverein in deiner Nähe.">
+  <meta property="og:url" content="https://adams-erben.de/">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="/assets/styles.css">
   <script src="/assets/app.js" defer></script>
 </head>
 <body>
   <div class="preview-banner" id="preview-banner" hidden>
     <strong>Prototyp</strong>
-    <span>Diese Vorschau nutzt einen kleinen Testdatensatz. Der Kontaktversand ist deaktiviert.</span>
+    <span>Diese Vorschau nutzt einen klar gekennzeichneten Demo-Datensatz. Es werden keine Formulardaten versendet.</span>
   </div>
   <a class="skip-link" href="#vereine">Zur Vereinssuche springen</a>
 
@@ -45,7 +52,7 @@
         <p class="independence-note">Keine offizielle Website des Films, der Produktion, des Verleihs oder des Deutschen Ruderverbands.</p>
       </div>
       <div class="hero-art" aria-hidden="true">
-        <svg viewBox="0 0 560 360" role="img">
+        <svg viewBox="0 0 560 360">
           <path class="water-line" d="M20 260 C110 230 170 290 260 260 S410 230 540 265" />
           <path class="water-line water-line-2" d="M0 295 C95 265 185 320 280 292 S435 262 560 300" />
           <g class="oars">
@@ -77,6 +84,18 @@
       </article>
     </section>
 
+    <section class="about" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <p class="eyebrow">So kommst du ins Boot</p>
+        <h2 id="steps-title">Drei Schritte vom Film zum ersten Ruderschlag</h2>
+      </div>
+      <div class="principles">
+        <article><h3>1. Verein finden</h3><p>Suche nach deinem Wohnort, deiner Postleitzahl oder direkt nach einem Ruderverein.</p></article>
+        <article><h3>2. Kontakt aufnehmen</h3><p>Adams Erben bringt deine Anfrage zum passenden Verein oder – falls nötig – zur zuständigen Verbandsstelle.</p></article>
+        <article><h3>3. Rudern ausprobieren</h3><p>Der Verein meldet sich bei dir und erklärt dir, wie ein Probetraining oder Einstieg vor Ort möglich ist.</p></article>
+      </div>
+    </section>
+
     <section class="directory" id="vereine" aria-labelledby="directory-title">
       <div class="section-heading directory-heading">
         <div>
@@ -90,33 +109,16 @@
       <div class="search-panel">
         <label class="search-field">
           <span>Suche</span>
-          <input id="search" type="search" autocomplete="postal-code" placeholder="z. B. Lübeck, 23909 oder Ruderclub">
+          <input id="search" type="search" autocomplete="off" placeholder="z. B. Lübeck, 23909 oder Ruderclub">
         </label>
-        <label>
-          <span>Art</span>
-          <select id="type-filter">
-            <option value="all">Alle</option>
-            <option value="club">Rudervereine</option>
-            <option value="member">Weitere DRV-Mitglieder</option>
-            <option value="lrv">Landesruderverbände</option>
-            <option value="drv">Deutscher Ruderverband</option>
-          </select>
-        </label>
-        <label>
-          <span>Bundesland</span>
-          <select id="state-filter">
-            <option value="all">Alle Bundesländer</option>
-          </select>
-        </label>
+        <label><span>Art</span><select id="type-filter"><option value="all">Alle</option><option value="club">Rudervereine</option><option value="member">Weitere DRV-Mitglieder</option><option value="lrv">Landesruderverbände</option><option value="drv">Deutscher Ruderverband</option></select></label>
+        <label><span>Bundesland</span><select id="state-filter"><option value="all">Alle Bundesländer</option></select></label>
       </div>
 
       <p class="result-summary" id="result-summary" aria-live="polite"></p>
       <div class="club-grid" id="club-grid"></div>
       <button class="button button-secondary load-more" id="load-more" type="button" hidden>Mehr anzeigen</button>
-
-      <noscript>
-        <p class="notice">Für die clientseitige Suche ist JavaScript erforderlich. Die offizielle Vereinssuche des Deutschen Ruderverbands findest du auf rudern.de.</p>
-      </noscript>
+      <noscript><p class="notice">Für die clientseitige Suche ist JavaScript erforderlich. Die offizielle Vereinssuche des Deutschen Ruderverbands findest du auf rudern.de.</p></noscript>
     </section>
 
     <section class="film" id="film" aria-labelledby="film-title">
@@ -133,65 +135,31 @@
     </section>
 
     <section class="about" id="ueber" aria-labelledby="about-title">
-      <div class="section-heading">
-        <p class="eyebrow">Über Adams Erben</p>
-        <h2 id="about-title">Unabhängig, datensparsam, vereinsnah</h2>
-      </div>
+      <div class="section-heading"><p class="eyebrow">Über Adams Erben</p><h2 id="about-title">Unabhängig, datensparsam, vereinsnah</h2></div>
       <div class="principles">
-        <article>
-          <h3>Öffentliche Vereinsdaten</h3>
-          <p>Die Suchdaten stammen aus der öffentlichen Vereinssuche des Deutschen Ruderverbands. E-Mail-Adressen werden nicht als offene Sammelliste an den Browser ausgeliefert.</p>
-        </article>
-        <article>
-          <h3>Sicheres Kontakt-Routing</h3>
-          <p>Eine Anfrage geht zuerst an den gewählten Verein. Fehlt dort eine öffentliche Kontaktadresse, wird sie an den zuständigen Landesruderverband und erst danach an den DRV geroutet.</p>
-        </article>
-        <article>
-          <h3>Keine Filmassets ohne Freigabe</h3>
-          <p>Wir verwenden eine eigene Gestaltung. Filmplakate, Filmstills, Logos oder andere geschützte Assets erscheinen nur mit ausdrücklicher Rechtefreigabe.</p>
-        </article>
+        <article><h3 id="data-origin-heading">Geplanter Datenbestand</h3><p id="data-origin-copy">Für die spätere Vereinsübersicht sollen öffentliche bzw. vom DRV freigegebene Organisationsdaten verwendet werden. Die Vorschau enthält ausschließlich einen kleinen Demo-Datensatz.</p></article>
+        <article><h3>Sicheres Kontakt-Routing</h3><p>Eine Anfrage geht zuerst an den gewählten Verein. Fehlt dort eine öffentliche Kontaktadresse, wird sie an den zuständigen Landesruderverband und erst danach an den DRV geroutet.</p></article>
+        <article><h3>Keine Filmassets ohne Freigabe</h3><p>Wir verwenden eine eigene Gestaltung. Filmplakate, Filmstills, Logos oder andere geschützte Assets erscheinen nur mit ausdrücklicher Rechtefreigabe.</p></article>
       </div>
     </section>
   </main>
 
-  <dialog id="contact-dialog" class="contact-dialog">
-    <form method="dialog" class="dialog-close-form">
-      <button type="submit" class="icon-button" aria-label="Dialog schließen">×</button>
-    </form>
+  <dialog id="contact-dialog" class="contact-dialog" aria-labelledby="contact-title">
+    <form method="dialog" class="dialog-close-form"><button type="submit" class="icon-button" aria-label="Dialog schließen">×</button></form>
     <div class="dialog-content">
       <p class="eyebrow">Kontakt zum Rudern</p>
       <h2 id="contact-title">Anfrage senden</h2>
       <p id="contact-target" class="contact-target"></p>
       <p class="routing-note">Die Empfängeradresse wird ausschließlich serverseitig aus dem gewählten Verein bestimmt und kann nicht frei eingegeben werden.</p>
-      <p class="preview-contact-note" id="preview-contact-note" hidden><strong>Preview:</strong> Das Formular demonstriert nur den geplanten Ablauf. Es werden keine Daten versendet.</p>
-
+      <p class="preview-contact-note" id="preview-contact-note" hidden><strong>Preview:</strong> Das Formular demonstriert den Ablauf lokal im Browser. Es werden keine Formulardaten an den Server übertragen.</p>
       <form id="contact-form">
-        <input type="hidden" name="organization" id="contact-organization">
-        <input type="hidden" name="startedAt" id="contact-started-at">
-        <label>
-          <span>Name</span>
-          <input name="name" autocomplete="name" required maxlength="100">
-        </label>
-        <label>
-          <span>E-Mail für die Antwort</span>
-          <input name="email" type="email" autocomplete="email" required maxlength="254">
-        </label>
-        <label>
-          <span>Postleitzahl <small>(optional)</small></span>
-          <input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="10">
-        </label>
-        <label>
-          <span>Nachricht</span>
-          <textarea name="message" required minlength="10" maxlength="2000" rows="7" placeholder="Zum Beispiel: Ich habe den Film gesehen und würde Rudern gern einmal ausprobieren …"></textarea>
-        </label>
-        <label class="honeypot" aria-hidden="true">
-          <span>Website</span>
-          <input name="website" tabindex="-1" autocomplete="off">
-        </label>
-        <label class="consent">
-          <input name="consent" type="checkbox" value="1" required>
-          <span>Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme an den angezeigten Verein bzw. den zuständigen Verband übermittelt werden. Details stehen in der <a href="/datenschutz.php" target="_blank">Datenschutzerklärung</a>.</span>
-        </label>
+        <input type="hidden" name="organization" id="contact-organization"><input type="hidden" name="startedAt" id="contact-started-at">
+        <label><span>Name</span><input name="name" autocomplete="name" required maxlength="100"></label>
+        <label><span>E-Mail für die Antwort</span><input name="email" type="email" autocomplete="email" required maxlength="254"></label>
+        <label><span>Postleitzahl <small>(optional)</small></span><input name="postalCode" inputmode="numeric" autocomplete="postal-code" maxlength="10"></label>
+        <label><span>Nachricht</span><textarea name="message" required minlength="10" maxlength="2000" rows="7" placeholder="Zum Beispiel: Ich habe den Film gesehen und würde Rudern gern einmal ausprobieren …"></textarea></label>
+        <label class="honeypot" aria-hidden="true"><span>Website</span><input name="website" tabindex="-1" autocomplete="off"></label>
+        <label class="consent"><input name="consent" type="checkbox" value="1" required><span>Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme an den angezeigten Verein bzw. den zuständigen Verband übermittelt werden. Details stehen in der <a href="/datenschutz.php" target="_blank">Datenschutzerklärung</a>.</span></label>
         <button class="button button-primary" type="submit">Anfrage senden</button>
         <p id="contact-status" class="form-status" aria-live="polite"></p>
       </form>
@@ -199,15 +167,8 @@
   </dialog>
 
   <footer class="site-footer">
-    <div>
-      <strong>Adams Erben</strong>
-      <p>Eine unabhängige Orientierungshilfe für Menschen, die Rudern kennenlernen möchten.</p>
-    </div>
-    <nav aria-label="Rechtliches">
-      <a href="/impressum.php">Impressum</a>
-      <a href="/datenschutz.php">Datenschutz</a>
-      <a href="https://www.rudern.de/service/vereinssuche" target="_blank" rel="noopener noreferrer">Datenquelle: DRV</a>
-    </nav>
+    <div><strong>Adams Erben</strong><p>Eine unabhängige Orientierungshilfe für Menschen, die Rudern kennenlernen möchten.</p></div>
+    <nav aria-label="Rechtliches"><a href="/impressum.php">Impressum</a><a href="/datenschutz.php">Datenschutz</a><a href="https://www.rudern.de/service/vereinssuche" target="_blank" rel="noopener noreferrer">Datenquelle: DRV</a></nav>
   </footer>
 </body>
 </html>
