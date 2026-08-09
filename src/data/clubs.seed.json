@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-08-09T00:00:00Z",
+  "source": "seed",
+  "sourceLabel": "Lokale Vorschau – vollständiger DRV-Sync noch nicht ausgeführt",
+  "count": 3,
+  "organizations": [
+    {
+      "id": "ratzeburger-ruderclub-ev",
+      "name": "Ratzeburger Ruderclub e.V.",
+      "drvId": "12420",
+      "type": "club",
+      "city": "Ratzeburg",
+      "postalCode": "23909",
+      "state": "Schleswig-Holstein",
+      "website": "http://www.rrc-online.de",
+      "profileUrl": "https://www.rudern.de/service/vereine/ratzeburger-ruderclub-ev",
+      "hasDirectContact": true,
+      "contactRouteLevel": "club",
+      "featured": true
+    },
+    {
+      "id": "landesruderverband-schleswig-holstein",
+      "name": "Landesruderverband Schleswig-Holstein",
+      "drvId": "30024",
+      "type": "lrv",
+      "city": "Schleswig-Holstein",
+      "postalCode": "",
+      "state": "Schleswig-Holstein",
+      "website": "",
+      "profileUrl": "https://www.rudern.de/service/vereinssuche",
+      "hasDirectContact": false,
+      "contactRouteLevel": "drv",
+      "featured": false
+    },
+    {
+      "id": "deutscher-ruderverband",
+      "name": "Deutscher Ruderverband e.V.",
+      "drvId": "",
+      "type": "drv",
+      "city": "Hannover",
+      "postalCode": "30169",
+      "state": "Niedersachsen",
+      "website": "https://www.rudern.de/",
+      "profileUrl": "https://www.rudern.de/verband/geschaeftsstelle",
+      "hasDirectContact": true,
+      "contactRouteLevel": "drv",
+      "featured": false
+    }
+  ]
+}
