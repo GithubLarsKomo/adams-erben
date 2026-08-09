@@ -6,6 +6,7 @@ import {
   evaluateSnapshotEligibility,
   suppressionIdentifier
 } from './contact-governance.mjs';
+import { isApprovedRegistryDirectContact } from './drv-registry.mjs';
 
 const clubSite = 'https://www.beispiel-ruderverein.de/';
 const now = new Date('2026-08-10T00:00:00.000Z');
@@ -113,6 +114,19 @@ const personal = evaluateSnapshotEligibility({
 }, clubSite, { now });
 assert.equal(personal.snapshotEligible, false);
 assert.equal(personal.governanceState, 'review-personal');
+
+const parityCases = [
+  { email: 'info@beispiel-ruderverein.de', website: clubSite },
+  { email: 'vorsitzender@web.de', website: clubSite },
+  { email: 'info@fremde-domain.de', website: clubSite },
+  { email: 'max.mustermann@beispiel-ruderverein.de', website: clubSite },
+  { email: 'max.mustermann@t-online.de', website: clubSite }
+];
+for (const testCase of parityCases) {
+  const central = classifyContactCandidate({ email: testCase.email }, testCase.website).autoApproved;
+  const registry = isApprovedRegistryDirectContact({ emailFromDrv: testCase.email, websiteFromDrv: testCase.website });
+  assert.equal(registry, central, `registry/contact-governance drift for ${testCase.email}`);
+}
 
 const hash1 = suppressionIdentifier(' Info@Example.org ', 'test-secret');
 const hash2 = suppressionIdentifier('info@example.org', 'test-secret');
