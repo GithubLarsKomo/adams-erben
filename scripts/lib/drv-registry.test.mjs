@@ -4,7 +4,8 @@ import {
   discoveryRecordFromRegistry,
   isApprovedRegistryDirectContact,
   parseDrvRegistryProfile,
-  publicOrganizationFromRegistry
+  publicOrganizationFromRegistry,
+  resolvePostalCity
 } from './drv-registry.mjs';
 
 assert.equal(LRV_PROFILES.length, 15);
@@ -13,6 +14,31 @@ assert.deepEqual(
   ['Rheinland-Pfalz', 'Saarland']
 );
 assert.equal(LRV_PROFILES.some((item) => item.drvId === '30021'), false);
+
+assert.deepEqual(
+  resolvePostalCity('Erlanger Wanderrudergesellschaft Franken e.V. Erlangen', { places: ['Erlangen', 'Frauenaurach'] }),
+  { city: 'Erlangen', citySource: 'drv-text+geonames-postcode' }
+);
+assert.deepEqual(
+  resolvePostalCity('Bootshaus Seeweg-Süd Dießen am Ammersee', { places: ['Dießen', 'Dießen am Ammersee'] }),
+  { city: 'Dießen am Ammersee', citySource: 'drv-text+geonames-postcode' }
+);
+assert.deepEqual(
+  resolvePostalCity('B.R.C. Hevella e.V. Berlin', { places: ['Berlin'] }),
+  { city: 'Berlin', citySource: 'drv-text+geonames-postcode' }
+);
+assert.deepEqual(
+  resolvePostalCity('Bootshaus Bäkepromenade Stahnsdorf', { places: ['Kleinmachnow', 'Stahnsdorf'] }),
+  { city: 'Stahnsdorf', citySource: 'drv-text+geonames-postcode' }
+);
+assert.deepEqual(
+  resolvePostalCity('Abt. Rudern Leipzig', { places: ['Leipzig'] }),
+  { city: 'Leipzig', citySource: 'drv-text+geonames-postcode' }
+);
+assert.deepEqual(
+  resolvePostalCity('unbrauchbarer Freitext', { places: ['Köln'] }),
+  { city: 'Köln', citySource: 'geonames-postcode' }
+);
 
 const postalStates = new Map([
   ['23909', { state: 'Schleswig-Holstein', places: ['Ratzeburg'] }],
@@ -41,6 +67,8 @@ const club = parseDrvRegistryProfile(
 assert.equal(club.organizationId, '12420');
 assert.equal(club.id, 'ratzeburger-ruderclub-ev');
 assert.equal(club.type, 'club');
+assert.equal(club.city, 'Ratzeburg');
+assert.equal(club.citySource, 'drv-text+geonames-postcode');
 assert.equal(club.state, 'Schleswig-Holstein');
 assert.deepEqual(club.states, ['Schleswig-Holstein']);
 assert.equal(club.websiteFromDrv, 'http://www.rrc-online.de/');
@@ -62,6 +90,7 @@ assert.equal('emailFromDrv' in publicClub, false);
 const discoveryClub = discoveryRecordFromRegistry(club);
 assert.equal(discoveryClub.organizationId, '12420');
 assert.equal(discoveryClub.type, 'club');
+assert.equal(discoveryClub.citySource, 'drv-text+geonames-postcode');
 assert.equal('emailFromDrv' in discoveryClub, false);
 
 const missingHtml = `
@@ -81,6 +110,8 @@ const missing = parseDrvRegistryProfile(
 assert.equal(missing.websiteFromDrv, '');
 assert.equal(missing.websiteStatus, 'missing');
 assert.equal(missing.organizationId, '19999');
+assert.equal(missing.city, 'Hannover');
+assert.equal(missing.citySource, 'geonames-postcode');
 assert.equal(isApprovedRegistryDirectContact(missing), false);
 
 const lrvHtml = `
@@ -119,6 +150,7 @@ const suedwest = parseDrvRegistryProfile(
 assert.equal(suedwest.type, 'lrv');
 assert.equal(suedwest.state, 'Rheinland-Pfalz / Saarland');
 assert.deepEqual(suedwest.states, ['Rheinland-Pfalz', 'Saarland']);
+assert.equal(suedwest.city, 'Mainz');
 assert.equal(isApprovedRegistryDirectContact(suedwest), true);
 
 assert.equal(isApprovedRegistryDirectContact({
