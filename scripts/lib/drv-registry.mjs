@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 
-export const DRV_REGISTRY_PARSER_VERSION = '1.1.2';
+export const DRV_REGISTRY_PARSER_VERSION = '1.1.3';
 export const DRV_ORIGIN = 'https://www.rudern.de';
 
 // Current Länderrat roster represented by the corresponding official DRV profiles.
@@ -26,7 +26,7 @@ export const LRV_PROFILES = [
 
 export const LRV_BY_DRV_ID = new Map(LRV_PROFILES.map((item) => [item.drvId, item]));
 
-const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend)/i;
+const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend|Adolfinum)/i;
 const NON_OFFICIAL_SITE_HOST = /(google\.|openstreetmap|maps\.|facebook\.|instagram\.|youtube\.|youtu\.be|linkedin\.|x\.com$|twitter\.|ruder-bundesliga\.de$|rudersport-magazin\.de$)/i;
 const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz\w*|vorstand|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*)$/i;
 const GENERIC_FUNCTIONAL_LOCAL_PART = /^(?:info|kontakt|contact|office|buero|büro|mail|post|anfrage|service|verein|webmaster)(?:[._-].*)?$/i;
