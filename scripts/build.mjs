@@ -17,9 +17,12 @@ await cp(src, dist, { recursive: true });
 const indexPath = path.join(dist, 'index.html');
 const indexHtml = await readFile(indexPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
+const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
+const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
-  .replace('</head>', `${previewStyles}</head>`);
+  .replaceAll('https://adams-erben.de/', canonicalUrl)
+  .replace('</head>', `${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
