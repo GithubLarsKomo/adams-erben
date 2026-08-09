@@ -37,8 +37,8 @@ $smtpAddress = cfg('SMTP_PROVIDER_ADDRESS', '[SMTP_PROVIDER_ADDRESS]');
     <h2>2. Grundsatz der Datenminimierung</h2>
     <p>Adams Erben setzt für die Vereinssuche keine Analyse- oder Werbetracker ein, bindet keine externen Schriftarten ein und verwendet keine Marketing-Cookies. Film- und Vereinsseiten sowie der YouTube-Trailer werden nur als externe Links geöffnet; auf dieser Website wird kein YouTube-Player eingebettet.</p>
 
-    <h2>3. Hosting</h2>
-    <p>Die Website wird bei <?= h($hosting) ?>, <?= h($hostingAddress) ?>, betrieben. Beim Abruf einer Website müssen technisch insbesondere IP-Adresse, Zeitpunkt, angeforderte Ressource, Browser-/Geräteinformationen und Übertragungsstatus verarbeitet werden. Die Anwendung selbst führt kein dauerhaftes Zugriffsprotokoll mit diesen Daten. Eine Verarbeitung auf Infrastruktur- und Sicherheitsebene des Hostinganbieters kann dennoch stattfinden.</p>
+    <h2>3. Hosting und Serverprotokolle</h2>
+    <p>Die Website wird bei <?= h($hosting) ?>, <?= h($hostingAddress) ?>, betrieben. Beim Abruf der Website werden technisch insbesondere IP-Adresse, Zeitpunkt, angeforderte Ressource, Browser-/Geräteinformationen und Übertragungsstatus verarbeitet. Webserver, Container-Plattform und Hostinganbieter können diese Angaben in technischen Zugriffs- und Sicherheitsprotokollen verarbeiten. Die konkrete Protokollierungs- und Aufbewahrungskonfiguration wird vor Produktivsetzung im tatsächlich verwendeten Hetzner/Coolify-Setup geprüft und hier erforderlichenfalls präzisiert.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Das berechtigte Interesse liegt im sicheren und zuverlässigen Betrieb der Website.</p>
 
     <h2>4. Vereinssuche</h2>
@@ -47,17 +47,17 @@ $smtpAddress = cfg('SMTP_PROVIDER_ADDRESS', '[SMTP_PROVIDER_ADDRESS]');
     <h2>5. Kontaktformular</h2>
     <p>Wenn du das Kontaktformular verwendest, verarbeiten wir deinen Namen, deine E-Mail-Adresse, optional deine Postleitzahl, den ausgewählten Verein bzw. Verband und den Nachrichtentext. Diese Daten werden ausschließlich verwendet, um die von dir gewünschte Anfrage zu versenden.</p>
     <p>Die Empfängeradresse ist nicht frei wählbar. Das System verwendet eine beim Website-Build erzeugte, serverseitige Routingliste. Soweit eine öffentliche Kontaktadresse des gewählten Vereins vorliegt, geht die Nachricht dorthin. Anderenfalls erfolgt die Weiterleitung an den zuständigen Landesruderverband und, wenn auch dort keine Adresse verfügbar ist, an den Deutschen Ruderverband.</p>
-    <p>Rechtsgrundlage für den Versand ist deine Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO. Die Einwilligung wird unmittelbar vor dem Versand über die Checkbox im Formular erteilt. Nach erfolgtem Versand befindet sich die Nachricht beim jeweiligen Empfänger; dieser verarbeitet die Anfrage in eigener datenschutzrechtlicher Verantwortung.</p>
+    <p>Rechtsgrundlage für den Versand ist deine Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO. Die Einwilligung wird unmittelbar vor dem Versand über die nicht vorausgewählte Checkbox im Formular erteilt. Nach erfolgtem Versand befindet sich die Nachricht beim jeweiligen Empfänger; dieser verarbeitet die Anfrage in eigener datenschutzrechtlicher Verantwortung.</p>
 
     <h2>6. E-Mail-Versand</h2>
     <p>Für den technischen Versand wird ein SMTP-Dienst eingesetzt. Konfigurierter Anbieter: <?= h($smtpProvider) ?>, <?= h($smtpAddress) ?>. Dabei werden die für die E-Mail-Zustellung erforderlichen Daten an diesen Dienst übermittelt. Vor Produktivsetzung müssen Anbieter, Vertrags-/AVV-Situation und etwaige Drittlandtransfers geprüft und diese Angaben vervollständigt werden.</p>
 
     <h2>7. Missbrauchsschutz</h2>
-    <p>Zum Schutz der Vereine vor automatisiertem Spam verwendet das Formular einen unsichtbaren Honeypot, Zeitplausibilitätsprüfungen und ein serverseitiges Rate Limit. Hierfür wird die anfragende IP-Adresse zusammen mit einem geheimen Serverwert gehasht; gespeichert wird nur dieser Hash mit Zeitstempeln. Diese Einträge werden spätestens nach 24 Stunden verworfen. Nachrichtentext, Name und E-Mail-Adresse werden für das Rate Limit nicht gespeichert.</p>
+    <p>Zum Schutz der Vereine vor automatisiertem Spam verwendet das Formular einen unsichtbaren Honeypot, Zeitplausibilitätsprüfungen, eine Herkunftsprüfung und ein serverseitiges Rate Limit. Hierfür wird die anfragende IP-Adresse zusammen mit einem geheimen Serverwert gehasht; gespeichert wird nur dieser Hash mit Zeitstempeln. Beim nächsten Schreibzugriff werden Rate-Limit-Einträge entfernt, sobald sie älter als 24 Stunden sind. Nachrichtentext, Name und E-Mail-Adresse werden für das Rate Limit nicht gespeichert.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Das berechtigte Interesse besteht im Schutz des Dienstes und der angeschlossenen Vereine vor Missbrauch.</p>
 
     <h2>8. Speicherdauer</h2>
-    <p>Die Anwendung speichert abgesendete Kontaktanfragen nicht in einer Datenbank. Sie werden unmittelbar über den konfigurierten SMTP-Dienst an den ermittelten Empfänger übertragen. Für die weitere Speicherung in den E-Mail-Systemen des Absenders, SMTP-Dienstes und Empfängers gelten deren jeweilige Aufbewahrungsregeln. Rate-Limit-Daten werden spätestens nach 24 Stunden entfernt.</p>
+    <p>Die Anwendung speichert abgesendete Kontaktanfragen nicht in einer eigenen Nachrichten-Datenbank. Sie werden unmittelbar über den konfigurierten SMTP-Dienst an den ermittelten Empfänger übertragen. Für die weitere Speicherung in den beteiligten E-Mail-Systemen gelten deren jeweilige Aufbewahrungsregeln. Rate-Limit-Daten werden bei der nächsten Formularnutzung bereinigt, sobald sie älter als 24 Stunden sind. Technische Server-/Plattformprotokolle richten sich nach der vor dem Go-live festzulegenden Hosting-Konfiguration.</p>
 
     <h2>9. Deine Rechte</h2>
     <p>Du hast nach Maßgabe der gesetzlichen Voraussetzungen insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Eine erteilte Einwilligung kannst du mit Wirkung für die Zukunft widerrufen. Außerdem besteht das Recht auf Beschwerde bei einer zuständigen Datenschutzaufsichtsbehörde.</p>
@@ -66,7 +66,7 @@ $smtpAddress = cfg('SMTP_PROVIDER_ADDRESS', '[SMTP_PROVIDER_ADDRESS]');
     <p>Beim Anklicken externer Links – etwa zu rudern.de, Vereinswebsites, der offiziellen Filmseite oder YouTube – verlässt du Adams Erben. Ab diesem Zeitpunkt gelten die Datenschutzbestimmungen des jeweiligen externen Anbieters.</p>
 
     <h2>11. Stand</h2>
-    <p>Stand: 9. August 2026. Die Datenschutzerklärung wird vor dem öffentlichen Start nochmals gegen die tatsächlich konfigurierte Hosting- und SMTP-Infrastruktur geprüft.</p>
+    <p>Stand: 9. August 2026. Die Datenschutzerklärung wird vor dem öffentlichen Start nochmals gegen die tatsächlich konfigurierte Hosting-, Logging- und SMTP-Infrastruktur geprüft.</p>
 
     <p><a href="/">Zurück zur Startseite</a></p>
   </main>
