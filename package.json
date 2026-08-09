@@ -1,0 +1,14 @@
+{
+  "name": "adams-erben",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "sync:drv": "node scripts/sync-drv.mjs"
+  },
+  "dependencies": {
+    "adm-zip": "0.5.16",
+    "cheerio": "1.1.2"
+  }
+}
