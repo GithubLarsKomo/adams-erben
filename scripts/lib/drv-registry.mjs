@@ -1,6 +1,6 @@
 import * as cheerio from 'cheerio';
 
-export const DRV_REGISTRY_PARSER_VERSION = '1.1.0';
+export const DRV_REGISTRY_PARSER_VERSION = '1.1.1';
 export const DRV_ORIGIN = 'https://www.rudern.de';
 
 // Current Länderrat roster represented by the corresponding official DRV profiles.
@@ -35,6 +35,16 @@ export const clean = (value = '') => String(value).replace(/\u00a0/g, ' ').repla
 
 function normalizeHost(value = '') {
   return String(value).trim().toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
+}
+
+function normalizePlace(value = '') {
+  return clean(value)
+    .toLocaleLowerCase('de-DE')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 function domainsRelated(a, b) {
@@ -115,18 +125,42 @@ export function extractProfileLinks(html) {
 }
 
 export function extractPostalSection(text) {
-  for (const marker of ['Bootshaus', 'Anschriften', 'Anschrift']) {
+  for (const marker of ['Bootshäuser', 'Bootshaus', 'Anschriften', 'Anschrift']) {
     const index = text.indexOf(marker);
     if (index < 0) continue;
-    const section = text.slice(index, index + 600);
+    const section = text.slice(index, index + 700);
     const zipMatch = section.match(/\b(\d{5})\b/);
     if (!zipMatch) continue;
     const postalCode = zipMatch[1];
     const before = section.slice(0, zipMatch.index).replace(/Route planen.*$/i, '').trim();
-    const cityMatch = before.match(/([A-ZÄÖÜ][\p{L}ÄÖÜäöüß.'’()\/-]*(?:\s+[\p{L}ÄÖÜäöüß.'’()\/-]+){0,4})\s*$/u);
+    const cityMatch = before.match(/([A-ZÄÖÜ][\p{L}ÄÖÜäöüß.'’()\/-]*(?:\s+[\p{L}ÄÖÜäöüß.'’()\/-]+){0,6})\s*$/u);
     return { postalCode, parsedCity: clean(cityMatch?.[1] || '') };
   }
   return { postalCode: '', parsedCity: '' };
+}
+
+// DRV address text is flattened and may prepend club/boathouse labels to the city
+// (e.g. "Bootshaus Seeweg-Süd Dießen am Ammersee"). GeoNames is already loaded
+// for postcode→state resolution, so use the postcode places as a validation layer.
+export function resolvePostalCity(parsedCity, postalInfo) {
+  const candidate = clean(parsedCity);
+  const places = [...new Set((postalInfo?.places || []).map(clean).filter(Boolean))]
+    .sort((a, b) => normalizePlace(b).length - normalizePlace(a).length);
+
+  if (!places.length) {
+    return { city: candidate, citySource: candidate ? 'drv-text-unverified' : 'missing' };
+  }
+
+  const candidateNorm = normalizePlace(candidate);
+  if (candidateNorm) {
+    const match = places.find((place) => {
+      const placeNorm = normalizePlace(place);
+      return candidateNorm === placeNorm || candidateNorm.endsWith(` ${placeNorm}`);
+    });
+    if (match) return { city: match, citySource: 'drv-text+geonames-postcode' };
+  }
+
+  return { city: places[0], citySource: 'geonames-postcode' };
 }
 
 export function firstPublicEmail($) {
@@ -185,9 +219,9 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
   const lrvProfile = LRV_BY_DRV_ID.get(drvId);
   const { postalCode, parsedCity } = extractPostalSection(text);
   const postalInfo = postalStates.get(postalCode);
+  const { city, citySource } = resolvePostalCity(parsedCity, postalInfo);
   const states = lrvProfile?.states || (postalInfo?.state ? [postalInfo.state] : []);
   const state = lrvProfile ? lrvProfile.states.join(' / ') : (postalInfo?.state || '');
-  const city = parsedCity || postalInfo?.places?.[0] || '';
   const emailFromDrv = firstPublicEmail($);
   const websiteFromDrv = firstExternalWebsite($);
   const slug = new URL(url).pathname.split('/').filter(Boolean).pop();
@@ -202,6 +236,7 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
     name,
     type,
     city,
+    citySource,
     postalCode,
     state,
     states,
@@ -258,6 +293,7 @@ export function discoveryRecordFromRegistry(record) {
     type: record.type,
     postalCode: record.postalCode,
     city: record.city,
+    citySource: record.citySource,
     state: record.state,
     states: record.states,
     drvProfileUrl: record.drvProfileUrl,
