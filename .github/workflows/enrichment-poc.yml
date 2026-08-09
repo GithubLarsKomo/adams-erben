@@ -6,11 +6,15 @@ on:
     branches: [feat/mvp-wayfinder]
     paths:
       - 'scripts/enrichment-poc.mjs'
+      - 'scripts/review-enrichment-poc.mjs'
+      - 'scripts/review-enrichment-poc.test.mjs'
       - 'package.json'
       - '.github/workflows/enrichment-poc.yml'
   pull_request:
     paths:
       - 'scripts/enrichment-poc.mjs'
+      - 'scripts/review-enrichment-poc.mjs'
+      - 'scripts/review-enrichment-poc.test.mjs'
       - 'package.json'
       - '.github/workflows/enrichment-poc.yml'
 
@@ -33,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
+      - name: Test conservative contact review rules
+        run: npm run test:enrich-review
+
       - name: Run 25-club enrichment PoC
         env:
           ENRICH_TARGET: '25'
@@ -46,22 +53,32 @@ jobs:
           ENRICH_MAX_SITE_PAGES: '5'
         run: npm run poc:enrich
 
+      - name: Apply conservative routing review
+        run: npm run poc:enrich:review
+
       - name: Validate report invariants
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const report = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/report.json', 'utf8'));
+          const review = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/review.json', 'utf8'));
           const s = report.summary;
+          const r = review.summary;
           if (s.sampleSize < 25) throw new Error(`sample too small: ${s.sampleSize}`);
           if (s.stateCount < 5) throw new Error(`too few states: ${s.stateCount}`);
-          const raw = fs.readFileSync('artifacts/enrichment-poc/report.json', 'utf8') + fs.readFileSync('artifacts/enrichment-poc/report.md', 'utf8');
+          if (r.organizations !== s.sampleSize) throw new Error(`review size mismatch: ${r.organizations} != ${s.sampleSize}`);
+          const files = ['report.json', 'report.md', 'review.json', 'review.md'];
+          const raw = files.map((name) => fs.readFileSync(`artifacts/enrichment-poc/${name}`, 'utf8')).join('\n');
           const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
-          if (email.test(raw)) throw new Error('public PoC report must not expose email addresses');
-          console.log(s);
+          if (email.test(raw)) throw new Error('public PoC artifacts must not expose email addresses');
+          console.log({ coverage: s, conservativeReview: r });
           NODE
 
-      - name: Add Markdown report to workflow summary
-        run: cat artifacts/enrichment-poc/report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Add reports to workflow summary
+        run: |
+          cat artifacts/enrichment-poc/report.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/enrichment-poc/review.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload public coverage report
         uses: actions/upload-artifact@v4
