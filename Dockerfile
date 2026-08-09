@@ -7,8 +7,10 @@ COPY src ./src
 
 # Safe default: do not reuse/crawl the full DRV directory until the preferred
 # data route has been agreed with the DRV (see Issue #1 and NOTICE.md).
+ARG PREVIEW_MODE=0
 ARG SKIP_DRV_SYNC=1
 ARG REQUIRE_DRV_SYNC=0
+ENV PREVIEW_MODE=${PREVIEW_MODE}
 ENV SKIP_DRV_SYNC=${SKIP_DRV_SYNC}
 ENV REQUIRE_DRV_SYNC=${REQUIRE_DRV_SYNC}
 RUN npm run build
@@ -19,6 +21,8 @@ COPY composer.json ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
 FROM php:8.3-apache
+ARG PREVIEW_MODE=0
+ENV PREVIEW_MODE=${PREVIEW_MODE}
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libonig-dev \
     && docker-php-ext-install mbstring \
