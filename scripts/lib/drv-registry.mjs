@@ -24,8 +24,21 @@ export const LRV_BY_DRV_ID = new Map([
 
 const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend)/i;
 const NON_OFFICIAL_SITE_HOST = /(google\.|openstreetmap|maps\.|facebook\.|instagram\.|youtube\.|youtu\.be|linkedin\.|x\.com$|twitter\.)/i;
+const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz\w*|vorstand|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*)$/i;
+const GENERIC_FUNCTIONAL_LOCAL_PART = /^(?:info|kontakt|contact|office|buero|büro|mail|post|anfrage|service|verein|webmaster)(?:[._-].*)?$/i;
 
 export const clean = (value = '') => String(value).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+
+function normalizeHost(value = '') {
+  return String(value).trim().toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
+}
+
+function domainsRelated(a, b) {
+  const left = normalizeHost(a);
+  const right = normalizeHost(b);
+  if (!left || !right) return false;
+  return left === right || left.endsWith(`.${right}`) || right.endsWith(`.${left}`);
+}
 
 export function extractProfileLinks(html) {
   const $ = cheerio.load(html);
@@ -125,7 +138,26 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
   };
 }
 
-export function publicOrganizationFromRegistry(record, contactRouteLevel = 'drv') {
+export function isApprovedRegistryDirectContact(record) {
+  const email = clean(record.emailFromDrv).toLowerCase();
+  if (!email || !email.includes('@')) return false;
+  const [local, emailDomain = ''] = email.split('@');
+
+  // Explicit club roles are safe enough for automatic routing even when the
+  // mailbox is hosted by a general-purpose provider.
+  if (ROLE_LOCAL_PART.test(local)) return true;
+
+  // Generic aliases such as info@ are only accepted automatically when the
+  // mailbox domain belongs to the known official club website.
+  if (!GENERIC_FUNCTIONAL_LOCAL_PART.test(local) || !record.websiteFromDrv) return false;
+  try {
+    return domainsRelated(emailDomain, new URL(record.websiteFromDrv).hostname);
+  } catch {
+    return false;
+  }
+}
+
+export function publicOrganizationFromRegistry(record, contactRouteLevel = 'drv', hasDirectContact = Boolean(record.emailFromDrv)) {
   return {
     id: record.id,
     organizationId: record.organizationId,
@@ -138,7 +170,7 @@ export function publicOrganizationFromRegistry(record, contactRouteLevel = 'drv'
     website: record.websiteFromDrv,
     profileUrl: record.drvProfileUrl,
     websiteStatus: record.websiteStatus,
-    hasDirectContact: Boolean(record.emailFromDrv),
+    hasDirectContact,
     contactRouteLevel,
     featured: record.featured
   };
