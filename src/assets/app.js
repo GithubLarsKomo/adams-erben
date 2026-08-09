@@ -17,6 +17,8 @@ const contactStartedAt = document.querySelector('#contact-started-at');
 const contactStatus = document.querySelector('#contact-status');
 const previewBanner = document.querySelector('#preview-banner');
 const previewContactNote = document.querySelector('#preview-contact-note');
+const dataOriginHeading = document.querySelector('#data-origin-heading');
+const dataOriginCopy = document.querySelector('#data-origin-copy');
 
 let organizations = [];
 let visibleCount = PAGE_SIZE;
@@ -25,33 +27,21 @@ if (PREVIEW_MODE) {
   previewBanner.hidden = false;
   previewContactNote.hidden = false;
   document.body.classList.add('is-preview');
+} else {
+  if (dataOriginHeading) dataOriginHeading.textContent = 'Öffentliche Vereinsdaten';
+  if (dataOriginCopy) dataOriginCopy.textContent = 'Die Suchdaten stammen aus der freigegebenen Datenquelle des Deutschen Ruderverbands. E-Mail-Adressen werden nicht als offene Sammelliste an den Browser ausgeliefert.';
 }
 
 function normalize(value = '') {
-  return value
-    .toLocaleLowerCase('de-DE')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/ß/g, 'ss')
-    .replace(/[^a-z0-9]+/g, ' ')
-    .trim();
+  return value.toLocaleLowerCase('de-DE').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
 function labelForType(type) {
-  return {
-    club: 'Ruderverein',
-    member: 'DRV-Mitglied',
-    lrv: 'Landesruderverband',
-    drv: 'Deutscher Ruderverband'
-  }[type] || 'Ruderorganisation';
+  return { club: 'Ruderverein', member: 'DRV-Mitglied', lrv: 'Landesruderverband', drv: 'Deutscher Ruderverband' }[type] || 'Ruderorganisation';
 }
 
 function routeText(level) {
-  return {
-    club: 'direkt an den Verein',
-    lrv: 'über den Landesruderverband',
-    drv: 'über den Deutschen Ruderverband'
-  }[level] || 'über die passende Verbandsstelle';
+  return { club: 'direkt an den Verein', lrv: 'über den Landesruderverband', drv: 'über den Deutschen Ruderverband' }[level] || 'über die passende Verbandsstelle';
 }
 
 function escaped(value = '') {
@@ -60,23 +50,26 @@ function escaped(value = '') {
   return element.innerHTML;
 }
 
+function safeExternalUrl(value = '') {
+  if (!value) return '';
+  try {
+    const url = new URL(value, window.location.origin);
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
 function filteredOrganizations() {
   const q = normalize(searchInput.value);
   const type = typeFilter.value;
   const state = stateFilter.value;
   const tokens = q ? q.split(/\s+/) : [];
-
   return organizations.filter((org) => {
     if (type !== 'all' && org.type !== type) return false;
     if (state !== 'all' && org.state !== state) return false;
     if (!tokens.length) return true;
-    const haystack = normalize([
-      org.name,
-      org.city,
-      org.postalCode,
-      org.state,
-      org.drvId
-    ].filter(Boolean).join(' '));
+    const haystack = normalize([org.name, org.city, org.postalCode, org.state, org.drvId].filter(Boolean).join(' '));
     return tokens.every((token) => haystack.includes(token));
   });
 }
@@ -84,21 +77,17 @@ function filteredOrganizations() {
 function clubCard(org) {
   const location = [org.postalCode, org.city].filter(Boolean).join(' ');
   const meta = [location, org.state].filter(Boolean).join(' · ');
-  const website = org.website
-    ? `<a href="${escaped(org.website)}" target="_blank" rel="noopener noreferrer">Website</a>`
-    : '';
-  const profile = org.profileUrl
-    ? `<a href="${escaped(org.profileUrl)}" target="_blank" rel="noopener noreferrer">DRV-Profil</a>`
-    : '';
+  const websiteUrl = safeExternalUrl(org.website);
+  const profileUrl = safeExternalUrl(org.profileUrl);
+  const website = websiteUrl ? `<a href="${escaped(websiteUrl)}" target="_blank" rel="noopener noreferrer">Website</a>` : '';
+  const profile = profileUrl ? `<a href="${escaped(profileUrl)}" target="_blank" rel="noopener noreferrer">DRV-Profil</a>` : '';
   const links = [website, profile].filter(Boolean).join('<span aria-hidden="true"> · </span>');
   const contactLabel = PREVIEW_MODE ? 'Kontakt (Demo)' : 'Kontakt';
+  const badge = org.featured ? '<span class="badge badge-small">Ratzeburg</span>' : (org.demo ? '<span class="badge badge-small">Demo</span>' : '');
 
   return `
     <article class="club-card ${org.featured ? 'club-card-featured' : ''}">
-      <div class="club-card-topline">
-        <span class="club-type">${escaped(labelForType(org.type))}</span>
-        ${org.featured ? '<span class="badge badge-small">Ratzeburg</span>' : ''}
-      </div>
+      <div class="club-card-topline"><span class="club-type">${escaped(labelForType(org.type))}</span>${badge}</div>
       <h3>${escaped(org.name)}</h3>
       <p class="club-location">${escaped(meta || 'Standort siehe DRV-Profil')}</p>
       <p class="club-route">Kontakt ${escaped(routeText(org.contactRouteLevel))}</p>
@@ -118,8 +107,7 @@ function render() {
 }
 
 function populateStates() {
-  const states = [...new Set(organizations.map((org) => org.state).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, 'de'));
+  const states = [...new Set(organizations.map((org) => org.state).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
   for (const state of states) {
     const option = document.createElement('option');
     option.value = state;
@@ -136,33 +124,30 @@ function openContact(id) {
   contactOrganization.value = org.id;
   contactStartedAt.value = String(Date.now());
   contactStatus.textContent = PREVIEW_MODE
-    ? `Demo: Später würde die Nachricht ${routeText(org.contactRouteLevel)} weitergeleitet. In dieser Vorschau wird nichts versendet.`
+    ? `Demo: Die Nachricht würde ${routeText(org.contactRouteLevel)} weitergeleitet. Es werden keine Daten übertragen.`
     : `Deine Nachricht wird ${routeText(org.contactRouteLevel)} weitergeleitet.`;
 
   const submitButton = contactForm.querySelector('button[type="submit"]');
-  if (PREVIEW_MODE) {
-    submitButton.disabled = true;
-    submitButton.textContent = 'Versand in Preview deaktiviert';
-  } else {
-    submitButton.disabled = false;
-    submitButton.textContent = 'Anfrage senden';
-  }
-
+  submitButton.disabled = false;
+  submitButton.textContent = PREVIEW_MODE ? 'Demo-Anfrage absenden' : 'Anfrage senden';
   contactDialog.showModal();
   contactForm.querySelector('[name="name"]').focus();
 }
 
 async function submitContact(event) {
   event.preventDefault();
+  const button = contactForm.querySelector('button[type="submit"]');
+
   if (PREVIEW_MODE) {
-    contactStatus.textContent = 'Der Versand ist in dieser öffentlichen Vorschau deaktiviert.';
+    const org = organizations.find((item) => item.id === contactOrganization.value);
+    const route = routeText(org?.contactRouteLevel);
+    contactStatus.textContent = `Demo erfolgreich: Diese Anfrage würde ${route} weitergeleitet. Es wurden keine Daten an den Server übertragen.`;
+    button.textContent = 'Demo angezeigt';
     return;
   }
 
-  const button = contactForm.querySelector('button[type="submit"]');
   button.disabled = true;
   contactStatus.textContent = 'Anfrage wird gesendet …';
-
   const payload = Object.fromEntries(new FormData(contactForm).entries());
   payload.consent = contactForm.elements.consent.checked ? '1' : '0';
 
@@ -192,11 +177,9 @@ async function init() {
     populateStates();
     render();
     const sourceDate = data.generatedAt ? new Date(data.generatedAt) : null;
-    const dateText = sourceDate && !Number.isNaN(sourceDate.valueOf())
-      ? sourceDate.toLocaleDateString('de-DE')
-      : 'unbekannt';
+    const dateText = sourceDate && !Number.isNaN(sourceDate.valueOf()) ? sourceDate.toLocaleDateString('de-DE') : 'unbekannt';
     dataStatus.textContent = PREVIEW_MODE
-      ? `${organizations.length.toLocaleString('de-DE')} Testeinträge · Prototyp`
+      ? `${organizations.length.toLocaleString('de-DE')} Demo-Einträge · keine vollständigen DRV-Daten`
       : `${organizations.length.toLocaleString('de-DE')} Einträge · Stand ${dateText}`;
   } catch (error) {
     dataStatus.textContent = 'Vereinsdaten konnten nicht geladen werden.';
@@ -206,26 +189,13 @@ async function init() {
 }
 
 for (const control of [searchInput, typeFilter, stateFilter]) {
-  control?.addEventListener(control === searchInput ? 'input' : 'change', () => {
-    visibleCount = PAGE_SIZE;
-    render();
-  });
+  control?.addEventListener(control === searchInput ? 'input' : 'change', () => { visibleCount = PAGE_SIZE; render(); });
 }
-
-loadMore?.addEventListener('click', () => {
-  visibleCount += PAGE_SIZE;
-  render();
-});
-
+loadMore?.addEventListener('click', () => { visibleCount += PAGE_SIZE; render(); });
 document.addEventListener('click', (event) => {
   const button = event.target.closest('[data-contact]');
   if (button) openContact(button.dataset.contact);
 });
-
 contactForm?.addEventListener('submit', submitContact);
-
-contactDialog?.addEventListener('click', (event) => {
-  if (event.target === contactDialog) contactDialog.close();
-});
-
+contactDialog?.addEventListener('click', (event) => { if (event.target === contactDialog) contactDialog.close(); });
 init();
