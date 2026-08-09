@@ -4,7 +4,12 @@ COPY package.json ./
 RUN npm install --no-audit --no-fund
 COPY scripts ./scripts
 COPY src ./src
-ARG REQUIRE_DRV_SYNC=1
+
+# Safe default: do not reuse/crawl the full DRV directory until the preferred
+# data route has been agreed with the DRV (see Issue #1 and NOTICE.md).
+ARG SKIP_DRV_SYNC=1
+ARG REQUIRE_DRV_SYNC=0
+ENV SKIP_DRV_SYNC=${SKIP_DRV_SYNC}
 ENV REQUIRE_DRV_SYNC=${REQUIRE_DRV_SYNC}
 RUN npm run build
 
