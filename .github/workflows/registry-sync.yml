@@ -10,6 +10,13 @@ on:
       - 'scripts/lib/drv-registry.test.mjs'
       - 'package.json'
       - '.github/workflows/registry-sync.yml'
+  pull_request:
+    paths:
+      - 'scripts/sync-drv.mjs'
+      - 'scripts/lib/drv-registry.mjs'
+      - 'scripts/lib/drv-registry.test.mjs'
+      - 'package.json'
+      - '.github/workflows/registry-sync.yml'
 
 permissions:
   contents: read
