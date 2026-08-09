@@ -30,6 +30,8 @@ jobs:
           node --check scripts/sync-drv.mjs
           node --check scripts/lib/drv-registry.mjs
           node --check scripts/lib/drv-registry.test.mjs
+          node --check scripts/lib/contact-governance.mjs
+          node --check scripts/lib/contact-governance.test.mjs
           node --check scripts/enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.test.mjs
@@ -41,6 +43,9 @@ jobs:
 
       - name: Test DRV registry parser and routing gate
         run: npm run test:drv-registry
+
+      - name: Test shared contact governance
+        run: npm run test:contact-governance
 
       - name: Test discovery sample stratification
         run: npm run test:discover-prepare
