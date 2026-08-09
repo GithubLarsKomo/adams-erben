@@ -6,12 +6,17 @@ const root = process.cwd();
 const src = path.join(root, 'src');
 const dist = path.join(root, 'dist');
 const privateDir = path.join(root, 'build-private');
+const previewMode = process.env.PREVIEW_MODE === '1';
 
 await rm(dist, { recursive: true, force: true });
 await rm(privateDir, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 await mkdir(privateDir, { recursive: true });
 await cp(src, dist, { recursive: true });
+
+const indexPath = path.join(dist, 'index.html');
+const indexHtml = await readFile(indexPath, 'utf8');
+await writeFile(indexPath, indexHtml.replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production'));
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
 const publicPath = path.join(dist, 'data', 'clubs.json');
@@ -29,10 +34,11 @@ function runSync() {
 }
 
 try {
+  if (previewMode) throw new Error('preview mode always uses checked-in seed data');
   if (process.env.SKIP_DRV_SYNC === '1') throw new Error('DRV sync explicitly skipped');
   await runSync();
 } catch (error) {
-  if (process.env.REQUIRE_DRV_SYNC === '1') throw error;
+  if (!previewMode && process.env.REQUIRE_DRV_SYNC === '1') throw error;
   console.warn(`[build] ${error.message}; using checked-in seed data.`);
   const seed = await readFile(seedPath, 'utf8');
   await writeFile(publicPath, seed);
@@ -40,7 +46,8 @@ try {
     path.join(privateDir, 'recipients.json'),
     JSON.stringify({
       generatedAt: new Date().toISOString(),
-      source: 'seed-fallback',
+      source: previewMode ? 'preview-seed' : 'seed-fallback',
+      preview: previewMode,
       recipients: {},
       drv: {
         name: 'Deutscher Ruderverband e.V.',
@@ -51,4 +58,4 @@ try {
 }
 
 await rm(seedPath, { force: true });
-console.log('[build] dist ready');
+console.log(`[build] dist ready (${previewMode ? 'preview' : 'production'} mode)`);
