@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
-import { parseDrvRegistryProfile, publicOrganizationFromRegistry, discoveryRecordFromRegistry } from './drv-registry.mjs';
+import {
+  discoveryRecordFromRegistry,
+  isApprovedRegistryDirectContact,
+  parseDrvRegistryProfile,
+  publicOrganizationFromRegistry
+} from './drv-registry.mjs';
 
 const postalStates = new Map([
   ['23909', { state: 'Schleswig-Holstein', places: ['Ratzeburg'] }],
@@ -34,8 +39,9 @@ assert.equal(club.featured, true);
 assert.equal(club.sourceType, 'drv-profile');
 assert.equal(club.sourceUrl, 'https://www.rudern.de/service/vereine/ratzeburger-ruderclub-ev');
 assert.match(club.parserVersion, /^\d+\.\d+\.\d+$/);
+assert.equal(isApprovedRegistryDirectContact(club), true);
 
-const publicClub = publicOrganizationFromRegistry(club, 'club');
+const publicClub = publicOrganizationFromRegistry(club, 'club', true);
 assert.equal(publicClub.id, 'ratzeburger-ruderclub-ev');
 assert.equal(publicClub.organizationId, '12420');
 assert.equal(publicClub.hasDirectContact, true);
@@ -44,6 +50,7 @@ assert.equal('emailFromDrv' in publicClub, false);
 
 const discoveryClub = discoveryRecordFromRegistry(club);
 assert.equal(discoveryClub.organizationId, '12420');
+assert.equal(discoveryClub.type, 'club');
 assert.equal('emailFromDrv' in discoveryClub, false);
 
 const missingHtml = `
@@ -62,6 +69,7 @@ const missing = parseDrvRegistryProfile(
 assert.equal(missing.websiteFromDrv, '');
 assert.equal(missing.websiteStatus, 'missing');
 assert.equal(missing.organizationId, '19999');
+assert.equal(isApprovedRegistryDirectContact(missing), false);
 
 const lrvHtml = `
 <html><body>
@@ -79,5 +87,21 @@ const lrv = parseDrvRegistryProfile(
 );
 assert.equal(lrv.type, 'lrv');
 assert.equal(lrv.state, 'Niedersachsen');
+assert.equal(isApprovedRegistryDirectContact(lrv), true);
+
+assert.equal(isApprovedRegistryDirectContact({
+  emailFromDrv: 'info@gmail.com',
+  websiteFromDrv: 'https://www.beispiel-ruderverein.de/'
+}), false);
+
+assert.equal(isApprovedRegistryDirectContact({
+  emailFromDrv: 'vorsitzender@t-online.de',
+  websiteFromDrv: 'https://www.beispiel-ruderverein.de/'
+}), true);
+
+assert.equal(isApprovedRegistryDirectContact({
+  emailFromDrv: 'max.mustermann@beispiel-ruderverein.de',
+  websiteFromDrv: 'https://www.beispiel-ruderverein.de/'
+}), false);
 
 console.log('DRV registry parser tests passed');
