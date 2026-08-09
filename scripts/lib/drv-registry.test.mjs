@@ -13,12 +13,13 @@ const postalStates = new Map([
 
 const clubHtml = `
 <html><body>
+<nav><a href="https://www.ruder-bundesliga.de/">STÜBBE Ruder-Bundesliga</a></nav>
 <h1>Ratzeburger Ruderclub e.V.</h1>
 <div>DRV-ID 12420</div>
 <section>Anschrift Dr.-Alfred-Block-Allee 5 Ratzeburg 23909</section>
-<a href="https://www.facebook.com/rrc">Facebook</a>
-<a href="https://www.rrc-online.de/">Website</a>
-<a href="mailto:info@rrc-online.de">Kontakt</a>
+<div class="field field--website"><span>Website</span><a href="http://www.rrc-online.de">http://www.rrc-online.de</a></div>
+<div class="field field--email"><span>E-Mail</span><a href="mailto:info@rrc-online.de">info@rrc-online.de</a></div>
+<footer><a href="https://www.rudersport-magazin.de/">Rudersport Magazin</a></footer>
 </body></html>`;
 
 const club = parseDrvRegistryProfile(
@@ -32,7 +33,7 @@ assert.equal(club.organizationId, '12420');
 assert.equal(club.id, 'ratzeburger-ruderclub-ev');
 assert.equal(club.type, 'club');
 assert.equal(club.state, 'Schleswig-Holstein');
-assert.equal(club.websiteFromDrv, 'https://www.rrc-online.de/');
+assert.equal(club.websiteFromDrv, 'http://www.rrc-online.de/');
 assert.equal(club.websiteStatus, 'present');
 assert.equal(club.emailFromDrv, 'info@rrc-online.de');
 assert.equal(club.featured, true);
@@ -55,6 +56,7 @@ assert.equal('emailFromDrv' in discoveryClub, false);
 
 const missingHtml = `
 <html><body>
+<nav><a href="https://www.ruder-bundesliga.de/">Ruder-Bundesliga</a></nav>
 <h1>Beispiel Ruderverein e.V.</h1>
 <div>DRV-ID 19999</div>
 <section>Anschrift Uferweg 1 Musterstadt 30169</section>
@@ -73,11 +75,12 @@ assert.equal(isApprovedRegistryDirectContact(missing), false);
 
 const lrvHtml = `
 <html><body>
+<nav><a href="https://www.ruder-bundesliga.de/">Ruder-Bundesliga</a></nav>
 <h1>Landesruderverband Niedersachsen e.V.</h1>
 <div>DRV-ID 30018</div>
 <section>Anschrift Maschstraße 20 Hannover 30169</section>
-<a href="https://www.lrvn.de/">Website</a>
-<a href="mailto:geschaeftsstelle@lrvn.de">Kontakt</a>
+<div class="field field--website"><span>Website</span><a href="https://www.lrvn.de/">https://www.lrvn.de/</a></div>
+<div class="field field--email"><span>E-Mail</span><a href="mailto:geschaeftsstelle@lrvn.de">geschaeftsstelle@lrvn.de</a></div>
 </body></html>`;
 const lrv = parseDrvRegistryProfile(
   'https://www.rudern.de/service/vereine/landesruderverband-niedersachsen',
@@ -87,6 +90,7 @@ const lrv = parseDrvRegistryProfile(
 );
 assert.equal(lrv.type, 'lrv');
 assert.equal(lrv.state, 'Niedersachsen');
+assert.equal(lrv.websiteFromDrv, 'https://www.lrvn.de/');
 assert.equal(isApprovedRegistryDirectContact(lrv), true);
 
 assert.equal(isApprovedRegistryDirectContact({
