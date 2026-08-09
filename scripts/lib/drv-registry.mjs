@@ -1,26 +1,30 @@
 import * as cheerio from 'cheerio';
 
-export const DRV_REGISTRY_PARSER_VERSION = '1.0.1';
+export const DRV_REGISTRY_PARSER_VERSION = '1.1.0';
 export const DRV_ORIGIN = 'https://www.rudern.de';
 
-export const LRV_BY_DRV_ID = new Map([
-  ['30010', 'Baden-Württemberg'],
-  ['30011', 'Bayern'],
-  ['30012', 'Berlin'],
-  ['30013', 'Brandenburg'],
-  ['30014', 'Bremen'],
-  ['30015', 'Hamburg'],
-  ['30016', 'Hessen'],
-  ['30017', 'Mecklenburg-Vorpommern'],
-  ['30018', 'Niedersachsen'],
-  ['30019', 'Nordrhein-Westfalen'],
-  ['30020', 'Rheinland-Pfalz'],
-  ['30021', 'Saarland'],
-  ['30022', 'Sachsen'],
-  ['30023', 'Sachsen-Anhalt'],
-  ['30024', 'Schleswig-Holstein'],
-  ['30025', 'Thüringen']
-]);
+// Current Länderrat roster represented by the corresponding official DRV profiles.
+// The geographic Vereinssuche does not surface every LRV, so these profiles are
+// an explicit second registry source and a completeness gate.
+export const LRV_PROFILES = [
+  { drvId: '30010', states: ['Baden-Württemberg'], path: '/service/vereine/landesruderverband-baden-wuerttemberg-ev' },
+  { drvId: '30011', states: ['Bayern'], path: '/service/vereine/bayerischer-ruderverband-ev' },
+  { drvId: '30012', states: ['Berlin'], path: '/service/vereine/landesruderverband-berlin-ev' },
+  { drvId: '30013', states: ['Brandenburg'], path: '/service/vereine/landesruderverband-brandenburg-ev' },
+  { drvId: '30014', states: ['Bremen'], path: '/service/vereine/landesruderverband-bremen' },
+  { drvId: '30015', states: ['Hamburg'], path: '/service/vereine/allgemeiner-alster-club-norddeutscher-ruderer-bund' },
+  { drvId: '30016', states: ['Hessen'], path: '/service/vereine/hessischer-ruderverband-ev' },
+  { drvId: '30017', states: ['Mecklenburg-Vorpommern'], path: '/service/vereine/landesruderverband-mecklenburg-vorpommern-ev' },
+  { drvId: '30018', states: ['Niedersachsen'], path: '/service/vereine/landesruderverband-niedersachsen' },
+  { drvId: '30019', states: ['Nordrhein-Westfalen'], path: '/service/vereine/nordrhein-westfaelischer-ruderverband' },
+  { drvId: '30020', states: ['Rheinland-Pfalz', 'Saarland'], path: '/service/vereine/ruderverband-suedwest-ev' },
+  { drvId: '30022', states: ['Sachsen'], path: '/service/vereine/landesruderverband-sachsen' },
+  { drvId: '30023', states: ['Sachsen-Anhalt'], path: '/service/vereine/ruderverband-sachsen-anhalt' },
+  { drvId: '30024', states: ['Schleswig-Holstein'], path: '/service/vereine/ruderverband-schleswig-holstein' },
+  { drvId: '30025', states: ['Thüringen'], path: '/service/vereine/thueringer-ruderverband' }
+].map((item) => ({ ...item, url: new URL(item.path, DRV_ORIGIN).toString() }));
+
+export const LRV_BY_DRV_ID = new Map(LRV_PROFILES.map((item) => [item.drvId, item]));
 
 const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend)/i;
 const NON_OFFICIAL_SITE_HOST = /(google\.|openstreetmap|maps\.|facebook\.|instagram\.|youtube\.|youtu\.be|linkedin\.|x\.com$|twitter\.|ruder-bundesliga\.de$|rudersport-magazin\.de$)/i;
@@ -178,16 +182,18 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
   const name = clean($('h1').first().text());
   const text = clean($('body').text());
   const drvId = text.match(/DRV-ID\s+(\d{4,6})/i)?.[1] || '';
+  const lrvProfile = LRV_BY_DRV_ID.get(drvId);
   const { postalCode, parsedCity } = extractPostalSection(text);
   const postalInfo = postalStates.get(postalCode);
-  const state = LRV_BY_DRV_ID.get(drvId) || postalInfo?.state || '';
+  const states = lrvProfile?.states || (postalInfo?.state ? [postalInfo.state] : []);
+  const state = lrvProfile ? lrvProfile.states.join(' / ') : (postalInfo?.state || '');
   const city = parsedCity || postalInfo?.places?.[0] || '';
   const emailFromDrv = firstPublicEmail($);
   const websiteFromDrv = firstExternalWebsite($);
   const slug = new URL(url).pathname.split('/').filter(Boolean).pop();
   const organizationId = drvId || slug;
   const featured = slug === 'ratzeburger-ruderclub-ev' || drvId === '12420';
-  const type = LRV_BY_DRV_ID.has(drvId) ? 'lrv' : (OTHER_MEMBER_PATTERN.test(name) ? 'member' : 'club');
+  const type = lrvProfile ? 'lrv' : (OTHER_MEMBER_PATTERN.test(name) ? 'member' : 'club');
 
   return {
     organizationId,
@@ -198,13 +204,14 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
     city,
     postalCode,
     state,
+    states,
     drvProfileUrl: url,
     websiteFromDrv,
     websiteStatus: websiteFromDrv ? 'present' : 'missing',
     emailFromDrv,
     featured,
     fetchedAt,
-    sourceType: 'drv-profile',
+    sourceType: lrvProfile ? 'drv-lrv-profile' : 'drv-profile',
     sourceUrl: url,
     parserVersion: DRV_REGISTRY_PARSER_VERSION
   };
@@ -233,6 +240,7 @@ export function publicOrganizationFromRegistry(record, contactRouteLevel = 'drv'
     city: record.city,
     postalCode: record.postalCode,
     state: record.state,
+    states: record.states,
     website: record.websiteFromDrv,
     profileUrl: record.drvProfileUrl,
     websiteStatus: record.websiteStatus,
@@ -251,6 +259,7 @@ export function discoveryRecordFromRegistry(record) {
     postalCode: record.postalCode,
     city: record.city,
     state: record.state,
+    states: record.states,
     drvProfileUrl: record.drvProfileUrl,
     websiteFromDrv: record.websiteFromDrv,
     websiteStatus: record.websiteStatus,
