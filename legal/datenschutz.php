@@ -45,18 +45,22 @@ $smtpAddress = cfg('SMTP_PROVIDER_ADDRESS', '[SMTP_PROVIDER_ADDRESS]');
     <h2>2. Grundsatz der Datenminimierung</h2>
     <p>Adams Erben setzt für die Vereinssuche keine Analyse- oder Werbetracker ein, bindet keine externen Schriftarten ein und verwendet keine Marketing-Cookies. Film- und Vereinsseiten sowie der YouTube-Trailer werden nur als externe Links geöffnet; auf dieser Website wird kein YouTube-Player eingebettet.</p>
 
-    <h2>3. Hosting und Serverprotokolle</h2>
+    <h2>3. Cookies und lokale Speicherung</h2>
+    <p>Adams Erben verwendet derzeit keine Cookies und speichert keine Informationen mittels Local Storage, Session Storage oder vergleichbarer clientseitiger Speichertechniken auf deinem Endgerät. Es werden keine Analyse-, Werbe- oder Trackingdienste eingesetzt. Daher ist derzeit kein Cookie- oder Consent-Banner erforderlich.</p>
+    <p>Sollte sich die technische Ausstattung der Website künftig ändern, wird diese Datenschutzerklärung entsprechend aktualisiert und – soweit rechtlich erforderlich – vor dem Speichern oder Auslesen von Informationen auf dem Endgerät eine Einwilligung eingeholt.</p>
+
+    <h2>4. Hosting und Serverprotokolle</h2>
     <p>Die Website wird bei <?= h($hosting) ?>, <?= h($hostingAddress) ?>, betrieben. Beim Abruf der Website werden technisch insbesondere IP-Adresse, Zeitpunkt, angeforderte Ressource, Browser-/Geräteinformationen und Übertragungsstatus verarbeitet. Webserver, Container-Plattform und Hostinganbieter können diese Angaben in technischen Zugriffs- und Sicherheitsprotokollen verarbeiten.</p>
     <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Das berechtigte Interesse liegt im sicheren und zuverlässigen Betrieb der Website.</p>
 
-    <h2>4. Vereinssuche</h2>
+    <h2>5. Vereinssuche</h2>
     <?php if ($preview): ?>
       <p>Die Vorschau verwendet einen kleinen, klar als Demo gekennzeichneten Datensatz. Neben wenigen realen Referenzeinträgen enthält er fiktive Demo-Rudervereine, damit Suche, Filter und Routinglogik gezeigt werden können. Er ist ausdrücklich kein vollständiger DRV-Datenbestand.</p>
     <?php else: ?>
       <p>Für die clientseitige Suche werden Organisationsdaten aus der freigegebenen Datenquelle des Deutschen Ruderverbands bereitgestellt, insbesondere Vereins-/Verbandsname, Ort, Postleitzahl, Bundesland, DRV-ID, Website und Link zum DRV-Profil. Öffentliche E-Mail-Adressen werden bewusst nicht als aggregierte Liste an den Browser ausgeliefert.</p>
     <?php endif; ?>
 
-    <h2>5. Kontaktformular</h2>
+    <h2>6. Kontaktformular</h2>
     <?php if ($preview): ?>
       <p>Im Preview-Modus findet kein Kontaktversand statt. Die Eingaben verbleiben im Browser und werden beim Demo-Absenden nicht per HTTP an den Server übertragen. Die serverseitige Kontakt-API blockiert den Versand zusätzlich im Preview-Modus.</p>
     <?php else: ?>
@@ -66,24 +70,24 @@ $smtpAddress = cfg('SMTP_PROVIDER_ADDRESS', '[SMTP_PROVIDER_ADDRESS]');
     <?php endif; ?>
 
     <?php if (!$preview): ?>
-      <h2>6. E-Mail-Versand</h2>
+      <h2>7. E-Mail-Versand</h2>
       <p>Für den technischen Versand wird ein SMTP-Dienst eingesetzt. Konfigurierter Anbieter: <?= h($smtpProvider) ?>, <?= h($smtpAddress) ?>. Dabei werden die für die E-Mail-Zustellung erforderlichen Daten an diesen Dienst übermittelt.</p>
 
-      <h2>7. Missbrauchsschutz</h2>
+      <h2>8. Missbrauchsschutz</h2>
       <p>Zum Schutz der Vereine vor automatisiertem Spam verwendet das Formular einen unsichtbaren Honeypot, Zeitplausibilitätsprüfungen, eine Herkunftsprüfung und ein serverseitiges Rate Limit.</p>
 
-      <h2>8. Speicherdauer</h2>
+      <h2>9. Speicherdauer</h2>
       <p>Die Anwendung speichert abgesendete Kontaktanfragen nicht in einer eigenen Nachrichten-Datenbank. Sie werden unmittelbar über den konfigurierten SMTP-Dienst an den ermittelten Empfänger übertragen.</p>
     <?php endif; ?>
 
-    <h2><?= $preview ? '6' : '9' ?>. Deine Rechte</h2>
+    <h2><?= $preview ? '7' : '10' ?>. Deine Rechte</h2>
     <p>Du hast nach Maßgabe der gesetzlichen Voraussetzungen insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem besteht das Recht auf Beschwerde bei einer zuständigen Datenschutzaufsichtsbehörde.</p>
 
-    <h2><?= $preview ? '7' : '10' ?>. Externe Links</h2>
+    <h2><?= $preview ? '8' : '11' ?>. Externe Links</h2>
     <p>Beim Anklicken externer Links – etwa zu rudern.de, Vereinswebsites, der offiziellen Filmseite oder YouTube – verlässt du Adams Erben. Ab diesem Zeitpunkt gelten die Datenschutzbestimmungen des jeweiligen externen Anbieters.</p>
 
-    <h2><?= $preview ? '8' : '11' ?>. Stand</h2>
-    <p>Stand: 9. August 2026.</p>
+    <h2><?= $preview ? '9' : '12' ?>. Stand</h2>
+    <p>Stand: 10. August 2026.</p>
     <p><a href="/">Zurück zur Startseite</a></p>
   </main>
 </body>
