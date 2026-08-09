@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "sync:drv": "node scripts/sync-drv.mjs"
+    "sync:drv": "node scripts/sync-drv.mjs",
+    "poc:enrich": "node scripts/enrichment-poc.mjs"
   },
   "dependencies": {
     "adm-zip": "0.5.16",
