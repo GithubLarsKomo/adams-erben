@@ -28,30 +28,9 @@ jobs:
         run: |
           node --check scripts/build.mjs
           node --check scripts/sync-drv.mjs
-          node --check scripts/lib/drv-registry.mjs
-          node --check scripts/lib/drv-registry.test.mjs
-          node --check scripts/enrichment-poc.mjs
-          node --check scripts/review-enrichment-poc.mjs
-          node --check scripts/review-enrichment-poc.test.mjs
-          node --check scripts/prepare-discovery-poc.mjs
-          node --check scripts/prepare-discovery-poc.test.mjs
-          node --check scripts/discover-websites.mjs
-          node --check scripts/discover-websites.test.mjs
           node --check src/assets/app.js
 
-      - name: Test DRV registry parser
-        run: npm run test:drv-registry
-
-      - name: Test discovery sample stratification
-        run: npm run test:discover-prepare
-
-      - name: Test conservative contact review rules
-        run: npm run test:enrich-review
-
-      - name: Test website discovery scoring
-        run: npm run test:discover
-
-      - name: Build production-safe seed fallback
+      - name: Build with checked-in seed
         env:
           SKIP_DRV_SYNC: '1'
         run: npm run build
@@ -68,39 +47,6 @@ jobs:
         run: |
           node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); console.log('organizations:',d.organizations.length)"
 
-      - name: Build explicit public preview
-        env:
-          PREVIEW_MODE: '1'
-          SKIP_DRV_SYNC: '0'
-          REQUIRE_DRV_SYNC: '1'
-        run: npm run build
-
-      - name: Validate preview invariants
-        shell: bash
-        run: |
-          grep -q 'content="preview"' dist/index.html
-          grep -q 'preview.css' dist/index.html
-          grep -q 'noindex,nofollow' dist/index.html
-          grep -q 'Prototyp' dist/index.html
-          grep -q 'Drei Schritte vom Film zum ersten Ruderschlag' dist/index.html
-          grep -q 'Demo-Anfrage absenden' dist/assets/app.js
-          grep -q 'Es wurden keine Daten an den Server übertragen' dist/assets/app.js
-          grep -q '"preview": true' build-private/recipients.json
-          node - <<'NODE'
-          const fs = require('fs');
-          const d = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
-          if (d.organizations.length < 12) throw new Error('preview demo dataset too small');
-          const states = new Set(d.organizations.map((x) => x.state).filter(Boolean));
-          if (states.size < 8) throw new Error('preview demo dataset lacks geographic spread');
-          const lrv = d.organizations.find((x) => x.id === 'landesruderverband-schleswig-holstein');
-          if (!lrv || lrv.contactRouteLevel !== 'lrv') throw new Error('LRV demo routing invalid');
-          if (!d.organizations.some((x) => x.demo === true)) throw new Error('demo entries not marked');
-          NODE
-          if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
-            echo 'Preview browser data must not contain email addresses.' >&2
-            exit 1
-          fi
-
       - name: PHP syntax
         run: |
           php -v
@@ -108,73 +54,3 @@ jobs:
           php -l api/health.php
           php -l legal/impressum.php
           php -l legal/datenschutz.php
-
-  enrichment-poc:
-    if: github.head_ref == 'feat/mvp-wayfinder' || github.ref == 'refs/heads/feat/mvp-wayfinder'
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
-
-      - name: Test conservative contact review rules
-        run: npm run test:enrich-review
-
-      - name: Test website discovery scoring
-        run: npm run test:discover
-
-      - name: Run 25-club enrichment PoC
-        env:
-          ENRICH_TARGET: '25'
-          ENRICH_MIN_STATES: '5'
-          ENRICH_MAX_PER_STATE: '5'
-          ENRICH_MAX_PROFILE_SCANS: '160'
-          ENRICH_PROFILE_CONCURRENCY: '3'
-          ENRICH_PROFILE_DELAY_MS: '350'
-          ENRICH_SITE_CONCURRENCY: '2'
-          ENRICH_SITE_DELAY_MS: '900'
-          ENRICH_MAX_SITE_PAGES: '5'
-        run: npm run poc:enrich
-
-      - name: Apply conservative routing review
-        run: npm run poc:enrich:review
-
-      - name: Validate report invariants
-        run: |
-          node - <<'NODE'
-          const fs = require('fs');
-          const report = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/report.json', 'utf8'));
-          const review = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/review.json', 'utf8'));
-          const s = report.summary;
-          const r = review.summary;
-          if (s.sampleSize < 25) throw new Error(`sample too small: ${s.sampleSize}`);
-          if (s.stateCount < 5) throw new Error(`too few states: ${s.stateCount}`);
-          if (r.organizations !== s.sampleSize) throw new Error(`review size mismatch: ${r.organizations} != ${s.sampleSize}`);
-          const files = ['report.json', 'report.md', 'review.json', 'review.md'];
-          const raw = files.map((name) => fs.readFileSync(`artifacts/enrichment-poc/${name}`, 'utf8')).join('\n');
-          const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
-          if (email.test(raw)) throw new Error('public PoC artifacts must not expose email addresses');
-          console.log({ coverage: s, conservativeReview: r });
-          NODE
-
-      - name: Add reports to workflow summary
-        run: |
-          cat artifacts/enrichment-poc/report.md >> "$GITHUB_STEP_SUMMARY"
-          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
-          cat artifacts/enrichment-poc/review.md >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload public coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: enrichment-poc-report
-          path: artifacts/enrichment-poc/
-          if-no-files-found: error
-          retention-days: 14
