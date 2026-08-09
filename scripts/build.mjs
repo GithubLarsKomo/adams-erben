@@ -16,7 +16,11 @@ await cp(src, dist, { recursive: true });
 
 const indexPath = path.join(dist, 'index.html');
 const indexHtml = await readFile(indexPath, 'utf8');
-await writeFile(indexPath, indexHtml.replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production'));
+const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
+const builtIndexHtml = indexHtml
+  .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
+  .replace('</head>', `${previewStyles}</head>`);
+await writeFile(indexPath, builtIndexHtml);
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
 const publicPath = path.join(dist, 'data', 'clubs.json');
