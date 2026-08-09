@@ -6,6 +6,7 @@ on:
     branches: [feat/mvp-wayfinder]
     paths:
       - 'scripts/enrichment-poc.mjs'
+      - 'scripts/diagnose-enrichment-fallbacks.mjs'
       - 'scripts/review-enrichment-poc.mjs'
       - 'scripts/review-enrichment-poc.test.mjs'
       - 'package.json'
@@ -13,6 +14,7 @@ on:
   pull_request:
     paths:
       - 'scripts/enrichment-poc.mjs'
+      - 'scripts/diagnose-enrichment-fallbacks.mjs'
       - 'scripts/review-enrichment-poc.mjs'
       - 'scripts/review-enrichment-poc.test.mjs'
       - 'package.json'
@@ -56,22 +58,31 @@ jobs:
       - name: Apply conservative routing review
         run: npm run poc:enrich:review
 
+      - name: Diagnose reachable fallback sites
+        env:
+          ENRICH_DIAGNOSTICS_DELAY_MS: '600'
+          ENRICH_DIAGNOSTICS_MAX_ATTEMPTS: '16'
+        run: npm run poc:enrich:diagnose
+
       - name: Validate report invariants
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const report = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/report.json', 'utf8'));
           const review = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/review.json', 'utf8'));
+          const diagnostics = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/fallback-diagnostics.json', 'utf8'));
           const s = report.summary;
           const r = review.summary;
+          const d = diagnostics.summary;
           if (s.sampleSize < 25) throw new Error(`sample too small: ${s.sampleSize}`);
           if (s.stateCount < 5) throw new Error(`too few states: ${s.stateCount}`);
           if (r.organizations !== s.sampleSize) throw new Error(`review size mismatch: ${r.organizations} != ${s.sampleSize}`);
-          const files = ['report.json', 'report.md', 'review.json', 'review.md'];
+          if (d.organizations > r.fallback) throw new Error(`diagnostics size exceeds fallback count: ${d.organizations} > ${r.fallback}`);
+          const files = ['report.json', 'report.md', 'review.json', 'review.md', 'fallback-diagnostics.json', 'fallback-diagnostics.md'];
           const raw = files.map((name) => fs.readFileSync(`artifacts/enrichment-poc/${name}`, 'utf8')).join('\n');
           const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
           if (email.test(raw)) throw new Error('public PoC artifacts must not expose email addresses');
-          console.log({ coverage: s, conservativeReview: r });
+          console.log({ coverage: s, conservativeReview: r, fallbackDiagnostics: d });
           NODE
 
       - name: Add reports to workflow summary
@@ -79,6 +90,8 @@ jobs:
           cat artifacts/enrichment-poc/report.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/enrichment-poc/review.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/enrichment-poc/fallback-diagnostics.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload public coverage report
         uses: actions/upload-artifact@v4
