@@ -1,0 +1,70 @@
+name: DRV Registry Quality
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - 'scripts/sync-drv.mjs'
+      - 'scripts/lib/drv-registry.mjs'
+      - 'scripts/lib/drv-registry.test.mjs'
+      - 'package.json'
+      - '.github/workflows/registry-sync.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  registry-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test registry parser and routing gate
+        run: npm run test:drv-registry
+
+      - name: Run full DRV registry sync
+        env:
+          REQUIRE_DRV_SYNC: '1'
+          DRV_SYNC_REQUIRED_COVERAGE: '0.95'
+          DRV_SYNC_CONCURRENCY: '3'
+          DRV_SYNC_DELAY_MS: '300'
+        run: npm run sync:drv
+
+      - name: Validate registry quality and privacy
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/drv-registry/report.json', 'utf8'));
+          const missing = JSON.parse(fs.readFileSync('build-private/website-missing.json', 'utf8'));
+          if (report.coveragePct < 95) throw new Error(`registry coverage below 95%: ${report.coveragePct}`);
+          if (!Array.isArray(missing.organizations)) throw new Error('website-missing queue missing');
+          if (missing.organizations.length !== report.clubsMissingWebsiteFromDrv) {
+            throw new Error(`website-missing mismatch: ${missing.organizations.length} != ${report.clubsMissingWebsiteFromDrv}`);
+          }
+          const raw = fs.readFileSync('artifacts/drv-registry/report.json', 'utf8') + fs.readFileSync('artifacts/drv-registry/report.md', 'utf8');
+          const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+          if (email.test(raw)) throw new Error('public registry report must not expose email addresses');
+          console.log(report);
+          NODE
+
+      - name: Add quality report to workflow summary
+        run: cat artifacts/drv-registry/report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload public registry quality report
+        uses: actions/upload-artifact@v4
+        with:
+          name: drv-registry-quality-report
+          path: artifacts/drv-registry/
+          if-no-files-found: error
+          retention-days: 14
