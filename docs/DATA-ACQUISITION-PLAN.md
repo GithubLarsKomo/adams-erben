@@ -105,23 +105,38 @@ Ist eine Website im DRV-Profil vorhanden:
 
 ### Stufe B: fehlende Website suchen
 
+Implementiert als PoC B in `scripts/discover-websites.mjs` und Issue #9.
+
 Nur wenn der DRV keine belastbare URL liefert:
 
+- Stichprobe mit `npm run poc:discover:prepare` aus 25 `website_missing`-Fällen erzeugen;
 - Suchanfrage: `"<Vereinsname>" <Ort> Rudern`;
-- Search Provider hinter einer kleinen Adapter-Schnittstelle, damit der Anbieter austauschbar bleibt;
-- Kandidaten aus Verzeichnissen, Social Media, Branchenbüchern und offensichtlichen Fremdseiten nicht automatisch als Vereinsdomain übernehmen;
+- Search Provider hinter Adapter-Schnittstelle;
+- aktuell Brave Search API, Key ausschließlich über `BRAVE_SEARCH_API_KEY`;
+- Fixture-Modus für deterministische Tests;
+- Kandidaten aus Social Media, DRV selbst und offensichtlichen Verzeichnissen nicht automatisch übernehmen;
 - offizielle Domain nur bei ausreichender Identitätskonfidenz akzeptieren.
 
-### Scoring-Vorschlag
+### Scoring PoC B
 
-- Vereinsname / charakteristische Namenstoken: +0,35
-- Ort: +0,20
-- PLZ / Anschrift: +0,20
-- DRV-/Ruderbezug: +0,10
-- Impressum nennt passende Organisation: +0,25
-- widersprechende Anschrift/Organisation: harter Malus
+Aktuelle Defaultwerte:
 
-Automatische Übernahme erst ab hoher Konfidenz; Mehrdeutigkeiten kommen in die Review-Queue.
+- Auto-Accept >= 0,78
+- Review >= 0,48
+- Reject < 0,48
+- Differenz zwischen zwei grundsätzlich akzeptablen Top-Kandidaten < 0,12 → Review
+
+Signale:
+
+- Vereinsname / charakteristische Namenstoken;
+- Ort;
+- PLZ;
+- DRV-/Ruderbezug;
+- Suchrang als schwaches Signal;
+- bekannte DRV-Domain, falls vorhanden;
+- Verzeichnis-/Fremdseiten als Malus bzw. Ausschluss.
+
+Die Thresholds werden nach realem 25er-PoC gegen manuell verifizierte Ground Truth geschärft, nicht anhand einzelner Anekdoten.
 
 ## Phase 3 – Website Enrichment
 
@@ -159,23 +174,27 @@ Erfasst werden:
 
 ## Phase 4 – Kontaktklassifikation
 
-### `functional`
+### Rohklassifikation
 
-Beispiele:
+`functional | personal | none`
 
-- `info@...`
-- `kontakt@...`
-- `buero@...`
-- `geschaeftsstelle@...`
-- `verwaltung@...`
-- `vorstand@...`
-- `rudern@...`
+### Conservative Review Gate
 
-Diese Klasse ist bevorzugtes Routingziel.
+Ein Roh-Treffer wird nicht automatisch Direct Route.
 
-### `personal`
+Auto-Direct zunächst nur für:
 
-Personalisierte Adresse bzw. öffentlich genannter Funktionsträger. Sie wird mit eigener Provenienz geführt und nicht automatisch genauso behandelt wie eine Funktionsadresse. Die endgültige Produktionsregel folgt aus DATA-GOVERNANCE/INV-6.
+- funktionale Adresse auf Vereinsdomain;
+- eindeutig rollenbezogene Funktionsadresse wie `vorsitzender@`, `ruderwart@`, `verwaltung@`.
+
+Review für:
+
+- generische Funktionsadresse auf fremder Domain;
+- personalisierte Adresse;
+- personalisierte Rollenadresse;
+- Drittanbieter-Kontext wie Gastronomie/Catering/Hotel/Dienstleister.
+
+Umgesetzt in `scripts/review-enrichment-poc.mjs` mit synthetischen Tests.
 
 ### `none`
 
@@ -187,13 +206,11 @@ Verein ohne geeignete Adresse
         -> DRV
 ```
 
-Damit bleibt die Kontaktfunktion auch bei unvollständiger Direktabdeckung zu 100 % routbar.
-
 ## Phase 5 – PoC und Eskalationsstufen
 
 ### PoC A – 25 Vereine
 
-Bereits implementiert in `scripts/enrichment-poc.mjs`.
+Implementiert in `scripts/enrichment-poc.mjs` plus konservativem Review-Pass.
 
 Auswahl:
 
@@ -201,33 +218,33 @@ Auswahl:
 - mindestens fünf Bundesländer;
 - maximal fünf Vereine je Bundesland;
 - Ratzeburger Ruderclub bevorzugt enthalten;
-- zunächst Vereine mit im DRV vorhandener Website, damit Website-Crawl und Mailklassifikation unabhängig von Search-Discovery gemessen werden.
+- zunächst Vereine mit im DRV vorhandener Website.
 
-Gemessen werden:
+Gemessen werden getrennt:
 
-- Website-Erreichbarkeit;
-- Identitätsscore;
-- Funktionsadress-Abdeckung;
-- nur personenbezogene Kontakte;
-- keine Mail gefunden;
-- robots-/Fetch-Probleme;
-- Seitenzahl und Laufzeit.
+1. rohe Kontakt-Coverage;
+2. Auto-Direct-Anteil nach konservativem Review.
 
-Öffentliche Reports enthalten keine E-Mail-Adressen.
+Echter 25er-Lauf steht noch aus.
 
 ### PoC B – 25 Vereine ohne belastbaren DRV-Weblink
 
-Nach Auswertung von PoC A:
+Implementiert als Discovery-Pipeline:
 
-- 25 weitere Fälle aus der `website_missing`-Queue;
-- Search-Provider aktivieren;
-- automatische Domainzuordnung gegen manuell verifizierte Wahrheit messen.
+- `scripts/prepare-discovery-poc.mjs` erzeugt die Stichprobe;
+- `scripts/discover-websites.mjs` führt Search + Scoring aus;
+- `scripts/discover-websites.test.mjs` testet Kernregeln;
+- `docs/WEBSITE-DISCOVERY-POC.md` dokumentiert Input/Ground Truth/Thresholds;
+- `scripts/discovery-fixtures.example.json` erlaubt reproduzierbare Provider-Fixtures.
 
-Zielmetriken:
+Noch auszuführen:
 
-- Precision der automatischen Domainzuordnung;
-- Anteil Auto-Accept / Manual Review / No Website;
-- Fehlzuordnungen müssen deutlich unter 1 % liegen, bevor die Automatik auf den Gesamtbestand losgelassen wird.
+- 25 reale `website_missing`-Fälle erzeugen;
+- manuelle Ground Truth erfassen;
+- Search Provider mit Secret aktivieren;
+- Precision, Review-Quote und No-Candidate-Quote messen.
+
+Ziel: bekannte Fehlzuordnungsrate der automatisch akzeptierten Domains <1 % vor Vollrollout.
 
 ### Pilot – 100 Vereine
 
@@ -264,7 +281,7 @@ Ein Datensatz wird manuell geprüft bei:
 - technischem Block/Timeout;
 - Änderung eines zuvor freigegebenen Empfängers.
 
-Für ca. 600 Organisationen ist eine JSON-/CSV-basierte Review Queue zunächst ausreichend; eine Admin-Weboberfläche ist erst sinnvoll, wenn die manuelle Quote dies rechtfertigt.
+Für ca. 600 Organisationen ist eine JSON-/CSV-basierte Review Queue zunächst ausreichend.
 
 ## Phase 7 – Snapshot und Veröffentlichungsprozess
 
@@ -272,32 +289,15 @@ Die Acquisition-Pipeline erzeugt drei Artefakte:
 
 ### 1. Public Snapshot
 
-`clubs.json`
-
-Enthält keine Mailadressen, sondern nur:
-
-- Organisationsdaten;
-- Website;
-- Kontaktstatus/Route-Level;
-- Quellen-/Aktualitätsmetadaten, soweit öffentlich sinnvoll.
+`clubs.json` ohne Mailadressen.
 
 ### 2. Private Routing Snapshot
 
-`recipients.json`
-
-Enthält:
-
-- freigegebene direkte Empfänger;
-- LRV-Fallback;
-- DRV-Fallback;
-- Provenienz;
-- letzte Verifikation.
-
-Nie in Webroot, GitHub-Artifact oder öffentliche Logs aufnehmen.
+`recipients.json` mit freigegebenen Empfängern, Fallbacks, Provenienz und letzter Verifikation.
 
 ### 3. Quality Report
 
-Enthält nur aggregierte Werte und adressfreie Einzelergebnisse.
+Nur aggregierte Werte und adressfreie Einzelergebnisse.
 
 ## Phase 8 – Aktualisierung im Betrieb
 
@@ -310,11 +310,11 @@ Empfohlener Rhythmus:
 - manueller Hinweis eines Vereins: sofortige Korrektur + bevorzugte Quelle;
 - kompletter Re-Crawl nicht bei jedem Deployment.
 
-Stale-Regel für Routingkontakte: nach 180 Tagen ohne erfolgreiche Verifikation erneute Prüfung priorisieren.
+Stale-Regel: Routingkontakte nach 180 Tagen ohne erfolgreiche Verifikation priorisiert erneut prüfen.
 
 ## Phase 9 – technische Modularisierung
 
-Nach dem PoC soll der derzeitige Prototyp in folgende Module zerlegt werden:
+Nach den PoCs soll der Prototyp in gemeinsam getestete Module zerlegt werden:
 
 ```text
 scripts/lib/http.mjs
@@ -324,55 +324,39 @@ scripts/lib/website-identity.mjs
 scripts/lib/contact-extractor.mjs
 scripts/lib/contact-classifier.mjs
 scripts/lib/provenance.mjs
-scripts/sync-drv.mjs
 scripts/discover-websites.mjs
 scripts/enrich-clubs.mjs
 scripts/build-snapshot.mjs
 ```
 
-Damit können Registry, Discovery, Crawl und Website-Build unabhängig getestet und ausgeführt werden.
-
 ## Phase 10 – Teststrategie
 
 ### Unit Tests
 
-HTML-Fixtures für:
-
-- DRV-Profil;
-- `mailto:`;
-- Klartext-E-Mail;
-- `[at]`-Obfuskation;
-- mehrere Funktionsadressen;
-- ausschließlich persönliche Kontakte;
-- Redirects;
-- falsche Domain;
-- robots-Regeln.
+HTML-/Search-Fixtures für DRV-Profil, E-Mail-Muster, Rollen, falsche Domains, Drittanbieter-Kontext, Ambiguitäten und robots-Regeln.
 
 ### Regression Fixtures
 
-Repräsentative anonymisierte/gekürzte HTML-Strukturen aus realen Vereinssites, damit Parseränderungen keine bekannte Kontaktklasse zerstören.
+Repräsentative anonymisierte/gekürzte Strukturen realer Vereinssites.
 
 ### Live Smoke Test
 
-Kleine konstante Menge von 5–10 Websites, nicht der Vollbestand, um Netzwerk-/Parserprobleme früh zu erkennen.
+Kleine konstante Menge von 5–10 Websites, nicht der Vollbestand.
 
 ## Go-live Quality Gates
 
-Vor dem produktiven Routing:
-
 1. 100 % der Organisationen haben stabile ID und Routing-Fallback.
 2. Keine E-Mail-Adresse steht im öffentlichen `clubs.json`.
-3. Automatisch zugeordnete Vereinsdomain hat hohe Precision; bekannte Fehlzuordnungsrate <1 %.
+3. Automatisch zugeordnete Vereinsdomain: bekannte Fehlzuordnungsrate <1 %.
 4. Alle direkten Empfänger haben Provenienz und `verifiedAt`.
-5. Personenkontakte folgen den finalen Governance-Regeln.
-6. Review Queue enthält keine ungeprüften Fälle, die trotzdem direkt geroutet werden.
-7. Snapshot-Build ist reproduzierbar und unabhängig vom Live-Crawl.
+5. Direct Route erfüllt Conservative Review Gate.
+6. Personenkontakte folgen finalen Governance-Regeln.
+7. Review Queue enthält keine ungeprüften Fälle, die trotzdem direkt geroutet werden.
+8. Snapshot-Build ist reproduzierbar und unabhängig vom Live-Crawl.
 
-## Entscheidung nach PoC A
+## Nächste ausführbare Aktionen
 
-Der 25er-Test beantwortet primär zwei Fragen:
-
-1. Wie hoch ist die direkte Kontaktabdeckung auf bereits bekannten offiziellen Vereinswebsites?
-2. Welche technischen Sonderfälle treten bei fünf gezielten Seiten pro Domain auf?
-
-Danach wird entschieden, ob für den Vollbetrieb fünf Seiten pro Domain ausreichen oder ein zweiter Crawl-Pass nötig ist. Erst anschließend wird PoC B für die eigentliche Website-Discovery implementiert.
+1. PoC A real mit 25 Vereinen ausführen und beide Kennzahlen auswerten.
+2. Parallel PoC-B-Stichprobe mit `npm run poc:discover:prepare` erzeugen.
+3. Für diese 25 Fälle manuelle Ground Truth erfassen.
+4. PoC B mit Brave Search ausführen und Precision messen.
