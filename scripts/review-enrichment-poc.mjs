@@ -1,89 +1,32 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { classifyContactCandidate, CONTACT_POLICY_VERSION } from './lib/contact-governance.mjs';
 
-const THIRD_PARTY_CONTEXT = /(gastronom|restaurant|catering|gaststätte|gaststaette|bewirtung|hotel|ferienwohnung|webdesign|webagentur|hosting|agentur|dienstleister|fotograf|ticket|reservierung)/i;
-const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz|vorsitzende?r?|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*)$/i;
-const GENERIC_FUNCTIONAL_LOCAL_PART = /^(?:info|kontakt|contact|office|buero|büro|mail|post|anfrage|service|verein|vorstand|webmaster)(?:[._-].*)?$/i;
-const PERSONAL_PROVIDER_DOMAINS = new Set([
-  'gmail.com', 'googlemail.com', 'gmx.de', 'gmx.net', 'web.de', 't-online.de',
-  'outlook.com', 'hotmail.com', 'live.de', 'live.com', 'icloud.com', 'yahoo.com', 'yahoo.de'
-]);
-
-function normalizeHost(value = '') {
-  return String(value).trim().toLowerCase().replace(/^www\./, '').replace(/\.$/, '');
-}
-
-function emailParts(email = '') {
-  const [local = '', domain = ''] = String(email).toLowerCase().split('@');
-  return { local, domain: normalizeHost(domain) };
-}
-
-function siteHost(website = '') {
-  try { return normalizeHost(new URL(website).hostname); } catch { return ''; }
-}
-
-function domainsRelated(emailDomain, websiteHost) {
-  if (!emailDomain || !websiteHost) return false;
-  return emailDomain === websiteHost
-    || websiteHost.endsWith(`.${emailDomain}`)
-    || emailDomain.endsWith(`.${websiteHost}`);
-}
-
-export function classifyContact(contact, website) {
-  const { local, domain } = emailParts(contact.email);
-  const host = siteHost(website);
-  const sameDomain = domainsRelated(domain, host);
-  const context = String(contact.context || '');
-  const thirdPartyContext = THIRD_PARTY_CONTEXT.test(context);
-  const roleAlias = ROLE_LOCAL_PART.test(local);
-  const genericFunctional = GENERIC_FUNCTIONAL_LOCAL_PART.test(local) || contact.kind === 'functional';
-  const personalProvider = PERSONAL_PROVIDER_DOMAINS.has(domain);
-
-  let disposition = 'review-personal';
-  let reason = 'personal_contact';
-  let rank = 20;
-
-  if (thirdPartyContext && !roleAlias) {
-    disposition = 'review-third-party';
-    reason = 'third_party_context';
-    rank = 0;
-  } else if (sameDomain && genericFunctional) {
-    disposition = 'direct-functional';
-    reason = 'functional_on_club_domain';
-    rank = 100;
-  } else if (roleAlias) {
-    disposition = 'direct-functional';
-    reason = sameDomain ? 'role_alias_on_club_domain' : 'explicit_role_alias_external_domain';
-    rank = sameDomain ? 95 : 85;
-  } else if (genericFunctional) {
-    disposition = 'review-external-functional';
-    reason = 'generic_functional_external_domain';
-    rank = 55;
-  } else if (sameDomain) {
-    disposition = 'review-personal';
-    reason = 'personal_on_club_domain';
-    rank = 50;
-  } else if (contact.role) {
-    disposition = 'review-personal-role';
-    reason = 'personal_contact_with_club_role';
-    rank = 45;
-  } else if (personalProvider) {
-    disposition = 'review-personal';
-    reason = 'personal_provider_without_role';
-    rank = 15;
+function legacyDisposition(classification) {
+  switch (classification.governanceState) {
+    case 'auto-approved-functional':
+      return 'direct-functional';
+    case 'review-functional':
+      return 'review-external-functional';
+    case 'review-personal':
+      return classification.reason === 'personal_contact_with_club_role' ? 'review-personal-role' : 'review-personal';
+    case 'excluded-third-party':
+      return 'review-third-party';
+    case 'excluded-invalid':
+      return 'review-invalid';
+    default:
+      return 'review-personal';
   }
+}
 
+// Compatibility wrapper for the existing PoC report. The underlying decision is
+// now owned by scripts/lib/contact-governance.mjs.
+export function classifyContact(contact, website) {
+  const classification = classifyContactCandidate(contact, website);
   return {
-    ...contact,
-    sameDomain,
-    roleAlias,
-    genericFunctional,
-    personalProvider,
-    thirdPartyContext,
-    disposition,
-    reason,
-    rank
+    ...classification,
+    disposition: legacyDisposition(classification)
   };
 }
 
@@ -95,6 +38,7 @@ function publicDecision(item) {
     status: item.status,
     disposition: item.disposition,
     reason: item.reason,
+    policyVersion: CONTACT_POLICY_VERSION,
     candidateCount: item.candidateCount,
     directCandidateCount: item.directCandidateCount,
     reviewCandidateCount: item.reviewCandidateCount,
@@ -124,6 +68,7 @@ export function reviewOrganization(item) {
 
   return {
     ...item,
+    policyVersion: CONTACT_POLICY_VERSION,
     disposition,
     reason,
     candidateCount: reviewed.length,
@@ -144,6 +89,7 @@ function buildSummary(reviewed) {
   const pct = (n) => Number((n / total * 100).toFixed(1));
   return {
     generatedAt: new Date().toISOString(),
+    policyVersion: CONTACT_POLICY_VERSION,
     organizations: reviewed.length,
     autoDirectFunctional: direct.length,
     autoDirectFunctionalPct: pct(direct.length),
@@ -157,7 +103,7 @@ function buildSummary(reviewed) {
 
 function markdown(summary, decisions) {
   const rows = decisions.map((item) => `| ${item.name.replace(/\|/g, '\\|')} | ${item.disposition} | ${item.reason} | ${item.candidateCount} | ${item.directCandidateCount} | ${item.reviewCandidateCount} | ${item.thirdPartyCandidateCount} |`).join('\n');
-  return `# Enrichment PoC – Conservative Review\n\nStand: ${summary.generatedAt}\n\n- Auto-Direct Funktionskontakt: **${summary.autoDirectFunctional}/${summary.organizations} (${summary.autoDirectFunctionalPct} %)**\n- Manuelle Review nötig: **${summary.reviewRequired}/${summary.organizations} (${summary.reviewRequiredPct} %)**\n- Fallback LRV/DRV nötig: **${summary.fallbackRequired}/${summary.organizations} (${summary.fallbackRequiredPct} %)**\n- Organisationen mit verdächtigen Drittanbieter-Kandidaten: **${summary.organizationsWithThirdPartyCandidates}**\n\n## Entscheidungen\n\n| Verein | Disposition | Grund | Kandidaten | Direct | Review | Drittanbieter |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${rows}\n\nDer öffentliche Report enthält bewusst keine E-Mail-Adressen. Direkte Empfänger bleiben ausschließlich im privaten Build-Artefakt.\n`;
+  return `# Enrichment PoC – Conservative Review\n\nStand: ${summary.generatedAt}\n\n- Governance-Policy: **${summary.policyVersion}**\n- Auto-Direct Funktionskontakt: **${summary.autoDirectFunctional}/${summary.organizations} (${summary.autoDirectFunctionalPct} %)**\n- Manuelle Review nötig: **${summary.reviewRequired}/${summary.organizations} (${summary.reviewRequiredPct} %)**\n- Fallback LRV/DRV nötig: **${summary.fallbackRequired}/${summary.organizations} (${summary.fallbackRequiredPct} %)**\n- Organisationen mit verdächtigen Drittanbieter-Kandidaten: **${summary.organizationsWithThirdPartyCandidates}**\n\n## Entscheidungen\n\n| Verein | Disposition | Grund | Kandidaten | Direct | Review | Drittanbieter |\n| --- | --- | --- | ---: | ---: | ---: | ---: |\n${rows}\n\nDer öffentliche Report enthält bewusst keine E-Mail-Adressen. Direkte Empfänger bleiben ausschließlich im privaten Build-Artefakt. Personalisierte Adressen werden von der gemeinsamen Governance-Policy niemals automatisch freigegeben.\n`;
 }
 
 async function main() {
@@ -172,9 +118,9 @@ async function main() {
   await mkdir(reportDir, { recursive: true });
   await writeFile(path.join(reportDir, 'review.json'), JSON.stringify({ summary, decisions: publicDecisions }, null, 2));
   await writeFile(path.join(reportDir, 'review.md'), markdown(summary, publicDecisions));
-  await writeFile(path.join(root, 'build-private', 'enrichment-poc-reviewed.json'), JSON.stringify({ generatedAt: summary.generatedAt, decisions: reviewed }, null, 2));
+  await writeFile(path.join(root, 'build-private', 'enrichment-poc-reviewed.json'), JSON.stringify({ generatedAt: summary.generatedAt, policyVersion: CONTACT_POLICY_VERSION, decisions: reviewed }, null, 2));
 
-  console.log(`[review] direct=${summary.autoDirectFunctional}, review=${summary.reviewRequired}, fallback=${summary.fallbackRequired}, thirdPartyOrgs=${summary.organizationsWithThirdPartyCandidates}`);
+  console.log(`[review] policy=${CONTACT_POLICY_VERSION}, direct=${summary.autoDirectFunctional}, review=${summary.reviewRequired}, fallback=${summary.fallbackRequired}, thirdPartyOrgs=${summary.organizationsWithThirdPartyCandidates}`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
