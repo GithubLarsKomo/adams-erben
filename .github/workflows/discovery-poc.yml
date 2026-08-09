@@ -10,6 +10,13 @@ on:
       - 'scripts/discovery-input.poc.json'
       - 'scripts/discovery-ground-truth.poc.json'
       - '.github/workflows/discovery-poc.yml'
+  pull_request:
+    paths:
+      - 'scripts/discover-websites.mjs'
+      - 'scripts/discover-websites.test.mjs'
+      - 'scripts/discovery-input.poc.json'
+      - 'scripts/discovery-ground-truth.poc.json'
+      - '.github/workflows/discovery-poc.yml'
 
 permissions:
   contents: read
