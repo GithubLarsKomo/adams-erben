@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build-private/
+artifacts/enrichment-poc/
+.env
+.env.*
+!.env.example
+*.log
