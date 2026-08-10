@@ -5,7 +5,7 @@ export const CONTACT_STALE_DAYS = 180;
 export const CONTACT_DISABLE_DAYS = 270;
 
 export const THIRD_PARTY_CONTEXT = /(gastronom|restaurant|catering|gaststätte|gaststaette|bewirtung|hotel|ferienwohnung|webdesign|webagentur|hosting|agentur|dienstleister|fotograf|ticket|reservierung)/i;
-export const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz\w*|vorstand|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*|jugend|sport)$/i;
+export const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz\w*|vorstand|praesident\w*|präsident\w*|vizepraesident\w*|vizepräsident\w*|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*|jugend|sport)$/i;
 export const GENERIC_FUNCTIONAL_LOCAL_PART = /^(?:info|kontakt|contact|office|buero|büro|mail|post|anfrage|service|verein|webmaster)(?:[._-].*)?$/i;
 export const PERSONAL_PROVIDER_DOMAINS = new Set([
   'gmail.com', 'googlemail.com', 'gmx.de', 'gmx.net', 'web.de', 't-online.de',
