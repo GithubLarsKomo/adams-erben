@@ -48,22 +48,21 @@ async function runSync() {
 }
 
 try {
-  if (previewMode) throw new Error('preview mode always uses checked-in seed data');
   if (process.env.SKIP_DRV_SYNC === '1') throw new Error('DRV sync explicitly skipped');
   await runSync();
 } catch (error) {
-  if (!previewMode && process.env.REQUIRE_DRV_SYNC === '1') throw error;
+  if (process.env.REQUIRE_DRV_SYNC === '1') throw error;
   console.warn(`[build] ${error.message}; using checked-in seed data.`);
   const seed = await readFile(seedPath, 'utf8');
   await writeFile(publicPath, seed);
-  const fallbackReason = previewMode
-    ? 'preview mode uses checked-in seed data'
-    : (process.env.SKIP_DRV_SYNC === '1' ? 'DRV sync explicitly skipped' : error.message);
+  const fallbackReason = process.env.SKIP_DRV_SYNC === '1'
+    ? 'DRV sync explicitly skipped'
+    : error.message;
   await writeFile(
     path.join(privateDir, 'recipients.json'),
     JSON.stringify({
       generatedAt: new Date().toISOString(),
-      source: previewMode ? 'preview-seed' : 'seed-fallback',
+      source: previewMode ? 'preview-seed-fallback' : 'seed-fallback',
       preview: previewMode,
       routingMode: 'drv-only-fallback',
       fallbackReason,
