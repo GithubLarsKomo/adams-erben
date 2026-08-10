@@ -33,6 +33,10 @@ function siteHost(website = '') {
   try { return normalizeContactHost(new URL(website).hostname); } catch { return ''; }
 }
 
+function normalizedTrustedSet(values = []) {
+  return new Set((Array.isArray(values) ? values : []).map((value) => String(value || '').trim().toLowerCase()).filter(Boolean));
+}
+
 export function contactDomainsRelated(emailDomain, websiteHost) {
   const left = normalizeContactHost(emailDomain);
   const right = normalizeContactHost(websiteHost);
@@ -40,15 +44,20 @@ export function contactDomainsRelated(emailDomain, websiteHost) {
   return left === right || right.endsWith(`.${left}`) || left.endsWith(`.${right}`);
 }
 
-export function classifyContactCandidate(contact = {}, website = '') {
+export function classifyContactCandidate(contact = {}, website = '', { trustedDomains = [], trustedFunctionalLocalParts = [] } = {}) {
   const email = normalizeContactEmail(contact.email);
   const { local, domain } = emailParts(email);
   const host = siteHost(website);
   const sameDomain = contactDomainsRelated(domain, host);
+  const trustedDomainSet = normalizedTrustedSet(trustedDomains);
+  const trustedFunctionalSet = normalizedTrustedSet(trustedFunctionalLocalParts);
+  const trustedDomain = trustedDomainSet.has(domain);
+  const organizationDomain = sameDomain || trustedDomain;
   const context = String(contact.context || '');
   const thirdPartyContext = THIRD_PARTY_CONTEXT.test(context);
   const roleAlias = ROLE_LOCAL_PART.test(local);
   const genericFunctional = GENERIC_FUNCTIONAL_LOCAL_PART.test(local);
+  const trustedFunctionalAlias = trustedFunctionalSet.has(local) && organizationDomain;
   const personalProvider = PERSONAL_PROVIDER_DOMAINS.has(domain);
   const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -62,21 +71,26 @@ export function classifyContactCandidate(contact = {}, website = '') {
     governanceState = 'excluded-invalid';
     reason = 'invalid_email';
     rank = -10;
-  } else if (thirdPartyContext && !roleAlias) {
+  } else if (thirdPartyContext && !roleAlias && !trustedFunctionalAlias) {
     contactKind = 'third-party';
     governanceState = 'excluded-third-party';
     reason = 'third_party_context';
     rank = 0;
+  } else if (trustedFunctionalAlias) {
+    contactKind = 'role-functional';
+    governanceState = 'auto-approved-functional';
+    reason = 'verified_functional_alias';
+    rank = 105;
   } else if (roleAlias) {
     contactKind = 'role-functional';
     governanceState = 'auto-approved-functional';
     reason = sameDomain ? 'role_alias_on_club_domain' : 'explicit_role_alias_external_domain';
     rank = sameDomain ? 100 : 90;
-  } else if (sameDomain && genericFunctional) {
+  } else if (organizationDomain && genericFunctional) {
     contactKind = 'functional';
     governanceState = 'auto-approved-functional';
-    reason = 'functional_on_club_domain';
-    rank = 95;
+    reason = sameDomain ? 'functional_on_club_domain' : 'functional_on_verified_organization_domain';
+    rank = sameDomain ? 95 : 92;
   } else if (genericFunctional) {
     contactKind = 'functional';
     governanceState = 'review-functional';
@@ -109,8 +123,11 @@ export function classifyContactCandidate(contact = {}, website = '') {
     rank,
     validEmail,
     sameDomain,
+    trustedDomain,
+    organizationDomain,
     roleAlias,
     genericFunctional,
+    trustedFunctionalAlias,
     personalProvider,
     thirdPartyContext,
     autoApproved: governanceState === 'auto-approved-functional'
@@ -134,8 +151,14 @@ export function evaluateContactLifecycle({ verifiedAt, suppressed = false, now =
   return { lifecycleState: 'fresh', ageDays, directEligible: true };
 }
 
-export function evaluateSnapshotEligibility(contact, website, { verifiedAt = contact?.verifiedAt, suppressed = false, now = new Date() } = {}) {
-  const classification = classifyContactCandidate(contact, website);
+export function evaluateSnapshotEligibility(contact, website, {
+  verifiedAt = contact?.verifiedAt,
+  suppressed = false,
+  now = new Date(),
+  trustedDomains = [],
+  trustedFunctionalLocalParts = []
+} = {}) {
+  const classification = classifyContactCandidate(contact, website, { trustedDomains, trustedFunctionalLocalParts });
   const lifecycle = evaluateContactLifecycle({ verifiedAt, suppressed, now });
   const hasProvenance = Boolean(contact?.sourceUrl && verifiedAt);
   const eligible = classification.autoApproved && lifecycle.directEligible && hasProvenance && !suppressed;
