@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation]
   pull_request:
 
 permissions:
@@ -28,7 +28,12 @@ jobs:
         run: |
           node --check scripts/build.mjs
           node --check scripts/sync-drv.mjs
+          node --check scripts/validate-drv-output.mjs
+          node --check scripts/validate-drv-output.test.mjs
           node --check src/assets/app.js
+
+      - name: DRV output validator tests
+        run: npm run test:drv-output
 
       - name: Build with checked-in seed
         env:
@@ -46,6 +51,10 @@ jobs:
       - name: Validate generated search data
         run: |
           node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); console.log('organizations:',d.organizations.length)"
+
+      - name: Validate seed fallback routing metadata
+        run: |
+          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('build-private/recipients.json','utf8')); if(d.routingMode!=='drv-only-fallback'||Object.keys(d.recipients||{}).length!==0) process.exit(1); console.log('routingMode:',d.routingMode)"
 
       - name: PHP syntax
         run: |
