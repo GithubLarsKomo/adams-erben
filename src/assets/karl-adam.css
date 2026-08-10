@@ -174,6 +174,30 @@
 .text-link[href^="mailto:"]::before { content: "@"; }
 .text-link[href^="tel:"]::before { content: "☎"; }
 
+/* Ratzeburg tour: one primary action, two compact contact pills below. */
+.city-story .story-card .inline-actions {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  align-items: center;
+  gap: .65rem .8rem;
+}
+
+.city-story .story-card .inline-actions .button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.city-story .story-card .inline-actions .text-link[href^="tel:"] {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.city-story .story-card .inline-actions .text-link[href^="mailto:"] {
+  grid-column: 2;
+  grid-row: 2;
+}
+
 .voice-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -500,5 +524,17 @@
   .inline-actions .text-link {
     width: 100%;
     justify-content: center;
+  }
+
+  .city-story .story-card .inline-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .city-story .story-card .inline-actions .button,
+  .city-story .story-card .inline-actions .text-link[href^="tel:"],
+  .city-story .story-card .inline-actions .text-link[href^="mailto:"] {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: stretch;
   }
 }
