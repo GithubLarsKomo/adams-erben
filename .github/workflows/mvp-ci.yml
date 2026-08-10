@@ -156,3 +156,4 @@ jobs:
           php -l api/health.php
           php -l legal/impressum.php
           php -l legal/datenschutz.php
+          php -l legal/rechtliche-hinweise.php
