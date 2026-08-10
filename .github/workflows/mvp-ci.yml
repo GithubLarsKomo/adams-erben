@@ -28,6 +28,8 @@ jobs:
         run: |
           node --check scripts/build.mjs
           node --check scripts/sync-drv.mjs
+          node --check scripts/build-snapshot.mjs
+          node --check scripts/build-snapshot.test.mjs
           node --check scripts/lib/drv-registry.mjs
           node --check scripts/lib/drv-registry.test.mjs
           node --check scripts/lib/contact-governance.mjs
@@ -46,6 +48,9 @@ jobs:
 
       - name: Test shared contact governance
         run: npm run test:contact-governance
+
+      - name: Test approved snapshot routing
+        run: npm run test:snapshot
 
       - name: Test discovery sample stratification
         run: npm run test:discover-prepare
