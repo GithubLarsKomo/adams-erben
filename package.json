@@ -1,0 +1,41 @@
+{
+  "name": "adams-erben",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "sync:drv": "node scripts/sync-drv.mjs",
+    "lrv:enrich": "node scripts/enrich-lrv.mjs",
+    "lrv:laenderrat": "node scripts/enrich-lrv-laenderrat.mjs",
+    "test:lrv-laenderrat": "node scripts/enrich-lrv-laenderrat.test.mjs",
+    "history:merge": "node scripts/merge-contact-candidate-history.mjs",
+    "test:history": "node scripts/lib/contact-candidate-history.test.mjs && node scripts/contact-history-snapshot.integration.test.mjs",
+    "snapshot:build": "node scripts/build-snapshot.mjs && node scripts/report-contact-governance-reasons.mjs",
+    "snapshot:reasons": "node scripts/report-contact-governance-reasons.mjs",
+    "test:snapshot": "node scripts/build-snapshot.test.mjs && node scripts/build-snapshot-lrv-identity.test.mjs && node scripts/report-contact-governance-reasons.test.mjs",
+    "discovery:apply-verified": "node scripts/apply-verified-discovery.mjs",
+    "test:discovery-verified": "node scripts/apply-verified-discovery.test.mjs",
+    "full:prepare": "node scripts/prepare-full-enrichment.mjs",
+    "test:full-prepare": "node scripts/prepare-full-enrichment.test.mjs",
+    "pilot:prepare": "node scripts/prepare-pilot-100.mjs",
+    "test:pilot-prepare": "node scripts/prepare-pilot-100.test.mjs",
+    "pilot:run": "node scripts/run-pilot-100.mjs",
+    "test:pilot-run": "node scripts/run-pilot-100.test.mjs",
+    "test:drv-registry": "node scripts/lib/drv-registry.test.mjs && node scripts/lib/drv-registry-school.test.mjs && node scripts/lib/drv-registry-website.test.mjs",
+    "test:contact-governance": "node scripts/lib/contact-governance.test.mjs",
+    "test:contact-domain-evidence": "node scripts/lib/contact-domain-evidence.test.mjs",
+    "poc:enrich": "node scripts/enrichment-poc.mjs",
+    "poc:enrich:review": "node scripts/review-enrichment-poc.mjs",
+    "poc:enrich:diagnose": "node scripts/diagnose-enrichment-fallbacks.mjs",
+    "test:enrich-review": "node scripts/review-enrichment-poc.test.mjs",
+    "poc:discover:prepare": "node scripts/prepare-discovery-poc.mjs",
+    "test:discover-prepare": "node scripts/prepare-discovery-poc.test.mjs",
+    "poc:discover": "node scripts/discover-websites.mjs",
+    "test:discover": "node scripts/discover-websites.test.mjs"
+  },
+  "dependencies": {
+    "adm-zip": "0.5.16",
+    "cheerio": "1.1.2"
+  }
+}

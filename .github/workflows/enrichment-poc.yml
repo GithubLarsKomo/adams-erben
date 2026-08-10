@@ -1,0 +1,93 @@
+name: Enrichment PoC
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - 'scripts/enrichment-poc.mjs'
+      - 'scripts/diagnose-enrichment-fallbacks.mjs'
+      - 'scripts/review-enrichment-poc.mjs'
+      - 'scripts/review-enrichment-poc.test.mjs'
+      - '.github/workflows/enrichment-poc.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  enrichment-poc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test conservative contact review rules
+        run: npm run test:enrich-review
+
+      - name: Run 25-club enrichment PoC
+        env:
+          ENRICH_TARGET: '25'
+          ENRICH_MIN_STATES: '5'
+          ENRICH_MAX_PER_STATE: '5'
+          ENRICH_MAX_PROFILE_SCANS: '160'
+          ENRICH_PROFILE_CONCURRENCY: '3'
+          ENRICH_PROFILE_DELAY_MS: '350'
+          ENRICH_SITE_CONCURRENCY: '2'
+          ENRICH_SITE_DELAY_MS: '900'
+          ENRICH_MAX_SITE_PAGES: '5'
+        run: npm run poc:enrich
+
+      - name: Apply conservative routing review
+        run: npm run poc:enrich:review
+
+      - name: Diagnose reachable fallback sites
+        env:
+          ENRICH_DIAGNOSTICS_DELAY_MS: '600'
+          ENRICH_DIAGNOSTICS_MAX_ATTEMPTS: '16'
+        run: npm run poc:enrich:diagnose
+
+      - name: Validate report invariants
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/report.json', 'utf8'));
+          const review = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/review.json', 'utf8'));
+          const diagnostics = JSON.parse(fs.readFileSync('artifacts/enrichment-poc/fallback-diagnostics.json', 'utf8'));
+          const s = report.summary;
+          const r = review.summary;
+          const d = diagnostics.summary;
+          if (s.sampleSize < 25) throw new Error(`sample too small: ${s.sampleSize}`);
+          if (s.stateCount < 5) throw new Error(`too few states: ${s.stateCount}`);
+          if (r.organizations !== s.sampleSize) throw new Error(`review size mismatch: ${r.organizations} != ${s.sampleSize}`);
+          if (d.organizations > r.fallback) throw new Error(`diagnostics size exceeds fallback count: ${d.organizations} > ${r.fallback}`);
+          const files = ['report.json', 'report.md', 'review.json', 'review.md', 'fallback-diagnostics.json', 'fallback-diagnostics.md'];
+          const raw = files.map((name) => fs.readFileSync(`artifacts/enrichment-poc/${name}`, 'utf8')).join('\n');
+          const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+          if (email.test(raw)) throw new Error('public PoC artifacts must not expose email addresses');
+          console.log({ coverage: s, conservativeReview: r, fallbackDiagnostics: d });
+          NODE
+
+      - name: Add reports to workflow summary
+        run: |
+          cat artifacts/enrichment-poc/report.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/enrichment-poc/review.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/enrichment-poc/fallback-diagnostics.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload public coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: enrichment-poc-report
+          path: artifacts/enrichment-poc/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,178 @@
+name: Bounded 100 Club Pilot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - 'scripts/run-pilot-100.mjs'
+      - 'scripts/run-pilot-100.test.mjs'
+      - 'scripts/prepare-pilot-100.mjs'
+      - 'scripts/prepare-pilot-100.test.mjs'
+      - 'scripts/apply-verified-discovery.mjs'
+      - 'scripts/apply-verified-discovery.test.mjs'
+      - 'scripts/discovery-ground-truth.poc.json'
+      - 'scripts/pilot-100-ids.v1.json'
+      - 'scripts/build-snapshot.mjs'
+      - 'scripts/lib/contact-governance.mjs'
+      - 'scripts/lib/contact-domain-evidence.mjs'
+      - 'scripts/lib/lrv-identity.mjs'
+      - '.github/workflows/pilot-100-run.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_PILOT_SAMPLE_HASH: e593b08abd7dd063e6e1e76f80700d8884ae53523c9d93d8eca3c9ac82965a18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test sampler, verified discovery, domain evidence and bounded runner
+        run: |
+          npm run test:pilot-prepare
+          npm run test:discovery-verified
+          npm run test:contact-domain-evidence
+          npm run test:pilot-run
+
+      - name: Rebuild full DRV registry
+        env:
+          REQUIRE_DRV_SYNC: '1'
+          DRV_SYNC_REQUIRED_COVERAGE: '0.95'
+          DRV_SYNC_CONCURRENCY: '3'
+          DRV_SYNC_DELAY_MS: '300'
+          DRV_SYNC_LIMIT: '0'
+        run: npm run sync:drv
+
+      - name: Apply manually verified website resolution for acquisition only
+        run: npm run discovery:apply-verified
+
+      - name: Enrich LRV fallback contacts from official websites
+        env:
+          LRV_ENRICH_DELAY_MS: '700'
+          LRV_ENRICH_MAX_PAGES: '5'
+        run: npm run lrv:enrich
+
+      - name: Enrich LRV contacts from official DRV Länderrat
+        run: npm run lrv:laenderrat
+
+      - name: Build governance snapshot
+        env:
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.json
+        run: npm run snapshot:build
+
+      - name: Rebuild frozen 100-club input with verified website resolution
+        env:
+          PILOT_REGISTRY_FILE: 'build-private/drv-registry-websites.json'
+          PILOT_SAMPLE_TARGET: '100'
+          PILOT_SAMPLE_SEED: 'adams-erben-pilot-100-v1'
+          PILOT_FROZEN_IDS_FILE: 'scripts/pilot-100-ids.v1.json'
+        run: npm run pilot:prepare
+
+      - name: Verify frozen sample hash and website resolution before network pilot
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const cohort = JSON.parse(fs.readFileSync('scripts/pilot-100-ids.v1.json', 'utf8'));
+          const report = JSON.parse(fs.readFileSync('artifacts/pilot-100/report.json', 'utf8'));
+          const resolution = JSON.parse(fs.readFileSync('artifacts/verified-discovery/report.json', 'utf8'));
+          if (cohort.sampleHash !== process.env.EXPECTED_PILOT_SAMPLE_HASH) throw new Error(`committed cohort hash changed: ${cohort.sampleHash}`);
+          if (report.selectionMode !== 'frozen-ids' || report.sampleHash !== cohort.sampleHash) throw new Error('frozen pilot sample drift');
+          if (report.sample !== 100 || cohort.organizationIds.length !== 100) throw new Error('frozen pilot cohort must contain exactly 100 clubs');
+          if (resolution.appliedOfficialWebsites !== 18 || resolution.websitesMissingAfterResolution !== 5 || resolution.invalidGroundTruth !== 0) {
+            throw new Error(`unexpected verified discovery result: ${JSON.stringify(resolution)}`);
+          }
+          console.log(`Frozen pilot sample verified: ${report.sampleHash}; websites=${resolution.websitesPresentAfterResolution}; missing=${resolution.websitesMissingAfterResolution}`);
+          NODE
+
+      - name: Run bounded real pilot on frozen sample
+        env:
+          PILOT_RUN_CONCURRENCY: '3'
+          PILOT_RUN_PAGE_DELAY_MS: '450'
+          PILOT_RUN_MAX_PAGES: '5'
+          PILOT_RUN_MAX_ATTEMPTS: '8'
+          PILOT_RUN_TIMEOUT_MS: '12000'
+          PILOT_RUN_MAX_REDIRECTS: '5'
+          PILOT_RUN_IDENTITY_THRESHOLD: '0.45'
+        run: npm run pilot:run
+
+      - name: Validate bounded pilot and privacy gates
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/pilot-100-run/report.json', 'utf8'));
+          const publicRows = JSON.parse(fs.readFileSync('artifacts/pilot-100-run/organizations.json', 'utf8')).organizations;
+          const privateRows = JSON.parse(fs.readFileSync('build-private/pilot-100-decisions.json', 'utf8')).organizations;
+
+          if (report.runnerVersion !== 'pilot-100-run/1.2.0') throw new Error(`unexpected runner ${report.runnerVersion}`);
+          if (report.total !== 100 || publicRows.length !== 100 || privateRows.length !== 100) throw new Error('pilot result must contain exactly 100 organizations');
+          if (report.knownWebsite !== 95) throw new Error(`expected 95 known websites after verified discovery, got ${report.knownWebsite}`);
+          if (report.discoveryPending !== 5) throw new Error(`expected 5 discovery-pending none-cases, got ${report.discoveryPending}`);
+          if (report.maxPagesFetched > 5) throw new Error(`page fetch cap violated: ${report.maxPagesFetched}`);
+          if (report.maxPagesAttempted > 8) throw new Error(`page attempt cap violated: ${report.maxPagesAttempted}`);
+          if (report.trustedContactDomainOrganizations > report.domainEvidenceOrganizations) throw new Error('trusted domain evidence count exceeds candidate evidence count');
+
+          const pending = publicRows.filter((row) => row.status === 'discovery_pending_provider');
+          if (pending.length !== 5 || pending.some((row) => row.websiteStatus !== 'missing')) throw new Error('discovery-pending cohort must be exactly the five verified-none cases');
+
+          const saarbruecken = publicRows.find((row) => row.organizationId === '12103');
+          if (!saarbruecken) throw new Error('pilot regression case 12103 missing');
+          if (saarbruecken.status !== 'identity_review' || saarbruecken.proposedRouteLevel !== 'drv' || saarbruecken.finalHost !== 'ruderbund.de') throw new Error(`12103 website identity regression: ${JSON.stringify(saarbruecken)}`);
+
+          for (const row of publicRows) {
+            if ('contactDomainEvidence' in row || 'trustedDomains' in row || 'evidence' in row) throw new Error(`private domain evidence leaked into public row ${row.organizationId}`);
+          }
+          for (const decision of privateRows) {
+            for (const candidate of decision.candidates || []) {
+              if (candidate.snapshotEligible && !['functional', 'role-functional'].includes(candidate.contactKind)) throw new Error(`non-functional candidate became direct for ${decision.organizationId}`);
+            }
+          }
+
+          const publicRaw = [
+            'artifacts/verified-discovery/report.json',
+            'artifacts/verified-discovery/report.md',
+            'artifacts/pilot-100/sample.json',
+            'artifacts/pilot-100/report.json',
+            'artifacts/pilot-100/report.md',
+            'artifacts/pilot-100-run/report.json',
+            'artifacts/pilot-100-run/report.md',
+            'artifacts/pilot-100-run/organizations.json'
+          ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+          const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+          if (email.test(publicRaw)) throw new Error('public pilot artifacts must not expose email addresses');
+
+          console.log({knownWebsite:report.knownWebsite, discoveryPending:report.discoveryPending, reachable:report.reachable, processed:report.processed, identityReview:report.identityReview, domainEvidenceOrganizations:report.domainEvidenceOrganizations, trustedContactDomainOrganizations:report.trustedContactDomainOrganizations, contactOutcomes:report.contactOutcomes, directUpgrades:report.directUpgrades, routeBefore:report.routeBefore, routeAfter:report.routeAfter, statusCounts:report.statusCounts, errorCounts:report.errorCounts, pagesFetched:report.pagesFetched, pagesAttempted:report.pagesAttempted, runtimeMs:report.runtimeMs});
+          NODE
+
+      - name: Add pilot report to workflow summary
+        if: always()
+        run: |
+          if [ -f artifacts/verified-discovery/report.md ]; then cat artifacts/verified-discovery/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/pilot-100/report.md ]; then cat artifacts/pilot-100/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/pilot-100-run/report.md ]; then cat artifacts/pilot-100-run/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload address-free pilot artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bounded-100-club-pilot-report
+          path: |
+            artifacts/verified-discovery/
+            artifacts/pilot-100/
+            artifacts/pilot-100-run/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,135 @@
+name: Full Enrichment Prep
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - 'scripts/prepare-full-enrichment.mjs'
+      - 'scripts/prepare-full-enrichment.test.mjs'
+      - 'scripts/apply-verified-discovery.mjs'
+      - 'scripts/apply-verified-discovery.test.mjs'
+      - 'scripts/discovery-ground-truth.poc.json'
+      - 'scripts/build-snapshot.mjs'
+      - 'scripts/lib/contact-governance.mjs'
+      - 'scripts/lib/lrv-identity.mjs'
+      - '.github/workflows/full-enrichment-prep.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-full-enrichment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test verified discovery and batch preparation
+        run: |
+          npm run test:discovery-verified
+          npm run test:full-prepare
+
+      - name: Rebuild full DRV registry
+        env:
+          REQUIRE_DRV_SYNC: '1'
+          DRV_SYNC_REQUIRED_COVERAGE: '0.95'
+          DRV_SYNC_CONCURRENCY: '3'
+          DRV_SYNC_DELAY_MS: '300'
+          DRV_SYNC_LIMIT: '0'
+        run: npm run sync:drv
+
+      - name: Apply manually verified website resolution
+        run: npm run discovery:apply-verified
+
+      - name: Enrich LRV fallback contacts from official websites
+        env:
+          LRV_ENRICH_DELAY_MS: '700'
+          LRV_ENRICH_MAX_PAGES: '5'
+        run: npm run lrv:enrich
+
+      - name: Enrich LRV contacts from official DRV Länderrat
+        run: npm run lrv:laenderrat
+
+      - name: Build governance baseline snapshot
+        env:
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.json
+        run: npm run snapshot:build
+
+      - name: Prepare five deterministic enrichment batches
+        env:
+          FULL_ENRICHMENT_BATCH_COUNT: '5'
+          FULL_ENRICHMENT_REGISTRY_FILE: build-private/drv-registry-websites.json
+          FULL_ENRICHMENT_SNAPSHOT_FILE: dist/data/clubs.json
+        run: npm run full:prepare
+
+      - name: Validate 429/5 coverage, routing and privacy gates
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/full-enrichment-prep/report.json', 'utf8'));
+          if (report.version !== 'full-enrichment-prep/1.1.0') throw new Error(`unexpected prep version ${report.version}`);
+          if (report.batchMapVersion !== 'full-enrichment-prep/1.0.0') throw new Error(`unexpected batch-map version ${report.batchMapVersion}`);
+          if (report.clubs !== 434) throw new Error(`expected 434 clubs, got ${report.clubs}`);
+          if (report.knownWebsite !== 429) throw new Error(`expected 429 known websites, got ${report.knownWebsite}`);
+          if (report.missingWebsite !== 5) throw new Error(`expected 5 missing websites, got ${report.missingWebsite}`);
+          if (report.batchCount !== 5) throw new Error(`expected 5 batches, got ${report.batchCount}`);
+          if (JSON.stringify(report.batchSizes) !== JSON.stringify([86,86,86,86,85])) throw new Error(`unexpected batch sizes ${JSON.stringify(report.batchSizes)}`);
+          if (report.coverageHash !== '8e2133403ccaa00330c9b3a9e2debbfba15596a838b63ba35b3ee21a4554026e') throw new Error(`coverage hash drift ${report.coverageHash}`);
+          const expectedBatchHashes = [
+            'b9b4a761480a0aaf3818e0eb446436e0f07e9f7274fad384f48f0af3de118b75',
+            'be71d74548d25976d9d727c55f6bf1842826fab7aa92853d384e05315f470e8a',
+            '4b102d5ebbf6d9dce1fabc8073e58e0305097302e7293225c9f65575a452f644',
+            '8fae1af2515cad9bd2e46550d949cdbc944127ebd7bbb6d751b73924c65d0a23',
+            '52fd1bcc34c3e16c362b832fc0d91e25c40d062c47b8d94e54623c0d2e6b088d'
+          ];
+
+          const ids = [];
+          const aggregateRoutes = {club:0,lrv:0,drv:0};
+          for (let i = 1; i <= 5; i += 1) {
+            const batch = JSON.parse(fs.readFileSync(`build-private/full-enrichment/batch-${i}.json`, 'utf8'));
+            if (batch.count !== report.batchSizes[i - 1]) throw new Error(`batch ${i} count mismatch`);
+            const summary = report.batches[i - 1];
+            if (summary.organizationIdHash !== expectedBatchHashes[i - 1]) throw new Error(`batch ${i} ID hash drift ${summary.organizationIdHash}`);
+            for (const row of batch.organizations) {
+              if (!row.website || row.websiteStatus !== 'present') throw new Error(`batch ${i} missing website for ${row.organizationId}`);
+              if (!['club','lrv','drv'].includes(row.routeLevel)) throw new Error(`batch ${i} invalid route for ${row.organizationId}`);
+              aggregateRoutes[row.routeLevel] += 1;
+            }
+            ids.push(...batch.organizations.map((row) => row.organizationId));
+          }
+          if (ids.length !== 429 || new Set(ids).size !== 429) throw new Error(`batch coverage duplicate/missing: total=${ids.length}, unique=${new Set(ids).size}`);
+          if (JSON.stringify(aggregateRoutes) !== JSON.stringify(report.routeCounts)) throw new Error(`route aggregate mismatch ${JSON.stringify(aggregateRoutes)} != ${JSON.stringify(report.routeCounts)}`);
+          const missing = JSON.parse(fs.readFileSync('build-private/full-enrichment/missing.json', 'utf8'));
+          if (missing.count !== 5) throw new Error(`missing population mismatch ${missing.count}`);
+
+          const publicRaw = [
+            'artifacts/full-enrichment-prep/report.json',
+            'artifacts/full-enrichment-prep/report.md'
+          ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+          if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(publicRaw)) throw new Error('public full-enrichment prep report contains email address');
+          console.log({coverageHash: report.coverageHash, batchSizes: report.batchSizes, routeCounts: report.routeCounts, knownWebsite: report.knownWebsite, missingWebsite: report.missingWebsite});
+          NODE
+
+      - name: Add batch report to workflow summary
+        if: always()
+        run: |
+          if [ -f artifacts/full-enrichment-prep/report.md ]; then cat artifacts/full-enrichment-prep/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload address-free batch preparation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-enrichment-prep-report
+          path: artifacts/full-enrichment-prep/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,28 @@
+.preview-banner {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: .65rem;
+  flex-wrap: wrap;
+  padding: .65rem 1rem;
+  background: #fff0c2;
+  color: #4b3810;
+  border-bottom: 1px solid #e7c969;
+  font-size: .9rem;
+  text-align: center;
+}
+
+.preview-banner[hidden] { display: none; }
+.preview-banner strong { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; }
+.preview-contact-note {
+  padding: .8rem 1rem;
+  border-radius: 12px;
+  background: #fff0c2;
+  color: #4b3810;
+  border: 1px solid #e7c969;
+}
+.preview-contact-note[hidden] { display: none; }
+.is-preview [data-contact]::after { content: ""; }

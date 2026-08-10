@@ -1,0 +1,13 @@
+{
+  "name": "github-lars-komo/adams-erben",
+  "description": "Minimal contact endpoint for adams-erben.de",
+  "type": "project",
+  "require": {
+    "php": ">=8.2",
+    "phpmailer/phpmailer": "^6.10"
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  }
+}

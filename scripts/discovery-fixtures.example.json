@@ -1,0 +1,16 @@
+{
+  "12345": [
+    {
+      "rank": 1,
+      "url": "https://www.beispiel-ruderverein.de/",
+      "title": "Beispiel Ruderverein e.V.",
+      "description": "Rudern in Beispielstadt 12345"
+    },
+    {
+      "rank": 2,
+      "url": "https://example.org/vereinsverzeichnis/beispiel-ruderverein",
+      "title": "Vereinsverzeichnis – Beispiel Ruderverein",
+      "description": "Sportvereine in Beispielstadt"
+    }
+  ]
+}

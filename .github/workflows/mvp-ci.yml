@@ -1,0 +1,158 @@
+name: MVP CI
+
+on:
+  push:
+    branches: [main, feat/mvp-wayfinder]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-mvp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install frontend/build dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: JavaScript syntax
+        run: |
+          node --check scripts/build.mjs
+          node --check scripts/sync-drv.mjs
+          node --check scripts/build-snapshot.mjs
+          node --check scripts/build-snapshot.test.mjs
+          node --check scripts/build-snapshot-lrv-identity.test.mjs
+          node --check scripts/report-contact-governance-reasons.mjs
+          node --check scripts/report-contact-governance-reasons.test.mjs
+          node --check scripts/merge-contact-candidate-history.mjs
+          node --check scripts/contact-history-snapshot.integration.test.mjs
+          node --check scripts/apply-verified-discovery.mjs
+          node --check scripts/apply-verified-discovery.test.mjs
+          node --check scripts/prepare-full-enrichment.mjs
+          node --check scripts/prepare-full-enrichment.test.mjs
+          node --check scripts/enrich-lrv.mjs
+          node --check scripts/enrich-lrv-laenderrat.mjs
+          node --check scripts/enrich-lrv-laenderrat.test.mjs
+          node --check scripts/prepare-pilot-100.mjs
+          node --check scripts/prepare-pilot-100.test.mjs
+          node --check scripts/run-pilot-100.mjs
+          node --check scripts/run-pilot-100.test.mjs
+          node --check scripts/lib/drv-registry.mjs
+          node --check scripts/lib/drv-registry.test.mjs
+          node --check scripts/lib/contact-governance.mjs
+          node --check scripts/lib/contact-governance.test.mjs
+          node --check scripts/lib/contact-candidate-history.mjs
+          node --check scripts/lib/contact-candidate-history.test.mjs
+          node --check scripts/lib/contact-domain-evidence.mjs
+          node --check scripts/lib/contact-domain-evidence.test.mjs
+          node --check scripts/lib/lrv-identity.mjs
+          node --check scripts/enrichment-poc.mjs
+          node --check scripts/review-enrichment-poc.mjs
+          node --check scripts/review-enrichment-poc.test.mjs
+          node --check scripts/prepare-discovery-poc.mjs
+          node --check scripts/prepare-discovery-poc.test.mjs
+          node --check scripts/discover-websites.mjs
+          node --check scripts/discover-websites.test.mjs
+          node --check src/assets/app.js
+
+      - name: Test shared contact governance, history and domain evidence
+        run: |
+          npm run test:contact-governance
+          npm run test:history
+          npm run test:contact-domain-evidence
+
+      - name: Test verified website resolution and full enrichment preparation
+        run: |
+          npm run test:discovery-verified
+          npm run test:full-prepare
+
+      - name: Test DRV registry parser and routing gate
+        run: npm run test:drv-registry
+
+      - name: Test approved snapshot routing
+        run: npm run test:snapshot
+
+      - name: Test DRV Länderrat LRV enrichment
+        run: npm run test:lrv-laenderrat
+
+      - name: Test deterministic 100-club pilot sampling
+        run: npm run test:pilot-prepare
+
+      - name: Test bounded 100-club pilot runner
+        run: npm run test:pilot-run
+
+      - name: Test discovery sample stratification
+        run: npm run test:discover-prepare
+
+      - name: Test conservative contact review rules
+        run: npm run test:enrich-review
+
+      - name: Test website discovery scoring
+        run: npm run test:discover
+
+      - name: Build production-safe seed fallback
+        env:
+          SKIP_DRV_SYNC: '1'
+        run: npm run build
+
+      - name: Assert browser data contains no email addresses
+        shell: bash
+        run: |
+          if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
+            echo 'Public browser data must not contain email addresses.' >&2
+            exit 1
+          fi
+
+      - name: Validate generated search data
+        run: |
+          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); console.log('organizations:',d.organizations.length)"
+
+      - name: Build explicit public preview
+        env:
+          PREVIEW_MODE: '1'
+          SKIP_DRV_SYNC: '0'
+          REQUIRE_DRV_SYNC: '1'
+        run: npm run build
+
+      - name: Validate preview invariants
+        shell: bash
+        run: |
+          grep -q 'content="preview"' dist/index.html
+          grep -q 'preview.css' dist/index.html
+          grep -q 'noindex,nofollow' dist/index.html
+          grep -q 'Prototyp' dist/index.html
+          grep -q 'Drei Schritte vom Film zum ersten Ruderschlag' dist/index.html
+          grep -q 'Demo-Anfrage absenden' dist/assets/app.js
+          grep -q 'Es wurden keine Daten an den Server übertragen' dist/assets/app.js
+          grep -q '"preview": true' build-private/recipients.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const d = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
+          if (d.organizations.length < 12) throw new Error('preview demo dataset too small');
+          const states = new Set(d.organizations.map((x) => x.state).filter(Boolean));
+          if (states.size < 8) throw new Error('preview demo dataset lacks geographic spread');
+          const lrv = d.organizations.find((x) => x.id === 'landesruderverband-schleswig-holstein');
+          if (!lrv || lrv.contactRouteLevel !== 'lrv') throw new Error('LRV demo routing invalid');
+          if (!d.organizations.some((x) => x.demo === true)) throw new Error('demo entries not marked');
+          NODE
+          if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
+            echo 'Preview browser data must not contain email addresses.' >&2
+            exit 1
+          fi
+
+      - name: PHP syntax
+        run: |
+          php -v
+          php -l api/contact.php
+          php -l api/health.php
+          php -l legal/impressum.php
+          php -l legal/datenschutz.php
