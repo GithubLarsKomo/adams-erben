@@ -48,6 +48,8 @@ jobs:
           node --check scripts/lib/contact-governance.test.mjs
           node --check scripts/lib/contact-candidate-history.mjs
           node --check scripts/lib/contact-candidate-history.test.mjs
+          node --check scripts/lib/contact-domain-evidence.mjs
+          node --check scripts/lib/contact-domain-evidence.test.mjs
           node --check scripts/lib/lrv-identity.mjs
           node --check scripts/enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.mjs
@@ -58,13 +60,14 @@ jobs:
           node --check scripts/discover-websites.test.mjs
           node --check src/assets/app.js
 
-      - name: Test DRV registry parser and routing gate
-        run: npm run test:drv-registry
-
-      - name: Test shared contact governance and history
+      - name: Test shared contact governance, history and domain evidence
         run: |
           npm run test:contact-governance
           npm run test:history
+          npm run test:contact-domain-evidence
+
+      - name: Test DRV registry parser and routing gate
+        run: npm run test:drv-registry
 
       - name: Test approved snapshot routing
         run: npm run test:snapshot
