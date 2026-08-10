@@ -22,10 +22,12 @@ const lrvs = [
 const html = `
 <html><body>
   <main>
-    <section class="person-card">
-      <h3>Steffen Planer</h3>
+    <!-- Deliberately ambiguous DOM container: the role address must resolve by the
+         unique verified rusa.de organization domain, not by guessing nearby text. -->
+    <section class="shared-layout">
       <p>Ruderverband Sachsen-Anhalt</p>
-      <a href="mailto:praesident@rusa.de">Kontakt</a>
+      <p>Landesruderverband Nordrhein-Westfalen</p>
+      <div class="mail-only"><a href="mailto:praesident@rusa.de">Kontakt</a></div>
     </section>
     <section class="person-card">
       <h3>Wilhelm Hummels</h3>
@@ -51,12 +53,14 @@ const rusa = candidates.find((item) => item.organizationId === '30023');
 assert.ok(rusa);
 assert.equal(rusa.sourceUrl, LAENDERRAT_URL);
 assert.equal(rusa.sourceType, 'drv-laenderrat');
+assert.equal(rusa.resolutionMethod, 'verified-domain');
 assert.equal(rusa.contactKind, 'role-functional');
 assert.equal(rusa.autoApproved, true);
 assert.equal(rusa.reason, 'role_alias_on_club_domain');
 
 const nrw = candidates.find((item) => item.organizationId === '30019');
 assert.ok(nrw);
+assert.equal(nrw.resolutionMethod, 'dom-context');
 assert.equal(nrw.contactKind, 'personal');
 assert.equal(nrw.autoApproved, false);
 assert.equal(nrw.governanceState, 'review-personal');
