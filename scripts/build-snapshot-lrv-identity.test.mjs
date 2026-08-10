@@ -38,6 +38,11 @@ const registry = [
     emailFromDrv: 'brv-geschaeftsstelle@ruderverband.de'
   }),
   record({
+    drvId: '30014', id: 'lrv-bremen', name: 'Landesruderverband Bremen e.V.', type: 'lrv',
+    state: 'Bremen', states: ['Bremen'], websiteFromDrv: 'https://landesruderverband-bremen.de/',
+    emailFromDrv: 'info@lrv-bremen.de'
+  }),
+  record({
     drvId: '30018', id: 'lrv-niedersachsen', name: 'Landesruderverband Niedersachsen', type: 'lrv',
     state: 'Niedersachsen', states: ['Niedersachsen'], emailFromDrv: 'info@lrvn.de'
   }),
@@ -48,27 +53,30 @@ const registry = [
   }),
   record({ drvId: '10010', id: 'club-bw', name: 'Club BW', state: 'Baden-Württemberg', states: ['Baden-Württemberg'] }),
   record({ drvId: '10011', id: 'club-bayern', name: 'Club Bayern', state: 'Bayern', states: ['Bayern'] }),
+  record({ drvId: '10014', id: 'club-bremen', name: 'Club Bremen', state: 'Bremen', states: ['Bremen'] }),
   record({ drvId: '10018', id: 'club-ni', name: 'Club Niedersachsen', state: 'Niedersachsen', states: ['Niedersachsen'] }),
   record({ drvId: '10019', id: 'club-nrw', name: 'Club NRW', state: 'Nordrhein-Westfalen', states: ['Nordrhein-Westfalen'] })
 ];
 
 const result = buildSnapshot({ registry, now });
 
-for (const id of ['lrv-bw', 'lrv-bayern', 'lrv-niedersachsen', 'lrv-nrw']) {
+for (const id of ['lrv-bw', 'lrv-bayern', 'lrv-bremen', 'lrv-niedersachsen', 'lrv-nrw']) {
   assert.equal(result.recipients[id].routeLevel, 'lrv', `${id} should be a direct LRV route`);
 }
-for (const id of ['club-bw', 'club-bayern', 'club-ni', 'club-nrw']) {
+for (const id of ['club-bw', 'club-bayern', 'club-bremen', 'club-ni', 'club-nrw']) {
   assert.equal(result.recipients[id].routeLevel, 'lrv', `${id} should fall back to its LRV`);
 }
 
-assert.equal(result.report.lrvIdentityHintsApplied, 4);
-assert.equal(result.report.directApproved, 4);
-assert.equal(result.report.routeCounts.lrv, 8);
+assert.equal(result.report.lrvIdentityHintsApplied, 5);
+assert.equal(result.report.directApproved, 5);
+assert.equal(result.report.routeCounts.lrv, 10);
 assert.equal(result.report.routeCounts.drv, 0);
 
 const bwPublic = result.organizations.find((item) => item.organizationId === '30010');
+const hbPublic = result.organizations.find((item) => item.organizationId === '30014');
 const niPublic = result.organizations.find((item) => item.organizationId === '30018');
 assert.equal(bwPublic.website, 'https://www.lrvbw.de/');
+assert.equal(hbPublic.website, 'https://landesruderverband-bremen.de/');
 assert.equal(niPublic.website, 'https://www.lrvn.de/');
 
 const publicJson = JSON.stringify(result.organizations);
