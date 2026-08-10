@@ -30,10 +30,15 @@ jobs:
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/build-snapshot.test.mjs
+          node --check scripts/build-snapshot-lrv-identity.test.mjs
+          node --check scripts/enrich-lrv.mjs
+          node --check scripts/enrich-lrv-laenderrat.mjs
+          node --check scripts/enrich-lrv-laenderrat.test.mjs
           node --check scripts/lib/drv-registry.mjs
           node --check scripts/lib/drv-registry.test.mjs
           node --check scripts/lib/contact-governance.mjs
           node --check scripts/lib/contact-governance.test.mjs
+          node --check scripts/lib/lrv-identity.mjs
           node --check scripts/enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.mjs
           node --check scripts/review-enrichment-poc.test.mjs
@@ -51,6 +56,9 @@ jobs:
 
       - name: Test approved snapshot routing
         run: npm run test:snapshot
+
+      - name: Test DRV Länderrat LRV enrichment
+        run: npm run test:lrv-laenderrat
 
       - name: Test discovery sample stratification
         run: npm run test:discover-prepare
