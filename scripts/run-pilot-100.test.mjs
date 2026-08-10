@@ -11,7 +11,7 @@ import {
 } from './run-pilot-100.mjs';
 import { evaluateSnapshotEligibility } from './lib/contact-governance.mjs';
 
-assert.equal(PILOT_RUNNER_VERSION, 'pilot-100-run/1.1.0');
+assert.equal(PILOT_RUNNER_VERSION, 'pilot-100-run/1.2.0');
 assert.equal(relatedHost('www.rrc-online.de', 'rrc-online.de'), true);
 assert.equal(relatedHost('club.example', 'other.example'), false);
 
@@ -72,20 +72,22 @@ const rows = [
   {
     websiteStatus: 'present', status: 'processed', websiteReachable: true, contactOutcome: 'auto_direct',
     baseRouteLevel: 'lrv', proposedRouteLevel: 'club', pagesFetched: 4, pagesAttempted: 5,
-    identityStatus: 'drv-domain-consistent', errorCode: ''
+    identityStatus: 'drv-domain-consistent', errorCode: '', contactDomainCandidateCount: 1, trustedContactDomainCount: 1
   },
   {
     websiteStatus: 'present', status: 'identity_review', websiteReachable: true, contactOutcome: 'review',
     baseRouteLevel: 'drv', proposedRouteLevel: 'drv', pagesFetched: 1, pagesAttempted: 1,
-    identityStatus: 'review-weak-identity', errorCode: ''
+    identityStatus: 'review-weak-identity', errorCode: '', contactDomainCandidateCount: 0, trustedContactDomainCount: 0
   },
   {
     websiteStatus: 'present', status: 'robots_blocked', websiteReachable: false, contactOutcome: 'fallback',
-    baseRouteLevel: 'club', proposedRouteLevel: 'club', pagesFetched: 0, pagesAttempted: 0, errorCode: 'robots_blocked'
+    baseRouteLevel: 'club', proposedRouteLevel: 'club', pagesFetched: 0, pagesAttempted: 0, errorCode: 'robots_blocked',
+    contactDomainCandidateCount: 0, trustedContactDomainCount: 0
   },
   {
     websiteStatus: 'missing', status: 'discovery_pending_provider', websiteReachable: false, contactOutcome: 'discovery_pending_provider',
-    baseRouteLevel: 'drv', proposedRouteLevel: 'drv', pagesFetched: 0, pagesAttempted: 0, errorCode: ''
+    baseRouteLevel: 'drv', proposedRouteLevel: 'drv', pagesFetched: 0, pagesAttempted: 0, errorCode: '',
+    contactDomainCandidateCount: 0, trustedContactDomainCount: 0
   }
 ];
 const report = summarizePilotRun(rows, '2026-08-10T00:00:00.000Z', '2026-08-10T00:00:10.000Z');
@@ -94,6 +96,9 @@ assert.equal(report.knownWebsite, 3);
 assert.equal(report.discoveryPending, 1);
 assert.equal(report.identityReview, 1);
 assert.equal(report.directUpgrades, 1);
+assert.equal(report.domainEvidenceOrganizations, 1);
+assert.equal(report.trustedContactDomainOrganizations, 1);
+assert.equal(report.trustedContactDomains, 1);
 assert.equal(report.maxPagesFetched, 4);
 assert.equal(report.maxPagesAttempted, 5);
 assert.equal(report.routeBefore.lrv, 1);
@@ -102,5 +107,6 @@ assert.equal(report.identityStatusCounts['review-weak-identity'], 1);
 
 const publicJson = JSON.stringify(report);
 assert.equal(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(publicJson), false);
+assert.equal(publicJson.includes('rcnh.de'), false);
 
 console.log('bounded 100-club pilot runner tests passed');
