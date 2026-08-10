@@ -37,6 +37,8 @@ jobs:
           node --check scripts/contact-history-snapshot.integration.test.mjs
           node --check scripts/apply-verified-discovery.mjs
           node --check scripts/apply-verified-discovery.test.mjs
+          node --check scripts/prepare-full-enrichment.mjs
+          node --check scripts/prepare-full-enrichment.test.mjs
           node --check scripts/enrich-lrv.mjs
           node --check scripts/enrich-lrv-laenderrat.mjs
           node --check scripts/enrich-lrv-laenderrat.test.mjs
@@ -68,8 +70,10 @@ jobs:
           npm run test:history
           npm run test:contact-domain-evidence
 
-      - name: Test verified website resolution
-        run: npm run test:discovery-verified
+      - name: Test verified website resolution and full enrichment preparation
+        run: |
+          npm run test:discovery-verified
+          npm run test:full-prepare
 
       - name: Test DRV registry parser and routing gate
         run: npm run test:drv-registry
