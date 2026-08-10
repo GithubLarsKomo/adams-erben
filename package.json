@@ -9,7 +9,7 @@
     "lrv:enrich": "node scripts/enrich-lrv.mjs",
     "lrv:laenderrat": "node scripts/enrich-lrv-laenderrat.mjs",
     "test:lrv-laenderrat": "node scripts/enrich-lrv-laenderrat.test.mjs",
-    "snapshot:build": "node scripts/build-snapshot.mjs",
+    "snapshot:build": "node scripts/build-snapshot.mjs && node scripts/report-contact-governance-reasons.mjs",
     "snapshot:reasons": "node scripts/report-contact-governance-reasons.mjs",
     "test:snapshot": "node scripts/build-snapshot.test.mjs && node scripts/build-snapshot-lrv-identity.test.mjs && node scripts/report-contact-governance-reasons.test.mjs",
     "pilot:prepare": "node scripts/prepare-pilot-100.mjs",
