@@ -4,17 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="adams-erben-mode" content="__APP_MODE__">
-  <title>Adams Erben – Finde deinen Ruderverein</title>
-  <meta name="description" content="Finde Rudervereine, Landesruderverbände und den Deutschen Ruderverband – unabhängig zum Kinostart von Adams Acht.">
+  <title>Adams Erben – Der Film endet im Kino. Adams Erbe lebt im Bootshaus weiter.</title>
+  <meta name="description" content="Entdecke Karl Adams Erbe in Ratzeburg und finde einen Ruderverein in deiner Nähe.">
   <meta name="theme-color" content="#0b2336">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_DE">
   <meta property="og:site_name" content="Adams Erben">
-  <meta property="og:title" content="Adams Erben – Finde deinen Ruderverein">
-  <meta property="og:description" content="Vom Kinosaal ins Boot: Finde einen Ruderverein in deiner Nähe.">
+  <meta property="og:title" content="Adams Erben – Vom Film ins Bootshaus">
+  <meta property="og:description" content="Karl Adams Ideen, Ratzeburgs Rudergeschichte und der direkte Weg zum Ruderverein.">
   <meta property="og:url" content="https://adams-erben.de/">
   <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/karl-adam.css">
   <script src="/assets/app.js" defer></script>
 </head>
 <body>
@@ -29,13 +30,14 @@
       <span class="brand-mark" aria-hidden="true">AE</span>
       <span>
         <strong>Adams Erben</strong>
-        <small>Rudern beginnt vor deiner Haustür.</small>
+        <small>Vom Kinosaal ins Bootshaus.</small>
       </span>
     </a>
     <nav aria-label="Hauptnavigation">
+      <a href="#ratzeburg">Ratzeburg</a>
+      <a href="#stimmen">Stimmen</a>
+      <a href="#labor">Adams Labor</a>
       <a href="#vereine">Verein finden</a>
-      <a href="#film">Zum Film</a>
-      <a href="#ueber">Über das Projekt</a>
     </nav>
   </header>
 
@@ -43,13 +45,13 @@
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow">Unabhängige Initiative zum Kinostart</p>
-        <h1 id="hero-title">Der Film endet im Kino.<br>Dein Rudern kann dort anfangen.</h1>
-        <p class="lead">„Adams Acht“ erzählt eine der großen Geschichten des deutschen Rudersports. Adams Erben hilft dir, danach den passenden Ruderclub in deiner Nähe zu finden.</p>
+        <h1 id="hero-title">Der Film endet im Kino.<br>Adams Erbe lebt im Bootshaus weiter.</h1>
+        <p class="lead">„Adams Acht“ erzählt eine außergewöhnliche Geschichte des deutschen Rudersports. Adams Erben schlägt die Brücke von Karl Adams Ideen und Ratzeburgs Rudergeschichte zum Rudern von heute – und zu einem Verein ganz in deiner Nähe.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="#vereine">Ruderverein finden</a>
-          <a class="button button-secondary" href="https://www.adamsacht.de/" target="_blank" rel="noopener noreferrer">Offizielle Filmseite</a>
+          <a class="button button-secondary" href="#ratzeburg">Ratzeburg entdecken</a>
         </div>
-        <p class="independence-note">Keine offizielle Website des Films, der Produktion, des Verleihs oder des Deutschen Ruderverbands.</p>
+        <p class="independence-note">Keine offizielle Website des Films, der Produktion, des Verleihs, des Deutschen Ruderverbands oder der hier genannten Partner.</p>
       </div>
       <div class="hero-art" aria-hidden="true">
         <svg viewBox="0 0 560 360">
@@ -66,28 +68,149 @@
       </div>
     </section>
 
-    <section class="featured" aria-labelledby="featured-title">
+    <section class="featured" id="ratzeburg" aria-labelledby="featured-title">
       <div class="section-heading">
         <p class="eyebrow">Der besondere Ort</p>
         <h2 id="featured-title">Ratzeburg: Wo aus einer Idee Geschichte wurde</h2>
+        <p>Hier treffen Filmgeschichte, olympische Tradition und lebendiger Vereinssport unmittelbar aufeinander.</p>
       </div>
-      <article class="featured-card" id="featured-club">
-        <div>
-          <span class="badge">Im Mittelpunkt des Films</span>
-          <h3>Ratzeburger Ruderclub e.V.</h3>
-          <p>Der Ratzeburger Ruderclub ist der zentrale Ort der Geschichte um Karl Adam und den Deutschland-Achter. Deshalb steht er hier an erster Stelle.</p>
+      <article class="featured-card rrc-card" id="featured-club">
+        <div class="rrc-visual" aria-label="Platzhalter für Clublogo und historische beziehungsweise aktuelle Fotografie">
+          <div class="asset-placeholder asset-placeholder-logo"><strong>RRC</strong><span>Clubfahne oder Vintage-Logo mit Stadtwappen</span></div>
+          <div class="asset-placeholder asset-placeholder-photo"><strong>Bildplatzhalter</strong><span>RRC heute / historisches Motiv aus der Karl-Adam-Zeit – nach Rechtefreigabe</span></div>
         </div>
-        <div class="featured-actions">
-          <button class="button button-primary" type="button" data-contact="ratzeburger-ruderclub-ev">Kontakt aufnehmen</button>
-          <a class="button button-ghost" href="https://www.rudern.de/service/vereine/ratzeburger-ruderclub-ev" target="_blank" rel="noopener noreferrer">DRV-Profil</a>
+        <div class="rrc-copy">
+          <span class="badge">Im Mittelpunkt der Geschichte</span>
+          <h3>Ratzeburger Ruderclub e.V.</h3>
+          <p>Der Ratzeburger Ruderclub ist einer der zentralen Orte der Geschichte um Karl Adam und den Deutschland-Achter. Heute ist er vor allem das, was diese Seite zeigen möchte: ein echtes Bootshaus mit Menschen, die Rudern möglich machen.</p>
+          <div class="featured-actions">
+            <button class="button button-primary" type="button" data-contact="ratzeburger-ruderclub-ev">Kontakt aufnehmen</button>
+            <a class="button button-secondary" href="https://www.rrc-online.de/" target="_blank" rel="noopener noreferrer">rrc-online.de</a>
+            <a class="button button-ghost" href="https://www.rudern.de/service/vereine/ratzeburger-ruderclub-ev" target="_blank" rel="noopener noreferrer">DRV-Profil</a>
+          </div>
         </div>
       </article>
     </section>
 
-    <section class="about" aria-labelledby="steps-title">
+    <section class="city-story" aria-labelledby="city-title">
       <div class="section-heading">
-        <p class="eyebrow">So kommst du ins Boot</p>
-        <h2 id="steps-title">Drei Schritte vom Film zum ersten Ruderschlag</h2>
+        <p class="eyebrow">Auf Adams Spuren</p>
+        <h2 id="city-title">Ratzeburg, die Ruderstadt</h2>
+      </div>
+      <div class="city-grid">
+        <article class="story-card">
+          <p class="card-kicker">Stadtführung</p>
+          <h3>Vom Gedenkstein bis zur Ruderakademie</h3>
+          <p>Die rund zweistündige Themenführung folgt den Spuren Karl Adams und der Ratzeburger Rudergeschichte: vom Karl-Adam-Gedenkstein beim RRC über die frühere Gelehrtenschule und das historische Bootshaus bis zur Ruderakademie.</p>
+          <p><strong>Stadtführer:</strong> Guido Klossek. Aktuelle Termine, Preise und mögliche Gruppentermine bitte direkt bei der Stadt beziehungsweise Tourist-Information prüfen.</p>
+          <div class="inline-actions">
+            <a class="button button-primary" href="https://www.ratzeburg.de/index.php?FID=2559.13514.1&ModID=7&object=tx%2C2559.534" target="_blank" rel="noopener noreferrer">Zur Ruderführung</a>
+            <a class="text-link" href="mailto:tourist-info@ratzeburg.de">tourist-info@ratzeburg.de</a>
+            <a class="text-link" href="tel:+4945418000886">04541 8000-886</a>
+          </div>
+        </article>
+        <article class="story-card story-card-visual">
+          <div class="asset-placeholder asset-placeholder-wide"><strong>Ratzeburg damals und heute</strong><span>Später: historisches Motiv von Dirk Andresen + aktuelles Foto als visueller Übergang.</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="voices" id="stimmen" aria-labelledby="voices-title">
+      <div class="section-heading">
+        <p class="eyebrow">Adams Erben heute</p>
+        <h2 id="voices-title">Sechs Generationen. Sechs Perspektiven.</h2>
+        <p>Die endgültigen Stimmen werden mit echten Ruderinnen und Ruderern zwischen etwa 16 und 84 Jahren geführt. Bis dahin zeigen diese Sprechblasen die geplante Dramaturgie.</p>
+      </div>
+      <div class="voice-grid">
+        <blockquote class="voice-bubble"><p>„Welche Idee von Karl Adam ist für dich heute noch überraschend modern – und warum?“</p><footer><strong>Platzhalter · 16 Jahre</strong><span>Juniorin / Junior</span></footer></blockquote>
+        <blockquote class="voice-bubble"><p>„Acht Menschen, ein Boot: Was muss passieren, damit aus starken Einzelnen wirklich eine Mannschaft wird?“</p><footer><strong>Platzhalter · 24 Jahre</strong><span>Leistungssport</span></footer></blockquote>
+        <blockquote class="voice-bubble"><p>„Was würdest du jemandem sagen, der nach ‚Adams Acht‘ zum ersten Mal überlegt, Rudern auszuprobieren?“</p><footer><strong>Platzhalter · 36 Jahre</strong><span>Breitensport</span></footer></blockquote>
+        <blockquote class="voice-bubble"><p>„Was hat dich das Rudern über Vertrauen, Verantwortung oder Zusammenarbeit außerhalb des Bootes gelehrt?“</p><footer><strong>Platzhalter · 48 Jahre</strong><span>Trainerin / Trainer</span></footer></blockquote>
+        <blockquote class="voice-bubble"><p>„Was bringt dich an einem Tag aufs Wasser, an dem Motivation allein nicht reicht?“</p><footer><strong>Platzhalter · 65 Jahre</strong><span>Masters</span></footer></blockquote>
+        <blockquote class="voice-bubble"><p>„Wenn du eine Sache aus dem Rudern an die nächste Generation weitergeben könntest: Welche wäre es?“</p><footer><strong>Platzhalter · 84 Jahre</strong><span>Rudererfahrung über Jahrzehnte</span></footer></blockquote>
+      </div>
+    </section>
+
+    <section class="labor" id="labor" aria-labelledby="labor-title">
+      <div class="section-heading">
+        <p class="eyebrow">Adams Labor</p>
+        <h2 id="labor-title">Innovation wird sichtbar, wenn man Vorher und Nachher nebeneinanderlegt.</h2>
+        <p>Keine Heldengeschichte in Einzelbildern, sondern ein Vergleich: Was war üblich, was veränderte Adam – und was ist daraus im modernen Rudern geworden?</p>
+      </div>
+      <div class="lab-grid">
+        <article class="lab-card"><h3>Intervalltraining</h3><ol><li><span>Vor Adam</span><strong>Ausdauertraining stärker von langen, gleichmäßigen Belastungen geprägt.</strong></li><li><span>Adam</span><strong>Systematische Übertragung von Intervallprinzipien auf das Rudertraining.</strong></li><li><span>Heute</span><strong>Belastungssteuerung mit klaren Intensitätsbereichen, Tests und individualisierten Einheiten.</strong></li></ol></article>
+        <article class="lab-card"><h3>Krafttraining</h3><ol><li><span>Vor Adam</span><strong>Kraftarbeit war im Rudern kein selbstverständlicher Schwerpunkt.</strong></li><li><span>Adam</span><strong>Gezieltes Krafttraining wurde Teil des leistungsorientierten Gesamtsystems.</strong></li><li><span>Heute</span><strong>Kraft, Athletik, Prävention und Belastungsmanagement greifen systematisch ineinander.</strong></li></ol></article>
+        <article class="lab-card"><h3>Riemen &amp; Hebel</h3><ol><li><span>Vor Adam</span><strong>Bootsmaterial wurde stärker als gegebene Größe behandelt.</strong></li><li><span>Adam</span><strong>Riemen, Blattform und Hebelwirkung wurden als veränderbare Leistungsfaktoren gedacht.</strong></li><li><span>Heute</span><strong>Material, Rigging, Biomechanik und Messdaten werden gemeinsam optimiert.</strong></li></ol></article>
+        <article class="lab-card"><h3>Der mündige Athlet</h3><ol><li><span>Vor Adam</span><strong>Training war häufig stärker hierarchisch und an Anweisung orientiert.</strong></li><li><span>Adam</span><strong>Eigenverantwortung, Verständnis und der denkende Sportler gehörten zum Trainingsbild.</strong></li><li><span>Heute</span><strong>Feedback, Selbststeuerung und gemeinsame Leistungsanalyse sind feste Bestandteile moderner Trainingskultur.</strong></li></ol></article>
+      </div>
+      <p class="source-note">Die historische Detaildarstellung wird vor Veröffentlichung mit Quellen und Fachleuten gegengeprüft; der Branch zeigt zunächst die gewünschte Vergleichslogik.</p>
+    </section>
+
+    <section class="history" id="geschichte" aria-labelledby="history-title">
+      <div class="section-heading">
+        <p class="eyebrow">Lesen, einordnen, weiterfragen</p>
+        <h2 id="history-title">Karl Adam: Leistungsgeschichte und Zeitgeschichte gehören zusammen.</h2>
+      </div>
+      <div class="history-grid">
+        <article class="book-card">
+          <p class="card-kicker">Biografie</p>
+          <h3>„Karl Adam – Der Vater des Deutschland-Achters“</h3>
+          <p>Dirk Andresen und Timo Reinke erzählen Adams Lebens- und Sportgeschichte ausführlich in ihrer 320-seitigen Biografie. Wer nach Film und Website tiefer einsteigen möchte, findet hier den naheliegenden Ausgangspunkt.</p>
+          <p class="noncommercial-note"><strong>Hinweis:</strong> Dieser Verweis ist ausdrücklich keine bezahlte Werbung. Adams Erben erhält keine Provision oder sonstige Vergütung.</p>
+          <div class="inline-actions">
+            <a class="button button-primary" href="https://www.dergoldachter.de/buecher/karl-adam/das-buch" target="_blank" rel="noopener noreferrer">Zur Biografie</a>
+            <a class="button button-ghost" href="https://www.dergoldachter.de/buecher/karl-adam" target="_blank" rel="noopener noreferrer">Der Goldachter</a>
+          </div>
+        </article>
+        <article class="context-card">
+          <p class="card-kicker">Historische Verantwortung</p>
+          <h3>Nicht nur fragen, was Adam erreichte.</h3>
+          <p>Zu einer zeitgemäßen Beschäftigung mit Karl Adam gehört auch seine NS-Vergangenheit und die Frage, wie er selbst und die Nachkriegsgesellschaft damit umgingen. Gerade diese Ebene verdient eine sachliche, quellenbasierte und nicht vereinfachende Auseinandersetzung.</p>
+          <p>Der Deutsche Ruderverband hat seine NS-Geschichte extern untersuchen lassen und 2025 entschieden, den Karl-Adam-Preis nicht weiter zu vergeben. Zugleich weist der DRV selbst darauf hin, dass nach 1945 prägende Personen wie Adam bislang noch nicht vollständig systematisch untersucht wurden.</p>
+          <div class="inline-actions">
+            <a class="button button-secondary" href="https://www.rudern.de/news/veroeffentlichung-studie-drv-im-nationalsozialismus-und-digitales-drv-archiv" target="_blank" rel="noopener noreferrer">DRV-Studie zur NS-Zeit</a>
+            <a class="button button-ghost" href="https://www.rudern.de/news/karl-adam-preis-wird-nicht-mehr-vergeben" target="_blank" rel="noopener noreferrer">Einordnung zum Karl-Adam-Preis</a>
+          </div>
+          <p class="source-note">Ein weiterer kontroverser Presse-/Rudersport-Beitrag wird erst nach eindeutiger Quellenprüfung ergänzt.</p>
+        </article>
+      </div>
+      <div class="partner-strip">
+        <div><strong>Ausstellung &amp; Dokumentation</strong><span>Verknüpfung mit Dirk Andresens Ausstellung und weiteren Materialien nach Abstimmung.</span></div>
+        <a class="button button-ghost" href="https://karladam.de/" target="_blank" rel="noopener noreferrer">karladam.de · im Aufbau</a>
+      </div>
+    </section>
+
+    <section class="funding" id="foerderung" aria-labelledby="funding-title">
+      <div class="section-heading">
+        <p class="eyebrow">Rudern braucht Rückenwind</p>
+        <h2 id="funding-title">Förderung macht aus guten Ideen dauerhafte Möglichkeiten.</h2>
+        <p>Vereine tragen Rudersport durch Mitgliedsbeiträge und Ehrenamt. Zusätzliche Förderung hilft dort, wo Boote, Stege, Nachwuchsarbeit, Inklusion, Ausbildung oder größere Projekte finanziert werden müssen.</p>
+      </div>
+      <div class="funding-grid">
+        <article class="funding-primary">
+          <span class="badge">Ratzeburg</span>
+          <h3>Karl-Adam-Stiftung</h3>
+          <p>Die Karl-Adam-Stiftung wurde gegründet, um den Rudersport in Ratzeburg und insbesondere den Ratzeburger Ruderclub zu fördern. Sie zeigt exemplarisch, wie privates Engagement langfristig Vereinsarbeit unterstützen kann.</p>
+          <a class="button button-primary" href="https://www.rrc-online.de/2004/allgemein/karl-adam-stiftung/" target="_blank" rel="noopener noreferrer">Zur Stiftung</a>
+        </article>
+        <article class="funding-options">
+          <h3>Förderung hat viele Absender</h3>
+          <ul>
+            <li><strong>Landessportverbände</strong> – Projekt-, Bau-, Vereinsentwicklungs- und Innovationsförderung.</li>
+            <li><strong>Kreissportverbände</strong> – regionale Beratung und je nach Region eigene Förderwege.</li>
+            <li><strong>Sport- und Bürgerstiftungen</strong> – lokal oder thematisch ausgerichtete Förderung.</li>
+            <li><strong>Länder, Kommunen und Programme</strong> – etwa für Sportstätten, Jugend, Inklusion oder Ehrenamt.</li>
+            <li><strong>Verbände und Partner</strong> – Wettbewerbe, Vereinspreise und projektbezogene Unterstützung.</li>
+          </ul>
+        </article>
+        <blockquote class="foundation-quote"><p>„Was ermöglicht Förderung im Rudersport, das Mitgliedsbeiträge und Ehrenamt allein nicht leisten können – und warum lohnt es sich gerade heute, darin zu investieren?“</p><footer><strong>Zitatplatzhalter</strong><span>Karl-Adam-Stiftung · Vorsitz/Funktion vor Veröffentlichung verifizieren</span></footer></blockquote>
+      </div>
+    </section>
+
+    <section class="about journey" aria-labelledby="steps-title">
+      <div class="section-heading">
+        <p class="eyebrow">Und jetzt?</p>
+        <h2 id="steps-title">Geschichte wird lebendig, wenn jemand einsteigt.</h2>
       </div>
       <div class="principles">
         <article><h3>1. Verein finden</h3><p>Suche nach deinem Wohnort, deiner Postleitzahl oder direkt nach einem Ruderverein.</p></article>
@@ -99,9 +222,9 @@
     <section class="directory" id="vereine" aria-labelledby="directory-title">
       <div class="section-heading directory-heading">
         <div>
-          <p class="eyebrow">Deutschlandweit</p>
+          <p class="eyebrow">Der Kern von Adams Erben</p>
           <h2 id="directory-title">Finde deinen Ruderverein</h2>
-          <p>Suche nach Vereinsname, Stadt, Postleitzahl oder Bundesland.</p>
+          <p>Suche nach Vereinsname, Stadt, Postleitzahl oder Bundesland. Die redaktionellen Inhalte führen bewusst hierher zurück.</p>
         </div>
         <div class="data-status" id="data-status" aria-live="polite">Vereinsdaten werden geladen …</div>
       </div>
@@ -123,14 +246,13 @@
 
     <section class="film" id="film" aria-labelledby="film-title">
       <div>
-        <p class="eyebrow">Warum diese Seite?</p>
+        <p class="eyebrow">Der Ausgangspunkt</p>
         <h2 id="film-title">Vom Kinosaal ins Boot</h2>
-        <p>„Adams Acht“ startet am 17. September 2026 in den deutschen Kinos. Der Film erzählt, wie in Ratzeburg aus ungewöhnlichen Trainingsideen, Teamgeist und Beharrlichkeit ein Olympiasieg entstand.</p>
-        <p>Diese Website nutzt den Kinostart als Einladung: Wer nach dem Film Lust bekommt, Rudern selbst auszuprobieren, soll mit wenigen Klicks einen Ansprechpartner vor Ort finden.</p>
+        <p>„Adams Acht“ startet am 17. September 2026 in den deutschen Kinos. Diese Website nutzt den Kinostart als Einladung: Wer danach Lust bekommt, Rudern selbst auszuprobieren, soll mit wenigen Klicks einen Ansprechpartner vor Ort finden.</p>
       </div>
       <div class="film-links">
         <a class="button button-primary" href="https://www.youtube.com/watch?v=40FSwYIk2i0" target="_blank" rel="noopener noreferrer">Trailer auf YouTube</a>
-        <a class="button button-secondary" href="https://www.adamsacht.de/" target="_blank" rel="noopener noreferrer">Zum Film</a>
+        <a class="button button-secondary" href="https://www.adamsacht.de/" target="_blank" rel="noopener noreferrer">Offizielle Filmseite</a>
       </div>
     </section>
 
@@ -139,7 +261,7 @@
       <div class="principles">
         <article><h3 id="data-origin-heading">Geplanter Datenbestand</h3><p id="data-origin-copy">Für die spätere Vereinsübersicht sollen öffentliche bzw. vom DRV freigegebene Organisationsdaten verwendet werden. Die Vorschau enthält ausschließlich einen kleinen Demo-Datensatz.</p></article>
         <article><h3>Sicheres Kontakt-Routing</h3><p>Eine Anfrage geht zuerst an den gewählten Verein. Fehlt dort eine öffentliche Kontaktadresse, wird sie an den zuständigen Landesruderverband und erst danach an den DRV geroutet.</p></article>
-        <article><h3>Keine Filmassets ohne Freigabe</h3><p>Wir verwenden eine eigene Gestaltung. Filmplakate, Filmstills, Logos oder andere geschützte Assets erscheinen nur mit ausdrücklicher Rechtefreigabe.</p></article>
+        <article><h3>Rechte vor Reichweite</h3><p>Historische Fotos, Clublogos, Filmstills und Partnerassets erscheinen erst nach ausdrücklicher Rechteklärung. Bis dahin bleiben Platzhalter sichtbar.</p></article>
       </div>
     </section>
   </main>
