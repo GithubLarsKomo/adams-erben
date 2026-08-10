@@ -95,6 +95,7 @@ jobs:
       - name: Run bounded real enrichment for batch 1
         env:
           PILOT_RUN_INPUT: build-private/full-enrichment/batch-1.json
+          PILOT_RUN_EXPECTED_COUNT: '86'
           PILOT_RUN_CONTACTS_FILE: build-private/full-enrichment-results/batch-1-contacts.json
           PILOT_RUN_DECISIONS_FILE: build-private/full-enrichment-results/batch-1-decisions.json
           PILOT_RUN_REPORT_DIR: artifacts/full-enrichment-batch-1
