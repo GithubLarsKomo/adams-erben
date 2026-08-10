@@ -12,6 +12,8 @@ on:
       - 'scripts/build-snapshot.mjs'
       - 'scripts/build-snapshot.test.mjs'
       - 'scripts/build-snapshot-lrv-identity.test.mjs'
+      - 'scripts/prepare-pilot-100.mjs'
+      - 'scripts/prepare-pilot-100.test.mjs'
       - 'scripts/lib/drv-registry.mjs'
       - 'scripts/lib/drv-registry.test.mjs'
       - 'scripts/lib/drv-registry-website.test.mjs'
@@ -30,6 +32,8 @@ on:
       - 'scripts/build-snapshot.mjs'
       - 'scripts/build-snapshot.test.mjs'
       - 'scripts/build-snapshot-lrv-identity.test.mjs'
+      - 'scripts/prepare-pilot-100.mjs'
+      - 'scripts/prepare-pilot-100.test.mjs'
       - 'scripts/lib/drv-registry.mjs'
       - 'scripts/lib/drv-registry.test.mjs'
       - 'scripts/lib/drv-registry-website.test.mjs'
@@ -59,15 +63,17 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Test registry, governance snapshot and discovery sampling
+      - name: Test registry, governance, sampling and discovery
         run: |
           npm run test:drv-registry
           npm run test:contact-governance
           npm run test:snapshot
           npm run test:lrv-laenderrat
+          npm run test:pilot-prepare
           npm run test:discover-prepare
           node --check scripts/enrich-lrv.mjs
           node --check scripts/enrich-lrv-laenderrat.mjs
+          node --check scripts/prepare-pilot-100.mjs
 
       - name: Run full DRV registry sync
         env:
@@ -98,6 +104,14 @@ jobs:
           SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.json
         run: npm run snapshot:build
 
+      - name: Prepare deterministic 100-club pilot sample
+        env:
+          PILOT_SAMPLE_TARGET: '100'
+          PILOT_SAMPLE_SEED: 'adams-erben-pilot-100-v1'
+          PILOT_STATE_FLOOR: '3'
+          PILOT_ROUTE_FLOOR: '30'
+        run: npm run pilot:prepare
+
       - name: Prepare up to 25 missing-website cases from registry queue
         env:
           DISCOVERY_SAMPLE_TARGET: '25'
@@ -115,7 +129,7 @@ jobs:
           fs.writeFileSync('artifacts/drv-registry/discovery-sample.json', JSON.stringify(input, null, 2));
           NODE
 
-      - name: Validate registry, LRV enrichment, snapshot and privacy gates
+      - name: Validate registry, LRV, pilot, snapshot and privacy gates
         run: |
           node - <<'NODE'
           const fs = require('fs');
@@ -124,8 +138,10 @@ jobs:
           const snapshot = JSON.parse(fs.readFileSync('artifacts/snapshot/report.json', 'utf8'));
           const lrv = JSON.parse(fs.readFileSync('artifacts/lrv-enrichment/report.json', 'utf8'));
           const laenderrat = JSON.parse(fs.readFileSync('artifacts/lrv-laenderrat/report.json', 'utf8'));
+          const pilot = JSON.parse(fs.readFileSync('artifacts/pilot-100/report.json', 'utf8'));
+          const pilotSample = JSON.parse(fs.readFileSync('artifacts/pilot-100/sample.json', 'utf8'));
           const missing = JSON.parse(fs.readFileSync('build-private/website-missing.json', 'utf8'));
-          const sample = JSON.parse(fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8'));
+          const discoverySample = JSON.parse(fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8'));
           const publicClubs = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
           const recipients = JSON.parse(fs.readFileSync('build-private/recipients.json', 'utf8'));
 
@@ -137,11 +153,11 @@ jobs:
 
           if (!Array.isArray(missing.organizations)) throw new Error('website-missing queue missing');
           if (missing.organizations.length !== report.clubsMissingWebsiteFromDrv) throw new Error(`website-missing mismatch: ${missing.organizations.length} != ${report.clubsMissingWebsiteFromDrv}`);
-          const expectedSampleSize = Math.min(25, missing.organizations.length);
-          if (!Array.isArray(sample.organizations) || sample.organizations.length !== expectedSampleSize) throw new Error(`discovery sample must contain ${expectedSampleSize} organizations, got ${sample.organizations?.length}`);
-          if (sample.organizations.length < 20) throw new Error(`discovery sample too small: ${sample.organizations.length}`);
-          const states = new Set(sample.organizations.map((item) => item.state).filter(Boolean));
-          if (states.size < 5) throw new Error(`discovery sample has only ${states.size} states`);
+          const expectedDiscoverySize = Math.min(25, missing.organizations.length);
+          if (!Array.isArray(discoverySample.organizations) || discoverySample.organizations.length !== expectedDiscoverySize) throw new Error(`discovery sample must contain ${expectedDiscoverySize} organizations, got ${discoverySample.organizations?.length}`);
+          if (discoverySample.organizations.length < 20) throw new Error(`discovery sample too small: ${discoverySample.organizations.length}`);
+          const discoveryStates = new Set(discoverySample.organizations.map((item) => item.state).filter(Boolean));
+          if (discoveryStates.size < 5) throw new Error(`discovery sample has only ${discoveryStates.size} states`);
 
           if (lrv.summary.targets < 1 || lrv.summary.targets > 15) throw new Error(`unexpected LRV enrichment target count: ${lrv.summary.targets}`);
           if (laenderrat.lrvRegistryCount !== 15) throw new Error(`unexpected Länderrat LRV registry count: ${laenderrat.lrvRegistryCount}`);
@@ -157,6 +173,31 @@ jobs:
           if (!Array.isArray(publicClubs.organizations) || publicClubs.organizations.length !== snapshot.publicOrganizations) throw new Error('public snapshot organization count mismatch');
           if (!recipients.recipients || Object.keys(recipients.recipients).length !== snapshot.publicOrganizations) throw new Error('private recipient snapshot count mismatch');
 
+          if (pilot.samplerVersion !== 'pilot-100/1.0.0') throw new Error(`unexpected pilot sampler: ${pilot.samplerVersion}`);
+          if (pilot.sample !== 100 || pilot.target !== 100) throw new Error(`pilot sample size invalid: ${pilot.sample}/${pilot.target}`);
+          if (!Array.isArray(pilotSample.organizations) || pilotSample.organizations.length !== 100) throw new Error('pilot sample artifact must contain 100 organizations');
+          const pilotIds = pilotSample.organizations.map((item) => item.organizationId);
+          if (new Set(pilotIds).size !== 100) throw new Error('pilot sample contains duplicate organization IDs');
+          if (pilot.sampleStates.length !== pilot.populationStates.length || pilot.populationStates.length !== 16) {
+            throw new Error(`pilot state coverage invalid: ${pilot.sampleStates.length}/${pilot.populationStates.length}`);
+          }
+          const populationClubRows = publicClubs.organizations.filter((item) => item.type === 'club');
+          const populationByState = Object.create(null);
+          for (const row of populationClubRows) if (row.state) populationByState[row.state] = (populationByState[row.state] || 0) + 1;
+          for (const [state, population] of Object.entries(populationByState)) {
+            const required = Math.min(3, population);
+            if ((pilot.stateCounts[state] || 0) < required) throw new Error(`pilot state floor not met for ${state}: ${pilot.stateCounts[state] || 0}/${required}`);
+          }
+          for (const key of ['websiteMissing', 'drvFallback', 'stateMissing', 'https']) {
+            if (pilot.mandatoryIncluded[key] !== pilot.mandatoryPopulation[key]) {
+              throw new Error(`pilot mandatory stratum incomplete for ${key}: ${pilot.mandatoryIncluded[key]}/${pilot.mandatoryPopulation[key]}`);
+            }
+          }
+          if ((pilot.routeCounts.club || 0) < 30 || (pilot.routeCounts.lrv || 0) < 30) throw new Error(`pilot route floors invalid: ${JSON.stringify(pilot.routeCounts)}`);
+          for (const scheme of ['http', 'https', 'missing']) {
+            if (!(pilot.schemeCounts[scheme] > 0)) throw new Error(`pilot lacks ${scheme} website class`);
+          }
+
           const publicRaw = [
             'artifacts/drv-registry/report.json',
             'artifacts/drv-registry/report.md',
@@ -169,10 +210,13 @@ jobs:
             'artifacts/snapshot/baseline-registry.md',
             'artifacts/snapshot/report.json',
             'artifacts/snapshot/report.md',
+            'artifacts/pilot-100/sample.json',
+            'artifacts/pilot-100/report.json',
+            'artifacts/pilot-100/report.md',
             'dist/data/clubs.json'
           ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
           const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
-          if (email.test(publicRaw)) throw new Error('public registry/LRV/snapshot artifacts must not expose email addresses');
+          if (email.test(publicRaw)) throw new Error('public registry/LRV/snapshot/pilot artifacts must not expose email addresses');
 
           console.log({
             registry: report,
@@ -185,7 +229,16 @@ jobs:
             },
             snapshotBefore: { directApproved: baseline.directApproved, routeCounts: baseline.routeCounts },
             snapshotAfter: { directApproved: snapshot.directApproved, routeCounts: snapshot.routeCounts },
-            discoverySample: { organizations: sample.organizations.length, states: states.size }
+            pilot: {
+              sample: pilot.sample,
+              sampleHash: pilot.sampleHash,
+              states: pilot.sampleStates.length,
+              routeCounts: pilot.routeCounts,
+              websiteStatusCounts: pilot.websiteStatusCounts,
+              schemeCounts: pilot.schemeCounts,
+              mandatoryIncluded: pilot.mandatoryIncluded
+            },
+            discoverySample: { organizations: discoverySample.organizations.length, states: discoveryStates.size }
           });
           NODE
 
@@ -202,6 +255,8 @@ jobs:
           printf '\n---\n\n# Snapshot nach LRV-Enrichment\n\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/snapshot/report.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/pilot-100/report.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
           const fs = require('fs');
           const sample = JSON.parse(fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8'));
@@ -209,7 +264,7 @@ jobs:
           console.log(`## PoC-B-Stichprobe\n\n- Organisationen ohne DRV-Weblink im Test: **${sample.organizations.length}**\n- Bundesländer: **${states.size}**\n- keine E-Mail-Adressen im Artifact`);
           NODE
 
-      - name: Upload public registry, LRV and snapshot quality reports
+      - name: Upload public registry, LRV, pilot and snapshot quality reports
         uses: actions/upload-artifact@v4
         with:
           name: drv-registry-quality-report
@@ -217,6 +272,7 @@ jobs:
             artifacts/drv-registry/
             artifacts/lrv-enrichment/
             artifacts/lrv-laenderrat/
+            artifacts/pilot-100/
             artifacts/snapshot/
             dist/data/clubs.json
           if-no-files-found: error
