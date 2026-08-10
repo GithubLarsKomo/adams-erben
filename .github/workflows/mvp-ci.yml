@@ -35,6 +35,8 @@ jobs:
           node --check scripts/report-contact-governance-reasons.test.mjs
           node --check scripts/merge-contact-candidate-history.mjs
           node --check scripts/contact-history-snapshot.integration.test.mjs
+          node --check scripts/apply-verified-discovery.mjs
+          node --check scripts/apply-verified-discovery.test.mjs
           node --check scripts/enrich-lrv.mjs
           node --check scripts/enrich-lrv-laenderrat.mjs
           node --check scripts/enrich-lrv-laenderrat.test.mjs
@@ -65,6 +67,9 @@ jobs:
           npm run test:contact-governance
           npm run test:history
           npm run test:contact-domain-evidence
+
+      - name: Test verified website resolution
+        run: npm run test:discovery-verified
 
       - name: Test DRV registry parser and routing gate
         run: npm run test:drv-registry
