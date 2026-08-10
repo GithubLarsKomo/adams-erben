@@ -1,0 +1,170 @@
+name: Bounded 100 Club Pilot
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/run-pilot-100.mjs'
+      - 'scripts/run-pilot-100.test.mjs'
+      - 'scripts/prepare-pilot-100.mjs'
+      - 'scripts/prepare-pilot-100.test.mjs'
+      - 'scripts/build-snapshot.mjs'
+      - 'scripts/lib/contact-governance.mjs'
+      - 'scripts/lib/lrv-identity.mjs'
+      - '.github/workflows/pilot-100-run.yml'
+      - 'package.json'
+
+permissions:
+  contents: read
+
+jobs:
+  bounded-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      EXPECTED_PILOT_SAMPLE_HASH: e593b08abd7dd063e6e1e76f80700d8884ae53523c9d93d8eca3c9ac82965a18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test sampler and bounded runner
+        run: |
+          npm run test:pilot-prepare
+          npm run test:pilot-run
+
+      - name: Rebuild full DRV registry
+        env:
+          REQUIRE_DRV_SYNC: '1'
+          DRV_SYNC_REQUIRED_COVERAGE: '0.95'
+          DRV_SYNC_CONCURRENCY: '3'
+          DRV_SYNC_DELAY_MS: '300'
+          DRV_SYNC_LIMIT: '0'
+        run: npm run sync:drv
+
+      - name: Enrich LRV fallback contacts from official websites
+        env:
+          LRV_ENRICH_DELAY_MS: '700'
+          LRV_ENRICH_MAX_PAGES: '5'
+        run: npm run lrv:enrich
+
+      - name: Enrich LRV contacts from official DRV Länderrat
+        run: npm run lrv:laenderrat
+
+      - name: Build governance snapshot
+        env:
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.json
+        run: npm run snapshot:build
+
+      - name: Rebuild frozen 100-club input
+        env:
+          PILOT_SAMPLE_TARGET: '100'
+          PILOT_SAMPLE_SEED: 'adams-erben-pilot-100-v1'
+          PILOT_STATE_FLOOR: '3'
+          PILOT_ROUTE_FLOOR: '30'
+        run: npm run pilot:prepare
+
+      - name: Verify frozen sample hash before network pilot
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/pilot-100/report.json', 'utf8'));
+          if (report.sampleHash !== process.env.EXPECTED_PILOT_SAMPLE_HASH) {
+            throw new Error(`pilot sample drift: ${report.sampleHash} != ${process.env.EXPECTED_PILOT_SAMPLE_HASH}`);
+          }
+          if (report.sample !== 100 || report.mandatoryIncluded.websiteMissing !== 23 || report.mandatoryIncluded.drvFallback !== 13) {
+            throw new Error(`pilot sample contract changed: ${JSON.stringify(report.mandatoryIncluded)}`);
+          }
+          console.log(`Frozen pilot sample verified: ${report.sampleHash}`);
+          NODE
+
+      - name: Run bounded real pilot on frozen sample
+        env:
+          PILOT_RUN_CONCURRENCY: '3'
+          PILOT_RUN_PAGE_DELAY_MS: '450'
+          PILOT_RUN_MAX_PAGES: '5'
+          PILOT_RUN_MAX_ATTEMPTS: '8'
+          PILOT_RUN_TIMEOUT_MS: '12000'
+          PILOT_RUN_MAX_REDIRECTS: '5'
+          PILOT_RUN_IDENTITY_THRESHOLD: '0.45'
+        run: npm run pilot:run
+
+      - name: Validate bounded pilot and privacy gates
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/pilot-100-run/report.json', 'utf8'));
+          const publicRows = JSON.parse(fs.readFileSync('artifacts/pilot-100-run/organizations.json', 'utf8')).organizations;
+          const privateRows = JSON.parse(fs.readFileSync('build-private/pilot-100-decisions.json', 'utf8')).organizations;
+
+          if (report.runnerVersion !== 'pilot-100-run/1.0.0') throw new Error(`unexpected runner ${report.runnerVersion}`);
+          if (report.total !== 100 || publicRows.length !== 100 || privateRows.length !== 100) throw new Error('pilot result must contain exactly 100 organizations');
+          if (report.knownWebsite !== 77) throw new Error(`expected 77 known websites, got ${report.knownWebsite}`);
+          if (report.discoveryPending !== 23) throw new Error(`expected 23 discovery-pending cases, got ${report.discoveryPending}`);
+          if (report.maxPagesFetched > 5) throw new Error(`page fetch cap violated: ${report.maxPagesFetched}`);
+          if (report.maxPagesAttempted > 8) throw new Error(`page attempt cap violated: ${report.maxPagesAttempted}`);
+
+          const pending = publicRows.filter((row) => row.status === 'discovery_pending_provider');
+          if (pending.length !== 23 || pending.some((row) => row.websiteStatus !== 'missing')) {
+            throw new Error('discovery-pending cohort is not exactly the 23 missing-website cases');
+          }
+          for (const decision of privateRows) {
+            for (const candidate of decision.candidates || []) {
+              if (candidate.snapshotEligible && !['functional', 'role-functional'].includes(candidate.contactKind)) {
+                throw new Error(`non-functional candidate became direct for ${decision.organizationId}`);
+              }
+            }
+          }
+
+          const publicRaw = [
+            'artifacts/pilot-100/sample.json',
+            'artifacts/pilot-100/report.json',
+            'artifacts/pilot-100/report.md',
+            'artifacts/pilot-100-run/report.json',
+            'artifacts/pilot-100-run/report.md',
+            'artifacts/pilot-100-run/organizations.json'
+          ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+          const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+          if (email.test(publicRaw)) throw new Error('public pilot artifacts must not expose email addresses');
+
+          console.log({
+            knownWebsite: report.knownWebsite,
+            discoveryPending: report.discoveryPending,
+            reachable: report.reachable,
+            processed: report.processed,
+            contactOutcomes: report.contactOutcomes,
+            directUpgrades: report.directUpgrades,
+            routeBefore: report.routeBefore,
+            routeAfter: report.routeAfter,
+            statusCounts: report.statusCounts,
+            errorCounts: report.errorCounts,
+            pagesFetched: report.pagesFetched,
+            pagesAttempted: report.pagesAttempted,
+            runtimeMs: report.runtimeMs
+          });
+          NODE
+
+      - name: Add pilot report to workflow summary
+        if: always()
+        run: |
+          if [ -f artifacts/pilot-100/report.md ]; then cat artifacts/pilot-100/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/pilot-100-run/report.md ]; then cat artifacts/pilot-100-run/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload address-free pilot artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bounded-100-club-pilot-report
+          path: |
+            artifacts/pilot-100/
+            artifacts/pilot-100-run/
+          if-no-files-found: warn
+          retention-days: 14
