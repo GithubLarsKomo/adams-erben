@@ -10,6 +10,7 @@ import { isApprovedRegistryDirectContact } from './drv-registry.mjs';
 
 const clubSite = 'https://www.beispiel-ruderverein.de/';
 const now = new Date('2026-08-10T00:00:00.000Z');
+assert.equal(CONTACT_POLICY_VERSION, '1.1.0');
 
 const sameDomainInfo = classifyContactCandidate({ email: 'INFO@beispiel-ruderverein.de', kind: 'functional', context: 'Kontakt Geschäftsstelle' }, clubSite);
 assert.equal(sameDomainInfo.email, 'info@beispiel-ruderverein.de');
@@ -18,13 +19,28 @@ assert.equal(sameDomainInfo.governanceState, 'auto-approved-functional');
 assert.equal(sameDomainInfo.autoApproved, true);
 assert.equal(sameDomainInfo.policyVersion, CONTACT_POLICY_VERSION);
 
+const sameDomainRole = classifyContactCandidate({ email: 'vorsitzender@beispiel-ruderverein.de', context: '1. Vorsitzender' }, clubSite);
+assert.equal(sameDomainRole.contactKind, 'role-functional');
+assert.equal(sameDomainRole.governanceState, 'auto-approved-functional');
+assert.equal(sameDomainRole.reason, 'role_alias_on_club_domain');
+
 const externalRole = classifyContactCandidate({ email: 'vorsitzender@web.de', context: '1. Vorsitzender' }, clubSite);
 assert.equal(externalRole.contactKind, 'role-functional');
-assert.equal(externalRole.governanceState, 'auto-approved-functional');
+assert.equal(externalRole.governanceState, 'review-functional');
+assert.equal(externalRole.reason, 'role_alias_external_unverified_domain');
+assert.equal(externalRole.autoApproved, false);
+
+const injectedExternalRole = classifyContactCandidate({ email: 'vorstand@unrelated.example', context: 'Vorstand Kontakt' }, clubSite);
+assert.equal(injectedExternalRole.governanceState, 'review-functional');
+assert.equal(injectedExternalRole.autoApproved, false);
 
 const presidentRole = classifyContactCandidate({ email: 'praesident@verband.example', context: 'Präsident Landesverband' }, 'https://verband.example/');
 assert.equal(presidentRole.contactKind, 'role-functional');
 assert.equal(presidentRole.autoApproved, true);
+
+const trustedRoleDomain = classifyContactCandidate({ email: 'praesident@kontakt-domain.example', context: 'Präsident Landesverband' }, 'https://website-domain.example/', { trustedDomains: ['kontakt-domain.example'] });
+assert.equal(trustedRoleDomain.governanceState, 'auto-approved-functional');
+assert.equal(trustedRoleDomain.reason, 'role_alias_on_verified_organization_domain');
 
 const trustedOrganizationDomain = classifyContactCandidate({ email: 'info@kontakt-domain.example', context: 'Allgemeiner Verbandskontakt' }, 'https://website-domain.example/', { trustedDomains: ['kontakt-domain.example'] });
 assert.equal(trustedOrganizationDomain.governanceState, 'auto-approved-functional');
@@ -50,6 +66,10 @@ assert.equal(personalProvider.autoApproved, false);
 const thirdParty = classifyContactCandidate({ email: 'info@catering-muster.de', context: 'Gastronomie und Catering im Bootshaus' }, clubSite);
 assert.equal(thirdParty.contactKind, 'third-party');
 assert.equal(thirdParty.governanceState, 'excluded-third-party');
+
+const thirdPartyExternalRole = classifyContactCandidate({ email: 'vorstand@catering-muster.de', context: 'Gastronomie und Catering im Bootshaus' }, clubSite);
+assert.equal(thirdPartyExternalRole.contactKind, 'third-party');
+assert.equal(thirdPartyExternalRole.governanceState, 'excluded-third-party');
 
 const invalid = classifyContactCandidate({ email: 'not-an-email' }, clubSite);
 assert.equal(invalid.governanceState, 'excluded-invalid');
@@ -79,6 +99,7 @@ assert.equal(personal.governanceState, 'review-personal');
 
 const parityCases = [
   { email: 'info@beispiel-ruderverein.de', website: clubSite },
+  { email: 'vorsitzender@beispiel-ruderverein.de', website: clubSite },
   { email: 'vorsitzender@web.de', website: clubSite },
   { email: 'info@fremde-domain.de', website: clubSite },
   { email: 'max.mustermann@beispiel-ruderverein.de', website: clubSite },
