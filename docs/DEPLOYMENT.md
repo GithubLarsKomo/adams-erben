@@ -38,7 +38,32 @@ SKIP_DRV_SYNC=0
 REQUIRE_DRV_SYNC=1
 ```
 
-Dann bricht der Build bei weniger als 90 % erfolgreich gelesenen Profilen ab, statt eine deutlich unvollständige Deutschland-Liste auszuliefern.
+Dann bricht der Build bei unzureichender Registry-/Bundesland-/Routing-Abdeckung ab, statt eine deutlich unvollständige Deutschland-Liste auszuliefern.
+
+### Preview mit vollständigen DRV-Daten
+
+`PREVIEW_MODE` und Daten-Sync sind unabhängig. Für eine nicht indexierbare Preview mit vollständiger Vereinssuche wird verwendet:
+
+```text
+PREVIEW_MODE=1
+SKIP_DRV_SYNC=0
+REQUIRE_DRV_SYNC=1
+```
+
+Damit gilt:
+
+- UI und Kontaktformular bleiben im Preview-/Demo-Modus;
+- `noindex,nofollow` und die Preview-Domain bleiben aktiv;
+- der Build führt trotzdem den vollständigen DRV-Sync samt Output-Validator aus;
+- ein fehlgeschlagener oder unvollständiger Sync bricht den Build wegen `REQUIRE_DRV_SYNC=1` ab;
+- es wird nicht still auf den Seed-Datensatz zurückgefallen.
+
+Für eine rein statische Preview ohne echten Sync bleibt weiterhin möglich:
+
+```text
+PREVIEW_MODE=1
+SKIP_DRV_SYNC=1
+```
 
 ## 3. Runtime-Secrets / Environment
 
