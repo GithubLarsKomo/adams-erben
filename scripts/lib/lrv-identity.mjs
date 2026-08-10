@@ -1,5 +1,6 @@
 // Verified organization identity hints only. No recipient addresses are stored here.
-// Sources are official LRV pages/imprints and are revalidated through the acquisition track.
+// Sources are official LRV pages/imprints or official DRV profile evidence and are
+// revalidated through the acquisition track.
 export const LRV_IDENTITY_HINTS = new Map([
   ['30010', {
     website: 'https://www.lrvbw.de/',
@@ -12,6 +13,12 @@ export const LRV_IDENTITY_HINTS = new Map([
     contactDomains: ['ruderverband.de'],
     functionalLocalParts: ['brv-geschaeftsstelle'],
     verificationSource: 'official-lrv-imprint'
+  }],
+  ['30014', {
+    website: 'https://landesruderverband-bremen.de/',
+    contactDomains: ['lrv-bremen.de'],
+    functionalLocalParts: [],
+    verificationSource: 'official-drv-profile'
   }],
   ['30018', {
     website: 'https://www.lrvn.de/',
