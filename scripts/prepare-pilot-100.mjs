@@ -7,6 +7,7 @@ export const PILOT_SAMPLER_VERSION = 'pilot-100/1.0.0';
 const DEFAULT_SEED = 'adams-erben-pilot-100-v1';
 const REGISTRY_FILE = process.env.PILOT_REGISTRY_FILE || 'build-private/drv-registry.json';
 const SNAPSHOT_FILE = process.env.PILOT_SNAPSHOT_FILE || 'dist/data/clubs.json';
+const FROZEN_IDS_FILE = process.env.PILOT_FROZEN_IDS_FILE || '';
 const PRIVATE_OUTPUT = process.env.PILOT_PRIVATE_OUTPUT || 'build-private/pilot-100-input.json';
 const REPORT_DIR = process.env.PILOT_REPORT_DIR || 'artifacts/pilot-100';
 
@@ -125,7 +126,35 @@ function finalReasons(entry) {
   return [...reasons].sort();
 }
 
-export function buildPilotSample({ registry, publicOrganizations, target = 100, seed = DEFAULT_SEED, stateFloor = 3, routeFloor = 30 } = {}) {
+function normalizeFrozenIds(value) {
+  if (!value) return null;
+  const ids = Array.isArray(value) ? value : value.organizationIds;
+  if (!Array.isArray(ids)) throw new Error('frozen pilot cohort must contain organizationIds[]');
+  const normalized = ids.map((id) => String(id || '').trim()).filter(Boolean);
+  if (new Set(normalized).size !== normalized.length) throw new Error('frozen pilot cohort contains duplicate organization IDs');
+  return normalized;
+}
+
+function selectFrozenCohort(clubs, frozenIds, target) {
+  if (frozenIds.length !== target) throw new Error(`frozen pilot cohort size ${frozenIds.length} != target ${target}`);
+  const byId = new Map(clubs.map((row) => [row.organizationId, row]));
+  const missingIds = frozenIds.filter((id) => !byId.has(id));
+  if (missingIds.length) throw new Error(`frozen pilot cohort missing from current registry: ${missingIds.join(', ')}`);
+  return frozenIds.map((id) => ({
+    ...byId.get(id),
+    inclusionReasons: finalReasons({ row: byId.get(id), stageReasons: new Set(['frozen-cohort:v1']) })
+  }));
+}
+
+export function buildPilotSample({
+  registry,
+  publicOrganizations,
+  target = 100,
+  seed = DEFAULT_SEED,
+  stateFloor = 3,
+  routeFloor = 30,
+  frozenIds = null
+} = {}) {
   const snapshotByOrg = new Map((publicOrganizations || []).filter((row) => row.type === 'club').map((row) => [row.organizationId, row]));
   const clubs = (registry || [])
     .filter((row) => row.type === 'club' && snapshotByOrg.has(row.organizationId))
@@ -133,33 +162,43 @@ export function buildPilotSample({ registry, publicOrganizations, target = 100, 
 
   if (clubs.length < target) throw new Error(`pilot population too small: ${clubs.length} < ${target}`);
 
-  const selected = new Map();
-  const mandatorySets = [
-    ['mandatory:website-missing', clubs.filter((row) => row.websiteStatus === 'missing')],
-    ['mandatory:drv-fallback', clubs.filter((row) => row.routeLevel === 'drv')],
-    ['mandatory:state-missing', clubs.filter((row) => !row.state)],
-    ['mandatory:https', clubs.filter((row) => row.schemeClass === 'https')]
-  ];
+  const normalizedFrozenIds = normalizeFrozenIds(frozenIds);
+  let sample;
+  let selectionMode;
 
-  const mandatoryUnion = new Set(mandatorySets.flatMap(([, rows]) => rows.map((row) => row.organizationId)));
-  if (mandatoryUnion.size > target) throw new Error(`mandatory pilot strata exceed target: ${mandatoryUnion.size} > ${target}`);
+  if (normalizedFrozenIds) {
+    sample = selectFrozenCohort(clubs, normalizedFrozenIds, target);
+    selectionMode = 'frozen-ids';
+  } else {
+    const selected = new Map();
+    const mandatorySets = [
+      ['mandatory:website-missing', clubs.filter((row) => row.websiteStatus === 'missing')],
+      ['mandatory:drv-fallback', clubs.filter((row) => row.routeLevel === 'drv')],
+      ['mandatory:state-missing', clubs.filter((row) => !row.state)],
+      ['mandatory:https', clubs.filter((row) => row.schemeClass === 'https')]
+    ];
 
-  for (const [reason, rows] of mandatorySets) addRows(selected, sortedCandidates(rows, `${seed}|${reason}`), reason, target);
+    const mandatoryUnion = new Set(mandatorySets.flatMap(([, rows]) => rows.map((row) => row.organizationId)));
+    if (mandatoryUnion.size > target) throw new Error(`mandatory pilot strata exceed target: ${mandatoryUnion.size} > ${target}`);
 
-  ensureGroupFloor(selected, clubs, (row) => row.state, stateFloor, seed, target, 'state-floor');
-  ensureRouteFloor(selected, clubs, 'club', routeFloor, seed, target);
-  ensureRouteFloor(selected, clubs, 'lrv', routeFloor, seed, target);
+    for (const [reason, rows] of mandatorySets) addRows(selected, sortedCandidates(rows, `${seed}|${reason}`), reason, target);
 
-  for (const row of sortedCandidates(clubs.filter((item) => !selected.has(item.organizationId)), `${seed}|fill`)) {
-    if (selected.size >= target) break;
-    addRows(selected, [row], 'deterministic-fill', target);
+    ensureGroupFloor(selected, clubs, (row) => row.state, stateFloor, seed, target, 'state-floor');
+    ensureRouteFloor(selected, clubs, 'club', routeFloor, seed, target);
+    ensureRouteFloor(selected, clubs, 'lrv', routeFloor, seed, target);
+
+    for (const row of sortedCandidates(clubs.filter((item) => !selected.has(item.organizationId)), `${seed}|fill`)) {
+      if (selected.size >= target) break;
+      addRows(selected, [row], 'deterministic-fill', target);
+    }
+
+    if (selected.size !== target) throw new Error(`pilot sample incomplete: ${selected.size}/${target}`);
+
+    sample = [...selected.values()]
+      .map((entry) => ({ ...entry.row, inclusionReasons: finalReasons(entry) }))
+      .sort((a, b) => stableRank(seed, a.organizationId).localeCompare(stableRank(seed, b.organizationId)));
+    selectionMode = 'dynamic-stratified';
   }
-
-  if (selected.size !== target) throw new Error(`pilot sample incomplete: ${selected.size}/${target}`);
-
-  const sample = [...selected.values()]
-    .map((entry) => ({ ...entry.row, inclusionReasons: finalReasons(entry) }))
-    .sort((a, b) => stableRank(seed, a.organizationId).localeCompare(stableRank(seed, b.organizationId)));
 
   const ids = sample.map((row) => row.organizationId);
   const sampleHash = createHash('sha256').update(ids.join('\n')).digest('hex');
@@ -168,6 +207,7 @@ export function buildPilotSample({ registry, publicOrganizations, target = 100, 
   const report = {
     samplerVersion: PILOT_SAMPLER_VERSION,
     seed,
+    selectionMode,
     target,
     population: clubs.length,
     sample: sample.length,
@@ -198,12 +238,13 @@ export function buildPilotSample({ registry, publicOrganizations, target = 100, 
 
 function reportMarkdown(report) {
   const stateRows = Object.entries(report.stateCounts).map(([state, count]) => `| ${state} | ${count} |`).join('\n');
-  return `# 100er-Pilot – Stichprobenreport\n\n- Sampler: **${report.samplerVersion}**\n- Seed: \`${report.seed}\`\n- Population: **${report.population}**\n- Stichprobe: **${report.sample}**\n- Sample-Hash: \`${report.sampleHash}\`\n- Bundesländer: **${report.sampleStates.length}/${report.populationStates.length}**\n- Website missing: **${report.mandatoryIncluded.websiteMissing}/${report.mandatoryPopulation.websiteMissing}**\n- DRV-Fallback: **${report.mandatoryIncluded.drvFallback}/${report.mandatoryPopulation.drvFallback}**\n- State missing: **${report.mandatoryIncluded.stateMissing}/${report.mandatoryPopulation.stateMissing}**\n- HTTPS: **${report.mandatoryIncluded.https}/${report.mandatoryPopulation.https}**\n\n## Route-Level\n\n${Object.entries(report.routeCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Website-Schema\n\n${Object.entries(report.schemeCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Bundesländer\n\n| Bundesland | Vereine |\n| --- | ---: |\n${stateRows}\n\nDer Report und die Stichprobe sind adressfrei; Kontaktadressen bleiben außerhalb öffentlicher Artefakte.\n`;
+  return `# 100er-Pilot – Stichprobenreport\n\n- Sampler: **${report.samplerVersion}**\n- Auswahlmodus: **${report.selectionMode}**\n- Seed: \`${report.seed}\`\n- Population: **${report.population}**\n- Stichprobe: **${report.sample}**\n- Sample-Hash: \`${report.sampleHash}\`\n- Bundesländer: **${report.sampleStates.length}/${report.populationStates.length}**\n- Website missing: **${report.mandatoryIncluded.websiteMissing}/${report.mandatoryPopulation.websiteMissing}**\n- DRV-Fallback: **${report.mandatoryIncluded.drvFallback}/${report.mandatoryPopulation.drvFallback}**\n- State missing: **${report.mandatoryIncluded.stateMissing}/${report.mandatoryPopulation.stateMissing}**\n- HTTPS: **${report.mandatoryIncluded.https}/${report.mandatoryPopulation.https}**\n\n## Route-Level\n\n${Object.entries(report.routeCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Website-Schema\n\n${Object.entries(report.schemeCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Bundesländer\n\n| Bundesland | Vereine |\n| --- | ---: |\n${stateRows}\n\nDer Report und die Stichprobe sind adressfrei; Kontaktadressen bleiben außerhalb öffentlicher Artefakte. Im Modus \`frozen-ids\` bleiben nur die Vereins-IDs fix; Registry-, Website- und Routingmetadaten werden frisch aufgebaut.\n`;
 }
 
 async function main() {
   const registryRaw = JSON.parse(await readFile(REGISTRY_FILE, 'utf8'));
   const snapshotRaw = JSON.parse(await readFile(SNAPSHOT_FILE, 'utf8'));
+  const frozenRaw = FROZEN_IDS_FILE ? JSON.parse(await readFile(FROZEN_IDS_FILE, 'utf8')) : null;
   const target = Number(process.env.PILOT_SAMPLE_TARGET || 100);
   const seed = process.env.PILOT_SAMPLE_SEED || DEFAULT_SEED;
   const stateFloor = Number(process.env.PILOT_STATE_FLOOR || 3);
@@ -214,12 +255,18 @@ async function main() {
     target,
     seed,
     stateFloor,
-    routeFloor
+    routeFloor,
+    frozenIds: frozenRaw
   });
+
+  if (frozenRaw?.sampleHash && report.sampleHash !== frozenRaw.sampleHash) {
+    throw new Error(`frozen pilot cohort hash mismatch: ${report.sampleHash} != ${frozenRaw.sampleHash}`);
+  }
 
   const payload = {
     generatedAt: new Date().toISOString(),
     samplerVersion: PILOT_SAMPLER_VERSION,
+    selectionMode: report.selectionMode,
     seed,
     sampleHash: report.sampleHash,
     count: sample.length,
@@ -232,7 +279,7 @@ async function main() {
   await writeFile(path.join(REPORT_DIR, 'sample.json'), JSON.stringify(payload, null, 2));
   await writeFile(path.join(REPORT_DIR, 'report.json'), JSON.stringify(report, null, 2));
   await writeFile(path.join(REPORT_DIR, 'report.md'), reportMarkdown(report));
-  console.log(`[pilot-100] sample=${report.sample}/${report.population}; states=${report.sampleStates.length}/${report.populationStates.length}; missing=${report.mandatoryIncluded.websiteMissing}; drv=${report.mandatoryIncluded.drvFallback}; hash=${report.sampleHash.slice(0, 12)}`);
+  console.log(`[pilot-100] mode=${report.selectionMode}; sample=${report.sample}/${report.population}; states=${report.sampleStates.length}/${report.populationStates.length}; missing=${report.mandatoryIncluded.websiteMissing}; drv=${report.mandatoryIncluded.drvFallback}; hash=${report.sampleHash.slice(0, 12)}`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
