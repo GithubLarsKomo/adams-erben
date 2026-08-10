@@ -1,6 +1,7 @@
 import * as cheerio from 'cheerio';
+import { classifyContactCandidate } from './contact-governance.mjs';
 
-export const DRV_REGISTRY_PARSER_VERSION = '1.1.4';
+export const DRV_REGISTRY_PARSER_VERSION = '1.1.5';
 export const DRV_ORIGIN = 'https://www.rudern.de';
 
 export const LRV_PROFILES = [
@@ -25,8 +26,6 @@ export const LRV_BY_DRV_ID = new Map(LRV_PROFILES.map((item) => [item.drvId, ite
 
 const OTHER_MEMBER_PATTERN = /(Bundesstützpunkt|Olympiastützpunkt|Gymnasium|Schule|Schülerruder|Hochschule|Universität|Institut|Regattaverband|Ruderjugend|Adolfinum)/i;
 const NON_OFFICIAL_SITE_HOST = /(google\.|openstreetmap|maps\.|facebook\.|instagram\.|youtube\.|youtu\.be|linkedin\.|x\.com$|twitter\.|ruder-bundesliga\.de$|rudersport-magazin\.de$)/i;
-const ROLE_LOCAL_PART = /^(?:1\.?|2\.?)?(?:vorsitz\w*|vorstand|ruderwart\w*|sportwart\w*|jugendwart\w*|schriftwart\w*|kassier\w*|kasse|geschaeftsfuehr\w*|geschäftsführ\w*|geschaeftsstelle|geschäftsstelle|verwaltung|sekretariat|presse|trainer\w*)$/i;
-const GENERIC_FUNCTIONAL_LOCAL_PART = /^(?:info|kontakt|contact|office|buero|büro|mail|post|anfrage|service|verein|webmaster)(?:[._-].*)?$/i;
 const NOISY_CITY_PATTERN = /\b(?:bootshaus|anschrift|ruder\w*|verein\w*|club|gesellschaft|abteilung|abt\.?|e\.?\s*v\.?|straße|str\.?|weg|allee|ufer|promenade|hafen|seeweg|fähre)\b/i;
 
 export const clean = (value = '') => String(value).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
@@ -54,13 +53,6 @@ function plausibleCityCandidate(value = '') {
   return tokens.length >= 1 && tokens.length <= 6;
 }
 
-function domainsRelated(a, b) {
-  const left = normalizeHost(a);
-  const right = normalizeHost(b);
-  if (!left || !right) return false;
-  return left === right || left.endsWith(`.${right}`) || right.endsWith(`.${left}`);
-}
-
 function normalizedExternalUrl(rawHref) {
   if (!rawHref) return '';
   let candidate = clean(rawHref);
@@ -70,7 +62,8 @@ function normalizedExternalUrl(rawHref) {
   if (!/^https?:\/\//i.test(candidate)) return '';
   try {
     const url = new URL(candidate);
-    if (url.hostname.endsWith('rudern.de')) return '';
+    const host = normalizeHost(url.hostname);
+    if (host === 'rudern.de' || host.endsWith('.rudern.de')) return '';
     if (NON_OFFICIAL_SITE_HOST.test(url.hostname)) return '';
     url.hash = '';
     return url.toString();
@@ -88,7 +81,8 @@ function labeledWebsiteCandidate($) {
     const scopes = [$(element).parent(), $(element).next(), $(element).parent().next(), $(element).closest('[class*="field"], dl, tr, section')];
     for (const scope of scopes) {
       if (!scope?.length) continue;
-      for (const anchor of scope.find('a[href]').toArray()) {
+      const anchors = scope.is('a[href]') ? [scope[0], ...scope.find('a[href]').toArray()] : scope.find('a[href]').toArray();
+      for (const anchor of anchors) {
         const candidate = normalizedExternalUrl($(anchor).attr('href'));
         if (candidate) {
           selected = candidate;
@@ -256,22 +250,68 @@ export function parseDrvRegistryProfile(url, html, postalStates = new Map(), fet
   const organizationId = drvId || slug;
   const featured = slug === 'ratzeburger-ruderclub-ev' || drvId === '12420';
   const type = lrvProfile ? 'lrv' : (OTHER_MEMBER_PATTERN.test(name) ? 'member' : 'club');
-  return { organizationId, id: slug, drvId, name, type, city, citySource, postalCode, state, states, drvProfileUrl: url, websiteFromDrv, websiteStatus: websiteFromDrv ? 'present' : 'missing', emailFromDrv, featured, fetchedAt, sourceType: lrvProfile ? 'drv-lrv-profile' : 'drv-profile', sourceUrl: url, parserVersion: DRV_REGISTRY_PARSER_VERSION };
+  return {
+    organizationId,
+    id: slug,
+    drvId,
+    name,
+    type,
+    city,
+    citySource,
+    postalCode,
+    state,
+    states,
+    drvProfileUrl: url,
+    websiteFromDrv,
+    websiteStatus: websiteFromDrv ? 'present' : 'missing',
+    emailFromDrv,
+    featured,
+    fetchedAt,
+    sourceType: lrvProfile ? 'drv-lrv-profile' : 'drv-profile',
+    sourceUrl: url,
+    parserVersion: DRV_REGISTRY_PARSER_VERSION
+  };
 }
 
 export function isApprovedRegistryDirectContact(record) {
-  const email = clean(record.emailFromDrv).toLowerCase();
-  if (!email || !email.includes('@')) return false;
-  const [local, emailDomain = ''] = email.split('@');
-  if (ROLE_LOCAL_PART.test(local)) return true;
-  if (!GENERIC_FUNCTIONAL_LOCAL_PART.test(local) || !record.websiteFromDrv) return false;
-  try { return domainsRelated(emailDomain, new URL(record.websiteFromDrv).hostname); } catch { return false; }
+  return classifyContactCandidate({ email: record.emailFromDrv }, record.websiteFromDrv).autoApproved;
 }
 
 export function publicOrganizationFromRegistry(record, contactRouteLevel = 'drv', hasDirectContact = Boolean(record.emailFromDrv)) {
-  return { id: record.id, organizationId: record.organizationId, name: record.name, drvId: record.drvId, type: record.type, city: record.city, postalCode: record.postalCode, state: record.state, states: record.states, website: record.websiteFromDrv, profileUrl: record.drvProfileUrl, websiteStatus: record.websiteStatus, hasDirectContact, contactRouteLevel, featured: record.featured };
+  return {
+    id: record.id,
+    organizationId: record.organizationId,
+    name: record.name,
+    drvId: record.drvId,
+    type: record.type,
+    city: record.city,
+    postalCode: record.postalCode,
+    state: record.state,
+    states: record.states,
+    website: record.websiteFromDrv,
+    profileUrl: record.drvProfileUrl,
+    websiteStatus: record.websiteStatus,
+    hasDirectContact,
+    contactRouteLevel,
+    featured: record.featured
+  };
 }
 
 export function discoveryRecordFromRegistry(record) {
-  return { organizationId: record.organizationId, drvId: record.drvId, name: record.name, type: record.type, postalCode: record.postalCode, city: record.city, citySource: record.citySource, state: record.state, states: record.states, drvProfileUrl: record.drvProfileUrl, websiteFromDrv: record.websiteFromDrv, websiteStatus: record.websiteStatus, fetchedAt: record.fetchedAt, parserVersion: record.parserVersion };
+  return {
+    organizationId: record.organizationId,
+    drvId: record.drvId,
+    name: record.name,
+    type: record.type,
+    postalCode: record.postalCode,
+    city: record.city,
+    citySource: record.citySource,
+    state: record.state,
+    states: record.states,
+    drvProfileUrl: record.drvProfileUrl,
+    websiteFromDrv: record.websiteFromDrv,
+    websiteStatus: record.websiteStatus,
+    fetchedAt: record.fetchedAt,
+    parserVersion: record.parserVersion
+  };
 }
