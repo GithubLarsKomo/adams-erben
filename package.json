@@ -13,6 +13,8 @@
     "test:snapshot": "node scripts/build-snapshot.test.mjs && node scripts/build-snapshot-lrv-identity.test.mjs",
     "pilot:prepare": "node scripts/prepare-pilot-100.mjs",
     "test:pilot-prepare": "node scripts/prepare-pilot-100.test.mjs",
+    "pilot:run": "node scripts/run-pilot-100.mjs",
+    "test:pilot-run": "node scripts/run-pilot-100.test.mjs",
     "test:drv-registry": "node scripts/lib/drv-registry.test.mjs && node scripts/lib/drv-registry-school.test.mjs && node scripts/lib/drv-registry-website.test.mjs",
     "test:contact-governance": "node scripts/lib/contact-governance.test.mjs",
     "poc:enrich": "node scripts/enrichment-poc.mjs",
