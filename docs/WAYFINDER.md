@@ -1,6 +1,6 @@
 # Wayfinder – Adams Erben
 
-Stand: 2026-08-09
+Stand: 2026-08-10
 
 ## Fixierter Ausgangspunkt
 
@@ -12,207 +12,189 @@ Arbeitsbranch: `feat/mvp-wayfinder`
 
 ## Bestätigte Fakten
 
-- Der DRV stellt eine öffentliche Vereinssuche mit dem deutschen Organisationsbestand bereit.
-- DRV-Profile enthalten zuverlässig Namen/Profil-URLs und je nach Eintrag DRV-ID, Anschrift, Website, E-Mail, Telefon und Ansprechpartner.
-- Direkte DRV-Rückmeldung vom 09.08.2026: Ein vollständiger strukturierter Export mit Website, Ansprechpartner und E-Mail kann nicht geliefert werden; diese Angaben sind beim DRV nur teilweise vorhanden.
-- Damit ist der DRV **Registry-/Seed-Quelle**, nicht vollständige Kontaktquelle.
-- Fehlende Website-/Kontaktdaten werden auf den offiziellen Vereinswebseiten angereichert.
-- Nutzungsrechte sind nach aktueller Projekteinschätzung kein technischer Blocker; verbleibende Punkte werden formal parallel geklärt und dokumentiert.
-- Öffentliche E-Mail-Adressen werden nicht als aggregierter Browserdatensatz veröffentlicht.
-- Routingziel bleibt: Verein -> LRV -> DRV.
-- Der Ratzeburger Ruderclub wird als zentraler Ort des Filmbezugs hervorgehoben.
-- Filmassets werden ohne Freigabe nicht übernommen; die Website bleibt als unabhängige Initiative gekennzeichnet.
-- Preview und Produktion sind getrennt: `preview.adams-erben.de` arbeitet mit Seed-Daten und ohne echten Mailversand.
+- Der DRV kann die gewünschte vollständige Kombination aus Vereinswebsite, Ansprechpartner und E-Mail nicht als kompletten strukturierten Export bereitstellen; diese Angaben sind beim DRV nur teilweise vorhanden.
+- Die öffentliche DRV-Vereinssuche ist deshalb **Registry/Seed**, nicht alleinige Kontaktquelle.
+- Registry Parser **1.1.5** verarbeitet im realen Voll-Lauf **503/503 Profile = 100 %**.
+- Aktuell klassifiziert: **434 Vereine**, **15/15 LRV**, **54 sonstige Mitglieder**.
+- **411/434 Vereine** besitzen einen DRV-Weblink; **23/434** gehen an Website Discovery.
+- Routingziel bleibt Verein → LRV → DRV.
+- Öffentliche Browserdaten enthalten keine E-Mail-Adressen.
+- Preview und Produktion sind getrennt; ein Deployment crawlt niemals live DRV- oder Vereinsseiten.
+- Der Ratzeburger Ruderclub bleibt hervorgehoben; Filmassets werden ohne Freigabe nicht übernommen.
 
 ## Architekturentscheidung – getrennte Pipelines
 
-### A. Acquisition Pipeline
+### Acquisition
 
 ```text
 DRV Registry
-  -> Website Resolution
-  -> Vereinswebsite-Crawl
-  -> Kontaktklassifikation
-  -> Review / Quality Gate
-  -> freigegebener Snapshot
+→ Website Discovery
+→ Vereins-/LRV-Enrichment
+→ zentrale Contact Governance
+→ Approved Snapshot
 ```
 
-### B. Web Deployment Pipeline
+### Deployment
 
 ```text
-freigegebener Snapshot
-  -> public clubs.json
-  -> private recipients.json
-  -> Build
-  -> Coolify
+Approved Snapshot
+→ public clubs.json
+→ private recipients.json
+→ Build
+→ Coolify
 ```
 
-**Wichtig:** Ein Website-Deployment crawlt niemals live DRV- oder Vereinsseiten. Datenakquise und Veröffentlichung sind zeitlich und technisch getrennt.
+## Abgeschlossene Untersuchungen
 
-## Datenlayer
+### Registry / Seed – abgeschlossen
 
-### Layer 1 – DRV Registry
+- stabile DRV-ID / Slug-Fallback;
+- Provenienz + Parser-Version;
+- 15/15 LRV explizit abgesichert;
+- Website-/City-/Mitgliedstyp-Regressionen getestet;
+- öffentliche/private Artefakte getrennt;
+- Coverage-Gate >=95 %, real **100 %**.
 
-Mindestens:
+Aktueller Voll-Lauf:
 
-- stabile Organisations-ID / DRV-ID
-- Name
-- Typ
-- PLZ, Ort, Bundesland
-- DRV-Profil
-- vorhandene Website
-- vorhandene öffentliche E-Mail nur für private Pipeline
-- Feld-Provenienz + Fetch-/Parser-Version
+- 503/503 Profile;
+- 434 Vereine;
+- 15 LRV;
+- 54 sonstige Mitglieder;
+- 411 Vereine mit DRV-Weblink;
+- 23 Vereine ohne DRV-Weblink;
+- 250 Vereine bereits über einen DRV-Kandidaten Direct-fähig.
 
-Fehlende Werte erzeugen einen Status, keinen Importfehler.
+### Enrichment PoC A – abgeschlossen
 
-### Layer 2 – Website Resolution
+25 bekannte Vereinswebsites / 12 Bundesländer:
 
-1. DRV-Website-URL validieren.
-2. Redirects verfolgen.
-3. Domainidentität mit Name + Ort/PLZ + Impressum/Adresse prüfen.
-4. Fehlt die URL: gezielte Suchprovider-Abfrage.
-5. Unsichere/mehrdeutige Kandidaten -> Review Queue.
+- Website erreichbar: **23/25**;
+- Funktionskontakt: **18/25**;
+- Auto-Direct: **18/25**;
+- Review: **1/25**;
+- Fallback: **6/25**.
 
-### Layer 3 – Website Enrichment
+Ein zusätzlicher Diagnosepass über 64 Pfade / 38 erfolgreiche HTML-Seiten fand **0 zusätzliche E-Mail-Signale**.
 
-- nur bestätigte offizielle Domain;
-- Startseite + wenige kontaktnahe Seiten;
-- `robots.txt` beachten;
-- niedrige Parallelität und hostbasiertes Rate-Limit;
-- kein Login/Captcha-/Cloudflare-Bypass;
-- keine automatische Nutzung externer Kontaktformulare;
-- E-Mail + Kontext + Quelle + Rolle extrahieren.
+Entscheidung: maximal fünf erfolgreich geladene kontaktnahe Seiten; anschließend Fallback statt breitem Path-Probing.
 
-### Layer 4 – Kontaktklassifikation
+### Contact Governance – technisch abgeschlossen
 
-- `functional`: bevorzugtes Routingziel (`info@`, `kontakt@`, `buero@`, `vorstand@` usw.)
-- `personal`: gesonderte Datenklasse mit Governance/Review
-- `none`: Fallback LRV -> DRV
+`scripts/lib/contact-governance.mjs`:
 
-## Laufende Untersuchungen
+- personalisierte Adressen nie Auto-Direct;
+- Funktions-/Rollenadresse nur mit sicherem Organisationskontext;
+- Drittanbieter ausgeschlossen;
+- Provenienz + `verifiedAt` Pflicht;
+- stale ab 180 Tagen, Auto-Direct aus ab 270 Tagen;
+- HMAC-Suppression;
+- Korrektur/Opt-out vor Crawl-Ergebnis.
 
-### INV-1 – DRV Registry / Seed
+Verifizierte Organisationsidentität darf zusätzliche Website-/Kontakt-Domains oder einen eng begrenzten Funktionsalias belegen, **ohne Empfängeradressen zu hardcoden**.
 
-**Frage:** Wie stabil und vollständig können wir Organisationsbestand und Basisdaten reproduzierbar importieren?
+### Approved Snapshot – abgeschlossen als Pipeline-Stufe
 
-**Stop-Bedingung:** stabile ID-Strategie, >=95 % technisch parsebare DRV-Profile, Feld-Provenienz und deterministische Enrichment-Queue.
+`scripts/build-snapshot.mjs` entscheidet Routing erst nach Registry/Enrichment unter der zentralen Governance.
 
-**Ausgabe:** Registry-Schema + Parservertrag.
+Erzeugt werden:
 
-### INV-2 – Film-/Brand-Safe Copy
+- public `clubs.json` ohne E-Mail-Adressen;
+- private `recipients.json`;
+- adressfreier Quality Report;
+- Verein → LRV → DRV Fallback;
+- Suppression-/Lifecycle-Gate.
 
-**Frage:** Welche filmbezogenen Bezeichnungen und Links verwenden wir ohne falsche Affiliation oder ungeklärte Asset-Nutzung?
+## LRV-Fallback – abgeschlossen
 
-**Stop-Bedingung:** Copy-/Asset-Regeln dokumentiert.
+Ausgangslage:
 
-**Ausgabe:** `docs/BRAND-GUIDELINES.md`.
+- **7/15 LRV** Direct-fähig;
+- Clubrouting: **250 Direct / 64 LRV / 120 DRV**.
 
-### INV-3 – Kontakt-Routing / Datenschutz / Anti-Abuse
+Die Untersuchung zeigte mehrere Ursachen:
 
-**Frage:** Wie wird genau ein whitelisted Empfänger missbrauchsarm erreicht?
+1. offizielle Website- und Kontakt-Domain unterscheiden sich bei einzelnen LRV;
+2. zusammengesetzte Funktionsaliase werden nicht durch eine pauschale Regex abgedeckt;
+3. einige LRV-Seiten blockieren automatisierte Abrufe via `robots.txt`;
+4. einzelne Verbände veröffentlichen ausschließlich personenbezogene Kontakte.
 
-**Stop-Bedingung:** Testversand, feste Empfängerauflösung, Rate Limit, Datenschutztext.
+Lösung ohne Aufweichung der Governance:
 
-### INV-4 – Hetzner/Coolify + Domains
+- `scripts/lib/lrv-identity.mjs` enthält ausschließlich verifizierte Organisationsidentität, keine Empfängeradressen;
+- Website-Enrichment respektiert `robots.txt` vollständig;
+- offizielle DRV-Länderrat-Seite dient als zweite DRV-Quelle;
+- Zuordnung im Länderrat primär über eindeutigen DOM-Kontext;
+- falls der DOM-Kontext nicht eindeutig ist: Fallback nur, wenn die E-Mail-Domain über DRV-Profil bzw. verifizierte Identität **genau einem LRV** zugeordnet werden kann;
+- Rollenaliase Präsident/Vizepräsident sind als Funktionsrollen erfasst;
+- persönliche Länderrat-Adressen bleiben Review.
 
-**Frage:** Wie werden Preview und Produktion reproduzierbar deployed?
+Realer Referenzlauf nach dem Domain-Fallback:
 
-**Stop-Bedingung:** HTTPS, Healthcheck und Testmail für Produktion.
+- Länderrat: 15 Kandidaten für 14 eindeutig zugeordnete LRV;
+- 4 Kandidaten erfüllen das technische Auto-Approval-Gate, 11 bleiben Review;
+- 2 Kandidaten mussten über eindeutige verifizierte Domain statt DOM-Kontext aufgelöst werden;
+- **14/15 LRV** besitzen im finalen Snapshot eine sichere Direct Route;
+- Clubrouting: **250 Direct / 171 LRV / 13 DRV**.
 
-### INV-5 – Vereinswebsite-Enrichment
+Die verbleibenden 13 DRV-Fallbacks sind ausschließlich:
 
-**Frage:** Wie zuverlässig finden wir auf einer bestätigten Vereinswebsite eine für die Vermittlung geeignete Kontaktmöglichkeit?
+- Rheinland-Pfalz: **12**;
+- Saarland: **1**.
 
-**Aktueller PoC A:**
+Damit gehören alle zum Ruderverband Südwest. Dieser bleibt absichtlich DRV-Fallback: die aktuell geprüften Quellen liefern nur personenbezogene Kontakte. Die Governance wird für Coverage nicht gelockert.
 
-- 25 Vereine;
-- mindestens fünf Bundesländer;
-- maximal fünf je Bundesland;
-- Ratzeburger Ruderclub bevorzugt;
-- zunächst nur Vereine mit DRV-Weblink, um Crawl-/Extraktionsqualität isoliert zu messen;
-- maximal fünf relevante Seiten je Domain;
-- Klassifikation `functional | personal | none`;
-- adressfreier Coverage-Report;
-- tatsächliche Kontakte nur unter `build-private/`.
+## Website Discovery PoC B – vorbereitet
 
-Implementierung: `scripts/enrichment-poc.mjs`.
+Aktuelle vollständige `website_missing`-Queue: **23 Vereine**.
 
-**Stop-Bedingung PoC A:** Coverage-/Fehlermuster dokumentiert und Crawl-Budget bewertet.
+Eingefrorener Vertrag:
 
-**Danach PoC B:** 25 Fälle ohne belastbaren DRV-Weblink zur Messung der Website-Discovery.
+- 23/23 manuell klassifiziert;
+- **18 `official` / 5 `none` / 0 `ambiguous`**;
+- Query: Vereinsname + PLZ + Ort/Ortsteil + Rudern;
+- mehrere legitime Hosts möglich;
+- `none` + Auto-Accept zählt als False Positive;
+- Ziel: **0 falsche Auto-Accepts**.
 
-### INV-6 – Governance angereicherter Kontakte
+Der echte Brave-Lauf bleibt als einziger PoC-B-Schritt offen und läuft erst, wenn `BRAVE_SEARCH_API_KEY` als Repository-Secret vorhanden ist. Die providerunabhängigen Tests sind grün.
 
-**Frage:** Wie behandeln wir Funktionskontakte versus personalisierte Ansprechpartner?
+## Noch offene Engineering-Stufen
 
-**Stop-Bedingung:** Allow-/Deny-Regeln, Transparenz/Korrektur/Opt-out und technische Filter dokumentiert.
+1. **100er-Pilot** – stratifizierte Stichprobe und reproduzierbarer Lauf über Registry/Discovery/Enrichment/Snapshot.
+2. Voll-Enrichment modularisieren und Produktionssnapshot erzeugen.
+3. Lauf-zu-Lauf-Stabilität, Review-Quote und False Positives messen.
 
-## Formale Nutzungs-/Rechteklärung
+## Formale Go-live-Spur
 
-Kein Engineering-Blocker mehr. Parallel zu dokumentieren:
+Vor Produktion weiterhin dokumentiert abzuschließen:
 
-- DRV-Kommunikation / Freigabeumfang;
-- gewünschte Quellenangabe;
-- ggf. technische Abrufparameter;
-- Korrektur-/Opt-out-Kanal.
-
-Die formalen Punkte werden vor Produktion geschlossen, aber die PoC-/Pipeline-Entwicklung läuft weiter.
-
-## PoC A – Messgrößen
-
-Der Test misst:
-
-- erreichbare Website;
-- automatischen Identitätsscore;
-- gefundene Funktionsadresse;
-- ausschließlich personenbezogene Kontakte;
-- keine Mail gefunden;
-- robots-/HTTP-/TLS-/Redirect-Probleme;
-- Seitenzahl;
-- Laufzeit;
-- Übereinstimmung einer DRV-Mail mit der Vereinswebsite intern, ohne E-Mail im Report zu veröffentlichen.
-
-Öffentlicher Report:
-
-- `artifacts/enrichment-poc/report.json`
-- `artifacts/enrichment-poc/report.md`
-
-Private Treffer:
-
-- `build-private/enrichment-poc-contacts.json`
-
-## Vollständiger Rollout – vorgesehene Stufen
-
-1. **PoC A / 25 bekannte Websites** – Extraktion messen.
-2. **PoC B / 25 fehlende Websites** – Website-Discovery messen.
-3. **Pilot / 100 Vereine** – stratifiziert über Regionen, Website-Typen und Kontaktmuster.
-4. **Vollbestand** – erst nach Precision-/Review-Gates.
-5. **Approved Snapshot** – keine Live-Crawls im Deployment.
-6. **Betrieb** – Registry monatlich, Kontakt-Enrichment etwa alle 90 Tage, Fehler priorisiert.
-
-Vollständige Planung: `docs/DATA-ACQUISITION-PLAN.md`.
+- DRV-Kommunikation / Freigabeumfang und Quellenangabe;
+- Datenschutz-/Informationspflichten;
+- Betreiberangaben;
+- SMTP;
+- Coolify/DNS/HTTPS/Healthcheck/Testmail.
 
 ## Quality Gates vor Vollbestand
 
-- Registry >=95 % technisch parsebar;
-- 100 % stabile ID + Routing-Fallback;
-- Domain-Fehlzuordnung nach Pilot <1 %;
-- jeder direkte Empfänger besitzt Provenienz + `verifiedAt`;
-- keine E-Mail im öffentlichen Datensatz;
-- personalisierte Kontakte nur nach finaler Governance-Regel;
-- unklare Datensätze landen in Review und werden nicht automatisch direkt geroutet.
+- Registry >=95 % technisch parsebar — **erfüllt: 100 %**;
+- stabile ID + Routing-Fallback — **erfüllt**;
+- keine E-Mail im öffentlichen Datensatz — **CI-erzwungen**;
+- personalisierte Kontakte nicht Auto-Direct — **CI-erzwungen**;
+- direkte Empfänger mit Provenienz + `verifiedAt` — **CI-erzwungen**;
+- LRV-Fallback — **14/15 sicher, Südwest bewusst DRV-Fallback**;
+- Domain-Fehlzuordnung <1 % — realer Search-Provider-PoC noch offen.
 
-## Risiken
+## Genau eine nächste ausführbare Aktion
 
-- HTML-Struktur ändert sich -> Fixtures + Parser-Version.
-- falsche Domain -> Multi-Signal-Scoring + Review.
-- fremde Website blockiert Crawler -> kein Bypass, stattdessen Review/Fallback.
-- ausschließlich JavaScript-gerenderte Kontakte -> zweite Ausbaustufe/Review statt aggressiver Umgehung.
-- personenbezogene Mail -> eigene Datenklasse.
-- öffentliche E-Mail-Aggregation -> ausschließlich private Routingartefakte.
-- Spam-Relay -> whitelisted Empfänger, Rate Limit, Honeypot, Origin-Check.
+**100er-Pilot vorbereiten und eine stratifizierte, adressfreie Eingabestichprobe erzeugen.**
 
-## Nächste ausführbare Aktion
+Die Stichprobe soll:
 
-**PoC A ausführen und Coverage-Report auswerten.** Danach werden konkrete Thresholds für Crawl-Seitenzahl, Funktionsadress-Abdeckung und die Notwendigkeit eines zweiten Passes festgelegt; erst dann folgt PoC B für fehlende Vereinswebsites.
+- alle LRV/Regionen abdecken;
+- bekannte DRV-Websites und `website_missing` getrennt markieren;
+- verschiedene Website-/Fehlerklassen enthalten;
+- Registry-, Website- und Routing-Provenienz mitführen;
+- noch keinen Vollcrawl starten.
+
+Danach wird der Pilot über dieselbe Governance- und Snapshot-Stufe ausgeführt. Der echte 23er-Brave-PoC bleibt parallel automatisch ausführbar, sobald das Repository-Secret vorhanden ist.
