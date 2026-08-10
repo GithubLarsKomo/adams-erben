@@ -34,6 +34,8 @@ jobs:
           node --check scripts/enrich-lrv.mjs
           node --check scripts/enrich-lrv-laenderrat.mjs
           node --check scripts/enrich-lrv-laenderrat.test.mjs
+          node --check scripts/prepare-pilot-100.mjs
+          node --check scripts/prepare-pilot-100.test.mjs
           node --check scripts/lib/drv-registry.mjs
           node --check scripts/lib/drv-registry.test.mjs
           node --check scripts/lib/contact-governance.mjs
@@ -59,6 +61,9 @@ jobs:
 
       - name: Test DRV Länderrat LRV enrichment
         run: npm run test:lrv-laenderrat
+
+      - name: Test deterministic 100-club pilot sampling
+        run: npm run test:pilot-prepare
 
       - name: Test discovery sample stratification
         run: npm run test:discover-prepare
