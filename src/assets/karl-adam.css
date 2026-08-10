@@ -135,10 +135,44 @@
 }
 
 .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 42px;
+  padding: .62rem .85rem;
+  border: 1px solid rgba(11,35,54,.14);
+  border-radius: 999px;
+  background: var(--foam);
+  color: var(--navy);
+  font-size: .88rem;
   font-weight: 750;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
 }
+
+.text-link:hover {
+  background: var(--water);
+  color: var(--accent-dark);
+  border-color: rgba(11,35,54,.22);
+}
+
+.text-link[href^="mailto:"]::before,
+.text-link[href^="tel:"]::before {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--navy);
+  font-size: .78rem;
+  font-weight: 900;
+  flex: 0 0 auto;
+}
+
+.text-link[href^="mailto:"]::before { content: "@"; }
+.text-link[href^="tel:"]::before { content: "☎"; }
 
 .voice-grid {
   display: grid;
@@ -456,5 +490,15 @@
 
   .partner-strip {
     display: grid;
+  }
+
+  .inline-actions {
+    align-items: stretch;
+  }
+
+  .inline-actions .button,
+  .inline-actions .text-link {
+    width: 100%;
+    justify-content: center;
   }
 }
