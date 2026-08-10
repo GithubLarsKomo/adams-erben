@@ -9,6 +9,8 @@
     "lrv:enrich": "node scripts/enrich-lrv.mjs",
     "lrv:laenderrat": "node scripts/enrich-lrv-laenderrat.mjs",
     "test:lrv-laenderrat": "node scripts/enrich-lrv-laenderrat.test.mjs",
+    "history:merge": "node scripts/merge-contact-candidate-history.mjs",
+    "test:history": "node scripts/lib/contact-candidate-history.test.mjs && node scripts/contact-history-snapshot.integration.test.mjs",
     "snapshot:build": "node scripts/build-snapshot.mjs && node scripts/report-contact-governance-reasons.mjs",
     "snapshot:reasons": "node scripts/report-contact-governance-reasons.mjs",
     "test:snapshot": "node scripts/build-snapshot.test.mjs && node scripts/build-snapshot-lrv-identity.test.mjs && node scripts/report-contact-governance-reasons.test.mjs",
