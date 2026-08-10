@@ -60,6 +60,11 @@ function safeExternalUrl(value = '') {
   }
 }
 
+function organizationStates(org) {
+  const values = Array.isArray(org.states) && org.states.length ? org.states : [org.state];
+  return [...new Set(values.filter(Boolean))];
+}
+
 function filteredOrganizations() {
   const q = normalize(searchInput.value);
   const type = typeFilter.value;
@@ -67,9 +72,9 @@ function filteredOrganizations() {
   const tokens = q ? q.split(/\s+/) : [];
   return organizations.filter((org) => {
     if (type !== 'all' && org.type !== type) return false;
-    if (state !== 'all' && org.state !== state) return false;
+    if (state !== 'all' && !organizationStates(org).includes(state)) return false;
     if (!tokens.length) return true;
-    const haystack = normalize([org.name, org.city, org.postalCode, org.state, org.drvId].filter(Boolean).join(' '));
+    const haystack = normalize([org.name, org.city, org.postalCode, ...organizationStates(org), org.drvId].filter(Boolean).join(' '));
     return tokens.every((token) => haystack.includes(token));
   });
 }
@@ -107,7 +112,7 @@ function render() {
 }
 
 function populateStates() {
-  const states = [...new Set(organizations.map((org) => org.state).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'de'));
+  const states = [...new Set(organizations.flatMap(organizationStates))].sort((a, b) => a.localeCompare(b, 'de'));
   for (const state of states) {
     const option = document.createElement('option');
     option.value = state;
