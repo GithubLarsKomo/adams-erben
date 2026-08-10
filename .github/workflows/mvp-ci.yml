@@ -33,6 +33,8 @@ jobs:
           node --check scripts/build-snapshot-lrv-identity.test.mjs
           node --check scripts/report-contact-governance-reasons.mjs
           node --check scripts/report-contact-governance-reasons.test.mjs
+          node --check scripts/merge-contact-candidate-history.mjs
+          node --check scripts/contact-history-snapshot.integration.test.mjs
           node --check scripts/enrich-lrv.mjs
           node --check scripts/enrich-lrv-laenderrat.mjs
           node --check scripts/enrich-lrv-laenderrat.test.mjs
@@ -59,10 +61,10 @@ jobs:
       - name: Test DRV registry parser and routing gate
         run: npm run test:drv-registry
 
-      - name: Test shared contact governance
+      - name: Test shared contact governance and history
         run: |
           npm run test:contact-governance
-          node scripts/lib/contact-candidate-history.test.mjs
+          npm run test:history
 
       - name: Test approved snapshot routing
         run: npm run test:snapshot
