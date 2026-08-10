@@ -16,8 +16,10 @@ const externalRoleAlias = classifyContact({
   kind: 'personal',
   context: '1. Vorsitzender'
 }, clubSite);
-assert.equal(externalRoleAlias.disposition, 'direct-functional');
+assert.equal(externalRoleAlias.disposition, 'review-external-functional');
 assert.equal(externalRoleAlias.contactKind, 'role-functional');
+assert.equal(externalRoleAlias.governanceState, 'review-functional');
+assert.equal(externalRoleAlias.autoApproved, false);
 
 const externalGeneric = classifyContact({
   email: 'info@fremde-domain.de',
@@ -66,7 +68,7 @@ const org = reviewOrganization({
 assert.equal(org.disposition, 'direct-functional');
 assert.equal(org.preferredContact.email, 'info@beispiel-ruderverein.de');
 assert.equal(org.thirdPartyCandidateCount, 1);
-assert.equal(org.policyVersion, '1.0.0');
+assert.equal(org.policyVersion, '1.1.0');
 assert.equal(org.contacts.find((item) => item.email === 'max.mustermann@beispiel-ruderverein.de').autoApproved, false);
 
 console.log('review-enrichment-poc tests passed');
