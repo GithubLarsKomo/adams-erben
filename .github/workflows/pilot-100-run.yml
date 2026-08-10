@@ -104,7 +104,7 @@ jobs:
           const publicRows = JSON.parse(fs.readFileSync('artifacts/pilot-100-run/organizations.json', 'utf8')).organizations;
           const privateRows = JSON.parse(fs.readFileSync('build-private/pilot-100-decisions.json', 'utf8')).organizations;
 
-          if (report.runnerVersion !== 'pilot-100-run/1.0.0') throw new Error(`unexpected runner ${report.runnerVersion}`);
+          if (report.runnerVersion !== 'pilot-100-run/1.1.0') throw new Error(`unexpected runner ${report.runnerVersion}`);
           if (report.total !== 100 || publicRows.length !== 100 || privateRows.length !== 100) throw new Error('pilot result must contain exactly 100 organizations');
           if (report.knownWebsite !== 77) throw new Error(`expected 77 known websites, got ${report.knownWebsite}`);
           if (report.discoveryPending !== 23) throw new Error(`expected 23 discovery-pending cases, got ${report.discoveryPending}`);
@@ -115,6 +115,16 @@ jobs:
           if (pending.length !== 23 || pending.some((row) => row.websiteStatus !== 'missing')) {
             throw new Error('discovery-pending cohort is not exactly the 23 missing-website cases');
           }
+
+          // Regression from pilot round 1: DRV 12103 points to a separate rowing
+          // organization. A weak identity may never turn that website contact into
+          // a new direct route, even though the DRV supplied the URL.
+          const saarbruecken = publicRows.find((row) => row.organizationId === '12103');
+          if (!saarbruecken) throw new Error('pilot regression case 12103 missing');
+          if (saarbruecken.status !== 'identity_review' || saarbruecken.proposedRouteLevel !== 'drv' || saarbruecken.finalHost !== 'ruderbund.de') {
+            throw new Error(`12103 website identity regression: ${JSON.stringify(saarbruecken)}`);
+          }
+
           for (const decision of privateRows) {
             for (const candidate of decision.candidates || []) {
               if (candidate.snapshotEligible && !['functional', 'role-functional'].includes(candidate.contactKind)) {
@@ -139,6 +149,8 @@ jobs:
             discoveryPending: report.discoveryPending,
             reachable: report.reachable,
             processed: report.processed,
+            identityReview: report.identityReview,
+            identityStatusCounts: report.identityStatusCounts,
             contactOutcomes: report.contactOutcomes,
             directUpgrades: report.directUpgrades,
             routeBefore: report.routeBefore,
