@@ -88,10 +88,14 @@ assert.equal(freshSnapshot.recipients['moellner-ruder-club-ev'].routeLevel, 'clu
 assert.equal(freshSnapshot.recipients['moellner-ruder-club-ev'].verifiedAt, previousVerifiedAt);
 assert.equal(freshSnapshot.recipients['moellner-ruder-club-ev'].email, clubEmail);
 
-// Carry-forward does not reset the lifecycle clock. Once the original
-// verification is >=270 days old, the same candidate must stop routing Direct.
+// Carry-forward does not reset the lifecycle clock. Once the original club
+// verification is >=270 days old, it must stop routing Direct. Keep the LRV
+// independently fresh so this assertion isolates the club candidate lifecycle.
+const expiryRegistry = registry.map((row) => row.type === 'lrv'
+  ? { ...row, fetchedAt: '2027-05-10T00:00:00.000Z' }
+  : row);
 const expiredSnapshot = buildSnapshot({
-  registry,
+  registry: expiryRegistry,
   externalCandidates: replay.privatePayload.contacts,
   now: new Date('2027-05-10T12:00:00.000Z')
 });
