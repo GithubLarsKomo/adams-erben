@@ -13,6 +13,7 @@ import {
 const DIRECTORY_URL = `${DRV_ORIGIN}/service/vereinssuche`;
 const GEONAMES_URL = 'https://download.geonames.org/export/zip/DE.zip';
 const TARGET = Math.max(5, Number(process.env.DISCOVERY_SAMPLE_TARGET || 25));
+const MIN_SAMPLE = Math.max(5, Number(process.env.DISCOVERY_SAMPLE_MIN_SIZE || 20));
 const MIN_STATES = Math.max(1, Number(process.env.DISCOVERY_SAMPLE_MIN_STATES || 5));
 const MAX_PER_STATE = Math.max(1, Number(process.env.DISCOVERY_SAMPLE_MAX_PER_STATE || 5));
 const MAX_SCANS = Math.max(TARGET, Number(process.env.DISCOVERY_SAMPLE_MAX_SCANS || 250));
@@ -49,30 +50,43 @@ async function loadPostalStates() {
   return map;
 }
 
-export function chooseMissingWebsiteSample(items, { target = TARGET, minStates = MIN_STATES, maxPerState = MAX_PER_STATE } = {}) {
+export function chooseMissingWebsiteSample(items, {
+  target = TARGET,
+  minSample = MIN_SAMPLE,
+  minStates = MIN_STATES,
+  maxPerState = MAX_PER_STATE
+} = {}) {
   const candidates = items
     .filter((item) => item.type === 'club' && !item.websiteFromDrv && item.state)
     .sort((a, b) => `${a.state}|${a.organizationId}`.localeCompare(`${b.state}|${b.organizationId}`, 'de'));
-  const selected = [];
-  const counts = new Map();
 
-  while (selected.length < target) {
-    let added = false;
-    for (const item of candidates) {
-      if (selected.includes(item)) continue;
-      const count = counts.get(item.state) || 0;
-      if (count >= maxPerState) continue;
-      selected.push(item);
-      counts.set(item.state, count + 1);
-      added = true;
-      if (selected.length >= target) break;
+  // If fewer cases exist than the nominal PoC target, use the entire real queue.
+  // The per-state cap is only a sampling rule, not a reason to discard scarce cases.
+  let selected;
+  if (candidates.length <= target) {
+    selected = [...candidates];
+  } else {
+    selected = [];
+    const counts = new Map();
+    while (selected.length < target) {
+      let added = false;
+      for (const item of candidates) {
+        if (selected.includes(item)) continue;
+        const count = counts.get(item.state) || 0;
+        if (count >= maxPerState) continue;
+        selected.push(item);
+        counts.set(item.state, count + 1);
+        added = true;
+        if (selected.length >= target) break;
+      }
+      if (!added) break;
     }
-    if (!added) break;
   }
 
   const states = new Set(selected.map((item) => item.state));
-  if (selected.length < target || states.size < minStates) {
-    throw new Error(`Could only select ${selected.length}/${target} missing-website clubs across ${states.size}/${minStates} states`);
+  const requiredSize = Math.min(target, Math.max(minSample, Math.min(candidates.length, target)));
+  if (selected.length < requiredSize || states.size < minStates) {
+    throw new Error(`Could only select ${selected.length}/${target} missing-website clubs (minimum ${requiredSize}) across ${states.size}/${minStates} states`);
   }
   return selected;
 }
@@ -120,9 +134,11 @@ async function main() {
   await writeFile(OUTPUT, JSON.stringify({
     generatedAt: new Date().toISOString(),
     source,
+    availableMissingWebsiteClubs: candidates.length,
+    requestedTarget: TARGET,
     organizations: selected
   }, null, 2));
-  console.log(`[prepare-discovery] selected ${selected.length} clubs across ${new Set(selected.map((item) => item.state)).size} states from ${source} -> ${OUTPUT}`);
+  console.log(`[prepare-discovery] selected ${selected.length}/${candidates.length} available clubs across ${new Set(selected.map((item) => item.state)).size} states from ${source} -> ${OUTPUT}`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
