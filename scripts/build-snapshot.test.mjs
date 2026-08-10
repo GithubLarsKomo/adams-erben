@@ -90,12 +90,15 @@ const result = buildSnapshot({ registry, externalCandidates, suppressionHashes, 
 
 assert.equal(result.recipients['direct-rv'].routeLevel, 'club');
 assert.equal(result.recipients['direct-rv'].email, 'info@direct-rv.de');
-assert.equal(result.recipients['direct-rv'].policyVersion, '1.0.0');
+assert.equal(result.recipients['direct-rv'].policyVersion, '1.1.0');
 
-// A personalized DRV address does not auto-route, but a separately verified
-// role alias from the official club site may do so.
-assert.equal(result.recipients['personal-rv'].routeLevel, 'club');
-assert.equal(result.recipients['personal-rv'].email, 'vorsitzender@web.de');
+// An external role mailbox is no longer enough on its own. Without a verified
+// organization-domain relation it remains review and the club falls back to LRV.
+assert.equal(result.recipients['personal-rv'].routeLevel, 'lrv');
+assert.equal(result.recipients['personal-rv'].routeOrganizationId, '30011');
+const personalDecision = result.decisions.find((item) => item.id === 'personal-rv');
+assert.ok(personalDecision.candidates.some((candidate) => candidate.reason === 'role_alias_external_unverified_domain'));
+assert.equal(personalDecision.directCandidateApproved, false);
 
 // Suppression overrides an otherwise valid direct address and falls back to LRV.
 assert.equal(result.recipients['suppressed-rv'].routeLevel, 'lrv');
@@ -106,7 +109,7 @@ assert.equal(result.decisions.find((item) => item.id === 'suppressed-rv').suppre
 assert.equal(result.recipients['no-state-rv'].routeLevel, 'drv');
 assert.equal(result.recipients['no-state-rv'].routeOrganizationId, 'drv');
 
-// Website enrichment can add a safe direct route even when DRV has no email.
+// Website enrichment can add a safe same-domain direct route even when DRV has no email.
 assert.equal(result.recipients['web-enriched-rv'].routeLevel, 'club');
 assert.equal(result.recipients['web-enriched-rv'].email, 'kontakt@web-enriched-rv.de');
 
@@ -116,8 +119,8 @@ assert.equal(result.decisions.find((item) => item.id === 'expired-rv').staleCand
 
 assert.equal(result.report.registryOrganizations, 7);
 assert.equal(result.report.publicOrganizations, 8);
-assert.equal(result.report.routeCounts.club, 3);
-assert.equal(result.report.routeCounts.lrv, 3); // LRV itself + two club fallbacks
+assert.equal(result.report.routeCounts.club, 2);
+assert.equal(result.report.routeCounts.lrv, 4); // LRV itself + three club fallbacks
 assert.equal(result.report.routeCounts.drv, 1);
 assert.equal(result.report.organizationsWithSuppressedCandidates, 1);
 assert.equal(result.report.organizationsWithStaleCandidates, 1);
