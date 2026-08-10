@@ -59,6 +59,7 @@ const first = buildPilotSample(args);
 const second = buildPilotSample(args);
 
 assert.equal(PILOT_SAMPLER_VERSION, 'pilot-100/1.0.0');
+assert.equal(first.report.selectionMode, 'dynamic-stratified');
 assert.equal(first.sample.length, 100);
 assert.equal(new Set(first.sample.map((row) => row.organizationId)).size, 100);
 assert.deepEqual(first.sample.map((row) => row.organizationId), second.sample.map((row) => row.organizationId));
@@ -86,7 +87,33 @@ assert.equal(first.report.mandatoryIncluded.drvFallback, first.report.mandatoryP
 assert.equal(first.report.mandatoryIncluded.stateMissing, first.report.mandatoryPopulation.stateMissing);
 assert.equal(first.report.mandatoryIncluded.https, first.report.mandatoryPopulation.https);
 
-const publicJson = JSON.stringify({ sample: first.sample, report: first.report });
+const frozenIds = registry.slice(0, 100).map((row) => row.organizationId).reverse();
+const frozen = buildPilotSample({ ...args, frozenIds });
+assert.equal(frozen.report.selectionMode, 'frozen-ids');
+assert.deepEqual(frozen.sample.map((row) => row.organizationId), frozenIds);
+assert.ok(frozen.sample.every((row) => row.inclusionReasons.includes('frozen-cohort:v1')));
+
+const refreshedOrganizations = publicOrganizations.map((row) => ({ ...row }));
+const refreshedId = frozenIds[0];
+const refreshedSnapshot = refreshedOrganizations.find((row) => row.organizationId === refreshedId);
+refreshedSnapshot.contactRouteLevel = 'drv';
+refreshedSnapshot.website = 'https://fresh-metadata.example/';
+const refreshedFrozen = buildPilotSample({ ...args, publicOrganizations: refreshedOrganizations, frozenIds });
+assert.equal(refreshedFrozen.report.sampleHash, frozen.report.sampleHash);
+assert.deepEqual(refreshedFrozen.sample.map((row) => row.organizationId), frozenIds);
+assert.equal(refreshedFrozen.sample.find((row) => row.organizationId === refreshedId).routeLevel, 'drv');
+assert.equal(refreshedFrozen.sample.find((row) => row.organizationId === refreshedId).website, 'https://fresh-metadata.example/');
+
+assert.throws(
+  () => buildPilotSample({ ...args, frozenIds: [...frozenIds.slice(0, 99), frozenIds[0]] }),
+  /duplicate organization IDs/
+);
+assert.throws(
+  () => buildPilotSample({ ...args, frozenIds: [...frozenIds.slice(0, 99), '99999'] }),
+  /missing from current registry/
+);
+
+const publicJson = JSON.stringify({ sample: first.sample, report: first.report, frozen: frozen.sample, frozenReport: frozen.report });
 assert.equal(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(publicJson), false);
 assert.equal(publicJson.includes('emailFromDrv'), false);
 assert.equal(publicJson.includes('private-'), false);
