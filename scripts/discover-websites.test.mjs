@@ -118,16 +118,18 @@ const input = JSON.parse(readFileSync('scripts/discovery-input.poc.json', 'utf8'
 const truth = JSON.parse(readFileSync('scripts/discovery-ground-truth.poc.json', 'utf8'));
 const inputIds = input.organizations.map((item) => item.organizationId).sort();
 const truthIds = Object.keys(truth).sort();
-assert.equal(input.organizations.length, 25);
-assert.equal(truthIds.length, 25);
+assert.equal(input.availableMissingWebsiteClubs, 23);
+assert.equal(input.organizations.length, 23);
+assert.equal(truthIds.length, 23);
 assert.deepEqual(inputIds, truthIds);
-assert.equal(new Set(inputIds).size, 25);
+assert.equal(new Set(inputIds).size, 23);
 assert.equal(input.organizations.every((item) => item.postalCode && item.city), true);
+assert.equal(input.organizations.every((item) => item.parserVersion === '1.1.5'), true);
 
 const truthEntries = Object.values(truth).map(normalizeGroundTruthEntry);
-assert.equal(truthEntries.filter((item) => item.status === 'official').length, 19);
+assert.equal(truthEntries.filter((item) => item.status === 'official').length, 18);
 assert.equal(truthEntries.filter((item) => item.status === 'none').length, 5);
-assert.equal(truthEntries.filter((item) => item.status === 'ambiguous').length, 1);
+assert.equal(truthEntries.filter((item) => item.status === 'ambiguous').length, 0);
 assert.equal(truthEntries.every((item) => item.status !== 'official' || item.acceptedHosts.length > 0), true);
 
 console.log('discover-websites tests passed');
