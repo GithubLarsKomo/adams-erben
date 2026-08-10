@@ -18,6 +18,8 @@
     "test:discovery-verified": "node scripts/apply-verified-discovery.test.mjs",
     "full:prepare": "node scripts/prepare-full-enrichment.mjs",
     "test:full-prepare": "node scripts/prepare-full-enrichment.test.mjs",
+    "full:merge": "node scripts/merge-full-enrichment-results.mjs",
+    "test:full-merge": "node scripts/merge-full-enrichment-results.test.mjs",
     "pilot:prepare": "node scripts/prepare-pilot-100.mjs",
     "test:pilot-prepare": "node scripts/prepare-pilot-100.test.mjs",
     "pilot:run": "node scripts/run-pilot-100.mjs",
