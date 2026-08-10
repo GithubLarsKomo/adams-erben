@@ -36,6 +36,8 @@ jobs:
           node --check scripts/enrich-lrv-laenderrat.test.mjs
           node --check scripts/prepare-pilot-100.mjs
           node --check scripts/prepare-pilot-100.test.mjs
+          node --check scripts/run-pilot-100.mjs
+          node --check scripts/run-pilot-100.test.mjs
           node --check scripts/lib/drv-registry.mjs
           node --check scripts/lib/drv-registry.test.mjs
           node --check scripts/lib/contact-governance.mjs
@@ -64,6 +66,9 @@ jobs:
 
       - name: Test deterministic 100-club pilot sampling
         run: npm run test:pilot-prepare
+
+      - name: Test bounded 100-club pilot runner
+        run: npm run test:pilot-run
 
       - name: Test discovery sample stratification
         run: npm run test:discover-prepare
