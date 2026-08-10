@@ -205,7 +205,7 @@ assert.equal(isApprovedRegistryDirectContact({
 assert.equal(isApprovedRegistryDirectContact({
   emailFromDrv: 'vorsitzender@t-online.de',
   websiteFromDrv: 'https://www.beispiel-ruderverein.de/'
-}), true);
+}), false);
 
 assert.equal(isApprovedRegistryDirectContact({
   emailFromDrv: 'max.mustermann@beispiel-ruderverein.de',
