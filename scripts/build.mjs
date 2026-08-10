@@ -19,9 +19,11 @@ const indexHtml = await readFile(indexPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
 const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
+const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
 const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
+  .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
   .replace('</head>', `${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
 
