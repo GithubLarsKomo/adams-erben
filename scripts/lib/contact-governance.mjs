@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 
-export const CONTACT_POLICY_VERSION = '1.0.0';
+export const CONTACT_POLICY_VERSION = '1.1.0';
 export const CONTACT_STALE_DAYS = 180;
 export const CONTACT_DISABLE_DAYS = 270;
 
@@ -71,7 +71,7 @@ export function classifyContactCandidate(contact = {}, website = '', { trustedDo
     governanceState = 'excluded-invalid';
     reason = 'invalid_email';
     rank = -10;
-  } else if (thirdPartyContext && !roleAlias && !trustedFunctionalAlias) {
+  } else if (thirdPartyContext && !(trustedFunctionalAlias || (roleAlias && organizationDomain))) {
     contactKind = 'third-party';
     governanceState = 'excluded-third-party';
     reason = 'third_party_context';
@@ -81,11 +81,16 @@ export function classifyContactCandidate(contact = {}, website = '', { trustedDo
     governanceState = 'auto-approved-functional';
     reason = 'verified_functional_alias';
     rank = 105;
-  } else if (roleAlias) {
+  } else if (roleAlias && organizationDomain) {
     contactKind = 'role-functional';
     governanceState = 'auto-approved-functional';
-    reason = sameDomain ? 'role_alias_on_club_domain' : 'explicit_role_alias_external_domain';
-    rank = sameDomain ? 100 : 90;
+    reason = sameDomain ? 'role_alias_on_club_domain' : 'role_alias_on_verified_organization_domain';
+    rank = sameDomain ? 100 : 96;
+  } else if (roleAlias) {
+    contactKind = 'role-functional';
+    governanceState = 'review-functional';
+    reason = 'role_alias_external_unverified_domain';
+    rank = 60;
   } else if (organizationDomain && genericFunctional) {
     contactKind = 'functional';
     governanceState = 'auto-approved-functional';
