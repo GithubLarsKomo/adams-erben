@@ -10,7 +10,7 @@ function legacyDisposition(classification) {
     case 'review-functional':
       return 'review-external-functional';
     case 'review-personal':
-      return classification.reason === 'personal_contact_with_club_role' ? 'review-personal-role' : 'review-personal';
+      return classification.role ? 'review-personal-role' : 'review-personal';
     case 'excluded-third-party':
       return 'review-third-party';
     case 'excluded-invalid':
