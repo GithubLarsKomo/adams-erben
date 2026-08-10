@@ -3,14 +3,15 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { evaluateSnapshotEligibility } from './lib/contact-governance.mjs';
+import { inferTrustedContactDomains, publicContactDomainEvidenceSummary } from './lib/contact-domain-evidence.mjs';
 
-export const PILOT_RUNNER_VERSION = 'pilot-100-run/1.1.0';
+export const PILOT_RUNNER_VERSION = 'pilot-100-run/1.2.0';
 
 const INPUT_FILE = process.env.PILOT_RUN_INPUT || 'build-private/pilot-100-input.json';
 const PRIVATE_CONTACTS_FILE = process.env.PILOT_RUN_CONTACTS_FILE || 'build-private/pilot-100-contacts.json';
 const PRIVATE_DECISIONS_FILE = process.env.PILOT_RUN_DECISIONS_FILE || 'build-private/pilot-100-decisions.json';
 const REPORT_DIR = process.env.PILOT_RUN_REPORT_DIR || 'artifacts/pilot-100-run';
-const USER_AGENT = process.env.PILOT_RUN_USER_AGENT || 'adams-erben-pilot-100/1.1 (+https://adams-erben.de)';
+const USER_AGENT = process.env.PILOT_RUN_USER_AGENT || 'adams-erben-pilot-100/1.2 (+https://adams-erben.de)';
 const SITE_CONCURRENCY = Math.max(1, Math.min(4, Number(process.env.PILOT_RUN_CONCURRENCY || 3)));
 const PAGE_DELAY_MS = Math.max(250, Number(process.env.PILOT_RUN_PAGE_DELAY_MS || 450));
 const MAX_PAGES = Math.max(1, Math.min(5, Number(process.env.PILOT_RUN_MAX_PAGES || 5)));
@@ -19,7 +20,7 @@ const TIMEOUT_MS = Math.max(4_000, Number(process.env.PILOT_RUN_TIMEOUT_MS || 12
 const MAX_REDIRECTS = Math.max(1, Math.min(6, Number(process.env.PILOT_RUN_MAX_REDIRECTS || 5)));
 const IDENTITY_THRESHOLD = Math.max(0.2, Math.min(0.9, Number(process.env.PILOT_RUN_IDENTITY_THRESHOLD || 0.45)));
 
-const CONTACT_LINK_PATTERN = /(kontakt|contact|impressum|imprint|vorstand|ansprech|geschäft|geschaeft|verein|über-uns|ueber-uns|team|office|büro|buero)/i;
+const CONTACT_LINK_PATTERN = /(kontakt|contact|impressum|imprint|datenschutz|privacy|vorstand|ansprech|geschäft|geschaeft|verein|über-uns|ueber-uns|team|office|büro|buero)/i;
 const STANDARD_CONTACT_PATHS = ['/kontakt', '/kontakt/', '/impressum', '/impressum/', '/vorstand', '/ansprechpartner'];
 const SOCIAL_HOSTS = ['facebook.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'youtu.be', 'x.com', 'twitter.com', 'tiktok.com'];
 const GENERIC_NAME_TOKENS = new Set([
@@ -255,6 +256,7 @@ function contactLinkScore(url, text) {
   let score = 0;
   if (/kontakt|contact/.test(target)) score += 100;
   if (/impressum|imprint/.test(target)) score += 90;
+  if (/datenschutz|privacy/.test(target)) score += 85;
   if (/vorstand|ansprech|team/.test(target)) score += 75;
   if (/geschäft|geschaeft|office|büro|buero/.test(target)) score += 65;
   if (/verein|über-uns|ueber-uns/.test(target)) score += 45;
@@ -299,6 +301,7 @@ function candidateCounts(evaluated) {
 }
 
 function publicOrgResult(org, extra = {}) {
+  const domainEvidence = extra.domainEvidenceSummary || {};
   return {
     organizationId: org.organizationId,
     drvId: org.drvId || '',
@@ -318,6 +321,9 @@ function publicOrgResult(org, extra = {}) {
     pagesFetched: extra.pagesFetched || 0,
     pagesAttempted: extra.pagesAttempted || 0,
     contactOutcome: extra.contactOutcome || 'fallback',
+    contactDomainEvidenceVersion: domainEvidence.evidenceVersion || '',
+    contactDomainCandidateCount: domainEvidence.candidateDomainCount || 0,
+    trustedContactDomainCount: domainEvidence.trustedDomainCount || 0,
     ...candidateCounts(extra.evaluated || []),
     errorCode: extra.errorCode || '',
     runtimeMs: extra.runtimeMs || 0
@@ -409,12 +415,18 @@ async function runOrganization(org) {
 
   const rawContacts = [];
   for (const page of pages) rawContacts.push(...extractContactsFromHtml(page.html, page.url, verifiedAt));
+  const domainEvidence = inferTrustedContactDomains({ website: home.finalUrl, contacts: rawContacts, identityStrong });
+  const domainEvidenceSummary = publicContactDomainEvidenceSummary(domainEvidence);
   const byEmail = new Map();
   for (const contact of rawContacts) {
     const previous = byEmail.get(contact.email);
     if (!previous || contact.context.length > previous.context.length) byEmail.set(contact.email, contact);
   }
-  const evaluated = [...byEmail.values()].map((contact) => evaluateSnapshotEligibility(contact, home.finalUrl, { verifiedAt, now: new Date() }));
+  const evaluated = [...byEmail.values()].map((contact) => evaluateSnapshotEligibility(contact, home.finalUrl, {
+    verifiedAt,
+    now: new Date(),
+    trustedDomains: domainEvidence.trustedDomains
+  }));
   evaluated.sort((a, b) => Number(b.snapshotEligible) - Number(a.snapshotEligible) || (b.rank || 0) - (a.rank || 0));
   const direct = evaluated.find((item) => item.snapshotEligible) || null;
   const review = evaluated.some((item) => item.governanceState.startsWith('review'));
@@ -425,7 +437,7 @@ async function runOrganization(org) {
     public: publicOrgResult(org, {
       status: 'processed', websiteReachable: true, finalHost, crossDomainRedirect, identityScore,
       identityHostSignal, identityStatus, robotsStatus: home.robotsStatus, pagesFetched: pages.length,
-      pagesAttempted: attempts, contactOutcome, proposedRouteLevel, evaluated,
+      pagesAttempted: attempts, contactOutcome, proposedRouteLevel, evaluated, domainEvidenceSummary,
       runtimeMs: Date.now() - startedAt
     }),
     private: {
@@ -436,6 +448,7 @@ async function runOrganization(org) {
       identityScore,
       identityHostSignal,
       identityStatus,
+      contactDomainEvidence: domainEvidence,
       pages: pages.map((page) => page.url),
       decision: contactOutcome,
       candidates: evaluated
@@ -489,6 +502,9 @@ export function summarizePilotRun(rows, startedAt, endedAt) {
     robotsUnavailable: rows.filter((row) => row.status === 'robots_unavailable').length,
     identityReview: rows.filter((row) => row.status === 'identity_review').length,
     networkOrHttpErrors: rows.filter((row) => ['network_error', 'http_error', 'unsupported_content', 'redirect_limit', 'redirect_without_location', 'unsupported_redirect'].includes(row.status)).length,
+    domainEvidenceOrganizations: rows.filter((row) => row.contactDomainCandidateCount > 0).length,
+    trustedContactDomainOrganizations: rows.filter((row) => row.trustedContactDomainCount > 0).length,
+    trustedContactDomains: rows.reduce((sum, row) => sum + Number(row.trustedContactDomainCount || 0), 0),
     contactOutcomes: countBy(rows, (row) => row.contactOutcome),
     routeBefore: countBy(rows, (row) => row.baseRouteLevel),
     routeAfter: countBy(rows, (row) => row.proposedRouteLevel),
@@ -510,7 +526,7 @@ function reportMarkdown(report) {
   const status = Object.entries(report.statusCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n');
   const contacts = Object.entries(report.contactOutcomes).map(([key, value]) => `- ${key}: **${value}**`).join('\n');
   const identities = Object.entries(report.identityStatusCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n');
-  return `# 100er-Pilot – realer bounded Run\n\n- Runner: **${report.runnerVersion}**\n- Organisationen: **${report.total}**\n- bekannte Websites: **${report.knownWebsite}**\n- Discovery pending: **${report.discoveryPending}**\n- Website erreichbar: **${report.reachable}**\n- verarbeitet: **${report.processed}**\n- Robots blocked: **${report.robotsBlocked}**\n- Robots unavailable: **${report.robotsUnavailable}**\n- Identity Review: **${report.identityReview}**\n- Netzwerk/HTTP/Content-Fehler: **${report.networkOrHttpErrors}**\n- Seiten erfolgreich: **${report.pagesFetched}**\n- Seitenversuche: **${report.pagesAttempted}**\n- max. erfolgreich je Organisation: **${report.maxPagesFetched}**\n- max. Versuche je Organisation: **${report.maxPagesAttempted}**\n- neue Direct-Upgrades durch Website-Kontakt: **${report.directUpgrades}**\n- Laufzeit: **${Math.round(report.runtimeMs / 1000)} s**\n\n## Kontakt-Ergebnis\n\n${contacts}\n\n## Website-Identität\n\n${identities}\n\n## Status\n\n${status}\n\n## Routing vorher\n\n${Object.entries(report.routeBefore).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Routing nach Pilot-Enrichment\n\n${Object.entries(report.routeAfter).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\nÖffentliche Pilot-Artefakte enthalten keine E-Mail-Adressen. Die 23 Fälle ohne bestätigte Website werden ohne realen Search Provider ausdrücklich nicht geraten oder gecrawlt. Website-Kontakte werden nur nach zusätzlichem Identitätsgate als automatische Direct-Quelle zugelassen.\n`;
+  return `# 100er-Pilot – realer bounded Run\n\n- Runner: **${report.runnerVersion}**\n- Organisationen: **${report.total}**\n- bekannte Websites: **${report.knownWebsite}**\n- Discovery pending: **${report.discoveryPending}**\n- Website erreichbar: **${report.reachable}**\n- verarbeitet: **${report.processed}**\n- Robots blocked: **${report.robotsBlocked}**\n- Robots unavailable: **${report.robotsUnavailable}**\n- Identity Review: **${report.identityReview}**\n- Netzwerk/HTTP/Content-Fehler: **${report.networkOrHttpErrors}**\n- Organisationen mit externer Domain-Evidence: **${report.domainEvidenceOrganizations}**\n- davon Trusted-Domain-Evidence: **${report.trustedContactDomainOrganizations}**\n- Trusted Contact Domains gesamt: **${report.trustedContactDomains}**\n- Seiten erfolgreich: **${report.pagesFetched}**\n- Seitenversuche: **${report.pagesAttempted}**\n- max. erfolgreich je Organisation: **${report.maxPagesFetched}**\n- max. Versuche je Organisation: **${report.maxPagesAttempted}**\n- neue Direct-Upgrades durch Website-Kontakt: **${report.directUpgrades}**\n- Laufzeit: **${Math.round(report.runtimeMs / 1000)} s**\n\n## Kontakt-Ergebnis\n\n${contacts}\n\n## Website-Identität\n\n${identities}\n\n## Status\n\n${status}\n\n## Routing vorher\n\n${Object.entries(report.routeBefore).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Routing nach Pilot-Enrichment\n\n${Object.entries(report.routeAfter).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\nÖffentliche Pilot-Artefakte enthalten keine E-Mail-Adressen oder E-Mail-Domains. Die 23 Fälle ohne bestätigte Website werden ohne realen Search Provider ausdrücklich nicht geraten oder gecrawlt. Externe Contact-Domains werden nur bei starker Website-Identität und unabhängiger Mehrsignal-Evidence als Organisationsdomain anerkannt.\n`;
 }
 
 async function main() {
@@ -538,7 +554,7 @@ async function main() {
   await writeFile(path.join(REPORT_DIR, 'report.json'), JSON.stringify(report, null, 2));
   await writeFile(path.join(REPORT_DIR, 'report.md'), reportMarkdown(report));
 
-  console.log(`[pilot-run] known=${report.knownWebsite}; pending=${report.discoveryPending}; reachable=${report.reachable}; auto=${report.contactOutcomes.auto_direct || 0}; review=${report.contactOutcomes.review || 0}; identityReview=${report.identityReview}; upgrades=${report.directUpgrades}; runtime=${Math.round(report.runtimeMs / 1000)}s`);
+  console.log(`[pilot-run] known=${report.knownWebsite}; pending=${report.discoveryPending}; reachable=${report.reachable}; auto=${report.contactOutcomes.auto_direct || 0}; review=${report.contactOutcomes.review || 0}; identityReview=${report.identityReview}; trustedDomainOrgs=${report.trustedContactDomainOrganizations}; upgrades=${report.directUpgrades}; runtime=${Math.round(report.runtimeMs / 1000)}s`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
