@@ -16,6 +16,8 @@
     "test:snapshot": "node scripts/build-snapshot.test.mjs && node scripts/build-snapshot-lrv-identity.test.mjs && node scripts/report-contact-governance-reasons.test.mjs",
     "discovery:apply-verified": "node scripts/apply-verified-discovery.mjs",
     "test:discovery-verified": "node scripts/apply-verified-discovery.test.mjs",
+    "full:prepare": "node scripts/prepare-full-enrichment.mjs",
+    "test:full-prepare": "node scripts/prepare-full-enrichment.test.mjs",
     "pilot:prepare": "node scripts/prepare-pilot-100.mjs",
     "test:pilot-prepare": "node scripts/prepare-pilot-100.test.mjs",
     "pilot:run": "node scripts/run-pilot-100.mjs",
