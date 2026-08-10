@@ -173,6 +173,103 @@ async function submitContact(event) {
   }
 }
 
+function ensureImageSlotStyles() {
+  if (document.querySelector('link[data-image-slot-styles]')) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = '/assets/image-slots.css';
+  link.dataset.imageSlotStyles = 'true';
+  document.head.append(link);
+}
+
+function imageExists(src) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+    image.src = src;
+  });
+}
+
+function singleImageFigure({ src, alt, caption, variant = 'photo' }) {
+  const figure = document.createElement('figure');
+  figure.className = `asset-media asset-media-${variant}`;
+
+  const image = document.createElement('img');
+  image.src = src;
+  image.alt = alt;
+  image.loading = 'lazy';
+  image.decoding = 'async';
+  figure.append(image);
+
+  if (caption) {
+    const figcaption = document.createElement('figcaption');
+    figcaption.textContent = caption;
+    figure.append(figcaption);
+  }
+
+  return figure;
+}
+
+async function replaceSinglePlaceholder(selector, config) {
+  const placeholder = document.querySelector(selector);
+  if (!placeholder || !(await imageExists(config.src))) return;
+  placeholder.replaceWith(singleImageFigure(config));
+}
+
+async function replaceThenNowPlaceholder() {
+  const placeholder = document.querySelector('.asset-placeholder-wide');
+  if (!placeholder) return;
+
+  const items = [
+    {
+      src: '/assets/images/ratzeburg-historisch.jpg',
+      alt: 'Historisches Motiv der Ratzeburger Rudergeschichte',
+      caption: 'Damals · historisches Motiv'
+    },
+    {
+      src: '/assets/images/ratzeburg-heute.jpg',
+      alt: 'Ratzeburg und der Rudersport heute',
+      caption: 'Heute · aktuelles Motiv'
+    }
+  ];
+
+  const availability = await Promise.all(items.map((item) => imageExists(item.src)));
+  const available = items.filter((_, index) => availability[index]);
+  if (!available.length) return;
+
+  if (available.length === 1) {
+    placeholder.replaceWith(singleImageFigure({ ...available[0], variant: 'photo' }));
+    return;
+  }
+
+  const container = document.createElement('div');
+  container.className = 'then-now-media';
+  for (const item of available) {
+    container.append(singleImageFigure({ ...item, variant: 'photo' }));
+  }
+  placeholder.replaceWith(container);
+}
+
+async function hydrateImageSlots() {
+  ensureImageSlotStyles();
+  await Promise.all([
+    replaceSinglePlaceholder('.asset-placeholder-logo', {
+      src: '/assets/images/rrc-vintage-logo.png',
+      alt: 'Logo des Ratzeburger Ruderclubs',
+      caption: '',
+      variant: 'logo'
+    }),
+    replaceSinglePlaceholder('.asset-placeholder-photo', {
+      src: '/assets/images/rrc-heute.jpg',
+      alt: 'Ratzeburger Ruderclub heute',
+      caption: 'Ratzeburger Ruderclub heute',
+      variant: 'photo'
+    }),
+    replaceThenNowPlaceholder()
+  ]);
+}
+
 async function init() {
   try {
     const response = await fetch('/data/clubs.json', { headers: { Accept: 'application/json' } });
@@ -203,4 +300,5 @@ document.addEventListener('click', (event) => {
 });
 contactForm?.addEventListener('submit', submitContact);
 contactDialog?.addEventListener('click', (event) => { if (event.target === contactDialog) contactDialog.close(); });
+hydrateImageSlots();
 init();
