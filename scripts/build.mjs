@@ -30,16 +30,21 @@ await writeFile(indexPath, builtIndexHtml);
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
 const publicPath = path.join(dist, 'data', 'clubs.json');
 
-function runSync() {
+function runNodeScript(script) {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, ['scripts/sync-drv.mjs'], {
+    const child = spawn(process.execPath, [script], {
       cwd: root,
       env: process.env,
       stdio: 'inherit'
     });
-    child.on('exit', (code) => code === 0 ? resolve() : reject(new Error(`DRV sync exited with ${code}`)));
+    child.on('exit', (code) => code === 0 ? resolve() : reject(new Error(`${script} exited with ${code}`)));
     child.on('error', reject);
   });
+}
+
+async function runSync() {
+  await runNodeScript('scripts/sync-drv.mjs');
+  await runNodeScript('scripts/validate-drv-output.mjs');
 }
 
 try {
@@ -51,12 +56,19 @@ try {
   console.warn(`[build] ${error.message}; using checked-in seed data.`);
   const seed = await readFile(seedPath, 'utf8');
   await writeFile(publicPath, seed);
+  const fallbackReason = previewMode
+    ? 'preview mode uses checked-in seed data'
+    : (process.env.SKIP_DRV_SYNC === '1' ? 'DRV sync explicitly skipped' : error.message);
   await writeFile(
     path.join(privateDir, 'recipients.json'),
     JSON.stringify({
       generatedAt: new Date().toISOString(),
       source: previewMode ? 'preview-seed' : 'seed-fallback',
       preview: previewMode,
+      routingMode: 'drv-only-fallback',
+      fallbackReason,
+      recipientCount: 0,
+      warning: 'No club/LRV recipient routes are present in this fallback file. Run the real DRV sync to generate full server-side routing.',
       recipients: {},
       drv: {
         name: 'Deutscher Ruderverband e.V.',
@@ -64,6 +76,7 @@ try {
       }
     }, null, 2)
   );
+  console.warn('[build] recipients.json is DRV-only fallback; full club/LRV routing requires a successful real DRV sync.');
 }
 
 await rm(seedPath, { force: true });
