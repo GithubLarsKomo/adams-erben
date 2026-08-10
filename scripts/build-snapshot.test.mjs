@@ -8,17 +8,18 @@ const suppressedEmail = 'info@suppressed-rv.de';
 const suppressionHashes = new Set([suppressionIdentifier(suppressedEmail, suppressionSecret)]);
 
 function record(overrides) {
+  const state = overrides.state ?? 'Bayern';
   return {
     organizationId: overrides.drvId || overrides.organizationId,
     id: overrides.id,
     drvId: overrides.drvId || overrides.organizationId,
     name: overrides.name,
     type: overrides.type || 'club',
-    city: overrides.city || 'Musterstadt',
+    city: overrides.city ?? 'Musterstadt',
     citySource: 'test',
-    postalCode: overrides.postalCode || '12345',
-    state: overrides.state || 'Bayern',
-    states: overrides.states || [overrides.state || 'Bayern'],
+    postalCode: overrides.postalCode ?? '12345',
+    state,
+    states: overrides.states ?? (state ? [state] : []),
     drvProfileUrl: `https://www.rudern.de/service/vereine/${overrides.id}`,
     websiteFromDrv: overrides.websiteFromDrv || '',
     websiteStatus: overrides.websiteFromDrv ? 'present' : 'missing',
