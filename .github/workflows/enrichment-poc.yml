@@ -9,15 +9,6 @@ on:
       - 'scripts/diagnose-enrichment-fallbacks.mjs'
       - 'scripts/review-enrichment-poc.mjs'
       - 'scripts/review-enrichment-poc.test.mjs'
-      - 'package.json'
-      - '.github/workflows/enrichment-poc.yml'
-  pull_request:
-    paths:
-      - 'scripts/enrichment-poc.mjs'
-      - 'scripts/diagnose-enrichment-fallbacks.mjs'
-      - 'scripts/review-enrichment-poc.mjs'
-      - 'scripts/review-enrichment-poc.test.mjs'
-      - 'package.json'
       - '.github/workflows/enrichment-poc.yml'
 
 permissions:
