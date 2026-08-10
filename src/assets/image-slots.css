@@ -51,6 +51,34 @@
   line-height: 1.35;
 }
 
+/* RRC feature: use one large current photo instead of logo + portrait split. */
+.rrc-visual {
+  grid-template-columns: 1fr !important;
+  min-height: 0;
+}
+
+.rrc-visual .asset-placeholder-logo,
+.rrc-visual .asset-media-logo {
+  display: none;
+}
+
+.rrc-visual .asset-placeholder-photo,
+.rrc-visual .asset-media-photo {
+  width: 100%;
+  min-height: 0;
+}
+
+.rrc-visual .asset-media-photo img {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.rrc-visual .asset-placeholder-photo {
+  aspect-ratio: 16 / 9;
+}
+
 .then-now-media {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -92,5 +120,14 @@
   .then-now-media,
   .then-now-media img {
     min-height: 210px;
+  }
+
+  .rrc-visual .asset-media-photo {
+    min-height: 0;
+  }
+
+  .rrc-visual .asset-media-photo img,
+  .rrc-visual .asset-placeholder-photo {
+    aspect-ratio: 4 / 3;
   }
 }
