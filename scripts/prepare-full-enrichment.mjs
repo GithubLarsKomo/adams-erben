@@ -4,6 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const FULL_ENRICHMENT_PREP_VERSION = 'full-enrichment-prep/1.1.0';
+export const FULL_ENRICHMENT_BATCH_MAP_VERSION = 'full-enrichment-prep/1.0.0';
 const REGISTRY_FILE = process.env.FULL_ENRICHMENT_REGISTRY_FILE || 'build-private/drv-registry-websites.json';
 const SNAPSHOT_FILE = process.env.FULL_ENRICHMENT_SNAPSHOT_FILE || 'dist/data/clubs.json';
 const OUTPUT_DIR = process.env.FULL_ENRICHMENT_OUTPUT_DIR || 'build-private/full-enrichment';
@@ -11,7 +12,7 @@ const REPORT_DIR = process.env.FULL_ENRICHMENT_REPORT_DIR || 'artifacts/full-enr
 const BATCH_COUNT = Math.max(1, Math.min(20, Number(process.env.FULL_ENRICHMENT_BATCH_COUNT || 5)));
 
 function stableRank(organizationId) {
-  return createHash('sha256').update(`${FULL_ENRICHMENT_PREP_VERSION}|${organizationId}`).digest('hex');
+  return createHash('sha256').update(`${FULL_ENRICHMENT_BATCH_MAP_VERSION}|${organizationId}`).digest('hex');
 }
 
 function publicBatchSummary(batch, index) {
@@ -66,6 +67,7 @@ export function buildFullEnrichmentBatches(registry, publicOrganizations = [], b
 
   const report = {
     version: FULL_ENRICHMENT_PREP_VERSION,
+    batchMapVersion: FULL_ENRICHMENT_BATCH_MAP_VERSION,
     clubs: clubs.length,
     knownWebsite: known.length,
     missingWebsite: missing.length,
@@ -96,6 +98,7 @@ async function main() {
     await writeFile(path.join(OUTPUT_DIR, `batch-${index + 1}.json`), JSON.stringify({
       generatedAt: new Date().toISOString(),
       version: FULL_ENRICHMENT_PREP_VERSION,
+      batchMapVersion: FULL_ENRICHMENT_BATCH_MAP_VERSION,
       batch: index + 1,
       batchCount: batches.length,
       count: batches[index].length,
@@ -111,7 +114,7 @@ async function main() {
   }, null, 2));
 
   await writeFile(path.join(REPORT_DIR, 'report.json'), JSON.stringify(report, null, 2));
-  await writeFile(path.join(REPORT_DIR, 'report.md'), `# Voll-Enrichment – Batch-Vorbereitung\n\n- Version: **${report.version}**\n- Vereine: **${report.clubs}**\n- bekannte/verifizierte Websites: **${report.knownWebsite}**\n- bewusst ohne Website: **${report.missingWebsite}**\n- Batches: **${report.batchCount}**\n- Größen: **${report.batchSizes.join(', ')}**\n- Coverage-Hash: \`${report.coverageHash}\`\n- Ausgangsrouting bekannte Websites: **${report.routeCounts.club} Direct / ${report.routeCounts.lrv} LRV / ${report.routeCounts.drv} DRV**\n\nÖffentliche Reports enthalten nur Counts und Hashes; private Batchdateien bleiben unter \`build-private/\`.\n`);
+  await writeFile(path.join(REPORT_DIR, 'report.md'), `# Voll-Enrichment – Batch-Vorbereitung\n\n- Version: **${report.version}**\n- Batch-Map: **${report.batchMapVersion}**\n- Vereine: **${report.clubs}**\n- bekannte/verifizierte Websites: **${report.knownWebsite}**\n- bewusst ohne Website: **${report.missingWebsite}**\n- Batches: **${report.batchCount}**\n- Größen: **${report.batchSizes.join(', ')}**\n- Coverage-Hash: \`${report.coverageHash}\`\n- Ausgangsrouting bekannte Websites: **${report.routeCounts.club} Direct / ${report.routeCounts.lrv} LRV / ${report.routeCounts.drv} DRV**\n\nÖffentliche Reports enthalten nur Counts und Hashes; private Batchdateien bleiben unter \`build-private/\`.\n`);
 
   console.log(`[full-enrichment-prep] clubs=${report.clubs}; known=${report.knownWebsite}; missing=${report.missingWebsite}; batches=${report.batchSizes.join('/')}; routes=${report.routeCounts.club}/${report.routeCounts.lrv}/${report.routeCounts.drv}; hash=${report.coverageHash.slice(0, 12)}`);
 }
