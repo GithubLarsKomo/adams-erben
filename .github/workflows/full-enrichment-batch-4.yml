@@ -1,0 +1,161 @@
+name: Full Enrichment Batch 4
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - '.github/workflows/full-enrichment-batch-4.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  full-enrichment-batch-4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      EXPECTED_COVERAGE_HASH: 8e2133403ccaa00330c9b3a9e2debbfba15596a838b63ba35b3ee21a4554026e
+      EXPECTED_BATCH_HASH: 8fae1af2515cad9bd2e46550d949cdbc944127ebd7bbb6d751b73924c65d0a23
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Test bounded runner and full preparation
+        run: |
+          npm run test:contact-governance
+          npm run test:contact-domain-evidence
+          npm run test:pilot-run
+          npm run test:discovery-verified
+          npm run test:full-prepare
+
+      - name: Rebuild full DRV registry
+        env:
+          REQUIRE_DRV_SYNC: '1'
+          DRV_SYNC_REQUIRED_COVERAGE: '0.95'
+          DRV_SYNC_CONCURRENCY: '3'
+          DRV_SYNC_DELAY_MS: '300'
+          DRV_SYNC_LIMIT: '0'
+        run: npm run sync:drv
+
+      - name: Apply manually verified website resolution
+        run: npm run discovery:apply-verified
+
+      - name: Enrich LRV fallback contacts from official websites
+        env:
+          LRV_ENRICH_DELAY_MS: '700'
+          LRV_ENRICH_MAX_PAGES: '5'
+        run: npm run lrv:enrich
+
+      - name: Enrich LRV contacts from official DRV Länderrat
+        run: npm run lrv:laenderrat
+
+      - name: Build governance baseline snapshot
+        env:
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.json
+        run: npm run snapshot:build
+
+      - name: Prepare deterministic full enrichment batches
+        env:
+          FULL_ENRICHMENT_BATCH_COUNT: '5'
+          FULL_ENRICHMENT_REGISTRY_FILE: build-private/drv-registry-websites.json
+          FULL_ENRICHMENT_SNAPSHOT_FILE: dist/data/clubs.json
+        run: npm run full:prepare
+
+      - name: Verify full population and batch 4 identity before crawl
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const report = JSON.parse(fs.readFileSync('artifacts/full-enrichment-prep/report.json', 'utf8'));
+          const batch = JSON.parse(fs.readFileSync('build-private/full-enrichment/batch-4.json', 'utf8'));
+          if (report.version !== 'full-enrichment-prep/1.1.0') throw new Error(`unexpected prep version ${report.version}`);
+          if (report.coverageHash !== process.env.EXPECTED_COVERAGE_HASH) throw new Error(`coverage hash drift ${report.coverageHash}`);
+          if (report.knownWebsite !== 429 || report.missingWebsite !== 5) throw new Error(`unexpected population ${report.knownWebsite}/${report.missingWebsite}`);
+          if (batch.count !== 86 || batch.organizations.length !== 86) throw new Error(`batch 4 must contain 86 clubs, got ${batch.count}`);
+          const ids = batch.organizations.map((row) => row.organizationId);
+          const hash = crypto.createHash('sha256').update(ids.join('\n')).digest('hex');
+          if (hash !== process.env.EXPECTED_BATCH_HASH) throw new Error(`batch 4 hash drift ${hash}`);
+          if (new Set(ids).size !== 86) throw new Error('batch 4 contains duplicate organization IDs');
+          for (const row of batch.organizations) {
+            if (!row.website || row.websiteStatus !== 'present') throw new Error(`missing verified website for ${row.organizationId}`);
+            if (!['club','lrv','drv'].includes(row.routeLevel)) throw new Error(`invalid baseline route for ${row.organizationId}`);
+          }
+          console.log({batch:4,count:batch.count,coverageHash:report.coverageHash,batchHash:hash,routeCounts:report.batches[3].routeCounts});
+          NODE
+
+      - name: Run bounded real enrichment for batch 4
+        env:
+          PILOT_RUN_INPUT: build-private/full-enrichment/batch-4.json
+          PILOT_RUN_EXPECTED_COUNT: '86'
+          PILOT_RUN_CONTACTS_FILE: build-private/full-enrichment-results/batch-4-contacts.json
+          PILOT_RUN_DECISIONS_FILE: build-private/full-enrichment-results/batch-4-decisions.json
+          PILOT_RUN_REPORT_DIR: artifacts/full-enrichment-batch-4
+          PILOT_RUN_USER_AGENT: adams-erben-full-enrichment/1.0 (+https://adams-erben.de)
+          PILOT_RUN_CONCURRENCY: '3'
+          PILOT_RUN_PAGE_DELAY_MS: '450'
+          PILOT_RUN_MAX_PAGES: '5'
+          PILOT_RUN_MAX_ATTEMPTS: '8'
+          PILOT_RUN_TIMEOUT_MS: '12000'
+          PILOT_RUN_MAX_REDIRECTS: '5'
+          PILOT_RUN_IDENTITY_THRESHOLD: '0.45'
+        run: npm run pilot:run
+
+      - name: Validate batch 4 quality and privacy gates
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const report = JSON.parse(fs.readFileSync('artifacts/full-enrichment-batch-4/report.json', 'utf8'));
+          const rows = JSON.parse(fs.readFileSync('artifacts/full-enrichment-batch-4/organizations.json', 'utf8')).organizations;
+          const privateRows = JSON.parse(fs.readFileSync('build-private/full-enrichment-results/batch-4-decisions.json', 'utf8')).organizations;
+          if (report.runnerVersion !== 'pilot-100-run/1.2.0') throw new Error(`unexpected runner ${report.runnerVersion}`);
+          if (report.total !== 86 || report.knownWebsite !== 86 || report.discoveryPending !== 0) throw new Error(`unexpected batch totals ${JSON.stringify({total:report.total,known:report.knownWebsite,pending:report.discoveryPending})}`);
+          if (rows.length !== 86 || privateRows.length !== 86) throw new Error('batch 4 result cardinality mismatch');
+          if (report.maxPagesFetched > 5 || report.maxPagesAttempted > 8) throw new Error('page/attempt cap violated');
+          if (report.trustedContactDomainOrganizations > report.domainEvidenceOrganizations) throw new Error('trusted-domain count exceeds evidence organizations');
+          const saarbruecken = rows.find((row) => row.organizationId === '12103');
+          if (saarbruecken && (saarbruecken.status !== 'identity_review' || saarbruecken.proposedRouteLevel !== 'drv' || saarbruecken.finalHost !== 'ruderbund.de')) throw new Error(`12103 website identity regression: ${JSON.stringify(saarbruecken)}`);
+          for (const row of rows) {
+            if ('contactDomainEvidence' in row || 'trustedDomains' in row || 'evidence' in row) throw new Error(`private domain evidence leaked for ${row.organizationId}`);
+          }
+          for (const decision of privateRows) {
+            for (const candidate of decision.candidates || []) {
+              if (candidate.snapshotEligible && !['functional','role-functional'].includes(candidate.contactKind)) throw new Error(`non-functional candidate became direct for ${decision.organizationId}`);
+            }
+          }
+          const publicRaw = [
+            'artifacts/full-enrichment-prep/report.json',
+            'artifacts/full-enrichment-prep/report.md',
+            'artifacts/full-enrichment-batch-4/report.json',
+            'artifacts/full-enrichment-batch-4/report.md',
+            'artifacts/full-enrichment-batch-4/organizations.json'
+          ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+          if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(publicRaw)) throw new Error('public batch 4 artifact contains email address');
+          console.log({reachable:report.reachable,processed:report.processed,identityReview:report.identityReview,contactOutcomes:report.contactOutcomes,directUpgrades:report.directUpgrades,routeBefore:report.routeBefore,routeAfter:report.routeAfter,statusCounts:report.statusCounts,errorCounts:report.errorCounts,domainEvidenceOrganizations:report.domainEvidenceOrganizations,trustedContactDomainOrganizations:report.trustedContactDomainOrganizations,pagesFetched:report.pagesFetched,pagesAttempted:report.pagesAttempted,runtimeMs:report.runtimeMs});
+          NODE
+
+      - name: Add batch 4 report to workflow summary
+        if: always()
+        run: |
+          if [ -f artifacts/full-enrichment-prep/report.md ]; then cat artifacts/full-enrichment-prep/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/full-enrichment-batch-4/report.md ]; then cat artifacts/full-enrichment-batch-4/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload address-free batch 4 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-enrichment-batch-4-report
+          path: |
+            artifacts/full-enrichment-prep/
+            artifacts/full-enrichment-batch-4/
+          if-no-files-found: warn
+          retention-days: 14
