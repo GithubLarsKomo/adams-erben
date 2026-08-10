@@ -6,9 +6,12 @@ on:
     branches: [feat/mvp-wayfinder]
     paths:
       - 'scripts/sync-drv.mjs'
+      - 'scripts/build-snapshot.mjs'
+      - 'scripts/build-snapshot.test.mjs'
       - 'scripts/lib/drv-registry.mjs'
       - 'scripts/lib/drv-registry.test.mjs'
       - 'scripts/lib/drv-registry-website.test.mjs'
+      - 'scripts/lib/contact-governance.mjs'
       - 'scripts/prepare-discovery-poc.mjs'
       - 'scripts/prepare-discovery-poc.test.mjs'
       - 'package.json'
@@ -16,9 +19,12 @@ on:
   pull_request:
     paths:
       - 'scripts/sync-drv.mjs'
+      - 'scripts/build-snapshot.mjs'
+      - 'scripts/build-snapshot.test.mjs'
       - 'scripts/lib/drv-registry.mjs'
       - 'scripts/lib/drv-registry.test.mjs'
       - 'scripts/lib/drv-registry-website.test.mjs'
+      - 'scripts/lib/contact-governance.mjs'
       - 'scripts/prepare-discovery-poc.mjs'
       - 'scripts/prepare-discovery-poc.test.mjs'
       - 'package.json'
@@ -43,9 +49,11 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Test registry parser and discovery sampling
+      - name: Test registry, governance snapshot and discovery sampling
         run: |
           npm run test:drv-registry
+          npm run test:contact-governance
+          npm run test:snapshot
           npm run test:discover-prepare
 
       - name: Run full DRV registry sync
@@ -56,6 +64,9 @@ jobs:
           DRV_SYNC_DELAY_MS: '300'
           DRV_SYNC_LIMIT: '0'
         run: npm run sync:drv
+
+      - name: Build governance-approved registry snapshot
+        run: npm run snapshot:build
 
       - name: Prepare up to 25 missing-website cases from registry queue
         env:
@@ -74,13 +85,17 @@ jobs:
           fs.writeFileSync('artifacts/drv-registry/discovery-sample.json', JSON.stringify(input, null, 2));
           NODE
 
-      - name: Validate registry quality and privacy
+      - name: Validate registry, snapshot and privacy gates
         run: |
           node - <<'NODE'
           const fs = require('fs');
           const report = JSON.parse(fs.readFileSync('artifacts/drv-registry/report.json', 'utf8'));
+          const snapshot = JSON.parse(fs.readFileSync('artifacts/snapshot/report.json', 'utf8'));
           const missing = JSON.parse(fs.readFileSync('build-private/website-missing.json', 'utf8'));
           const sample = JSON.parse(fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8'));
+          const publicClubs = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
+          const recipients = JSON.parse(fs.readFileSync('build-private/recipients.json', 'utf8'));
+
           if (report.coveragePct < 95) throw new Error(`registry coverage below 95%: ${report.coveragePct}`);
           if (report.discoveredProfiles < 400) throw new Error(`unexpectedly small DRV registry: ${report.discoveredProfiles}`);
           if (report.clubs < 300) throw new Error(`unexpectedly small club count: ${report.clubs}`);
@@ -94,6 +109,7 @@ jobs:
           if (missing.organizations.length !== report.clubsMissingWebsiteFromDrv) {
             throw new Error(`website-missing mismatch: ${missing.organizations.length} != ${report.clubsMissingWebsiteFromDrv}`);
           }
+
           const expectedSampleSize = Math.min(25, missing.organizations.length);
           if (!Array.isArray(sample.organizations) || sample.organizations.length !== expectedSampleSize) {
             throw new Error(`discovery sample must contain ${expectedSampleSize} organizations, got ${sample.organizations?.length}`);
@@ -101,17 +117,49 @@ jobs:
           if (sample.organizations.length < 20) throw new Error(`discovery sample too small: ${sample.organizations.length}`);
           const states = new Set(sample.organizations.map((item) => item.state).filter(Boolean));
           if (states.size < 5) throw new Error(`discovery sample has only ${states.size} states`);
-          const raw = fs.readFileSync('artifacts/drv-registry/report.json', 'utf8') +
-            fs.readFileSync('artifacts/drv-registry/report.md', 'utf8') +
-            fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8');
+
+          if (snapshot.policyVersion !== '1.0.0') throw new Error(`unexpected contact policy: ${snapshot.policyVersion}`);
+          if (snapshot.registryOrganizations !== report.parsedProfiles) {
+            throw new Error(`snapshot/registry count mismatch: ${snapshot.registryOrganizations} != ${report.parsedProfiles}`);
+          }
+          const routed = snapshot.routeCounts.club + snapshot.routeCounts.lrv + snapshot.routeCounts.drv;
+          if (routed !== snapshot.registryOrganizations) throw new Error(`snapshot routes incomplete: ${routed}/${snapshot.registryOrganizations}`);
+          if (!Array.isArray(publicClubs.organizations) || publicClubs.organizations.length !== snapshot.publicOrganizations) {
+            throw new Error('public snapshot organization count mismatch');
+          }
+          if (!recipients.recipients || Object.keys(recipients.recipients).length !== snapshot.publicOrganizations) {
+            throw new Error('private recipient snapshot count mismatch');
+          }
+
+          const publicRaw = [
+            'artifacts/drv-registry/report.json',
+            'artifacts/drv-registry/report.md',
+            'artifacts/drv-registry/discovery-sample.json',
+            'artifacts/snapshot/report.json',
+            'artifacts/snapshot/report.md',
+            'dist/data/clubs.json'
+          ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
           const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
-          if (email.test(raw)) throw new Error('public registry artifacts must not expose email addresses');
-          console.log({ report, discoverySample: { organizations: sample.organizations.length, states: states.size } });
+          if (email.test(publicRaw)) throw new Error('public registry/snapshot artifacts must not expose email addresses');
+
+          console.log({
+            registry: report,
+            snapshot: {
+              policyVersion: snapshot.policyVersion,
+              directApproved: snapshot.directApproved,
+              routeCounts: snapshot.routeCounts,
+              suppressed: snapshot.organizationsWithSuppressedCandidates,
+              stale: snapshot.organizationsWithStaleCandidates
+            },
+            discoverySample: { organizations: sample.organizations.length, states: states.size }
+          });
           NODE
 
-      - name: Add quality report to workflow summary
+      - name: Add quality reports to workflow summary
         run: |
           cat artifacts/drv-registry/report.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/snapshot/report.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
           node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
           const fs = require('fs');
@@ -120,10 +168,13 @@ jobs:
           console.log(`## PoC-B-Stichprobe\n\n- Organisationen ohne DRV-Weblink im Test: **${sample.organizations.length}**\n- Bundesländer: **${states.size}**\n- keine E-Mail-Adressen im Artifact`);
           NODE
 
-      - name: Upload public registry quality report
+      - name: Upload public registry and snapshot quality reports
         uses: actions/upload-artifact@v4
         with:
           name: drv-registry-quality-report
-          path: artifacts/drv-registry/
+          path: |
+            artifacts/drv-registry/
+            artifacts/snapshot/
+            dist/data/clubs.json
           if-no-files-found: error
           retention-days: 14
