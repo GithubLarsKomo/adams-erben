@@ -2,7 +2,8 @@ name: Bounded 100 Club Pilot
 
 on:
   workflow_dispatch:
-  pull_request:
+  push:
+    branches: [feat/mvp-wayfinder]
     paths:
       - 'scripts/run-pilot-100.mjs'
       - 'scripts/run-pilot-100.test.mjs'
@@ -13,7 +14,6 @@ on:
       - 'scripts/lib/contact-governance.mjs'
       - 'scripts/lib/lrv-identity.mjs'
       - '.github/workflows/pilot-100-run.yml'
-      - 'package.json'
 
 permissions:
   contents: read
