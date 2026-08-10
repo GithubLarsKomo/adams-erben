@@ -1,3 +1,5 @@
+// Verified organization identity hints only. No recipient addresses are stored here.
+// Sources are official LRV pages/imprints and are revalidated through the acquisition track.
 export const LRV_IDENTITY_HINTS = new Map([
   ['30010', {
     website: 'https://www.lrvbw.de/',
