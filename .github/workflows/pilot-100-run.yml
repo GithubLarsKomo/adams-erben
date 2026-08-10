@@ -8,6 +8,7 @@ on:
       - 'scripts/run-pilot-100.test.mjs'
       - 'scripts/prepare-pilot-100.mjs'
       - 'scripts/prepare-pilot-100.test.mjs'
+      - 'scripts/pilot-100-ids.v1.json'
       - 'scripts/build-snapshot.mjs'
       - 'scripts/lib/contact-governance.mjs'
       - 'scripts/lib/lrv-identity.mjs'
@@ -67,20 +68,26 @@ jobs:
         env:
           PILOT_SAMPLE_TARGET: '100'
           PILOT_SAMPLE_SEED: 'adams-erben-pilot-100-v1'
-          PILOT_STATE_FLOOR: '3'
-          PILOT_ROUTE_FLOOR: '30'
+          PILOT_FROZEN_IDS_FILE: 'scripts/pilot-100-ids.v1.json'
         run: npm run pilot:prepare
 
       - name: Verify frozen sample hash before network pilot
         run: |
           node - <<'NODE'
           const fs = require('fs');
+          const cohort = JSON.parse(fs.readFileSync('scripts/pilot-100-ids.v1.json', 'utf8'));
           const report = JSON.parse(fs.readFileSync('artifacts/pilot-100/report.json', 'utf8'));
-          if (report.sampleHash !== process.env.EXPECTED_PILOT_SAMPLE_HASH) {
-            throw new Error(`pilot sample drift: ${report.sampleHash} != ${process.env.EXPECTED_PILOT_SAMPLE_HASH}`);
+          if (cohort.sampleHash !== process.env.EXPECTED_PILOT_SAMPLE_HASH) {
+            throw new Error(`committed cohort hash changed: ${cohort.sampleHash} != ${process.env.EXPECTED_PILOT_SAMPLE_HASH}`);
           }
-          if (report.sample !== 100 || report.mandatoryIncluded.websiteMissing !== 23 || report.mandatoryIncluded.drvFallback !== 13) {
-            throw new Error(`pilot sample contract changed: ${JSON.stringify(report.mandatoryIncluded)}`);
+          if (report.selectionMode !== 'frozen-ids') {
+            throw new Error(`pilot must use frozen-ids mode, got ${report.selectionMode}`);
+          }
+          if (report.sampleHash !== cohort.sampleHash) {
+            throw new Error(`pilot sample drift: ${report.sampleHash} != ${cohort.sampleHash}`);
+          }
+          if (report.sample !== 100 || cohort.organizationIds.length !== 100) {
+            throw new Error(`frozen pilot cohort must contain exactly 100 clubs: report=${report.sample}, ids=${cohort.organizationIds.length}`);
           }
           console.log(`Frozen pilot sample verified: ${report.sampleHash}`);
           NODE
