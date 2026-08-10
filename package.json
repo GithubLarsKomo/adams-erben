@@ -7,6 +7,8 @@
     "build": "node scripts/build.mjs",
     "sync:drv": "node scripts/sync-drv.mjs",
     "lrv:enrich": "node scripts/enrich-lrv.mjs",
+    "lrv:laenderrat": "node scripts/enrich-lrv-laenderrat.mjs",
+    "test:lrv-laenderrat": "node scripts/enrich-lrv-laenderrat.test.mjs",
     "snapshot:build": "node scripts/build-snapshot.mjs",
     "test:snapshot": "node scripts/build-snapshot.test.mjs && node scripts/build-snapshot-lrv-identity.test.mjs",
     "test:drv-registry": "node scripts/lib/drv-registry.test.mjs && node scripts/lib/drv-registry-school.test.mjs && node scripts/lib/drv-registry-website.test.mjs",
