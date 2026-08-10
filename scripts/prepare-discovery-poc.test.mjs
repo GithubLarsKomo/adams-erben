@@ -37,7 +37,7 @@ items.push({
   websiteStatus: 'missing'
 });
 
-const selected = chooseMissingWebsiteSample(items, { target: 25, minStates: 5, maxPerState: 5 });
+const selected = chooseMissingWebsiteSample(items, { target: 25, minSample: 20, minStates: 5, maxPerState: 5 });
 assert.equal(selected.length, 25);
 assert.ok(new Set(selected.map((item) => item.state)).size >= 5);
 for (const state of states) {
@@ -48,8 +48,15 @@ assert.ok(selected.every((item) => !item.websiteFromDrv));
 assert.ok(!selected.some((item) => item.organizationId === 'with-site'));
 assert.ok(!selected.some((item) => item.organizationId === 'lrv'));
 
+// When the real missing-website queue is smaller than the nominal 25 target,
+// every available case is part of the PoC; per-state sampling caps no longer discard data.
+const scarce = items.filter((item) => item.type === 'club' && !item.websiteFromDrv).slice(0, 23);
+const scarceSelected = chooseMissingWebsiteSample(scarce, { target: 25, minSample: 20, minStates: 4, maxPerState: 5 });
+assert.equal(scarceSelected.length, 23);
+assert.deepEqual(scarceSelected.map((item) => item.organizationId), [...scarce].sort((a, b) => `${a.state}|${a.organizationId}`.localeCompare(`${b.state}|${b.organizationId}`, 'de')).map((item) => item.organizationId));
+
 assert.throws(
-  () => chooseMissingWebsiteSample(items.slice(0, 4), { target: 5, minStates: 5, maxPerState: 5 }),
+  () => chooseMissingWebsiteSample(items.slice(0, 4), { target: 25, minSample: 20, minStates: 5, maxPerState: 5 }),
   /Could only select/
 );
 
