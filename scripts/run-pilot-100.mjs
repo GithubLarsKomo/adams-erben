@@ -532,7 +532,8 @@ function reportMarkdown(report) {
 async function main() {
   const input = JSON.parse(await readFile(INPUT_FILE, 'utf8'));
   const organizations = input.organizations || [];
-  if (organizations.length !== 100) throw new Error(`pilot run expects exactly 100 organizations, got ${organizations.length}`);
+  const expectedCount = Math.max(1, Number(process.env.PILOT_RUN_EXPECTED_COUNT || 100));
+  if (organizations.length !== expectedCount) throw new Error(`bounded run expects exactly ${expectedCount} organizations, got ${organizations.length}`);
   const startedAt = new Date().toISOString();
   const results = await mapWithConcurrency(organizations, SITE_CONCURRENCY, async (org, index) => {
     if ((index + 1) % 10 === 0) console.log(`[pilot-run] ${index + 1}/${organizations.length}`);
