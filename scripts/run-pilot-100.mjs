@@ -4,26 +4,26 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { evaluateSnapshotEligibility } from './lib/contact-governance.mjs';
 
-export const PILOT_RUNNER_VERSION = 'pilot-100-run/1.0.0';
+export const PILOT_RUNNER_VERSION = 'pilot-100-run/1.1.0';
 
 const INPUT_FILE = process.env.PILOT_RUN_INPUT || 'build-private/pilot-100-input.json';
 const PRIVATE_CONTACTS_FILE = process.env.PILOT_RUN_CONTACTS_FILE || 'build-private/pilot-100-contacts.json';
 const PRIVATE_DECISIONS_FILE = process.env.PILOT_RUN_DECISIONS_FILE || 'build-private/pilot-100-decisions.json';
 const REPORT_DIR = process.env.PILOT_RUN_REPORT_DIR || 'artifacts/pilot-100-run';
-const USER_AGENT = process.env.PILOT_RUN_USER_AGENT || 'adams-erben-pilot-100/1.0 (+https://adams-erben.de)';
+const USER_AGENT = process.env.PILOT_RUN_USER_AGENT || 'adams-erben-pilot-100/1.1 (+https://adams-erben.de)';
 const SITE_CONCURRENCY = Math.max(1, Math.min(4, Number(process.env.PILOT_RUN_CONCURRENCY || 3)));
 const PAGE_DELAY_MS = Math.max(250, Number(process.env.PILOT_RUN_PAGE_DELAY_MS || 450));
 const MAX_PAGES = Math.max(1, Math.min(5, Number(process.env.PILOT_RUN_MAX_PAGES || 5)));
 const MAX_ATTEMPTS = Math.max(MAX_PAGES, Math.min(8, Number(process.env.PILOT_RUN_MAX_ATTEMPTS || 8)));
 const TIMEOUT_MS = Math.max(4_000, Number(process.env.PILOT_RUN_TIMEOUT_MS || 12_000));
 const MAX_REDIRECTS = Math.max(1, Math.min(6, Number(process.env.PILOT_RUN_MAX_REDIRECTS || 5)));
-const CROSS_DOMAIN_IDENTITY_THRESHOLD = Math.max(0.2, Math.min(0.9, Number(process.env.PILOT_RUN_IDENTITY_THRESHOLD || 0.45)));
+const IDENTITY_THRESHOLD = Math.max(0.2, Math.min(0.9, Number(process.env.PILOT_RUN_IDENTITY_THRESHOLD || 0.45)));
 
 const CONTACT_LINK_PATTERN = /(kontakt|contact|impressum|imprint|vorstand|ansprech|geschäft|geschaeft|verein|über-uns|ueber-uns|team|office|büro|buero)/i;
 const STANDARD_CONTACT_PATHS = ['/kontakt', '/kontakt/', '/impressum', '/impressum/', '/vorstand', '/ansprechpartner'];
 const SOCIAL_HOSTS = ['facebook.com', 'instagram.com', 'linkedin.com', 'youtube.com', 'youtu.be', 'x.com', 'twitter.com', 'tiktok.com'];
 const GENERIC_NAME_TOKENS = new Set([
-  'ruder', 'rudern', 'ruderclub', 'ruderverein', 'rudergesellschaft', 'ruderklub', 'ruder',
+  'ruder', 'rudern', 'ruderclub', 'ruderverein', 'rudergesellschaft', 'ruderklub',
   'club', 'klub', 'verein', 'gesellschaft', 'ev', 'e', 'v', 'von', 'der', 'die', 'das', 'und',
   'zu', 'zur', 'im', 'in', 'am', 'an', 'deutscher', 'deutsche', 'deutschland'
 ]);
@@ -59,6 +59,15 @@ function clubNameTokens(name = '') {
     .filter((token) => token.length >= 3 && !GENERIC_NAME_TOKENS.has(token));
 }
 
+export function hasDistinctiveHostSignal(org, finalUrl) {
+  try {
+    const host = normalizeHost(new URL(finalUrl).hostname);
+    return clubNameTokens(org.name).some((token) => host.includes(token));
+  } catch {
+    return false;
+  }
+}
+
 export function scoreWebsiteIdentity(org, html, finalUrl) {
   const $ = cheerio.load(html || '');
   const text = normalizeText($('body').text());
@@ -67,10 +76,7 @@ export function scoreWebsiteIdentity(org, html, finalUrl) {
   let score = Math.min(0.55, tokenHits * 0.14);
   if (org.city && text.includes(normalizeText(org.city))) score += 0.2;
   if (org.postalCode && text.includes(String(org.postalCode))) score += 0.15;
-  try {
-    const host = normalizeHost(new URL(finalUrl).hostname);
-    if (tokens.some((token) => host.includes(token))) score += 0.1;
-  } catch { /* ignore */ }
+  if (hasDistinctiveHostSignal(org, finalUrl)) score += 0.1;
   return Math.min(1, Number(score.toFixed(3)));
 }
 
@@ -113,28 +119,26 @@ export function robotsAllowsPath(rules, pathname) {
   return !best || best.type !== 'disallow';
 }
 
-function rawFetch(url, { redirect = 'manual', accept = 'text/html,application/xhtml+xml,*/*;q=0.8' } = {}) {
-  return new Promise(async (resolve, reject) => {
-    let lastError;
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
-      try {
-        const response = await fetch(url, {
-          headers: { 'User-Agent': USER_AGENT, Accept: accept },
-          redirect,
-          signal: controller.signal
-        });
-        clearTimeout(timeout);
-        return resolve(response);
-      } catch (error) {
-        clearTimeout(timeout);
-        lastError = error;
-        if (attempt < 2) await sleep(350 * attempt);
-      }
+async function rawFetch(url, { redirect = 'manual', accept = 'text/html,application/xhtml+xml,*/*;q=0.8' } = {}) {
+  let lastError;
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    try {
+      const response = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT, Accept: accept },
+        redirect,
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      return response;
+    } catch (error) {
+      clearTimeout(timeout);
+      lastError = error;
+      if (attempt < 2) await sleep(350 * attempt);
     }
-    reject(lastError || new Error(`fetch failed: ${url}`));
-  });
+  }
+  throw lastError || new Error(`fetch failed: ${url}`);
 }
 
 const robotsCache = new Map();
@@ -308,6 +312,7 @@ function publicOrgResult(org, extra = {}) {
     finalHost: extra.finalHost || '',
     crossDomainRedirect: Boolean(extra.crossDomainRedirect),
     identityScore: extra.identityScore ?? null,
+    identityHostSignal: Boolean(extra.identityHostSignal),
     identityStatus: extra.identityStatus || '',
     robotsStatus: extra.robotsStatus || '',
     pagesFetched: extra.pagesFetched || 0,
@@ -352,22 +357,35 @@ async function runOrganization(org) {
   const finalHost = normalizeHost(final.hostname);
   const crossDomainRedirect = !relatedHost(initialHost, finalHost);
   const identityScore = scoreWebsiteIdentity(org, home.html, home.finalUrl);
+  const identityHostSignal = hasDistinctiveHostSignal(org, home.finalUrl);
+  const identityStrong = identityScore >= IDENTITY_THRESHOLD || identityHostSignal;
   const identityStatus = socialHost(finalHost)
     ? 'blocked-social-redirect'
-    : crossDomainRedirect && identityScore < CROSS_DOMAIN_IDENTITY_THRESHOLD
-      ? 'review-cross-domain-identity'
+    : !identityStrong
+      ? 'review-weak-identity'
       : crossDomainRedirect
         ? 'accepted-cross-domain-identity'
-        : 'drv-domain-consistent';
+        : identityHostSignal && identityScore < IDENTITY_THRESHOLD
+          ? 'accepted-host-identity'
+          : 'drv-domain-consistent';
 
-  if (identityStatus === 'blocked-social-redirect' || identityStatus === 'review-cross-domain-identity') {
+  if (identityStatus === 'blocked-social-redirect' || identityStatus === 'review-weak-identity') {
     return {
       public: publicOrgResult(org, {
         status: 'identity_review', websiteReachable: true, finalHost, crossDomainRedirect,
-        identityScore, identityStatus, robotsStatus: home.robotsStatus, pagesFetched: 1, pagesAttempted: 1,
-        contactOutcome: 'review', runtimeMs: Date.now() - startedAt
+        identityScore, identityHostSignal, identityStatus, robotsStatus: home.robotsStatus,
+        pagesFetched: 1, pagesAttempted: 1, contactOutcome: 'review',
+        runtimeMs: Date.now() - startedAt
       }),
-      private: { organizationId: org.organizationId, candidates: [], decision: 'identity_review', finalUrl: home.finalUrl }
+      private: {
+        organizationId: org.organizationId,
+        candidates: [],
+        decision: 'identity_review',
+        finalUrl: home.finalUrl,
+        identityScore,
+        identityHostSignal,
+        identityStatus
+      }
     };
   }
 
@@ -405,9 +423,10 @@ async function runOrganization(org) {
 
   return {
     public: publicOrgResult(org, {
-      status: 'processed', websiteReachable: true, finalHost, crossDomainRedirect, identityScore, identityStatus,
-      robotsStatus: home.robotsStatus, pagesFetched: pages.length, pagesAttempted: attempts,
-      contactOutcome, proposedRouteLevel, evaluated, runtimeMs: Date.now() - startedAt
+      status: 'processed', websiteReachable: true, finalHost, crossDomainRedirect, identityScore,
+      identityHostSignal, identityStatus, robotsStatus: home.robotsStatus, pagesFetched: pages.length,
+      pagesAttempted: attempts, contactOutcome, proposedRouteLevel, evaluated,
+      runtimeMs: Date.now() - startedAt
     }),
     private: {
       organizationId: org.organizationId,
@@ -415,6 +434,7 @@ async function runOrganization(org) {
       proposedRouteLevel,
       finalUrl: home.finalUrl,
       identityScore,
+      identityHostSignal,
       identityStatus,
       pages: pages.map((page) => page.url),
       decision: contactOutcome,
@@ -478,6 +498,7 @@ export function summarizePilotRun(rows, startedAt, endedAt) {
     maxPagesFetched: Math.max(0, ...rows.map((row) => row.pagesFetched)),
     maxPagesAttempted: Math.max(0, ...rows.map((row) => row.pagesAttempted)),
     statusCounts: countBy(rows, (row) => row.status),
+    identityStatusCounts: countBy(rows.filter((row) => row.identityStatus), (row) => row.identityStatus),
     errorCounts: countBy(rows.filter((row) => row.errorCode), (row) => row.errorCode),
     startedAt,
     endedAt,
@@ -488,7 +509,8 @@ export function summarizePilotRun(rows, startedAt, endedAt) {
 function reportMarkdown(report) {
   const status = Object.entries(report.statusCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n');
   const contacts = Object.entries(report.contactOutcomes).map(([key, value]) => `- ${key}: **${value}**`).join('\n');
-  return `# 100er-Pilot – realer bounded Run\n\n- Runner: **${report.runnerVersion}**\n- Organisationen: **${report.total}**\n- bekannte Websites: **${report.knownWebsite}**\n- Discovery pending: **${report.discoveryPending}**\n- Website erreichbar: **${report.reachable}**\n- verarbeitet: **${report.processed}**\n- Robots blocked: **${report.robotsBlocked}**\n- Robots unavailable: **${report.robotsUnavailable}**\n- Identity Review: **${report.identityReview}**\n- Netzwerk/HTTP/Content-Fehler: **${report.networkOrHttpErrors}**\n- Seiten erfolgreich: **${report.pagesFetched}**\n- Seitenversuche: **${report.pagesAttempted}**\n- max. erfolgreich je Organisation: **${report.maxPagesFetched}**\n- max. Versuche je Organisation: **${report.maxPagesAttempted}**\n- neue Direct-Upgrades durch Website-Kontakt: **${report.directUpgrades}**\n- Laufzeit: **${Math.round(report.runtimeMs / 1000)} s**\n\n## Kontakt-Ergebnis\n\n${contacts}\n\n## Status\n\n${status}\n\n## Routing vorher\n\n${Object.entries(report.routeBefore).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Routing nach Pilot-Enrichment\n\n${Object.entries(report.routeAfter).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\nÖffentliche Pilot-Artefakte enthalten keine E-Mail-Adressen. Die 23 Fälle ohne bestätigte Website werden ohne realen Search Provider ausdrücklich nicht geraten oder gecrawlt.\n`;
+  const identities = Object.entries(report.identityStatusCounts).map(([key, value]) => `- ${key}: **${value}**`).join('\n');
+  return `# 100er-Pilot – realer bounded Run\n\n- Runner: **${report.runnerVersion}**\n- Organisationen: **${report.total}**\n- bekannte Websites: **${report.knownWebsite}**\n- Discovery pending: **${report.discoveryPending}**\n- Website erreichbar: **${report.reachable}**\n- verarbeitet: **${report.processed}**\n- Robots blocked: **${report.robotsBlocked}**\n- Robots unavailable: **${report.robotsUnavailable}**\n- Identity Review: **${report.identityReview}**\n- Netzwerk/HTTP/Content-Fehler: **${report.networkOrHttpErrors}**\n- Seiten erfolgreich: **${report.pagesFetched}**\n- Seitenversuche: **${report.pagesAttempted}**\n- max. erfolgreich je Organisation: **${report.maxPagesFetched}**\n- max. Versuche je Organisation: **${report.maxPagesAttempted}**\n- neue Direct-Upgrades durch Website-Kontakt: **${report.directUpgrades}**\n- Laufzeit: **${Math.round(report.runtimeMs / 1000)} s**\n\n## Kontakt-Ergebnis\n\n${contacts}\n\n## Website-Identität\n\n${identities}\n\n## Status\n\n${status}\n\n## Routing vorher\n\n${Object.entries(report.routeBefore).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\n## Routing nach Pilot-Enrichment\n\n${Object.entries(report.routeAfter).map(([key, value]) => `- ${key}: **${value}**`).join('\n')}\n\nÖffentliche Pilot-Artefakte enthalten keine E-Mail-Adressen. Die 23 Fälle ohne bestätigte Website werden ohne realen Search Provider ausdrücklich nicht geraten oder gecrawlt. Website-Kontakte werden nur nach zusätzlichem Identitätsgate als automatische Direct-Quelle zugelassen.\n`;
 }
 
 async function main() {
@@ -516,7 +538,7 @@ async function main() {
   await writeFile(path.join(REPORT_DIR, 'report.json'), JSON.stringify(report, null, 2));
   await writeFile(path.join(REPORT_DIR, 'report.md'), reportMarkdown(report));
 
-  console.log(`[pilot-run] known=${report.knownWebsite}; pending=${report.discoveryPending}; reachable=${report.reachable}; auto=${report.contactOutcomes.auto_direct || 0}; review=${report.contactOutcomes.review || 0}; upgrades=${report.directUpgrades}; runtime=${Math.round(report.runtimeMs / 1000)}s`);
+  console.log(`[pilot-run] known=${report.knownWebsite}; pending=${report.discoveryPending}; reachable=${report.reachable}; auto=${report.contactOutcomes.auto_direct || 0}; review=${report.contactOutcomes.review || 0}; identityReview=${report.identityReview}; upgrades=${report.directUpgrades}; runtime=${Math.round(report.runtimeMs / 1000)}s`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
