@@ -2,18 +2,6 @@ name: Bounded 100 Club Pilot
 
 on:
   workflow_dispatch:
-  push:
-    branches: [feat/mvp-wayfinder]
-    paths:
-      - 'scripts/run-pilot-100.mjs'
-      - 'scripts/run-pilot-100.test.mjs'
-      - 'scripts/prepare-pilot-100.mjs'
-      - 'scripts/prepare-pilot-100.test.mjs'
-      - 'scripts/pilot-100-ids.v1.json'
-      - 'scripts/build-snapshot.mjs'
-      - 'scripts/lib/contact-governance.mjs'
-      - 'scripts/lib/lrv-identity.mjs'
-      - '.github/workflows/pilot-100-run.yml'
 
 permissions:
   contents: read
@@ -123,9 +111,6 @@ jobs:
             throw new Error('discovery-pending cohort is not exactly the 23 missing-website cases');
           }
 
-          // Regression from pilot round 1: DRV 12103 points to a separate rowing
-          // organization. A weak identity may never turn that website contact into
-          // a new direct route, even though the DRV supplied the URL.
           const saarbruecken = publicRows.find((row) => row.organizationId === '12103');
           if (!saarbruecken) throw new Error('pilot regression case 12103 missing');
           if (saarbruecken.status !== 'identity_review' || saarbruecken.proposedRouteLevel !== 'drv' || saarbruecken.finalHost !== 'ruderbund.de') {
@@ -150,24 +135,6 @@ jobs:
           ].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
           const email = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
           if (email.test(publicRaw)) throw new Error('public pilot artifacts must not expose email addresses');
-
-          console.log({
-            knownWebsite: report.knownWebsite,
-            discoveryPending: report.discoveryPending,
-            reachable: report.reachable,
-            processed: report.processed,
-            identityReview: report.identityReview,
-            identityStatusCounts: report.identityStatusCounts,
-            contactOutcomes: report.contactOutcomes,
-            directUpgrades: report.directUpgrades,
-            routeBefore: report.routeBefore,
-            routeAfter: report.routeAfter,
-            statusCounts: report.statusCounts,
-            errorCounts: report.errorCounts,
-            pagesFetched: report.pagesFetched,
-            pagesAttempted: report.pagesAttempted,
-            runtimeMs: report.runtimeMs
-          });
           NODE
 
       - name: Add pilot report to workflow summary
