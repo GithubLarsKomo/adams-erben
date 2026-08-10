@@ -3,11 +3,11 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
   CONTACT_POLICY_VERSION,
-  classifyContactCandidate,
   evaluateSnapshotEligibility,
   suppressionIdentifier
 } from './lib/contact-governance.mjs';
 import { publicOrganizationFromRegistry } from './lib/drv-registry.mjs';
+import { lrvIdentityHints } from './lib/lrv-identity.mjs';
 
 const REGISTRY_FILE = process.env.SNAPSHOT_REGISTRY_FILE || 'build-private/drv-registry.json';
 const CANDIDATES_FILE = process.env.SNAPSHOT_CONTACT_CANDIDATES_FILE || 'build-private/contact-candidates.json';
@@ -93,12 +93,21 @@ function suppressionState(email, suppressionHashes, suppressionSecret) {
   return suppressionHashes.has(suppressionIdentifier(email, suppressionSecret));
 }
 
-function registryCandidate(record) {
+function identityHints(record) {
+  return record.type === 'lrv' ? lrvIdentityHints(record) : {
+    website: '',
+    contactDomains: [],
+    functionalLocalParts: [],
+    verificationSource: ''
+  };
+}
+
+function registryCandidate(record, identity) {
   if (!record.emailFromDrv) return null;
   return {
     organizationId: record.organizationId,
     email: record.emailFromDrv,
-    website: record.websiteFromDrv,
+    website: record.websiteFromDrv || identity.website || '',
     sourceType: 'drv-profile',
     sourceUrl: record.sourceUrl,
     verifiedAt: record.fetchedAt,
@@ -108,24 +117,28 @@ function registryCandidate(record) {
 
 function evaluateCandidates(record, external, suppressionHashes, suppressionSecret, now) {
   const candidates = [];
-  const drv = registryCandidate(record);
+  const identity = identityHints(record);
+  const drv = registryCandidate(record, identity);
   if (drv) candidates.push(drv);
   for (const candidate of external || []) candidates.push(candidate);
 
   return candidates.map((candidate) => {
-    const website = candidate.website || record.websiteFromDrv || '';
+    const website = candidate.website || record.websiteFromDrv || identity.website || '';
     const suppressed = suppressionState(candidate.email, suppressionHashes, suppressionSecret);
     return {
       ...evaluateSnapshotEligibility(candidate, website, {
         verifiedAt: candidate.verifiedAt,
         suppressed,
-        now
+        now,
+        trustedDomains: identity.contactDomains,
+        trustedFunctionalLocalParts: identity.functionalLocalParts
       }),
       organizationId: record.organizationId,
       website,
       sourceType: candidate.sourceType || 'unknown',
       sourceUrl: candidate.sourceUrl || '',
-      verifiedAt: candidate.verifiedAt || ''
+      verifiedAt: candidate.verifiedAt || '',
+      identityVerificationSource: identity.verificationSource || ''
     };
   }).sort(sortEvaluated);
 }
@@ -227,7 +240,11 @@ export function buildSnapshot({
       decisionReason
     };
 
-    organizations.push(publicOrganizationFromRegistry(record, routeLevel, Boolean(direct)));
+    const identity = identityHints(record);
+    const publicRecord = record.type === 'lrv' && !record.websiteFromDrv && identity.website
+      ? { ...record, websiteFromDrv: identity.website, websiteStatus: 'present' }
+      : record;
+    organizations.push(publicOrganizationFromRegistry(publicRecord, routeLevel, Boolean(direct)));
     decisions.push({
       id: record.id,
       organizationId: record.organizationId,
@@ -295,6 +312,7 @@ export function buildSnapshot({
     registryOrganizations: records.length,
     publicOrganizations: organizations.length,
     directApproved: decisions.filter((item) => item.directCandidateApproved).length,
+    lrvIdentityHintsApplied: records.filter((record) => record.type === 'lrv' && Boolean(lrvIdentityHints(record).verificationSource)).length,
     routeCounts,
     organizationsWithSuppressedCandidates: decisions.filter((item) => item.suppressedCandidateCount > 0).length,
     organizationsWithStaleCandidates: decisions.filter((item) => item.staleCandidateCount > 0).length,
@@ -306,7 +324,7 @@ export function buildSnapshot({
 }
 
 function reportMarkdown(report) {
-  return `# Approved Snapshot – Quality Report\n\nStand: ${report.generatedAt}\n\n- Contact-Governance-Policy: **${report.policyVersion}**\n- Registry-Organisationen: **${report.registryOrganizations}**\n- öffentliche Organisationen inkl. DRV: **${report.publicOrganizations}**\n- direkt freigegebene Organisationskontakte: **${report.directApproved}**\n- Routing Verein/Organisation: **${report.routeCounts.club}**\n- Routing LRV: **${report.routeCounts.lrv}**\n- Routing DRV: **${report.routeCounts.drv}**\n- Organisationen mit unterdrückten Kandidaten: **${report.organizationsWithSuppressedCandidates}**\n- Organisationen mit stale Kandidaten: **${report.organizationsWithStaleCandidates}**\n\nDer öffentliche Snapshot und dieser Report enthalten keine E-Mail-Adressen. E-Mail-Empfänger verbleiben ausschließlich in \`build-private/recipients.json\`.\n`;
+  return `# Approved Snapshot – Quality Report\n\nStand: ${report.generatedAt}\n\n- Contact-Governance-Policy: **${report.policyVersion}**\n- Registry-Organisationen: **${report.registryOrganizations}**\n- öffentliche Organisationen inkl. DRV: **${report.publicOrganizations}**\n- direkt freigegebene Organisationskontakte: **${report.directApproved}**\n- verifizierte LRV-Identitätshinweise angewendet: **${report.lrvIdentityHintsApplied || 0}**\n- Routing Verein/Organisation: **${report.routeCounts.club}**\n- Routing LRV: **${report.routeCounts.lrv}**\n- Routing DRV: **${report.routeCounts.drv}**\n- Organisationen mit unterdrückten Kandidaten: **${report.organizationsWithSuppressedCandidates}**\n- Organisationen mit stale Kandidaten: **${report.organizationsWithStaleCandidates}**\n\nDer öffentliche Snapshot und dieser Report enthalten keine E-Mail-Adressen. E-Mail-Empfänger verbleiben ausschließlich in \`build-private/recipients.json\`.\n`;
 }
 
 async function main() {
