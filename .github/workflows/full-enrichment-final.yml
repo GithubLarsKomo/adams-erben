@@ -1,0 +1,248 @@
+name: Full Enrichment Final Snapshot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/mvp-wayfinder]
+    paths:
+      - '.github/workflows/full-enrichment-final.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  full-enrichment-final:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      EXPECTED_COVERAGE_HASH: 8e2133403ccaa00330c9b3a9e2debbfba15596a838b63ba35b3ee21a4554026e
+      EXPECTED_BATCH_1_HASH: b9b4a761480a0aaf3818e0eb446436e0f07e9f7274fad384f48f0af3de118b75
+      EXPECTED_BATCH_2_HASH: be71d74548d25976d9d727c55f6bf1842826fab7aa92853d384e05315f470e8a
+      EXPECTED_BATCH_3_HASH: 4b102d5ebbf6d9dce1fabc8073e58e0305097302e7293225c9f65575a452f644
+      EXPECTED_BATCH_4_HASH: 8fae1af2515cad9bd2e46550d949cdbc944127ebd7bbb6d751b73924c65d0a23
+      EXPECTED_BATCH_5_HASH: 52fd1bcc34c3e16c362b832fc0d91e25c40d062c47b8d94e54623c0d2e6b088d
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Run pure-code gates
+        run: |
+          npm run test:contact-governance
+          npm run test:contact-domain-evidence
+          npm run test:history
+          npm run test:snapshot
+          npm run test:pilot-run
+          npm run test:discovery-verified
+          npm run test:full-prepare
+          npm run test:full-merge
+
+      - name: Rebuild full DRV registry
+        env:
+          REQUIRE_DRV_SYNC: '1'
+          DRV_SYNC_REQUIRED_COVERAGE: '0.95'
+          DRV_SYNC_CONCURRENCY: '3'
+          DRV_SYNC_DELAY_MS: '300'
+          DRV_SYNC_LIMIT: '0'
+        run: npm run sync:drv
+
+      - name: Apply manually verified website resolution
+        run: npm run discovery:apply-verified
+
+      - name: Enrich LRV fallback contacts
+        env:
+          LRV_ENRICH_DELAY_MS: '700'
+          LRV_ENRICH_MAX_PAGES: '5'
+        run: |
+          npm run lrv:enrich
+          npm run lrv:laenderrat
+
+      - name: Build baseline snapshot for batch route metadata
+        env:
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.json
+          SNAPSHOT_REGISTRY_FILE: build-private/drv-registry-websites.json
+        run: npm run snapshot:build
+
+      - name: Prepare deterministic five-batch population
+        env:
+          FULL_ENRICHMENT_BATCH_COUNT: '5'
+          FULL_ENRICHMENT_REGISTRY_FILE: build-private/drv-registry-websites.json
+          FULL_ENRICHMENT_SNAPSHOT_FILE: dist/data/clubs.json
+        run: npm run full:prepare
+
+      - name: Verify 429 coverage and all batch hashes before crawl
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const report = JSON.parse(fs.readFileSync('artifacts/full-enrichment-prep/report.json', 'utf8'));
+          if (report.coverageHash !== process.env.EXPECTED_COVERAGE_HASH) throw new Error(`coverage hash drift ${report.coverageHash}`);
+          if (report.knownWebsite !== 429 || report.missingWebsite !== 5) throw new Error(`unexpected population ${report.knownWebsite}/${report.missingWebsite}`);
+          const expectedCounts = [86,86,86,86,85];
+          const expectedHashes = [1,2,3,4,5].map((n) => process.env[`EXPECTED_BATCH_${n}_HASH`]);
+          const allIds = [];
+          for (let i = 0; i < 5; i += 1) {
+            const batch = JSON.parse(fs.readFileSync(`build-private/full-enrichment/batch-${i + 1}.json`, 'utf8'));
+            if (batch.count !== expectedCounts[i] || batch.organizations.length !== expectedCounts[i]) throw new Error(`batch ${i + 1} count drift`);
+            const ids = batch.organizations.map((row) => row.organizationId);
+            const hash = crypto.createHash('sha256').update(ids.join('\n')).digest('hex');
+            if (hash !== expectedHashes[i]) throw new Error(`batch ${i + 1} hash drift ${hash}`);
+            allIds.push(...ids);
+          }
+          if (allIds.length !== 429 || new Set(allIds).size !== 429) throw new Error('five batches do not cover 429 unique clubs exactly once');
+          console.log({coverageHash:report.coverageHash,batches:expectedCounts,unique:new Set(allIds).size});
+          NODE
+
+      - name: Run all five bounded acquisition stages on one private runner
+        run: |
+          set -euo pipefail
+          mkdir -p build-private/full-enrichment-results artifacts/full-enrichment-final-batches
+          for batch in 1 2 3 4 5; do
+            if [ "$batch" = "5" ]; then count=85; else count=86; fi
+            echo "Running bounded batch $batch/$count"
+            PILOT_RUN_INPUT="build-private/full-enrichment/batch-${batch}.json" \
+            PILOT_RUN_EXPECTED_COUNT="$count" \
+            PILOT_RUN_CONTACTS_FILE="build-private/full-enrichment-results/batch-${batch}-contacts.json" \
+            PILOT_RUN_DECISIONS_FILE="build-private/full-enrichment-results/batch-${batch}-decisions.json" \
+            PILOT_RUN_REPORT_DIR="artifacts/full-enrichment-final-batches/batch-${batch}" \
+            PILOT_RUN_USER_AGENT='adams-erben-full-enrichment-final/1.0 (+https://adams-erben.de)' \
+            PILOT_RUN_CONCURRENCY='3' \
+            PILOT_RUN_PAGE_DELAY_MS='450' \
+            PILOT_RUN_MAX_PAGES='5' \
+            PILOT_RUN_MAX_ATTEMPTS='8' \
+            PILOT_RUN_TIMEOUT_MS='12000' \
+            PILOT_RUN_MAX_REDIRECTS='5' \
+            PILOT_RUN_IDENTITY_THRESHOLD='0.45' \
+            npm run pilot:run
+          done
+
+      - name: Merge five private result sets
+        env:
+          FULL_MERGE_BATCH_COUNT: '5'
+          FULL_MERGE_EXPECTED_ORGANIZATIONS: '429'
+          FULL_MERGE_BASELINE_CONTACTS_FILE: build-private/contact-candidates.json
+          FULL_MERGE_RESULTS_DIR: build-private/full-enrichment-results
+        run: npm run full:merge
+
+      - name: Apply initial stateless Candidate History contract
+        env:
+          CONTACT_HISTORY_CURRENT_FILE: build-private/contact-candidates.current.json
+          CONTACT_HISTORY_ACQUISITION_FILE: build-private/contact-acquisition-results.json
+          CONTACT_HISTORY_OUTPUT_FILE: build-private/contact-candidates.merged.json
+          CONTACT_HISTORY_REPORT_DIR: artifacts/full-enrichment-final/contact-history
+        run: npm run history:merge
+
+      - name: Freeze snapshot timestamp
+        run: echo "SNAPSHOT_NOW=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+
+      - name: Build combined Approved Snapshot
+        env:
+          SNAPSHOT_REGISTRY_FILE: build-private/drv-registry-websites.json
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.merged.json
+          SNAPSHOT_PUBLIC_FILE: dist/data/clubs.json
+          SNAPSHOT_RECIPIENTS_FILE: build-private/full-enrichment-final-recipients.json
+          SNAPSHOT_DECISIONS_FILE: build-private/full-enrichment-final-decisions.json
+          SNAPSHOT_REPORT_DIR: artifacts/full-enrichment-final/snapshot
+        run: npm run snapshot:build
+
+      - name: Validate combined coverage privacy and routing
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const merge = JSON.parse(fs.readFileSync('artifacts/full-enrichment-merge/report.json', 'utf8'));
+          const history = JSON.parse(fs.readFileSync('artifacts/full-enrichment-final/contact-history/report.json', 'utf8'));
+          const snapshot = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
+          const snapshotReport = JSON.parse(fs.readFileSync('artifacts/full-enrichment-final/snapshot/report.json', 'utf8'));
+          if (merge.uniqueAcquisitionOrganizations !== 429 || merge.batchCount !== 5) throw new Error('merged acquisition coverage is not 429/5');
+          if (history.previousContacts !== 0 || history.acquisitionOrganizations !== 429 || history.carryForwardOrganizations !== 0) throw new Error('initial stateless history contract violated');
+          if (snapshot.count !== 504 || snapshot.organizations.length !== 504) throw new Error(`expected 504 public organizations incl DRV, got ${snapshot.count}`);
+          const clubs = snapshot.organizations.filter((row) => row.type === 'club');
+          if (clubs.length !== 434) throw new Error(`expected 434 clubs, got ${clubs.length}`);
+          const clubRoutes = {club:0,lrv:0,drv:0};
+          for (const row of clubs) clubRoutes[row.contactRouteLevel] += 1;
+          if (Object.values(clubRoutes).reduce((a,b)=>a+b,0) !== 434) throw new Error('club route count mismatch');
+          const publicFiles = [
+            'dist/data/clubs.json',
+            'artifacts/full-enrichment-prep/report.json',
+            'artifacts/full-enrichment-prep/report.md',
+            'artifacts/full-enrichment-merge/report.json',
+            'artifacts/full-enrichment-merge/report.md',
+            'artifacts/full-enrichment-final/contact-history/report.json',
+            'artifacts/full-enrichment-final/contact-history/report.md',
+            'artifacts/full-enrichment-final/snapshot/report.json',
+            'artifacts/full-enrichment-final/snapshot/report.md'
+          ];
+          for (let batch=1; batch<=5; batch+=1) {
+            publicFiles.push(`artifacts/full-enrichment-final-batches/batch-${batch}/report.json`);
+            publicFiles.push(`artifacts/full-enrichment-final-batches/batch-${batch}/report.md`);
+            publicFiles.push(`artifacts/full-enrichment-final-batches/batch-${batch}/organizations.json`);
+          }
+          const raw = publicFiles.map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+          if (/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(raw)) throw new Error('public final artifacts contain an email address');
+          const canonical = JSON.stringify(snapshot);
+          const firstHash = crypto.createHash('sha256').update(canonical).digest('hex');
+          fs.mkdirSync('artifacts/full-enrichment-final', {recursive:true});
+          fs.writeFileSync('artifacts/full-enrichment-final/first-snapshot.sha256', `${firstHash}\n`);
+          fs.writeFileSync('artifacts/full-enrichment-final/report.json', JSON.stringify({
+            version:'full-enrichment-final/1.0.0',
+            acquisitionOrganizations:429,
+            clubs:434,
+            publicOrganizations:snapshot.count,
+            clubRoutes,
+            snapshotRouteCounts:snapshotReport.routeCounts,
+            directApproved:snapshotReport.directApproved,
+            snapshotHash:firstHash
+          }, null, 2));
+          console.log({clubs:clubs.length,clubRoutes,directApproved:snapshotReport.directApproved,snapshotHash:firstHash});
+          NODE
+
+      - name: Rebuild snapshot identically for determinism gate
+        env:
+          SNAPSHOT_REGISTRY_FILE: build-private/drv-registry-websites.json
+          SNAPSHOT_CONTACT_CANDIDATES_FILE: build-private/contact-candidates.merged.json
+          SNAPSHOT_PUBLIC_FILE: dist/data/clubs.json
+          SNAPSHOT_RECIPIENTS_FILE: build-private/full-enrichment-final-recipients.json
+          SNAPSHOT_DECISIONS_FILE: build-private/full-enrichment-final-decisions.json
+          SNAPSHOT_REPORT_DIR: artifacts/full-enrichment-final/snapshot
+        run: |
+          npm run snapshot:build
+          node - <<'NODE'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const expected = fs.readFileSync('artifacts/full-enrichment-final/first-snapshot.sha256','utf8').trim();
+          const actual = crypto.createHash('sha256').update(fs.readFileSync('dist/data/clubs.json','utf8')).digest('hex');
+          if (actual !== expected) throw new Error(`snapshot determinism failure ${expected} != ${actual}`);
+          console.log({deterministic:true,snapshotHash:actual});
+          NODE
+
+      - name: Add final report to workflow summary
+        if: always()
+        run: |
+          if [ -f artifacts/full-enrichment-merge/report.md ]; then cat artifacts/full-enrichment-merge/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/full-enrichment-final/contact-history/report.md ]; then cat artifacts/full-enrichment-final/contact-history/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/full-enrichment-final/snapshot/report.md ]; then cat artifacts/full-enrichment-final/snapshot/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - name: Upload address-free final quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-enrichment-final-report
+          path: |
+            artifacts/full-enrichment-prep/
+            artifacts/full-enrichment-merge/
+            artifacts/full-enrichment-final/
+            artifacts/full-enrichment-final-batches/
+            dist/data/clubs.json
+          if-no-files-found: warn
+          retention-days: 14
