@@ -21,27 +21,6 @@ on:
       - 'scripts/lib/lrv-identity.mjs'
       - 'scripts/prepare-discovery-poc.mjs'
       - 'scripts/prepare-discovery-poc.test.mjs'
-      - 'package.json'
-      - '.github/workflows/registry-sync.yml'
-  pull_request:
-    paths:
-      - 'scripts/sync-drv.mjs'
-      - 'scripts/enrich-lrv.mjs'
-      - 'scripts/enrich-lrv-laenderrat.mjs'
-      - 'scripts/enrich-lrv-laenderrat.test.mjs'
-      - 'scripts/build-snapshot.mjs'
-      - 'scripts/build-snapshot.test.mjs'
-      - 'scripts/build-snapshot-lrv-identity.test.mjs'
-      - 'scripts/prepare-pilot-100.mjs'
-      - 'scripts/prepare-pilot-100.test.mjs'
-      - 'scripts/lib/drv-registry.mjs'
-      - 'scripts/lib/drv-registry.test.mjs'
-      - 'scripts/lib/drv-registry-website.test.mjs'
-      - 'scripts/lib/contact-governance.mjs'
-      - 'scripts/lib/lrv-identity.mjs'
-      - 'scripts/prepare-discovery-poc.mjs'
-      - 'scripts/prepare-discovery-poc.test.mjs'
-      - 'package.json'
       - '.github/workflows/registry-sync.yml'
 
 permissions:
@@ -210,6 +189,8 @@ jobs:
             'artifacts/snapshot/baseline-registry.md',
             'artifacts/snapshot/report.json',
             'artifacts/snapshot/report.md',
+            'artifacts/snapshot/contact-governance-reasons.json',
+            'artifacts/snapshot/contact-governance-reasons.md',
             'artifacts/pilot-100/sample.json',
             'artifacts/pilot-100/report.json',
             'artifacts/pilot-100/report.md',
@@ -254,6 +235,8 @@ jobs:
           cat artifacts/snapshot/baseline-registry.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n---\n\n# Snapshot nach LRV-Enrichment\n\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/snapshot/report.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
+          cat artifacts/snapshot/contact-governance-reasons.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
           cat artifacts/pilot-100/report.md >> "$GITHUB_STEP_SUMMARY"
           printf '\n---\n\n' >> "$GITHUB_STEP_SUMMARY"
