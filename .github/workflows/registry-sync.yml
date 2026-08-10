@@ -8,6 +8,7 @@ on:
       - 'scripts/sync-drv.mjs'
       - 'scripts/lib/drv-registry.mjs'
       - 'scripts/lib/drv-registry.test.mjs'
+      - 'scripts/lib/drv-registry-website.test.mjs'
       - 'scripts/prepare-discovery-poc.mjs'
       - 'scripts/prepare-discovery-poc.test.mjs'
       - 'package.json'
@@ -17,6 +18,7 @@ on:
       - 'scripts/sync-drv.mjs'
       - 'scripts/lib/drv-registry.mjs'
       - 'scripts/lib/drv-registry.test.mjs'
+      - 'scripts/lib/drv-registry-website.test.mjs'
       - 'scripts/prepare-discovery-poc.mjs'
       - 'scripts/prepare-discovery-poc.test.mjs'
       - 'package.json'
@@ -55,9 +57,10 @@ jobs:
           DRV_SYNC_LIMIT: '0'
         run: npm run sync:drv
 
-      - name: Prepare 25 missing-website cases from registry queue
+      - name: Prepare up to 25 missing-website cases from registry queue
         env:
           DISCOVERY_SAMPLE_TARGET: '25'
+          DISCOVERY_SAMPLE_MIN_SIZE: '20'
           DISCOVERY_SAMPLE_MIN_STATES: '5'
           DISCOVERY_SAMPLE_MAX_PER_STATE: '5'
         run: npm run poc:discover:prepare
@@ -91,7 +94,11 @@ jobs:
           if (missing.organizations.length !== report.clubsMissingWebsiteFromDrv) {
             throw new Error(`website-missing mismatch: ${missing.organizations.length} != ${report.clubsMissingWebsiteFromDrv}`);
           }
-          if (!Array.isArray(sample.organizations) || sample.organizations.length !== 25) throw new Error('discovery sample must contain 25 organizations');
+          const expectedSampleSize = Math.min(25, missing.organizations.length);
+          if (!Array.isArray(sample.organizations) || sample.organizations.length !== expectedSampleSize) {
+            throw new Error(`discovery sample must contain ${expectedSampleSize} organizations, got ${sample.organizations?.length}`);
+          }
+          if (sample.organizations.length < 20) throw new Error(`discovery sample too small: ${sample.organizations.length}`);
           const states = new Set(sample.organizations.map((item) => item.state).filter(Boolean));
           if (states.size < 5) throw new Error(`discovery sample has only ${states.size} states`);
           const raw = fs.readFileSync('artifacts/drv-registry/report.json', 'utf8') +
@@ -110,7 +117,7 @@ jobs:
           const fs = require('fs');
           const sample = JSON.parse(fs.readFileSync('artifacts/drv-registry/discovery-sample.json', 'utf8'));
           const states = new Set(sample.organizations.map((item) => item.state).filter(Boolean));
-          console.log(`## PoC-B-Stichprobe\n\n- Organisationen ohne DRV-Weblink: **${sample.organizations.length}**\n- Bundesländer: **${states.size}**\n- keine E-Mail-Adressen im Artifact`);
+          console.log(`## PoC-B-Stichprobe\n\n- Organisationen ohne DRV-Weblink im Test: **${sample.organizations.length}**\n- Bundesländer: **${states.size}**\n- keine E-Mail-Adressen im Artifact`);
           NODE
 
       - name: Upload public registry quality report
