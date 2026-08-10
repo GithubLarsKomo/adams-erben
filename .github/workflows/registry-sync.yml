@@ -162,7 +162,7 @@ jobs:
           if (lrv.summary.targets < 1 || lrv.summary.targets > 15) throw new Error(`unexpected LRV enrichment target count: ${lrv.summary.targets}`);
           if (laenderrat.lrvRegistryCount !== 15) throw new Error(`unexpected Länderrat LRV registry count: ${laenderrat.lrvRegistryCount}`);
           if (laenderrat.matchedOrganizations < 1 || laenderrat.autoApprovedCandidateCount < 1) throw new Error('DRV Länderrat produced no safe LRV role candidate');
-          if (snapshot.policyVersion !== '1.0.0' || baseline.policyVersion !== '1.0.0') throw new Error('unexpected contact policy version');
+          if (snapshot.policyVersion !== '1.1.0' || baseline.policyVersion !== '1.1.0') throw new Error('unexpected contact policy version');
           if (snapshot.registryOrganizations !== report.parsedProfiles || baseline.registryOrganizations !== report.parsedProfiles) throw new Error('snapshot/registry count mismatch');
           for (const current of [baseline, snapshot]) {
             const routed = current.routeCounts.club + current.routeCounts.lrv + current.routeCounts.drv;
