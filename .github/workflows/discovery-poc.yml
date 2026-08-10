@@ -54,7 +54,7 @@ jobs:
             echo 'BRAVE_SEARCH_API_KEY is not configured; real provider PoC is skipped.'
           fi
 
-      - name: Run real 25-club website discovery
+      - name: Run real website discovery against all 23 missing-website clubs
         if: steps.brave.outputs.available == 'true'
         env:
           SEARCH_PROVIDER: brave
@@ -73,9 +73,9 @@ jobs:
           const fs = require('fs');
           const report = JSON.parse(fs.readFileSync('artifacts/website-discovery-poc/report.json', 'utf8'));
           const s = report.summary;
-          if (s.organizations !== 25) throw new Error(`expected 25 organizations, got ${s.organizations}`);
-          if (s.groundTruthKnown !== 25) throw new Error(`expected 25 ground-truth cases, got ${s.groundTruthKnown}`);
-          if (s.groundTruthOfficial !== 19 || s.groundTruthNone !== 5 || s.groundTruthAmbiguous !== 1) {
+          if (s.organizations !== 23) throw new Error(`expected 23 organizations, got ${s.organizations}`);
+          if (s.groundTruthKnown !== 23) throw new Error(`expected 23 ground-truth cases, got ${s.groundTruthKnown}`);
+          if (s.groundTruthOfficial !== 18 || s.groundTruthNone !== 5 || s.groundTruthAmbiguous !== 0) {
             throw new Error(`unexpected truth distribution: ${JSON.stringify(s)}`);
           }
           if (s.autoAcceptedWrong !== 0) {
@@ -94,7 +94,7 @@ jobs:
           cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
           # Website Discovery PoC
 
-          Static scoring and Ground-Truth contract tests passed.
+          Static scoring and Ground-Truth contract tests passed for all 23 currently missing DRV website links.
 
           The real Brave Search run was not executed because `BRAVE_SEARCH_API_KEY` is not configured as a repository secret.
           EOF
