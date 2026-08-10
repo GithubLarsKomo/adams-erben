@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   PILOT_RUNNER_VERSION,
   extractContactsFromHtml,
+  hasDistinctiveHostSignal,
   parseRobots,
   relatedHost,
   robotsAllowsPath,
@@ -10,7 +11,7 @@ import {
 } from './run-pilot-100.mjs';
 import { evaluateSnapshotEligibility } from './lib/contact-governance.mjs';
 
-assert.equal(PILOT_RUNNER_VERSION, 'pilot-100-run/1.0.0');
+assert.equal(PILOT_RUNNER_VERSION, 'pilot-100-run/1.1.0');
 assert.equal(relatedHost('www.rrc-online.de', 'rrc-online.de'), true);
 assert.equal(relatedHost('club.example', 'other.example'), false);
 
@@ -32,6 +33,23 @@ const org = {
 };
 const identityHtml = `<html><body><h1>Ratzeburger Ruderclub</h1><p>Dr.-Alfred-Block-Allee, 23909 Ratzeburg</p></body></html>`;
 assert.ok(scoreWebsiteIdentity(org, identityHtml, 'https://www.rrc-online.de/') >= 0.45);
+assert.equal(hasDistinctiveHostSignal(org, 'https://www.rrc-online.de/'), false);
+
+const saarbruecken = {
+  name: 'Ruderverein Saarbrücken e.V.',
+  city: 'Saarbrücken',
+  postalCode: '66121'
+};
+const weakIdentityHtml = `<html><body><p>Rudern in Saarbrücken</p></body></html>`;
+assert.equal(hasDistinctiveHostSignal(saarbruecken, 'https://ruderbund.de/'), false);
+assert.ok(scoreWebsiteIdentity(saarbruecken, weakIdentityHtml, 'https://ruderbund.de/') < 0.45);
+
+const waging = {
+  name: 'Waginger Ruderverein e.V.',
+  city: 'Waging am See',
+  postalCode: '83329'
+};
+assert.equal(hasDistinctiveHostSignal(waging, 'https://waginger-ruderverein.de/'), true);
 
 const verifiedAt = '2026-08-10T00:00:00.000Z';
 const contacts = extractContactsFromHtml(`
@@ -53,7 +71,13 @@ assert.ok(evaluated.some((item) => item.email === 'max.mustermann@club.example' 
 const rows = [
   {
     websiteStatus: 'present', status: 'processed', websiteReachable: true, contactOutcome: 'auto_direct',
-    baseRouteLevel: 'lrv', proposedRouteLevel: 'club', pagesFetched: 4, pagesAttempted: 5, errorCode: ''
+    baseRouteLevel: 'lrv', proposedRouteLevel: 'club', pagesFetched: 4, pagesAttempted: 5,
+    identityStatus: 'drv-domain-consistent', errorCode: ''
+  },
+  {
+    websiteStatus: 'present', status: 'identity_review', websiteReachable: true, contactOutcome: 'review',
+    baseRouteLevel: 'drv', proposedRouteLevel: 'drv', pagesFetched: 1, pagesAttempted: 1,
+    identityStatus: 'review-weak-identity', errorCode: ''
   },
   {
     websiteStatus: 'present', status: 'robots_blocked', websiteReachable: false, contactOutcome: 'fallback',
@@ -65,14 +89,16 @@ const rows = [
   }
 ];
 const report = summarizePilotRun(rows, '2026-08-10T00:00:00.000Z', '2026-08-10T00:00:10.000Z');
-assert.equal(report.total, 3);
-assert.equal(report.knownWebsite, 2);
+assert.equal(report.total, 4);
+assert.equal(report.knownWebsite, 3);
 assert.equal(report.discoveryPending, 1);
+assert.equal(report.identityReview, 1);
 assert.equal(report.directUpgrades, 1);
 assert.equal(report.maxPagesFetched, 4);
 assert.equal(report.maxPagesAttempted, 5);
 assert.equal(report.routeBefore.lrv, 1);
 assert.equal(report.routeAfter.club, 2);
+assert.equal(report.identityStatusCounts['review-weak-identity'], 1);
 
 const publicJson = JSON.stringify(report);
 assert.equal(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(publicJson), false);
