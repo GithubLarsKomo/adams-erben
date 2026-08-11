@@ -29,6 +29,8 @@ await writeFile(indexPath, builtIndexHtml);
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
 const publicPath = path.join(dist, 'data', 'clubs.json');
+const postalSeedPath = path.join(dist, 'data', 'postal-locations.seed.json');
+const postalPublicPath = path.join(dist, 'data', 'postal-locations.json');
 
 function runNodeScript(script) {
   return new Promise((resolve, reject) => {
@@ -54,7 +56,9 @@ try {
   if (process.env.REQUIRE_DRV_SYNC === '1') throw error;
   console.warn(`[build] ${error.message}; using checked-in seed data.`);
   const seed = await readFile(seedPath, 'utf8');
+  const postalSeed = await readFile(postalSeedPath, 'utf8');
   await writeFile(publicPath, seed);
+  await writeFile(postalPublicPath, postalSeed);
   const fallbackReason = process.env.SKIP_DRV_SYNC === '1'
     ? 'DRV sync explicitly skipped'
     : error.message;
@@ -64,19 +68,16 @@ try {
       generatedAt: new Date().toISOString(),
       source: previewMode ? 'preview-seed-fallback' : 'seed-fallback',
       preview: previewMode,
-      routingMode: 'drv-only-fallback',
+      routingMode: 'direct-only',
       fallbackReason,
       recipientCount: 0,
-      warning: 'No club/LRV recipient routes are present in this fallback file. Run the real DRV sync to generate full server-side routing.',
-      recipients: {},
-      drv: {
-        name: 'Deutscher Ruderverband e.V.',
-        email: process.env.DRV_FALLBACK_EMAIL || 'info@rudern.de'
-      }
+      warning: 'No recipient routes are present in this fallback file. Run the real DRV sync to generate verified direct organization routes.',
+      recipients: {}
     }, null, 2)
   );
-  console.warn('[build] recipients.json is DRV-only fallback; full club/LRV routing requires a successful real DRV sync.');
+  console.warn('[build] recipients.json contains no fallback recipients; full direct routing requires a successful real DRV sync.');
 }
 
 await rm(seedPath, { force: true });
+await rm(postalSeedPath, { force: true });
 console.log(`[build] dist ready (${previewMode ? 'preview' : 'production'} mode)`);
