@@ -16,11 +16,41 @@ await cp(src, dist, { recursive: true });
 
 const indexPath = path.join(dist, 'index.html');
 const indexHtml = await readFile(indexPath, 'utf8');
+const rowingExplainerPath = path.join(src, 'partials', 'rowing-explainer.html');
+const rowingExplainerHtml = await readFile(rowingExplainerPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
 const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
+const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.css">\n  <link rel="stylesheet" href="/assets/storyboard-overrides.css">\n';
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
-const builtIndexHtml = indexHtml
+const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
+const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.png" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
+const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
+const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
+const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude"><img src="/assets/images/hoehe-mexiko.png" alt="Grafische Darstellung der Höhenvorbereitung auf die Olympischen Spiele 1968 in Mexiko-Stadt"></figure>';
+const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu Adams Erben heute ↓</a>\n';
+
+function replaceLaborVisuals(html) {
+  return html
+    .replace(
+      /<div class="interval-diagram"[^>]*>[\s\S]*?<\/div>/,
+      measuredTrainingImage
+    )
+    .replace(
+      /<div class="training-note"[^>]*>[\s\S]*?<\/div>/,
+      trainingImage
+    )
+    .replace(
+      /\s*<div class="oar-diagram"[^>]*>[\s\S]*?<\/div>/,
+      `\n${oarImage}`
+    )
+    .replace(
+      /<div class="altitude-mark"[^>]*>[\s\S]*?<\/div>/,
+      altitudeImage
+    );
+}
+
+const builtIndexHtml = replaceLaborVisuals(indexHtml)
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
   .replace('<script src="/assets/app.js" defer></script>', '<script type="module" src="/assets/app.js"></script>')
@@ -40,8 +70,10 @@ const builtIndexHtml = indexHtml
     'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme an den angezeigten Verein bzw. den zuständigen Verband übermittelt werden.',
     'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme ausschließlich an die ausgewählte Organisation übermittelt werden.'
   )
+  .replace('<a href="#stimmen">Stimmen</a>', '<a href="#rudern-verstehen">Rudern verstehen</a><a href="#stimmen">Stimmen</a>')
+  .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
-  .replace('</head>', `${previewStyles}${previewRobots}</head>`);
+  .replace('</head>', `${rowingStyles}${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');

@@ -1,0 +1,241 @@
+/* Small visual corrections for the rowing explainer concept branch.
+   Keep the established palette, but choose the accent according to background contrast. */
+
+:root {
+  --story-accent-on-light: var(--accent);
+  --story-accent-on-dark: #92d6ea;
+  --story-accent-on-blue: var(--navy);
+}
+
+/* Existing red remains the accent on white / cream / neutral light surfaces. */
+.rowing-explainer .boat-compare-card:not(.boat-compare-card-dark) .card-kicker,
+.rowing-explainer .rowing-panel .card-kicker,
+.rowing-explainer .age-band .card-kicker,
+.rowing-explainer .touring-card .card-kicker {
+  color: var(--story-accent-on-light) !important;
+}
+
+/* Light blue replaces red wherever the component sits on navy. */
+.rowing-chapter-racing > .rowing-chapter-intro .rowing-kicker,
+.rowing-chapter-racing .boat-compare-card-dark .card-kicker,
+.rowing-chapter-racing .eight-explainer .card-kicker,
+.rowing-chapter-racing .race-strip .card-kicker {
+  color: var(--story-accent-on-dark) !important;
+}
+
+/* Navy replaces pale blue on the light-blue touring chapter background. */
+.rowing-chapter-touring > .rowing-chapter-intro .rowing-kicker {
+  color: var(--story-accent-on-blue) !important;
+}
+
+/* Touring examples use one consistent light card treatment; numbering circles are omitted. */
+.rowing-explainer .touring-number {
+  display: none;
+}
+
+.rowing-explainer .touring-card-local {
+  background: white;
+  color: var(--navy);
+}
+
+.rowing-explainer .touring-card-local p:not(.card-kicker) {
+  color: #607783;
+}
+
+.rowing-explainer .touring-card-local .card-kicker {
+  color: var(--story-accent-on-light) !important;
+}
+
+/* The final voice closes the sequence on the right on desktop. */
+.voice-bubble-legacy {
+  grid-column: 8 / -1;
+  grid-row: 3;
+}
+
+/* Long-distance examples: equal visual slots without cropping non-square logos. */
+.distance-regattas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.distance-regatta-link {
+  display: grid;
+  gap: .45rem;
+  min-width: 0;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+
+.distance-regatta-link:hover {
+  color: var(--accent-dark);
+}
+
+.distance-regatta-logo {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: .35rem;
+}
+
+.distance-regatta-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.distance-regatta-link > span:last-child {
+  color: #55707d;
+  font-size: .72rem;
+  line-height: 1.35;
+}
+
+/* Adams Labor: material benefits from width, the text-led trainer card from a narrower column. */
+.lab-card-boat {
+  grid-column: span 7;
+}
+
+.lab-card-athlete {
+  grid-column: span 5;
+}
+
+/* Real concept images replacing the temporary laboratory diagrams. */
+.lab-image-frame {
+  margin: .35rem 0 .9rem;
+  padding: .55rem;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 18px;
+  background: rgba(255,255,255,.06);
+  overflow: hidden;
+}
+
+.lab-image-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* 2:1 measured-training artwork: use the available card width and preserve the full image. */
+.lab-image-frame-measured-training {
+  margin: .65rem 0 1.05rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.lab-image-frame-measured-training img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* Tafelbild: a restrained warm, light surround suggests a physical board in a sports hall.
+   The image itself remains unchanged and can be replaced independently later. */
+.lab-image-frame-training {
+  padding: 9px;
+  border: 1px solid rgba(247,245,239,.95);
+  border-radius: 16px;
+  background: #f7f5ef;
+  transform: rotate(-.2deg);
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.12),
+    inset 0 0 0 1px rgba(11,35,54,.10);
+}
+
+.lab-image-frame-training img {
+  max-height: 320px;
+  border-radius: 8px;
+}
+
+/* Oar comparison: seamless technical illustration directly on the navy card. */
+.lab-image-frame-oars {
+  margin: .9rem 0 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.lab-image-frame-oars img {
+  display: block;
+  width: 100%;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Mexiko: image fills the entire card up to the frame. */
+.lab-image-frame-altitude {
+  align-self: stretch;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.14);
+}
+
+.lab-image-frame-altitude img {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  border-radius: 17px;
+}
+
+@media (max-width: 920px) {
+  .voice-bubble-legacy {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .lab-card-boat,
+  .lab-card-athlete {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 640px) {
+  .lab-card-boat,
+  .lab-card-athlete {
+    grid-column: 1;
+  }
+
+  .lab-image-frame,
+  .lab-image-frame-training {
+    transform: none;
+  }
+
+  .lab-image-frame-training {
+    padding: 6px;
+  }
+
+  .lab-image-frame-measured-training img {
+    width: 100%;
+    max-height: none;
+  }
+
+  .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude):not(.lab-image-frame-oars):not(.lab-image-frame-measured-training) {
+    padding: .4rem;
+  }
+
+  .lab-image-frame img {
+    max-height: none;
+  }
+}
