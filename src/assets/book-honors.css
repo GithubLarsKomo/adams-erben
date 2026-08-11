@@ -16,6 +16,19 @@
   margin-top: 1.05rem;
 }
 
+/* The club finder is the primary navigation action on every viewport. */
+.site-header nav .nav-cta {
+  padding: .45rem .75rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--white);
+}
+
+.site-header nav .nav-cta:hover {
+  background: var(--accent-dark);
+  color: var(--white);
+}
+
 /* Keep the primary section navigation visible and touch-friendly on tablets and phones. */
 @media (max-width: 920px) {
   .site-header {
@@ -56,6 +69,17 @@
   .site-header nav a:hover {
     background: var(--water);
     color: var(--accent-dark);
+  }
+
+  .site-header nav .nav-cta {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--white);
+  }
+
+  .site-header nav .nav-cta:hover {
+    background: var(--accent-dark);
+    color: var(--white);
   }
 
   .site-header nav a:focus-visible {
