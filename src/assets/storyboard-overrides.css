@@ -28,6 +28,24 @@
   color: var(--story-accent-on-blue) !important;
 }
 
+/* Touring examples use one consistent light card treatment; numbering circles are omitted. */
+.rowing-explainer .touring-number {
+  display: none;
+}
+
+.rowing-explainer .touring-card-local {
+  background: white;
+  color: var(--navy);
+}
+
+.rowing-explainer .touring-card-local p:not(.card-kicker) {
+  color: #607783;
+}
+
+.rowing-explainer .touring-card-local .card-kicker {
+  color: var(--story-accent-on-light) !important;
+}
+
 /* The final voice closes the sequence on the right on desktop. */
 .voice-bubble-legacy {
   grid-column: 8 / -1;
