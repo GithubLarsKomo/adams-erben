@@ -31,6 +31,8 @@ const oarDiagram = `          <div class="oar-diagram" aria-label="Schematische 
             <small class="oar-label oar-label-in">Innenhebel</small><small class="oar-label oar-label-out">Außenhebel</small>
           </div>`;
 const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
+const altitudeMark = '<div class="altitude-mark" aria-hidden="true"><strong>≈ 2.200 m</strong><span>Mexiko-Stadt</span><i></i><small>Vorbereitung in der Höhe</small></div>';
+const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude"><img src="/assets/images/hoehe-mexiko.png" alt="Grafische Darstellung der Höhenvorbereitung auf die Olympischen Spiele 1968 in Mexiko-Stadt"></figure>';
 const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu Adams Erben heute ↓</a>\n';
 const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
@@ -39,6 +41,7 @@ const builtIndexHtml = indexHtml
   .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
   .replace(trainingNote, trainingImage)
   .replace(oarDiagram, oarImage)
+  .replace(altitudeMark, altitudeImage)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
   .replace('</head>', `${rowingStyles}${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
