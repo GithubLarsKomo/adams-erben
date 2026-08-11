@@ -16,15 +16,21 @@ await cp(src, dist, { recursive: true });
 
 const indexPath = path.join(dist, 'index.html');
 const indexHtml = await readFile(indexPath, 'utf8');
+const rowingExplainerPath = path.join(src, 'partials', 'rowing-explainer.html');
+const rowingExplainerHtml = await readFile(rowingExplainerPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
 const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
+const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.css">\n';
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
+const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
 const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
+  .replace('<a href="#stimmen">Stimmen</a>', '<a href="#rudern-verstehen">Rudern verstehen</a><a href="#stimmen">Stimmen</a>')
+  .replace(voicesAnchor, `${rowingExplainerHtml}\n\n${voicesAnchor}`)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
-  .replace('</head>', `${previewStyles}${previewRobots}</head>`);
+  .replace('</head>', `${rowingStyles}${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
