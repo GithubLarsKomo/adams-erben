@@ -1,6 +1,53 @@
 # Wayfinder – Adams Erben
 
-Stand: 2026-08-10
+Stand: 2026-08-11
+
+## Aktuelle Architekturentscheidung – 2026-08-11
+
+Die frühere Eskalationskette `Verein → LRV → DRV` ist als Produktlogik aufgehoben.
+
+Neue verbindliche Kontaktregel:
+
+```text
+Verein mit freigegebener direkter E-Mail
+→ Kontaktformular direkt an den Verein
+
+Verein ohne freigegebene direkte E-Mail
+→ keine Contact-Route
+→ Vereinswebsite, falls vorhanden
+→ andernfalls verfügbare Orts-/Adressinformation
+```
+
+Landesruderverbände und der DRV bleiben eigenständige Verzeichniseinträge und dürfen nur dann kontaktiert werden, wenn der Nutzer genau diese Organisation auswählt und für sie selbst ein direkter Kontakt freigegeben ist. Sie sind kein Fallback für Vereine.
+
+Technische Invarianten:
+
+- ein Verein ohne Direct-Freigabe hat keinen Eintrag in `build-private/recipients.json`;
+- `contactRouteLevel` ist in diesem Fall `none`;
+- die Contact-API akzeptiert nur direkte Routen mit `organizationId === routeOrganizationId`;
+- der Output-Validator schlägt bei indirektem bzw. Fallback-Routing fehl;
+- öffentliche Artefakte enthalten weiterhin keine E-Mail-Adressen.
+
+### Nearest-Neighbour-Suche
+
+Die Vereinssuche nach Nähe ist bewusst klein und providerfrei zur Laufzeit:
+
+```text
+lokaler PLZ-/Ortsindex
+→ Suchort im Browser auflösen
+→ Haversine-Distanz zu Rudervereinen
+→ sortieren
+→ Radius 25 / 50 / 100 km oder alle
+→ bis zu 5 nächste Vereine
+```
+
+- Der Produktions-Build nutzt die bereits vorhandene GeoNames-DE-Postleitzahlquelle, um einen lokalen Snapshot mit Ortsnamen und Koordinaten zu erzeugen.
+- Im Browser wird kein Google-, Karten- oder Geocoding-Dienst aufgerufen.
+- Optional kann `navigator.geolocation` verwendet werden; Adams Erben nutzt die gelieferten Koordinaten nur lokal zur Distanzberechnung.
+- Die angezeigte Entfernung ist ausdrücklich Luftlinie, keine Straßen- oder Fahrstrecke.
+- Fehlt im gewählten Radius ein Verein, werden stattdessen die drei geografisch nächsten Vereine angezeigt.
+
+**Alle Routingzahlen weiter unten sind historische Diagnosewerte der früheren Fallback-Architektur und kein aktuelles Sollverhalten mehr.**
 
 ## Fixierter Ausgangspunkt
 
@@ -8,7 +55,9 @@ Repository: `GithubLarsKomo/adams-erben`
 
 Immutable Ausgangs-SHA: `9ce485cdb5a9cef1bae60184589012c4c613ca9a`
 
-Arbeitsbranch: `feat/mvp-wayfinder`
+Ursprünglicher Arbeitsbranch: `feat/mvp-wayfinder`
+
+Aktueller Änderungsbranch: `feat/direct-club-contact-nearest`
 
 ## Architektur
 
@@ -25,14 +74,14 @@ DRV Registry
 
 Acquisition und Deployment bleiben getrennt; öffentliche Artefakte enthalten keine Kontaktadressen.
 
-## Bestätigte Referenzwerte
+## Bestätigte Referenzwerte – historischer Stand vor Direct-only
 
 - Registry Parser 1.1.5: **503/503 Profile = 100 %**.
 - 434 Vereine, 15 LRV, 54 sonstige Mitglieder.
 - DRV-seitig 411 Vereinswebsites vorhanden, 23 fehlend.
 - Contact Governance 1.1.0: personalisierte oder unzureichend belegte externe Kontakte werden nicht Auto-Direct.
-- 14/15 LRV besitzen eine sichere Direct-Route; Südwest bleibt bewusst DRV-Fallback.
-- Registry/Snapshot vor Vereinswebsite-Voll-Enrichment: **240 Direct / 180 LRV / 14 DRV**.
+- 14/15 LRV besaßen eine sichere Direct-Route; Südwest blieb im früheren Modell DRV-Fallback.
+- Registry/Snapshot vor Vereinswebsite-Voll-Enrichment: **240 Direct / 180 LRV / 14 DRV** im früheren Fallback-Modell.
 
 ## Candidate History – abgeschlossen
 
@@ -42,9 +91,10 @@ Last-known-good ist bis in den Snapshot replay-verifiziert:
 - `verifiedAt` wird nicht erneuert;
 - 180/270-Tage-Lifecycle bleibt wirksam;
 - Suppression/Korrektur bleiben autoritativ;
-- `processed` ohne Kontakt, `identity_review` und Discovery-pending resurrecten nichts.
+- `processed` ohne Kontakt, `identity_review` und Discovery-pending resurrecten nichts;
+- endet die Direct-Freigabe, entsteht im aktuellen Modell keine Ersatzroute zu LRV/DRV.
 
-## Bounded 100 Club Pilot
+## Bounded 100 Club Pilot – historische Fallback-Auswertung
 
 Frozen-ID-Kohorte:
 
@@ -80,14 +130,14 @@ Gemessen:
 
 Sicherheitsbefunde:
 
-- Saarbrücken 12103 bleibt korrekt Identity Review / DRV; die alte `ruderbund.de`-Fehlzuordnung ist weiterhin geschlossen.
-- 12417 ist wieder erreichbar und wird wieder korrekt Direct; der frühere Verlust war damit tatsächlich ein technischer Laufzeiteffekt.
+- Saarbrücken 12103 blieb korrekt Identity Review / DRV im damaligen Fallback-Modell; die alte `ruderbund.de`-Fehlzuordnung war geschlossen.
+- 12417 war wieder erreichbar und wurde wieder korrekt Direct; der frühere Verlust war damit tatsächlich ein technischer Laufzeiteffekt.
 - Contact Domain Evidence erzeugte zwei Trusted-Domain-Fälle, beide waren bereits Direct und verursachten keinen riskanten neuen Upgrade.
-- 11612 bleibt **Review**: 3 externe funktionale Domain-Kandidaten, aber keine Domain erreicht die Mehrsignal-Evidence. Die Regel wird deshalb nicht gelockert.
+- 11612 blieb **Review**: 3 externe funktionale Domain-Kandidaten, aber keine Domain erreichte die Mehrsignal-Evidence. Die Regel wurde deshalb nicht gelockert.
 
-Aktuelle Schlussfolgerung: Domain Evidence 1.0 ist konservativ und sicher, aber für 11612 nicht ausreichend. Kein Anlass zur Lockerung der Governance.
+Die Contact-Governance bleibt konservativ. Neu ist lediglich die Konsequenz eines nicht freigegebenen Kontakts: `none` statt Verbands-Fallback.
 
-## Verified Website Resolution – neuer produktionsnaher Pfad
+## Verified Website Resolution – produktionsnaher Pfad
 
 Die 23 Missing-Website-Fälle sind bereits manuell Ground-Truth-verifiziert:
 
@@ -95,7 +145,7 @@ Die 23 Missing-Website-Fälle sind bereits manuell Ground-Truth-verifiziert:
 - **5 `none`** ohne eigenständige Website;
 - 0 ambiguous.
 
-Neu umgesetzt:
+Umgesetzt:
 
 - `scripts/apply-verified-discovery.mjs`;
 - Quelle `manual-verified-discovery/1.0.0`;
@@ -104,33 +154,37 @@ Neu umgesetzt:
 - `none` bleibt bewusst missing;
 - Website-Resolution ist **nur Acquisition-Input** und genehmigt keine Kontaktadresse und keine Route;
 - Verifikationsdatum/Provenienz werden mitgeführt;
-- Unit-Test und MVP-CI sind grün.
+- Unit-Test und MVP-CI prüfen diesen Pfad.
 
-Damit ist `BRAVE_SEARCH_API_KEY` **kein Produktionsblocker mehr**. Der echte Search-Provider-PoC bleibt sinnvoll, um die spätere automatische Discovery-Präzision zu validieren, ist aber nicht mehr erforderlich, um die 18 bereits manuell verifizierten Websites zu nutzen.
+Damit ist `BRAVE_SEARCH_API_KEY` **kein Produktionsblocker**. Der echte Search-Provider-PoC bleibt sinnvoll, um die spätere automatische Discovery-Präzision zu validieren, ist aber nicht erforderlich, um die 18 bereits manuell verifizierten Websites zu nutzen.
 
-## Runde 5 – gestartet
+## Runde 5 – Einordnung unter Direct-only
 
-Der `Bounded 100 Club Pilot` ist auf denselben 100 IDs erweitert:
+Der `Bounded 100 Club Pilot` wurde auf denselben 100 IDs erweitert:
 
-- Registry/Snapshot-Routing bleibt unverändert;
 - ausschließlich der Acquisition-Registry werden die 18 manuell verifizierten Websites zugespielt;
 - erwartete bekannte Websites: **95**;
 - erwartete echte Discovery-pending-Fälle: **5**;
 - Seiten-/Robots-/Identity-/Privacy-Gates bleiben unverändert;
-- keine manuelle Website darf allein eine Direct-Route erzeugen; erst der normale Website-Crawler + Governance kann upgraden.
+- keine manuelle Website darf allein eine Direct-Route erzeugen; erst der normale Website-Crawler + Governance kann einen eigenen Vereinskontakt freigeben.
+
+Die alte Auswertung `Direct/LRV/DRV` ist für neue Produktentscheidungen nicht mehr maßgeblich. Relevant sind künftig insbesondere:
+
+- `Direct`: Verein besitzt einen freigegebenen eigenen Kontakt;
+- `none + website`: kein Formular, Website als CTA;
+- `none + no website`: kein Formular, nur Standort/Adresse;
+- Review-/Suppression-/Stale-Gründe für nicht freigegebene Direct-Kandidaten.
 
 ## Genau eine nächste ausführbare Aktion
 
-**Runde 5 auswerten, sobald der neue `Bounded 100 Club Pilot` beendet ist.**
+**Nach grünem PR #15 einen vollständigen produktionsnahen DRV-Snapshot mit der Direct-only-Policy erzeugen und die Verteilung `Direct / none+website / none+address` auswerten.**
 
 Stop-Gates:
 
-- Frozen-ID-Hash unverändert;
-- exakt 18 manuell verifizierte Websites übernommen und 5 `none` belassen;
-- 95 bekannte Websites / 5 pending;
-- keine neue Identity-Fehlzuordnung;
+- keine Vereinsroute zeigt auf eine andere `routeOrganizationId`;
+- kein Verein ohne `hasDirectContact` besitzt einen privaten Recipient;
 - keine E-Mail in öffentlichen Artefakten;
-- Direct-Upgrades der 18 neu erschlossenen Websites einzeln auf Plausibilität prüfen;
-- technische Fehlerquote und Review-Quote gegen Runde 4 vergleichen.
-
-Erst danach wird dieselbe Pipeline auf den Vollbestand modularisiert.
+- lokale PLZ-/Ortsdatei wird erzeugt und enthält nutzbare Koordinaten;
+- Ratzeburg/23909 liefert den RRC plausibel als nächsten Verein;
+- Suppression, Stale und Identity Review erzeugen `none`, keinen Verbands-Fallback;
+- Website-Fallbacks bleiben auf verifizierte Vereinswebsites beschränkt.

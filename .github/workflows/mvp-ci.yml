@@ -63,6 +63,7 @@ jobs:
           node --check scripts/discover-websites.mjs
           node --check scripts/discover-websites.test.mjs
           node --check src/assets/app.js
+          node --check src/assets/nearest.js
 
       - name: Test shared contact governance, history and domain evidence
         run: |
@@ -80,6 +81,9 @@ jobs:
 
       - name: Test approved snapshot routing
         run: npm run test:snapshot
+
+      - name: Test local nearest-club search
+        run: npm run test:nearest
 
       - name: Test DRV Länderrat LRV enrichment
         run: npm run test:lrv-laenderrat
@@ -114,13 +118,12 @@ jobs:
 
       - name: Validate generated search data
         run: |
-          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); console.log('organizations:',d.organizations.length)"
+          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); const p=JSON.parse(fs.readFileSync('dist/data/postal-locations.json','utf8')); if(!Array.isArray(p.locations)||p.locations.length<1) process.exit(1); console.log('organizations:',d.organizations.length,'postal locations:',p.locations.length)"
 
       - name: Build explicit public preview
         env:
           PREVIEW_MODE: '1'
-          SKIP_DRV_SYNC: '0'
-          REQUIRE_DRV_SYNC: '1'
+          SKIP_DRV_SYNC: '1'
         run: npm run build
 
       - name: Validate preview invariants
@@ -130,7 +133,7 @@ jobs:
           grep -q 'preview.css' dist/index.html
           grep -q 'noindex,nofollow' dist/index.html
           grep -q 'Prototyp' dist/index.html
-          grep -q 'Drei Schritte vom Film zum ersten Ruderschlag' dist/index.html
+          grep -q 'Geschichte wird lebendig, wenn jemand einsteigt.' dist/index.html
           grep -q 'Demo-Anfrage absenden' dist/assets/app.js
           grep -q 'Es wurden keine Daten an den Server übertragen' dist/assets/app.js
           grep -q '"preview": true' build-private/recipients.json
@@ -143,6 +146,8 @@ jobs:
           const lrv = d.organizations.find((x) => x.id === 'landesruderverband-schleswig-holstein');
           if (!lrv || lrv.contactRouteLevel !== 'lrv') throw new Error('LRV demo routing invalid');
           if (!d.organizations.some((x) => x.demo === true)) throw new Error('demo entries not marked');
+          const p = JSON.parse(fs.readFileSync('dist/data/postal-locations.json', 'utf8'));
+          if (!Array.isArray(p.locations) || p.locations.length < 12) throw new Error('preview postal lookup too small');
           NODE
           if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
             echo 'Preview browser data must not contain email addresses.' >&2

@@ -64,12 +64,14 @@ for (const id of ['lrv-bw', 'lrv-bayern', 'lrv-bremen', 'lrv-niedersachsen', 'lr
   assert.equal(result.recipients[id].routeLevel, 'lrv', `${id} should be a direct LRV route`);
 }
 for (const id of ['club-bw', 'club-bayern', 'club-bremen', 'club-ni', 'club-nrw']) {
-  assert.equal(result.recipients[id].routeLevel, 'lrv', `${id} should fall back to its LRV`);
+  assert.equal(result.recipients[id], undefined, `${id} must not fall back to its LRV`);
+  assert.equal(result.decisions.find((item) => item.id === id).routeLevel, 'none');
 }
 
 assert.equal(result.report.lrvIdentityHintsApplied, 5);
 assert.equal(result.report.directApproved, 5);
-assert.equal(result.report.routeCounts.lrv, 10);
+assert.equal(result.report.routeCounts.lrv, 5);
+assert.equal(result.report.routeCounts.none, 5);
 assert.equal(result.report.routeCounts.drv, 0);
 
 const bwPublic = result.organizations.find((item) => item.organizationId === '30010');

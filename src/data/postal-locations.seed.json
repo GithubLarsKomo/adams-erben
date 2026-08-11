@@ -1,0 +1,20 @@
+{
+  "source": "preview-demo",
+  "sourceLabel": "Lokaler Demo-Ortsindex für die Vorschau",
+  "locations": [
+    {"postalCode":"01067","places":["Dresden"],"latitude":51.0504,"longitude":13.7373},
+    {"postalCode":"10117","places":["Berlin"],"latitude":52.5200,"longitude":13.4050},
+    {"postalCode":"14467","places":["Potsdam"],"latitude":52.3906,"longitude":13.0645},
+    {"postalCode":"20095","places":["Hamburg"],"latitude":53.5503,"longitude":10.0014},
+    {"postalCode":"23552","places":["Lübeck"],"latitude":53.8655,"longitude":10.6866},
+    {"postalCode":"23909","places":["Ratzeburg"],"latitude":53.6990,"longitude":10.7720},
+    {"postalCode":"28195","places":["Bremen"],"latitude":53.0793,"longitude":8.8017},
+    {"postalCode":"30159","places":["Hannover"],"latitude":52.3759,"longitude":9.7320},
+    {"postalCode":"30169","places":["Hannover"],"latitude":52.3656,"longitude":9.7308},
+    {"postalCode":"50667","places":["Köln"],"latitude":50.9375,"longitude":6.9603},
+    {"postalCode":"55116","places":["Mainz"],"latitude":49.9929,"longitude":8.2473},
+    {"postalCode":"60311","places":["Frankfurt am Main"],"latitude":50.1109,"longitude":8.6821},
+    {"postalCode":"70173","places":["Stuttgart"],"latitude":48.7758,"longitude":9.1829},
+    {"postalCode":"80331","places":["München"],"latitude":48.1374,"longitude":11.5755}
+  ]
+}

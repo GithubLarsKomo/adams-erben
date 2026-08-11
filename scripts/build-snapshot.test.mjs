@@ -92,36 +92,41 @@ assert.equal(result.recipients['direct-rv'].routeLevel, 'club');
 assert.equal(result.recipients['direct-rv'].email, 'info@direct-rv.de');
 assert.equal(result.recipients['direct-rv'].policyVersion, '1.1.0');
 
-// An external role mailbox is no longer enough on its own. Without a verified
-// organization-domain relation it remains review and the club falls back to LRV.
-assert.equal(result.recipients['personal-rv'].routeLevel, 'lrv');
-assert.equal(result.recipients['personal-rv'].routeOrganizationId, '30011');
+// A non-approved club contact never falls back to a federation mailbox.
+assert.equal(result.recipients['personal-rv'], undefined);
 const personalDecision = result.decisions.find((item) => item.id === 'personal-rv');
 assert.ok(personalDecision.candidates.some((candidate) => candidate.reason === 'role_alias_external_unverified_domain'));
 assert.equal(personalDecision.directCandidateApproved, false);
+assert.equal(personalDecision.routeLevel, 'none');
 
-// Suppression overrides an otherwise valid direct address and falls back to LRV.
-assert.equal(result.recipients['suppressed-rv'].routeLevel, 'lrv');
-assert.equal(result.recipients['suppressed-rv'].routeOrganizationId, '30011');
+// Suppression removes contact completely instead of routing to the LRV.
+assert.equal(result.recipients['suppressed-rv'], undefined);
+assert.equal(result.decisions.find((item) => item.id === 'suppressed-rv').routeLevel, 'none');
 assert.equal(result.decisions.find((item) => item.id === 'suppressed-rv').suppressedCandidateCount, 1);
 
-// Personal contact with no usable state cannot bypass governance and reaches DRV.
-assert.equal(result.recipients['no-state-rv'].routeLevel, 'drv');
-assert.equal(result.recipients['no-state-rv'].routeOrganizationId, 'drv');
+// No usable direct address means no route, irrespective of state information.
+assert.equal(result.recipients['no-state-rv'], undefined);
+assert.equal(result.decisions.find((item) => item.id === 'no-state-rv').routeLevel, 'none');
 
-// Website enrichment can add a safe same-domain direct route even when DRV has no email.
+// Website enrichment may add a safe same-domain direct route.
 assert.equal(result.recipients['web-enriched-rv'].routeLevel, 'club');
 assert.equal(result.recipients['web-enriched-rv'].email, 'kontakt@web-enriched-rv.de');
 
-// Expired candidate is no longer direct and falls back to LRV.
-assert.equal(result.recipients['expired-rv'].routeLevel, 'lrv');
+// Expired contact is no longer direct and does not fall back.
+assert.equal(result.recipients['expired-rv'], undefined);
+assert.equal(result.decisions.find((item) => item.id === 'expired-rv').routeLevel, 'none');
 assert.equal(result.decisions.find((item) => item.id === 'expired-rv').staleCandidateCount, 1);
+
+// The LRV remains directly contactable only because its own address is approved.
+assert.equal(result.recipients['lrv-bayern'].routeLevel, 'lrv');
+assert.equal(result.recipients['lrv-bayern'].routeOrganizationId, '30011');
 
 assert.equal(result.report.registryOrganizations, 7);
 assert.equal(result.report.publicOrganizations, 8);
 assert.equal(result.report.routeCounts.club, 2);
-assert.equal(result.report.routeCounts.lrv, 4); // LRV itself + three club fallbacks
-assert.equal(result.report.routeCounts.drv, 1);
+assert.equal(result.report.routeCounts.lrv, 1);
+assert.equal(result.report.routeCounts.drv, 0);
+assert.equal(result.report.routeCounts.none, 4);
 assert.equal(result.report.organizationsWithSuppressedCandidates, 1);
 assert.equal(result.report.organizationsWithStaleCandidates, 1);
 

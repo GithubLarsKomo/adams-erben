@@ -17,7 +17,7 @@ const RECIPIENTS_FILE = process.env.SNAPSHOT_RECIPIENTS_FILE || 'build-private/r
 const DECISIONS_FILE = process.env.SNAPSHOT_DECISIONS_FILE || 'build-private/snapshot-decisions.json';
 const REPORT_DIR = process.env.SNAPSHOT_REPORT_DIR || 'artifacts/snapshot';
 
-const DRV_FALLBACK = {
+const DRV_DIRECTORY_CONTACT = {
   id: 'deutscher-ruderverband',
   organizationId: 'drv',
   name: 'Deutscher Ruderverband e.V.',
@@ -164,7 +164,7 @@ export function buildSnapshot({
   suppressionHashes = new Set(),
   suppressionSecret = '',
   now = new Date(),
-  drvFallback = DRV_FALLBACK
+  drvContact = DRV_DIRECTORY_CONTACT
 }) {
   const records = normalizeArray(registry);
   const externalByOrganization = externalCandidates instanceof Map ? externalCandidates : groupExternalCandidates(externalCandidates);
@@ -177,16 +177,6 @@ export function buildSnapshot({
     );
   }
 
-  const lrvRoutes = new Map();
-  for (const record of records) {
-    if (record.type !== 'lrv') continue;
-    const approved = (evaluatedByOrganization.get(record.organizationId) || []).find((candidate) => candidate.snapshotEligible);
-    if (!approved) continue;
-    for (const state of record.states || []) {
-      lrvRoutes.set(state, { record, candidate: approved });
-    }
-  }
-
   const recipients = {};
   const organizations = [];
   const decisions = [];
@@ -196,55 +186,37 @@ export function buildSnapshot({
     const direct = evaluated.find((candidate) => candidate.snapshotEligible) || null;
     const suppressedCount = evaluated.filter((candidate) => candidate.governanceState === 'suppressed').length;
     const staleCount = evaluated.filter((candidate) => ['stale', 'expired'].includes(candidate.lifecycleState) || candidate.governanceState === 'stale').length;
-
-    let routeLevel = 'drv';
-    let routeEmail = drvFallback.email;
-    let routeOrganizationId = drvFallback.organizationId;
-    let routeOrganizationName = drvFallback.name;
-    let sourceUrl = drvFallback.sourceUrl;
-    let verifiedAt = now.toISOString();
-    let decisionReason = direct ? direct.reason : 'drv_fallback';
+    const routeLevel = direct ? (record.type === 'lrv' ? 'lrv' : 'club') : 'none';
+    const routeOrganizationId = direct ? record.organizationId : '';
+    const routeOrganizationName = direct ? record.name : '';
+    const decisionReason = direct ? direct.reason : (evaluated.length ? 'no_eligible_direct_contact' : 'no_direct_contact_candidate');
 
     if (direct) {
-      routeLevel = record.type === 'lrv' ? 'lrv' : 'club';
-      routeEmail = direct.email;
-      routeOrganizationId = record.organizationId;
-      routeOrganizationName = record.name;
-      sourceUrl = direct.sourceUrl;
-      verifiedAt = direct.verifiedAt;
-      decisionReason = direct.reason;
-    } else if (record.type === 'club' && record.state && lrvRoutes.has(record.state)) {
-      const fallback = lrvRoutes.get(record.state);
-      routeLevel = 'lrv';
-      routeEmail = fallback.candidate.email;
-      routeOrganizationId = fallback.record.organizationId;
-      routeOrganizationName = fallback.record.name;
-      sourceUrl = fallback.candidate.sourceUrl;
-      verifiedAt = fallback.candidate.verifiedAt;
-      decisionReason = evaluated.length ? 'club_candidate_not_eligible_lrv_fallback' : 'no_club_candidate_lrv_fallback';
+      recipients[record.id] = {
+        organizationName: record.name,
+        organizationId: record.organizationId,
+        state: record.state,
+        states: record.states,
+        routeLevel,
+        email: direct.email,
+        routeOrganizationId: record.organizationId,
+        routeOrganizationName: record.name,
+        sourceUrl: direct.sourceUrl,
+        verifiedAt: direct.verifiedAt,
+        policyVersion: CONTACT_POLICY_VERSION,
+        decisionReason
+      };
     }
-
-    const key = record.id;
-    recipients[key] = {
-      organizationName: record.name,
-      organizationId: record.organizationId,
-      state: record.state,
-      states: record.states,
-      routeLevel,
-      email: routeEmail,
-      routeOrganizationId,
-      routeOrganizationName,
-      sourceUrl,
-      verifiedAt,
-      policyVersion: CONTACT_POLICY_VERSION,
-      decisionReason
-    };
 
     const identity = identityHints(record);
     const publicRecord = record.type === 'lrv' && !record.websiteFromDrv && identity.website
       ? { ...record, websiteFromDrv: identity.website, websiteStatus: 'present' }
       : record;
-    organizations.push(publicOrganizationFromRegistry(publicRecord, routeLevel, Boolean(direct)));
+    organizations.push({
+      ...publicOrganizationFromRegistry(publicRecord, routeLevel, Boolean(direct)),
+      latitude: Number.isFinite(Number(record.latitude)) ? Number(record.latitude) : null,
+      longitude: Number.isFinite(Number(record.longitude)) ? Number(record.longitude) : null
+    });
     decisions.push({
       id: record.id,
       organizationId: record.organizationId,
@@ -263,35 +235,35 @@ export function buildSnapshot({
   }
 
   organizations.push({
-    id: drvFallback.id,
-    organizationId: drvFallback.organizationId,
-    name: drvFallback.name,
+    id: drvContact.id,
+    organizationId: drvContact.organizationId,
+    name: drvContact.name,
     drvId: '',
     type: 'drv',
     city: 'Hannover',
     postalCode: '30169',
     state: 'Niedersachsen',
     states: ['Niedersachsen'],
-    website: drvFallback.website,
-    profileUrl: drvFallback.sourceUrl,
+    website: drvContact.website,
+    profileUrl: drvContact.sourceUrl,
     websiteStatus: 'present',
     hasDirectContact: true,
     contactRouteLevel: 'drv',
     featured: false
   });
-  recipients[drvFallback.id] = {
-    organizationName: drvFallback.name,
-    organizationId: drvFallback.organizationId,
+  recipients[drvContact.id] = {
+    organizationName: drvContact.name,
+    organizationId: drvContact.organizationId,
     state: 'Niedersachsen',
     states: ['Niedersachsen'],
     routeLevel: 'drv',
-    email: drvFallback.email,
-    routeOrganizationId: drvFallback.organizationId,
-    routeOrganizationName: drvFallback.name,
-    sourceUrl: drvFallback.sourceUrl,
+    email: drvContact.email,
+    routeOrganizationId: drvContact.organizationId,
+    routeOrganizationName: drvContact.name,
+    sourceUrl: drvContact.sourceUrl,
     verifiedAt: now.toISOString(),
     policyVersion: CONTACT_POLICY_VERSION,
-    decisionReason: 'system_drv_fallback'
+    decisionReason: 'system_direct_drv_contact'
   };
 
   organizations.sort((a, b) => {
@@ -304,7 +276,8 @@ export function buildSnapshot({
   const routeCounts = {
     club: decisions.filter((item) => item.routeLevel === 'club').length,
     lrv: decisions.filter((item) => item.routeLevel === 'lrv').length,
-    drv: decisions.filter((item) => item.routeLevel === 'drv').length
+    drv: decisions.filter((item) => item.routeLevel === 'drv').length,
+    none: decisions.filter((item) => item.routeLevel === 'none').length
   };
   const report = {
     generatedAt: now.toISOString(),
@@ -324,7 +297,7 @@ export function buildSnapshot({
 }
 
 function reportMarkdown(report) {
-  return `# Approved Snapshot – Quality Report\n\nStand: ${report.generatedAt}\n\n- Contact-Governance-Policy: **${report.policyVersion}**\n- Registry-Organisationen: **${report.registryOrganizations}**\n- öffentliche Organisationen inkl. DRV: **${report.publicOrganizations}**\n- direkt freigegebene Organisationskontakte: **${report.directApproved}**\n- verifizierte LRV-Identitätshinweise angewendet: **${report.lrvIdentityHintsApplied || 0}**\n- Routing Verein/Organisation: **${report.routeCounts.club}**\n- Routing LRV: **${report.routeCounts.lrv}**\n- Routing DRV: **${report.routeCounts.drv}**\n- Organisationen mit unterdrückten Kandidaten: **${report.organizationsWithSuppressedCandidates}**\n- Organisationen mit stale Kandidaten: **${report.organizationsWithStaleCandidates}**\n\nDer öffentliche Snapshot und dieser Report enthalten keine E-Mail-Adressen. E-Mail-Empfänger verbleiben ausschließlich in \`build-private/recipients.json\`.\n`;
+  return `# Approved Snapshot – Quality Report\n\nStand: ${report.generatedAt}\n\n- Contact-Governance-Policy: **${report.policyVersion}**\n- Registry-Organisationen: **${report.registryOrganizations}**\n- öffentliche Organisationen inkl. DRV: **${report.publicOrganizations}**\n- direkt freigegebene Organisationskontakte: **${report.directApproved}**\n- verifizierte LRV-Identitätshinweise angewendet: **${report.lrvIdentityHintsApplied || 0}**\n- direkte Kontakte Verein/Organisation: **${report.routeCounts.club}**\n- direkte Kontakte LRV: **${report.routeCounts.lrv}**\n- direkte Kontakte DRV aus Registry: **${report.routeCounts.drv}**\n- ohne direkten Kontakt: **${report.routeCounts.none}**\n- Organisationen mit unterdrückten Kandidaten: **${report.organizationsWithSuppressedCandidates}**\n- Organisationen mit stale Kandidaten: **${report.organizationsWithStaleCandidates}**\n\nDer öffentliche Snapshot und dieser Report enthalten keine E-Mail-Adressen. E-Mail-Empfänger verbleiben ausschließlich in \`build-private/recipients.json\`. Es gibt kein Fallback-Routing von Vereinen an Landesruderverbände oder den DRV.\n`;
 }
 
 async function main() {
@@ -360,8 +333,9 @@ async function main() {
   await writeFile(RECIPIENTS_FILE, JSON.stringify({
     generatedAt: now.toISOString(),
     policyVersion: CONTACT_POLICY_VERSION,
+    routingMode: 'direct-only',
     recipients: result.recipients,
-    drv: DRV_FALLBACK
+    drv: DRV_DIRECTORY_CONTACT
   }, null, 2));
   await writeFile(DECISIONS_FILE, JSON.stringify({
     generatedAt: now.toISOString(),
@@ -371,7 +345,7 @@ async function main() {
   await writeFile(path.join(REPORT_DIR, 'report.json'), JSON.stringify(result.report, null, 2));
   await writeFile(path.join(REPORT_DIR, 'report.md'), reportMarkdown(result.report));
 
-  console.log(`[snapshot] policy=${CONTACT_POLICY_VERSION}; direct=${result.report.directApproved}; club=${result.report.routeCounts.club}; lrv=${result.report.routeCounts.lrv}; drv=${result.report.routeCounts.drv}`);
+  console.log(`[snapshot] policy=${CONTACT_POLICY_VERSION}; direct=${result.report.directApproved}; club=${result.report.routeCounts.club}; lrv=${result.report.routeCounts.lrv}; none=${result.report.routeCounts.none}`);
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
