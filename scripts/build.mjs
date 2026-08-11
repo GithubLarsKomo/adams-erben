@@ -20,15 +20,25 @@ const rowingExplainerPath = path.join(src, 'partials', 'rowing-explainer.html');
 const rowingExplainerHtml = await readFile(rowingExplainerPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
 const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
-const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.css">\n';
+const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.css">\n  <link rel="stylesheet" href="/assets/storyboard-overrides.css">\n';
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
 const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
+const trainingNote = '<div class="training-note" aria-label="Historische Trainingsnotiz als gestalterische Illustration"><strong>7:00 Uhr · Turnhalle</strong><span>Scheibenhantel</span><span>Medizinball</span><span>Beinstreckkraft</span></div>';
+const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
+const oarDiagram = `          <div class="oar-diagram" aria-label="Schematische Darstellung von Innenhebel, Dolle und Außenhebel eines Riemens">
+            <span class="oar-handle">Griff</span><span class="oar-line oar-line-in"></span><span class="oar-gate">Dolle</span><span class="oar-line oar-line-out"></span><span class="oar-blade">Blatt</span>
+            <small class="oar-label oar-label-in">Innenhebel</small><small class="oar-label oar-label-out">Außenhebel</small>
+          </div>`;
+const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
+const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu Adams Erben heute ↓</a>\n';
 const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
   .replace('<a href="#stimmen">Stimmen</a>', '<a href="#rudern-verstehen">Rudern verstehen</a><a href="#stimmen">Stimmen</a>')
-  .replace(voicesAnchor, `${rowingExplainerHtml}\n\n${voicesAnchor}`)
+  .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
+  .replace(trainingNote, trainingImage)
+  .replace(oarDiagram, oarImage)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
   .replace('</head>', `${rowingStyles}${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
