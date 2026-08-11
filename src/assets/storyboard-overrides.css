@@ -47,36 +47,52 @@
   border-radius: 12px;
 }
 
+/* Tafelbild: nur ein sehr feiner Rahmen um das Bild, kein dicker Passepartout-Effekt. */
 .lab-image-frame-training {
-  background: #f6f0df;
-  border-color: rgba(11,35,54,.12);
-  transform: rotate(-.35deg);
-  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.30);
+  background: transparent;
+  transform: rotate(-.2deg);
+  box-shadow: none;
 }
 
 .lab-image-frame-training img {
   max-height: 320px;
+  border-radius: 17px;
+}
+
+.lab-image-frame-oars {
+  padding: .35rem;
 }
 
 .lab-image-frame-oars img {
-  max-height: 260px;
+  max-height: 280px;
 }
 
+/* Mexiko: Bild füllt die gesamte Karte bis zum Rahmen aus. */
 .lab-image-frame-altitude {
-  align-self: center;
+  align-self: stretch;
   margin: 0;
-  padding: .45rem;
-  background: rgba(255,255,255,.045);
+  padding: 0;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.14);
 }
 
 .lab-image-frame-altitude img {
-  max-height: 250px;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  border-radius: 17px;
 }
 
 @media (max-width: 640px) {
   .lab-image-frame,
   .lab-image-frame-training {
     transform: none;
+  }
+
+  .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude) {
     padding: .4rem;
   }
 
