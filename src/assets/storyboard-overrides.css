@@ -56,9 +56,9 @@
   border-radius: 12px;
 }
 
-/* 4:3 measured-training artwork: preserve the full image, keep it prominent but subordinate to the text. */
+/* 2:1 measured-training artwork: use the available card width and preserve the full image. */
 .lab-image-frame-measured-training {
-  margin: .55rem 0 1rem;
+  margin: .65rem 0 1.05rem;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -68,9 +68,11 @@
 }
 
 .lab-image-frame-measured-training img {
-  width: min(100%, 430px);
-  max-height: 285px;
-  margin: 0 auto;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
   object-fit: contain;
   border-radius: 10px;
 }
