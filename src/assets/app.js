@@ -5,6 +5,58 @@ const NEAREST_LIMIT = 5;
 const APP_MODE = document.querySelector('meta[name="adams-erben-mode"]')?.content || 'production';
 const PREVIEW_MODE = APP_MODE === 'preview';
 
+function ensureNearbyControls() {
+  const panel = document.querySelector('.search-panel');
+  if (!panel || document.querySelector('#find-nearby')) return;
+  const controls = document.createElement('div');
+  controls.className = 'nearby-controls';
+  controls.innerHTML = `
+    <div class="nearby-copy">
+      <strong>Vereine in deiner Nähe</strong>
+      <span>Ort oder PLZ oben eingeben. Die Entfernung wird lokal als Luftlinie berechnet – ohne Karten- oder Geocoding-Dienst.</span>
+    </div>
+    <label><span>Umkreis</span><select id="radius-filter"><option value="25">25 km</option><option value="50" selected>50 km</option><option value="100">100 km</option><option value="all">Alle</option></select></label>
+    <div class="nearby-actions">
+      <button class="button button-primary button-small" id="find-nearby" type="button">In der Nähe suchen</button>
+      <button class="button button-ghost button-small" id="use-location" type="button">Standort verwenden</button>
+    </div>
+    <p class="nearby-status" id="nearby-status" aria-live="polite"></p>`;
+  panel.insertAdjacentElement('afterend', controls);
+
+  if (!document.querySelector('style[data-nearby-styles]')) {
+    const style = document.createElement('style');
+    style.dataset.nearbyStyles = 'true';
+    style.textContent = `
+      .nearby-controls{margin-top:.8rem;padding:1rem;border:1px solid var(--line);border-radius:16px;background:var(--foam);display:grid;grid-template-columns:minmax(260px,2fr) minmax(130px,.5fr) auto;gap:.8rem;align-items:end}
+      .nearby-copy{display:grid;gap:.2rem}.nearby-copy span,.nearby-status{color:var(--muted);font-size:.82rem}.nearby-controls label{display:grid;gap:.35rem;font-size:.8rem;font-weight:750;color:var(--muted)}
+      .nearby-controls select{width:100%;border:1px solid #cfd7db;border-radius:11px;background:var(--white);color:var(--ink);padding:.65rem .8rem}.nearby-actions{display:flex;gap:.5rem;flex-wrap:wrap}.nearby-status{grid-column:1/-1;margin:0;min-height:1.3em}
+      .club-distance{display:block;margin-top:.35rem;color:var(--navy-2);font-size:.82rem;font-weight:800}.club-route-neutral{color:var(--muted)}.club-address-fallback{font-size:.86rem;color:var(--ink)}
+      @media(max-width:920px){.nearby-controls{grid-template-columns:1fr 1fr}.nearby-copy,.nearby-status{grid-column:1/-1}.nearby-actions{align-self:end}}
+      @media(max-width:640px){.nearby-controls{grid-template-columns:1fr}.nearby-copy,.nearby-status{grid-column:auto}}
+    `;
+    document.head.append(style);
+  }
+}
+
+function applyDirectContactCopy() {
+  const journey = document.querySelector('.journey .principles article:nth-child(2) p');
+  if (journey) journey.textContent = 'Wenn der Verein eine öffentliche E-Mail-Adresse bereitstellt, kannst du direkt anfragen. Andernfalls führt Adams Erben zur Vereinswebsite oder zeigt den verfügbaren Standort.';
+  const policyCard = document.querySelector('#ueber .principles article:nth-child(2)');
+  if (policyCard) {
+    const heading = policyCard.querySelector('h3');
+    const copy = policyCard.querySelector('p');
+    if (heading) heading.textContent = 'Direkter Kontakt – kein Verbands-Fallback';
+    if (copy) copy.textContent = 'Eine Anfrage wird nur angeboten, wenn für die ausgewählte Organisation selbst eine freigegebene öffentliche E-Mail-Adresse vorliegt. Fehlt sie, wird nicht an Landesruderverband oder DRV umgeleitet.';
+  }
+  const routingNote = document.querySelector('.routing-note');
+  if (routingNote) routingNote.textContent = 'Die Empfängeradresse wird ausschließlich serverseitig aus dem direkten, freigegebenen Kontakt der ausgewählten Organisation bestimmt. Es gibt kein Fallback an einen Verband.';
+  const consent = document.querySelector('#contact-form .consent span');
+  if (consent) consent.innerHTML = 'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme ausschließlich an die ausgewählte Organisation übermittelt werden. Details stehen in der <a href="/datenschutz.php" target="_blank">Datenschutzerklärung</a>.';
+}
+
+ensureNearbyControls();
+applyDirectContactCopy();
+
 const searchInput = document.querySelector('#search');
 const typeFilter = document.querySelector('#type-filter');
 const stateFilter = document.querySelector('#state-filter');
@@ -93,6 +145,13 @@ function filteredOrganizations() {
   });
 }
 
+function contactButtonLabel(org) {
+  if (PREVIEW_MODE) return 'Kontakt (Demo)';
+  if (org.type === 'lrv') return 'Verband kontaktieren';
+  if (org.type === 'drv') return 'DRV kontaktieren';
+  return 'Verein kontaktieren';
+}
+
 function clubCard(org) {
   const location = [org.postalCode, org.city].filter(Boolean).join(' ');
   const meta = [location, org.state].filter(Boolean).join(' · ');
@@ -108,15 +167,15 @@ function clubCard(org) {
   let contactHint = '';
   let actions = '';
   if (direct) {
-    const contactLabel = PREVIEW_MODE ? 'Kontakt (Demo)' : 'Verein kontaktieren';
-    contactHint = '<p class="club-route">Direkter Kontakt zum ausgewählten Verein bzw. zur ausgewählten Organisation</p>';
+    contactHint = '<p class="club-route">Direkter Kontakt zur ausgewählten Organisation</p>';
     const links = [websiteLink, profileLink].filter(Boolean).join('<span aria-hidden="true"> · </span>');
-    actions = `<button class="button button-primary button-small" type="button" data-contact="${escaped(org.id)}">${contactLabel}</button>${links ? `<span class="text-links">${links}</span>` : ''}`;
+    actions = `<button class="button button-primary button-small" type="button" data-contact="${escaped(org.id)}">${contactButtonLabel(org)}</button>${links ? `<span class="text-links">${links}</span>` : ''}`;
   } else if (websiteUrl) {
-    contactHint = '<p class="club-route club-route-neutral">Keine öffentliche Vereins-E-Mail hinterlegt – bitte nutze die Vereinswebsite.</p>';
-    actions = `<a class="button button-secondary button-small" href="${escaped(websiteUrl)}" target="_blank" rel="noopener noreferrer">Zur Vereinswebsite</a>${profileLink ? `<span class="text-links">${profileLink}</span>` : ''}`;
+    contactHint = '<p class="club-route club-route-neutral">Keine öffentliche direkte E-Mail hinterlegt – bitte nutze die Website.</p>';
+    const websiteLabel = org.type === 'club' ? 'Zur Vereinswebsite' : 'Zur Website';
+    actions = `<a class="button button-secondary button-small" href="${escaped(websiteUrl)}" target="_blank" rel="noopener noreferrer">${websiteLabel}</a>${profileLink ? `<span class="text-links">${profileLink}</span>` : ''}`;
   } else if (address) {
-    contactHint = '<p class="club-route club-route-neutral">Keine öffentliche Vereins-E-Mail oder Vereinswebsite hinterlegt.</p>';
+    contactHint = '<p class="club-route club-route-neutral">Keine öffentliche direkte E-Mail oder eigene Website hinterlegt.</p>';
     actions = `<span class="club-address-fallback"><strong>${org.streetAddress ? 'Anschrift' : 'Standort'}:</strong> ${escaped(address)}</span>`;
   } else {
     contactHint = '<p class="club-route club-route-neutral">Für diesen Eintrag liegen derzeit keine direkten Kontaktdaten vor.</p>';
@@ -143,11 +202,7 @@ function nearbyResults() {
   const radius = radiusKm();
   const inRadius = nearestClubs(organizations, nearbyOrigin, postalIndex, { radiusKm: radius, limit: NEAREST_LIMIT });
   if (inRadius.length) return { clubs: inRadius, fallback: false, radius };
-  return {
-    clubs: nearestClubs(organizations, nearbyOrigin, postalIndex, { radiusKm: Infinity, limit: 3 }),
-    fallback: true,
-    radius
-  };
+  return { clubs: nearestClubs(organizations, nearbyOrigin, postalIndex, { radiusKm: Infinity, limit: 3 }), fallback: true, radius };
 }
 
 function render() {
@@ -207,19 +262,13 @@ function useBrowserLocation() {
   if (nearbyStatus) nearbyStatus.textContent = 'Standortfreigabe wird angefragt …';
   navigator.geolocation.getCurrentPosition(
     (position) => {
-      nearbyOrigin = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        label: 'deinem aktuellen Standort'
-      };
+      nearbyOrigin = { latitude: position.coords.latitude, longitude: position.coords.longitude, label: 'deinem aktuellen Standort' };
       if (typeFilter) typeFilter.value = 'club';
       if (stateFilter) stateFilter.value = 'all';
       if (nearbyStatus) nearbyStatus.textContent = 'Standort übernommen. Die Koordinaten werden nur lokal im Browser für die Entfernungsberechnung verwendet.';
       render();
     },
-    () => {
-      if (nearbyStatus) nearbyStatus.textContent = 'Standort konnte nicht verwendet werden. Nutze stattdessen Ort oder PLZ.';
-    },
+    () => { if (nearbyStatus) nearbyStatus.textContent = 'Standort konnte nicht verwendet werden. Nutze stattdessen Ort oder PLZ.'; },
     { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
   );
 }
@@ -234,7 +283,6 @@ function openContact(id) {
   contactStatus.textContent = PREVIEW_MODE
     ? 'Demo: Die Nachricht würde ausschließlich direkt an die ausgewählte Organisation gehen. Es werden keine Daten übertragen.'
     : 'Deine Nachricht wird ausschließlich direkt an die ausgewählte Organisation gesendet.';
-
   const submitButton = contactForm.querySelector('button[type="submit"]');
   submitButton.disabled = false;
   submitButton.textContent = PREVIEW_MODE ? 'Demo-Anfrage absenden' : 'Anfrage senden';
@@ -245,18 +293,15 @@ function openContact(id) {
 async function submitContact(event) {
   event.preventDefault();
   const button = contactForm.querySelector('button[type="submit"]');
-
   if (PREVIEW_MODE) {
     contactStatus.textContent = 'Demo erfolgreich: Es würde ausschließlich der direkte Kontakt der ausgewählten Organisation verwendet. Es wurden keine Daten an den Server übertragen.';
     button.textContent = 'Demo angezeigt';
     return;
   }
-
   button.disabled = true;
   contactStatus.textContent = 'Anfrage wird gesendet …';
   const payload = Object.fromEntries(new FormData(contactForm).entries());
   payload.consent = contactForm.elements.consent.checked ? '1' : '0';
-
   try {
     const response = await fetch('/api/contact.php', {
       method: 'POST',
