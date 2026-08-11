@@ -23,6 +23,7 @@ const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rec
 const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
+  .replace('<script src="/assets/app.js" defer></script>', '<script type="module" src="/assets/app.js"></script>')
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
   .replace('</head>', `${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
