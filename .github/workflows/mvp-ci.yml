@@ -133,7 +133,7 @@ jobs:
           grep -q 'preview.css' dist/index.html
           grep -q 'noindex,nofollow' dist/index.html
           grep -q 'Prototyp' dist/index.html
-          grep -q 'Drei Schritte vom Film zum ersten Ruderschlag' dist/index.html
+          grep -q 'Geschichte wird lebendig, wenn jemand einsteigt.' dist/index.html
           grep -q 'Demo-Anfrage absenden' dist/assets/app.js
           grep -q 'Es wurden keine Daten an den Server übertragen' dist/assets/app.js
           grep -q '"preview": true' build-private/recipients.json
