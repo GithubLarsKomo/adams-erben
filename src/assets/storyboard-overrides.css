@@ -28,6 +28,55 @@
   color: var(--story-accent-on-blue) !important;
 }
 
+/* The final voice closes the sequence on the right on desktop. */
+.voice-bubble-legacy {
+  grid-column: 8 / -1;
+  grid-row: 3;
+}
+
+/* Long-distance examples: equal visual slots without cropping non-square logos. */
+.distance-regattas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.distance-regatta-link {
+  display: grid;
+  gap: .45rem;
+  min-width: 0;
+  color: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+
+.distance-regatta-link:hover {
+  color: var(--accent-dark);
+}
+
+.distance-regatta-logo {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: .35rem;
+}
+
+.distance-regatta-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.distance-regatta-link > span:last-child {
+  color: #55707d;
+  font-size: .72rem;
+  line-height: 1.35;
+}
+
 /* Adams Labor: material benefits from width, the text-led trainer card from a narrower column. */
 .lab-card-boat {
   grid-column: span 7;
@@ -133,6 +182,11 @@
 }
 
 @media (max-width: 920px) {
+  .voice-bubble-legacy {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
   .lab-card-boat,
   .lab-card-athlete {
     grid-column: span 6;
