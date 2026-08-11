@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest]
   pull_request:
 
 permissions:
@@ -28,12 +28,20 @@ jobs:
         run: |
           node --check scripts/build.mjs
           node --check scripts/sync-drv.mjs
+          node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
           node --check scripts/validate-drv-output.test.mjs
           node --check src/assets/app.js
+          node --check src/assets/nearest.js
 
       - name: DRV output validator tests
         run: npm run test:drv-output
+
+      - name: Direct-only snapshot tests
+        run: npm run test:snapshot
+
+      - name: Local nearest-club tests
+        run: npm run test:nearest
 
       - name: Build with checked-in seed
         env:
@@ -50,11 +58,11 @@ jobs:
 
       - name: Validate generated search data
         run: |
-          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); console.log('organizations:',d.organizations.length)"
+          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('dist/data/clubs.json','utf8')); if(!Array.isArray(d.organizations)||d.organizations.length<1) process.exit(1); const r=d.organizations.find(x=>x.id==='ratzeburger-ruderclub-ev'); if(!r||!r.featured) process.exit(1); const p=JSON.parse(fs.readFileSync('dist/data/postal-locations.json','utf8')); if(!Array.isArray(p.locations)||p.locations.length<1) process.exit(1); console.log('organizations:',d.organizations.length,'postal locations:',p.locations.length)"
 
       - name: Validate seed fallback routing metadata
         run: |
-          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('build-private/recipients.json','utf8')); if(d.routingMode!=='drv-only-fallback'||Object.keys(d.recipients||{}).length!==0) process.exit(1); console.log('routingMode:',d.routingMode)"
+          node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('build-private/recipients.json','utf8')); if(d.routingMode!=='direct-only'||Object.keys(d.recipients||{}).length!==0) process.exit(1); console.log('routingMode:',d.routingMode)"
 
       - name: PHP syntax
         run: |
