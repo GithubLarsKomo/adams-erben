@@ -74,16 +74,24 @@
   border-radius: 8px;
 }
 
-/* The historical oar comparison is horizontal and should exploit the wider material card. */
+/* Oar comparison: seamless technical illustration directly on the navy card. */
 .lab-image-frame-oars {
-  margin: .65rem 0 1rem;
-  padding: .3rem;
+  margin: .9rem 0 1.25rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .lab-image-frame-oars img {
+  display: block;
   width: 100%;
   max-height: none;
   object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* Mexiko: image fills the entire card up to the frame. */
@@ -125,7 +133,7 @@
     padding: 6px;
   }
 
-  .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude) {
+  .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude):not(.lab-image-frame-oars) {
     padding: .4rem;
   }
 
