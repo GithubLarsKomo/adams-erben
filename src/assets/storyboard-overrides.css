@@ -28,6 +28,15 @@
   color: var(--story-accent-on-blue) !important;
 }
 
+/* Adams Labor: material benefits from width, the text-led trainer card from a narrower column. */
+.lab-card-boat {
+  grid-column: span 7;
+}
+
+.lab-card-athlete {
+  grid-column: span 5;
+}
+
 /* Real concept images replacing the temporary laboratory diagrams. */
 .lab-image-frame {
   margin: .35rem 0 .9rem;
@@ -47,29 +56,37 @@
   border-radius: 12px;
 }
 
-/* Tafelbild: nur ein sehr feiner Rahmen um das Bild, kein dicker Passepartout-Effekt. */
+/* Tafelbild: a restrained warm, light surround suggests a physical board in a sports hall.
+   The image itself remains unchanged and can be replaced independently later. */
 .lab-image-frame-training {
-  padding: 0;
-  border: 1px solid rgba(255,255,255,.30);
-  background: transparent;
+  padding: 9px;
+  border: 1px solid rgba(247,245,239,.95);
+  border-radius: 16px;
+  background: #f7f5ef;
   transform: rotate(-.2deg);
-  box-shadow: none;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.12),
+    inset 0 0 0 1px rgba(11,35,54,.10);
 }
 
 .lab-image-frame-training img {
   max-height: 320px;
-  border-radius: 17px;
+  border-radius: 8px;
 }
 
+/* The historical oar comparison is horizontal and should exploit the wider material card. */
 .lab-image-frame-oars {
-  padding: .35rem;
+  margin: .65rem 0 1rem;
+  padding: .3rem;
 }
 
 .lab-image-frame-oars img {
-  max-height: 280px;
+  width: 100%;
+  max-height: none;
+  object-fit: contain;
 }
 
-/* Mexiko: Bild füllt die gesamte Karte bis zum Rahmen aus. */
+/* Mexiko: image fills the entire card up to the frame. */
 .lab-image-frame-altitude {
   align-self: stretch;
   margin: 0;
@@ -86,10 +103,26 @@
   border-radius: 17px;
 }
 
+@media (max-width: 920px) {
+  .lab-card-boat,
+  .lab-card-athlete {
+    grid-column: span 6;
+  }
+}
+
 @media (max-width: 640px) {
+  .lab-card-boat,
+  .lab-card-athlete {
+    grid-column: 1;
+  }
+
   .lab-image-frame,
   .lab-image-frame-training {
     transform: none;
+  }
+
+  .lab-image-frame-training {
+    padding: 6px;
   }
 
   .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude) {
