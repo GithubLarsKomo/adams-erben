@@ -81,24 +81,54 @@ export function validateDrvOutput(publicData, privateData, options = {}) {
   const duplicateIds = publicIds.filter((id, index) => publicIds.indexOf(id) !== index);
   if (duplicateIds.length) errors.push(`duplicate public organization ids: ${[...new Set(duplicateIds)].join(', ')}`);
 
-  const missingRecipients = [];
+  const missingDirectRecipients = [];
+  const unexpectedRecipients = [];
   const invalidRecipients = [];
-  for (const id of publicIds) {
+  const indirectRecipients = [];
+
+  for (const org of organizations) {
+    const id = org?.id;
+    if (!id) continue;
     const recipient = recipients[id];
-    if (!recipient) {
-      missingRecipients.push(id);
+    const shouldHaveDirect = org?.hasDirectContact === true;
+
+    if (shouldHaveDirect && !recipient) {
+      missingDirectRecipients.push(id);
       continue;
     }
+    if (!shouldHaveDirect && recipient) {
+      unexpectedRecipients.push(id);
+      continue;
+    }
+    if (!recipient) {
+      if (org?.contactRouteLevel !== 'none') {
+        errors.push(`organization without direct recipient must use contactRouteLevel=none: ${id}`);
+      }
+      continue;
+    }
+
     if (!ROUTE_LEVELS.has(recipient.routeLevel) || !EMAIL_RE.test(String(recipient.email || ''))) {
       invalidRecipients.push(id);
+      continue;
+    }
+    const organizationId = String(recipient.organizationId || '');
+    const routeOrganizationId = String(recipient.routeOrganizationId || '');
+    if (!organizationId || !routeOrganizationId || organizationId !== routeOrganizationId) {
+      indirectRecipients.push(id);
     }
   }
 
-  if (missingRecipients.length) {
-    errors.push(`missing routing recipients for ${missingRecipients.length} public organizations: ${missingRecipients.slice(0, 20).join(', ')}${missingRecipients.length > 20 ? ', …' : ''}`);
+  if (missingDirectRecipients.length) {
+    errors.push(`missing direct recipients for ${missingDirectRecipients.length} organizations: ${missingDirectRecipients.slice(0, 20).join(', ')}${missingDirectRecipients.length > 20 ? ', …' : ''}`);
+  }
+  if (unexpectedRecipients.length) {
+    errors.push(`unexpected recipients for ${unexpectedRecipients.length} organizations without direct contact: ${unexpectedRecipients.slice(0, 20).join(', ')}${unexpectedRecipients.length > 20 ? ', …' : ''}`);
   }
   if (invalidRecipients.length) {
     errors.push(`invalid route/email for ${invalidRecipients.length} recipients: ${invalidRecipients.slice(0, 20).join(', ')}${invalidRecipients.length > 20 ? ', …' : ''}`);
+  }
+  if (indirectRecipients.length) {
+    errors.push(`indirect/fallback routing detected for ${indirectRecipients.length} recipients: ${indirectRecipients.slice(0, 20).join(', ')}${indirectRecipients.length > 20 ? ', …' : ''}`);
   }
 
   const orphanRecipients = Object.keys(recipients).filter((id) => !publicIds.includes(id));
@@ -106,9 +136,9 @@ export function validateDrvOutput(publicData, privateData, options = {}) {
     warnings.push(`orphan private recipient entries (${orphanRecipients.length}): ${orphanRecipients.slice(0, 20).join(', ')}${orphanRecipients.length > 20 ? ', …' : ''}`);
   }
 
-  const routeCounts = { club: 0, lrv: 0, drv: 0 };
-  for (const id of publicIds) {
-    const level = recipients[id]?.routeLevel;
+  const routeCounts = { club: 0, lrv: 0, drv: 0, none: 0 };
+  for (const org of organizations) {
+    const level = org?.contactRouteLevel || 'none';
     if (level in routeCounts) routeCounts[level] += 1;
   }
 
@@ -146,7 +176,7 @@ async function main() {
   console.log(
     `[drv-validate] organizations=${result.metrics.organizations}, clubs=${result.metrics.clubs}, ` +
     `stateCoverage=${(result.metrics.stateCoverage * 100).toFixed(1)}%, recipients=${result.metrics.recipients}, ` +
-    `routes=club:${result.metrics.routeCounts.club}/lrv:${result.metrics.routeCounts.lrv}/drv:${result.metrics.routeCounts.drv}`
+    `routes=club:${result.metrics.routeCounts.club}/lrv:${result.metrics.routeCounts.lrv}/drv:${result.metrics.routeCounts.drv}/none:${result.metrics.routeCounts.none}`
   );
 
   if (!result.ok) {
