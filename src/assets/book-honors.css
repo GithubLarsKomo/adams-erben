@@ -15,3 +15,63 @@
 .book-honors .inline-actions {
   margin-top: 1.05rem;
 }
+
+/* Keep the primary section navigation visible and touch-friendly on tablets and phones. */
+@media (max-width: 920px) {
+  .site-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .75rem;
+  }
+
+  .site-header .brand {
+    align-self: flex-start;
+  }
+
+  .site-header nav {
+    display: flex;
+    width: 100%;
+    gap: .5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: .15rem 0 .55rem;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .site-header nav a {
+    flex: 0 0 auto;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    padding: .58rem .85rem;
+    border: 1px solid rgba(11, 35, 54, .14);
+    border-radius: 999px;
+    background: var(--foam);
+    color: var(--navy);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .site-header nav a:hover {
+    background: var(--water);
+    color: var(--accent-dark);
+  }
+
+  .site-header nav a:focus-visible {
+    outline: 3px solid #f2b544;
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding-top: .75rem;
+    padding-bottom: .65rem;
+  }
+
+  .site-header nav {
+    margin-inline: -.15rem;
+    padding-inline: .15rem;
+  }
+}
