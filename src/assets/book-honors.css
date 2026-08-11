@@ -32,9 +32,17 @@
 /* Keep the primary section navigation visible and touch-friendly on tablets and phones. */
 @media (max-width: 920px) {
   .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
     flex-direction: column;
     align-items: stretch;
     gap: .75rem;
+    background: rgba(255, 253, 248, .96);
+    border-bottom: 1px solid rgba(11, 35, 54, .1);
+    box-shadow: 0 8px 22px rgba(11, 35, 54, .06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .site-header .brand {
@@ -47,8 +55,10 @@
     gap: .5rem;
     flex-wrap: nowrap;
     overflow-x: auto;
+    overscroll-behavior-inline: contain;
     padding: .15rem 0 .55rem;
     scrollbar-width: thin;
+    scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -64,6 +74,7 @@
     color: var(--navy);
     line-height: 1.1;
     white-space: nowrap;
+    scroll-snap-align: start;
   }
 
   .site-header nav a:hover {
@@ -86,16 +97,36 @@
     outline: 3px solid #f2b544;
     outline-offset: 2px;
   }
+
+  /* Anchor targets must not disappear underneath the sticky mobile header. */
+  section[id] {
+    scroll-margin-top: 9.5rem;
+  }
 }
 
 @media (max-width: 640px) {
   .site-header {
-    padding-top: .75rem;
-    padding-bottom: .65rem;
+    padding-top: .65rem;
+    padding-bottom: .55rem;
+    gap: .55rem;
+  }
+
+  .site-header .brand small {
+    display: none;
+  }
+
+  .site-header .brand-mark {
+    width: 38px;
+    height: 38px;
   }
 
   .site-header nav {
     margin-inline: -.15rem;
     padding-inline: .15rem;
+    padding-bottom: .35rem;
+  }
+
+  section[id] {
+    scroll-margin-top: 8.25rem;
   }
 }
