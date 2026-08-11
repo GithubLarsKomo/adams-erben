@@ -159,3 +159,16 @@
     scroll-margin-top: 6.75rem;
   }
 }
+
+/* Replace the schematic boat mark in the first hero card with the Lake Albano 1960 skiff still. */
+.hero-art {
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  background: url('/assets/images/hero-skiff.png') center center / cover no-repeat;
+  box-shadow: 0 24px 60px rgba(3, 18, 28, .28);
+}
+
+.hero-art svg {
+  display: none;
+}
