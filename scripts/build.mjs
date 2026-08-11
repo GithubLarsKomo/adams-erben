@@ -24,6 +24,22 @@ const builtIndexHtml = indexHtml
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
   .replace('<script src="/assets/app.js" defer></script>', '<script type="module" src="/assets/app.js"></script>')
+  .replace(
+    'Adams Erben bringt deine Anfrage zum passenden Verein oder – falls nötig – zur zuständigen Verbandsstelle.',
+    'Wenn der Verein eine öffentliche E-Mail-Adresse bereitstellt, kannst du direkt anfragen. Andernfalls führt Adams Erben zur Vereinswebsite oder zeigt den verfügbaren Standort.'
+  )
+  .replace(
+    '<h3>Sicheres Kontakt-Routing</h3><p>Eine Anfrage geht zuerst an den gewählten Verein. Fehlt dort eine öffentliche Kontaktadresse, wird sie an den zuständigen Landesruderverband und erst danach an den DRV geroutet.</p>',
+    '<h3>Direkter Kontakt – kein Verbands-Fallback</h3><p>Eine Anfrage wird nur angeboten, wenn für die ausgewählte Organisation selbst eine freigegebene öffentliche E-Mail-Adresse vorliegt. Fehlt sie, wird nicht an Landesruderverband oder DRV umgeleitet.</p>'
+  )
+  .replace(
+    'Die Empfängeradresse wird ausschließlich serverseitig aus dem gewählten Verein bestimmt und kann nicht frei eingegeben werden.',
+    'Die Empfängeradresse wird ausschließlich serverseitig aus dem direkten, freigegebenen Kontakt der ausgewählten Organisation bestimmt. Es gibt kein Fallback an einen Verband.'
+  )
+  .replace(
+    'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme an den angezeigten Verein bzw. den zuständigen Verband übermittelt werden.',
+    'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme ausschließlich an die ausgewählte Organisation übermittelt werden.'
+  )
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
   .replace('</head>', `${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
