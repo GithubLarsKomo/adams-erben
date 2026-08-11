@@ -1,0 +1,75 @@
+/* Small visual corrections for the rowing explainer concept branch.
+   Keep the established palette, but choose the accent according to background contrast. */
+
+:root {
+  --story-accent-on-light: var(--accent);
+  --story-accent-on-dark: #92d6ea;
+  --story-accent-on-blue: var(--navy);
+}
+
+/* Existing red remains the accent on white / cream / neutral light surfaces. */
+.rowing-explainer .boat-compare-card:not(.boat-compare-card-dark) .card-kicker,
+.rowing-explainer .rowing-panel .card-kicker,
+.rowing-explainer .age-band .card-kicker,
+.rowing-explainer .touring-card .card-kicker {
+  color: var(--story-accent-on-light) !important;
+}
+
+/* Light blue replaces red wherever the component sits on navy. */
+.rowing-chapter-racing > .rowing-chapter-intro .rowing-kicker,
+.rowing-chapter-racing .boat-compare-card-dark .card-kicker,
+.rowing-chapter-racing .eight-explainer .card-kicker,
+.rowing-chapter-racing .race-strip .card-kicker {
+  color: var(--story-accent-on-dark) !important;
+}
+
+/* Navy replaces pale blue on the light-blue touring chapter background. */
+.rowing-chapter-touring > .rowing-chapter-intro .rowing-kicker {
+  color: var(--story-accent-on-blue) !important;
+}
+
+/* Real concept images replacing the temporary laboratory diagrams. */
+.lab-image-frame {
+  margin: .35rem 0 .9rem;
+  padding: .55rem;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 18px;
+  background: rgba(255,255,255,.06);
+  overflow: hidden;
+}
+
+.lab-image-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.lab-image-frame-training {
+  background: #f6f0df;
+  border-color: rgba(11,35,54,.12);
+  transform: rotate(-.35deg);
+  box-shadow: 0 8px 18px rgba(0,0,0,.12);
+}
+
+.lab-image-frame-training img {
+  max-height: 320px;
+}
+
+.lab-image-frame-oars img {
+  max-height: 260px;
+}
+
+@media (max-width: 640px) {
+  .lab-image-frame,
+  .lab-image-frame-training {
+    transform: none;
+    padding: .4rem;
+  }
+
+  .lab-image-frame img {
+    max-height: none;
+  }
+}
