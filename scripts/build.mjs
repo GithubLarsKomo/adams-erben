@@ -30,6 +30,20 @@ const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="
 const historyAnchor = '    <section class="history" id="geschichte" aria-labelledby="history-title">';
 const academyCityParagraph = '<p>Die rund zweistündige Themenführung folgt den Spuren Karl Adams und der Ratzeburger Rudergeschichte: vom Karl-Adam-Gedenkstein beim RRC über die frühere Gelehrtenschule und das historische Bootshaus bis zur Ruderakademie.</p>';
 const academyCityLink = '<a class="text-link city-academy-link" href="#ruderakademie">Mehr zur Ruderakademie und ihrer Verbindung zu Karl Adam ↓</a>';
+const primaryNavigation = `    <nav aria-label="Hauptnavigation">
+      <a href="#ratzeburg">Ratzeburg</a>
+      <a href="#stimmen">Stimmen</a>
+      <a href="#labor">Adams Labor</a>
+      <a href="#vereine">Verein finden</a>
+    </nav>`;
+const optimizedPrimaryNavigation = `    <nav aria-label="Hauptnavigation">
+      <a href="#ratzeburg">Ratzeburg</a>
+      <a href="#labor">Adams Labor</a>
+      <a href="#ruderakademie">Ruderakademie</a>
+      <a href="#rudern-verstehen">Rudern verstehen</a>
+      <a href="#stimmen">Stimmen</a>
+      <a class="nav-cta" href="#vereine">Verein finden</a>
+    </nav>`;
 const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.png" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
 const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
 const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
@@ -62,6 +76,7 @@ const builtIndexHtml = replaceLaborVisuals(indexHtml)
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
   .replace('<script src="/assets/app.js" defer></script>', '<script type="module" src="/assets/app.js"></script>')
+  .replace(primaryNavigation, optimizedPrimaryNavigation)
   .replace(
     'Adams Erben bringt deine Anfrage zum passenden Verein oder – falls nötig – zur zuständigen Verbandsstelle.',
     'Wenn der Verein eine öffentliche E-Mail-Adresse bereitstellt, kannst du direkt anfragen. Andernfalls führt Adams Erben zur Vereinswebsite oder zeigt den verfügbaren Standort.'
@@ -80,8 +95,6 @@ const builtIndexHtml = replaceLaborVisuals(indexHtml)
   )
   .replace(editorialLaborNote, '')
   .replace(editorialHistoryNote, '')
-  .replace('<a href="#stimmen">Stimmen</a>', '<a href="#rudern-verstehen">Rudern verstehen</a><a href="#stimmen">Stimmen</a>')
-  .replace('<a href="#labor">Adams Labor</a>', '<a href="#labor">Adams Labor</a><a href="#ruderakademie">Ruderakademie</a>')
   .replace(academyCityParagraph, `${academyCityParagraph}\n          ${academyCityLink}`)
   .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
   .replace(historyAnchor, `${academyHtml}\n\n${historyAnchor}`)
