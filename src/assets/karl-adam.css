@@ -332,55 +332,357 @@
   color: var(--muted);
 }
 
+/* Adams Labor: five experiments instead of a uniform comparison grid. */
+.lab-heading {
+  margin-bottom: 1.5rem;
+}
+
 .lab-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .lab-card {
-  border-radius: var(--radius);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  grid-column: span 6;
+  min-width: 0;
+  border-radius: 28px;
   background: var(--navy);
   color: var(--white);
-  padding: clamp(1.4rem, 3vw, 2.3rem);
+  padding: clamp(1.5rem, 3vw, 2.35rem);
   overflow: hidden;
+  box-shadow: 0 16px 35px rgba(11,35,54,.11);
+}
+
+.lab-card:nth-child(2),
+.lab-card:nth-child(4) {
+  background: #102c40;
+}
+
+.lab-card-boat {
+  grid-column: span 5;
+}
+
+.lab-card-athlete {
+  grid-column: span 7;
+}
+
+.lab-card-altitude {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(210px, .45fr);
+  column-gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: start;
+  background:
+    radial-gradient(circle at 82% 30%, rgba(126,204,229,.16), transparent 22%),
+    var(--navy);
+}
+
+.lab-card-head {
+  display: flex;
+  gap: .65rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.lab-number,
+.lab-theme {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lab-number {
+  justify-content: center;
+  min-width: 34px;
+  padding: .3rem .55rem;
+  background: var(--accent);
+  color: var(--white);
+}
+
+.lab-theme {
+  padding: .3rem .7rem;
+  border: 1px solid rgba(255,255,255,.18);
+  color: #a9dceb;
 }
 
 .lab-card h3 {
-  margin: 0 0 1rem;
+  margin: 0 0 .8rem;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.8rem;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1.06;
 }
 
-.lab-card ol {
-  list-style: none;
-  padding: 0;
+.lab-question {
+  margin: 0 0 1.2rem;
+  max-width: 38rem;
+  color: #dbe9ef;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.04rem;
+  line-height: 1.48;
+}
+
+.lab-story {
+  margin: 1.15rem 0 0;
+  display: grid;
+  gap: 0;
+}
+
+.lab-story > div {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 1rem;
+  padding: .85rem 0;
+  border-top: 1px solid rgba(255,255,255,.14);
+}
+
+.lab-story dt {
+  color: #92d6ea;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lab-story dd {
   margin: 0;
-  display: grid;
-  gap: .75rem;
-  counter-reset: lab;
+  color: #f4f8fa;
+  font-size: .91rem;
+  line-height: 1.55;
 }
 
-.lab-card li {
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: .9rem;
-  align-items: start;
-  padding-top: .75rem;
-  border-top: 1px solid rgba(255,255,255,.17);
+.lab-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
-.lab-card li span {
-  color: #9ec8d5;
-  font-size: .75rem;
+.lab-source {
+  display: inline-flex;
+  width: max-content;
+  margin-top: auto;
+  padding-top: 1rem;
+  color: #a9dceb;
+  font-size: .76rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.lab-source-row .lab-source {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.lab-source:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+.interval-diagram {
+  display: grid;
+  grid-template-columns: 1.2fr .55fr 1.2fr .55fr 1.2fr;
+  align-items: end;
+  gap: .25rem;
+  height: 76px;
+  margin: .2rem 0 .6rem;
+  padding: .4rem .55rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.24);
+}
+
+.interval-diagram span {
+  display: grid;
+  place-items: end center;
+  padding-bottom: .38rem;
+  border-radius: 8px 8px 0 0;
+  font-size: .62rem;
   font-weight: 850;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: .04em;
 }
 
-.lab-card li strong {
-  font-weight: 560;
-  line-height: 1.5;
+.interval-work {
+  height: 62px;
+  background: rgba(169,220,235,.2);
+  color: #c7ebf5;
+  border: 1px solid rgba(169,220,235,.35);
+}
+
+.interval-rest {
+  height: 28px;
+  color: #91a7b2;
+  border: 1px dashed rgba(255,255,255,.2);
+}
+
+.training-note {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .45rem;
+  margin: .35rem 0 .8rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: #f6f0df;
+  color: var(--navy);
+  transform: rotate(-.5deg);
+  box-shadow: 0 8px 18px rgba(0,0,0,.13);
+}
+
+.training-note strong {
+  grid-column: 1 / -1;
+  padding-bottom: .55rem;
+  border-bottom: 1px solid rgba(11,35,54,.18);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.training-note span {
+  font-size: .82rem;
+  font-weight: 750;
+}
+
+.training-note span::before {
+  content: "✓";
+  margin-right: .4rem;
+  color: var(--accent);
+}
+
+.oar-diagram {
+  display: grid;
+  grid-template-columns: auto minmax(55px,.55fr) 34px minmax(90px,1fr) auto;
+  grid-template-rows: 42px 24px;
+  align-items: center;
+  margin: .5rem 0 .85rem;
+}
+
+.oar-handle,
+.oar-blade {
+  font-size: .7rem;
+  font-weight: 850;
+  color: #d5ebf2;
+}
+
+.oar-line {
+  height: 5px;
+  background: #a9dceb;
+}
+
+.oar-gate {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #f4f8fa;
+  border-radius: 50%;
+  font-size: 0;
+}
+
+.oar-gate::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.oar-blade {
+  display: grid;
+  place-items: center;
+  min-width: 48px;
+  min-height: 28px;
+  border-radius: 55% 12% 12% 55%;
+  background: var(--accent);
+  color: white;
+}
+
+.oar-label {
+  color: #8fa9b5;
+  font-size: .64rem;
+  text-align: center;
+}
+
+.oar-label-in { grid-column: 2; }
+.oar-label-out { grid-column: 4; }
+
+.lab-statement {
+  margin: .35rem 0 .75rem;
+  padding: 1.25rem 1.4rem;
+  border-left: 4px solid var(--accent);
+  background: rgba(255,255,255,.06);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.35rem, 2.7vw, 2rem);
+  line-height: 1.25;
+}
+
+.lab-statement strong {
+  color: #a9dceb;
+}
+
+.lab-altitude-copy {
+  min-width: 0;
+}
+
+.altitude-mark {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-self: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.altitude-mark strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: .95;
+  color: #a9dceb;
+}
+
+.altitude-mark span,
+.altitude-mark small {
+  margin-top: .35rem;
+  color: #d7e6eb;
+}
+
+.altitude-mark i {
+  display: block;
+  width: 120px;
+  height: 55px;
+  margin-top: 1rem;
+  border-left: 3px solid rgba(169,220,235,.5);
+  border-top: 3px solid rgba(169,220,235,.5);
+  transform: rotate(45deg) skew(-12deg,-12deg);
+}
+
+.lab-story-wide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 1.5rem;
+}
+
+.lab-story-wide > div {
+  display: block;
+  padding: 1rem 1rem 0;
+  border-top: 1px solid rgba(255,255,255,.16);
+  border-left: 1px solid rgba(255,255,255,.1);
+}
+
+.lab-story-wide > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.lab-story-wide dt {
+  margin-bottom: .5rem;
 }
 
 .source-note {
@@ -481,12 +783,29 @@
   .foundation-quote {
     grid-column: auto;
   }
+
+  .lab-card,
+  .lab-card-boat,
+  .lab-card-athlete {
+    grid-column: span 6;
+  }
+
+  .lab-card-altitude {
+    grid-column: 1 / -1;
+  }
+
+  .lab-story-wide {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+
+  .lab-story-wide > div:nth-child(3) {
+    border-left: 0;
+  }
 }
 
 @media (max-width: 640px) {
   .rrc-visual,
-  .voice-grid,
-  .lab-grid {
+  .voice-grid {
     grid-template-columns: 1fr;
   }
 
@@ -507,9 +826,49 @@
     min-height: 210px;
   }
 
-  .lab-card li {
+  .lab-grid {
     grid-template-columns: 1fr;
-    gap: .3rem;
+  }
+
+  .lab-card,
+  .lab-card-boat,
+  .lab-card-athlete,
+  .lab-card-altitude {
+    grid-column: 1;
+  }
+
+  .lab-card-altitude {
+    display: flex;
+  }
+
+  .lab-story > div {
+    grid-template-columns: 1fr;
+    gap: .35rem;
+  }
+
+  .lab-story-wide {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-story-wide > div {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .training-note {
+    grid-template-columns: 1fr;
+  }
+
+  .training-note strong {
+    grid-column: 1;
+  }
+
+  .oar-diagram {
+    grid-template-columns: auto minmax(30px,.4fr) 28px minmax(55px,.8fr) auto;
+  }
+
+  .altitude-mark {
+    padding-top: 0;
   }
 
   .partner-strip {
