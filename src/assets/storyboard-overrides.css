@@ -56,6 +56,25 @@
   border-radius: 12px;
 }
 
+/* 4:3 measured-training artwork: preserve the full image, keep it prominent but subordinate to the text. */
+.lab-image-frame-measured-training {
+  margin: .55rem 0 1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.lab-image-frame-measured-training img {
+  width: min(100%, 430px);
+  max-height: 285px;
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
 /* Tafelbild: a restrained warm, light surround suggests a physical board in a sports hall.
    The image itself remains unchanged and can be replaced independently later. */
 .lab-image-frame-training {
@@ -133,7 +152,12 @@
     padding: 6px;
   }
 
-  .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude):not(.lab-image-frame-oars) {
+  .lab-image-frame-measured-training img {
+    width: 100%;
+    max-height: none;
+  }
+
+  .lab-image-frame:not(.lab-image-frame-training):not(.lab-image-frame-altitude):not(.lab-image-frame-oars):not(.lab-image-frame-measured-training) {
     padding: .4rem;
   }
 
