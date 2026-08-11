@@ -24,6 +24,7 @@ const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.cs
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
 const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
+const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.png" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
 const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
 const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
 const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude"><img src="/assets/images/hoehe-mexiko.png" alt="Grafische Darstellung der Höhenvorbereitung auf die Olympischen Spiele 1968 in Mexiko-Stadt"></figure>';
@@ -31,6 +32,10 @@ const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu A
 
 function replaceLaborVisuals(html) {
   return html
+    .replace(
+      /<div class="interval-diagram"[^>]*>[\s\S]*?<\/div>/,
+      measuredTrainingImage
+    )
     .replace(
       /<div class="training-note"[^>]*>[\s\S]*?<\/div>/,
       trainingImage
