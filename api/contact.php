@@ -140,27 +140,34 @@ try {
     $recipientFile = '/opt/adams-erben/recipients.json';
     $recipientData = json_decode((string) file_get_contents($recipientFile), true, 64, JSON_THROW_ON_ERROR);
     $route = $recipientData['recipients'][$organizationId] ?? null;
-    if (!is_array($route)) respond(422, ['error' => 'Für diesen Eintrag ist aktuell kein Kontakt-Routing verfügbar.']);
+    if (!is_array($route)) {
+        respond(422, ['error' => 'Für diesen Verein ist keine direkte öffentliche E-Mail-Adresse hinterlegt. Bitte nutze die Vereinswebsite oder die angezeigte Anschrift.']);
+    }
 
     $recipient = cleanText($route['email'] ?? '', 254);
     $organizationName = cleanText($route['organizationName'] ?? $organizationId, 180);
-    $state = cleanText($route['state'] ?? '', 80);
-    $routeLevel = in_array($route['routeLevel'] ?? '', ['club', 'lrv', 'drv'], true) ? $route['routeLevel'] : 'drv';
+    $internalOrganizationId = cleanText($route['organizationId'] ?? '', 160);
+    $routeOrganizationId = cleanText($route['routeOrganizationId'] ?? '', 160);
+    $routeLevel = in_array($route['routeLevel'] ?? '', ['club', 'lrv', 'drv'], true) ? $route['routeLevel'] : '';
+
+    if ($routeLevel === '' || $internalOrganizationId === '' || $routeOrganizationId === '' || !hash_equals($internalOrganizationId, $routeOrganizationId)) {
+        respond(422, ['error' => 'Für diesen Eintrag ist kein direkter Kontakt freigegeben.']);
+    }
     if (!filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-        throw new RuntimeException('Resolved recipient is invalid');
+        throw new RuntimeException('Resolved direct recipient is invalid');
     }
 
     enforceRateLimit($recipient);
 
     $routeTarget = match ($routeLevel) {
-        'club' => $organizationName,
-        'lrv' => $state !== '' ? "zuständiger Landesruderverband ({$state})" : 'zuständiger Landesruderverband',
-        default => 'Deutscher Ruderverband e.V.'
+        'lrv' => 'ausgewählter Landesruderverband',
+        'drv' => 'Deutscher Ruderverband e.V.',
+        default => 'ausgewählter Verein'
     };
 
     $intro = "Diese Nachricht wurde über adams-erben.de versendet.\n"
         . "Adams Erben ist eine unabhängige Orientierungshilfe zum Rudersport und keine offizielle Website des Films „Adams Acht“, der Filmproduktion, des Filmverleihs oder des Deutschen Ruderverbands.\n"
-        . "Die anfragende Person hat auf der Website „{$organizationName}“ ausgewählt. Das automatische Routing führt diese Nachricht an: {$routeTarget}.\n";
+        . "Die anfragende Person hat auf der Website „{$organizationName}“ ausgewählt. Die Nachricht wird ausschließlich an den direkten, für diese Organisation freigegebenen Kontakt gesendet ({$routeTarget}).\n";
 
     $body = $intro
         . "\n--- Anfrage ---\n"
