@@ -18,12 +18,18 @@ const indexPath = path.join(dist, 'index.html');
 const indexHtml = await readFile(indexPath, 'utf8');
 const rowingExplainerPath = path.join(src, 'partials', 'rowing-explainer.html');
 const rowingExplainerHtml = await readFile(rowingExplainerPath, 'utf8');
+const academyPath = path.join(src, 'partials', 'ruderakademie.html');
+const academyHtml = await readFile(academyPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
 const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
 const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.css">\n  <link rel="stylesheet" href="/assets/storyboard-overrides.css">\n';
+const academyStyles = '  <link rel="stylesheet" href="/assets/ruderakademie.css">\n';
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
 const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
+const historyAnchor = '    <section class="history" id="geschichte" aria-labelledby="history-title">';
+const academyCityParagraph = '<p>Die rund zweistündige Themenführung folgt den Spuren Karl Adams und der Ratzeburger Rudergeschichte: vom Karl-Adam-Gedenkstein beim RRC über die frühere Gelehrtenschule und das historische Bootshaus bis zur Ruderakademie.</p>';
+const academyCityLink = '<a class="text-link city-academy-link" href="#ruderakademie">Mehr zur Ruderakademie und ihrer Verbindung zu Karl Adam ↓</a>';
 const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.png" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
 const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
 const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
@@ -75,9 +81,11 @@ const builtIndexHtml = replaceLaborVisuals(indexHtml)
   .replace(editorialLaborNote, '')
   .replace(editorialHistoryNote, '')
   .replace('<a href="#stimmen">Stimmen</a>', '<a href="#rudern-verstehen">Rudern verstehen</a><a href="#stimmen">Stimmen</a>')
+  .replace(academyCityParagraph, `${academyCityParagraph}\n          ${academyCityLink}`)
   .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
+  .replace(historyAnchor, `${academyHtml}\n\n${historyAnchor}`)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
-  .replace('</head>', `${rowingStyles}${previewStyles}${previewRobots}</head>`);
+  .replace('</head>', `${rowingStyles}${academyStyles}${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
