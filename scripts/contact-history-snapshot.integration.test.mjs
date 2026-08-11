@@ -89,8 +89,8 @@ assert.equal(freshSnapshot.recipients['moellner-ruder-club-ev'].verifiedAt, prev
 assert.equal(freshSnapshot.recipients['moellner-ruder-club-ev'].email, clubEmail);
 
 // Carry-forward does not reset the lifecycle clock. Once the original club
-// verification is >=270 days old, it must stop routing Direct. Keep the LRV
-// independently fresh so this assertion isolates the club candidate lifecycle.
+// verification is >=270 days old, it must stop routing Direct. The LRV remains
+// independently contactable, but must never become a fallback for this club.
 const expiryRegistry = registry.map((row) => row.type === 'lrv'
   ? { ...row, fetchedAt: '2027-05-10T00:00:00.000Z' }
   : row);
@@ -99,12 +99,13 @@ const expiredSnapshot = buildSnapshot({
   externalCandidates: replay.privatePayload.contacts,
   now: new Date('2027-05-10T12:00:00.000Z')
 });
-assert.equal(expiredSnapshot.recipients['moellner-ruder-club-ev'].routeLevel, 'lrv');
-assert.equal(expiredSnapshot.recipients['moellner-ruder-club-ev'].routeOrganizationId, '30022');
+assert.equal(expiredSnapshot.recipients['moellner-ruder-club-ev'], undefined);
+assert.equal(expiredSnapshot.decisions.find((row) => row.organizationId === '12417').routeLevel, 'none');
 assert.equal(expiredSnapshot.decisions.find((row) => row.organizationId === '12417').staleCandidateCount, 1);
 
 // Suppression remains authoritative even when a technical error would otherwise
-// preserve a Last-known-good candidate.
+// preserve a Last-known-good candidate. It removes the route instead of falling
+// back to the LRV.
 const suppressionSecret = 'history-replay-secret';
 const suppressedSnapshot = buildSnapshot({
   registry,
@@ -113,11 +114,13 @@ const suppressedSnapshot = buildSnapshot({
   suppressionSecret,
   now: new Date('2026-08-10T06:00:00.000Z')
 });
-assert.equal(suppressedSnapshot.recipients['moellner-ruder-club-ev'].routeLevel, 'lrv');
+assert.equal(suppressedSnapshot.recipients['moellner-ruder-club-ev'], undefined);
+assert.equal(suppressedSnapshot.decisions.find((row) => row.organizationId === '12417').routeLevel, 'none');
 assert.equal(suppressedSnapshot.decisions.find((row) => row.organizationId === '12417').suppressedCandidateCount, 1);
 
 // A successful crawl with no contact is a new observation and must remove the
-// previous candidate from the current candidate set.
+// previous candidate from the current candidate set. No replacement recipient
+// is generated.
 const noContact = buildContactHistoryArtifacts({
   previousContacts,
   currentContacts: [],
@@ -125,7 +128,9 @@ const noContact = buildContactHistoryArtifacts({
   attemptedAt: '2026-08-10T05:00:00.000Z'
 });
 assert.equal(noContact.privatePayload.contacts.length, 0);
-assert.equal(buildSnapshot({ registry, externalCandidates: noContact.privatePayload.contacts, now: new Date('2026-08-10T06:00:00.000Z') }).recipients['moellner-ruder-club-ev'].routeLevel, 'lrv');
+const noContactSnapshot = buildSnapshot({ registry, externalCandidates: noContact.privatePayload.contacts, now: new Date('2026-08-10T06:00:00.000Z') });
+assert.equal(noContactSnapshot.recipients['moellner-ruder-club-ev'], undefined);
+assert.equal(noContactSnapshot.decisions.find((row) => row.organizationId === '12417').routeLevel, 'none');
 
 // Identity review is a semantic safety signal, not a technical outage.
 const identityReview = buildContactHistoryArtifacts({
