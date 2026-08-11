@@ -24,24 +24,32 @@ const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.cs
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
 const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
-const trainingNote = '<div class="training-note" aria-label="Historische Trainingsnotiz als gestalterische Illustration"><strong>7:00 Uhr · Turnhalle</strong><span>Scheibenhantel</span><span>Medizinball</span><span>Beinstreckkraft</span></div>';
 const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
-const oarDiagram = `          <div class="oar-diagram" aria-label="Schematische Darstellung von Innenhebel, Dolle und Außenhebel eines Riemens">
-            <span class="oar-handle">Griff</span><span class="oar-line oar-line-in"></span><span class="oar-gate">Dolle</span><span class="oar-line oar-line-out"></span><span class="oar-blade">Blatt</span>
-            <small class="oar-label oar-label-in">Innenhebel</small><small class="oar-label oar-label-out">Außenhebel</small>
-          </div>`;
 const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
-const altitudeMark = '<div class="altitude-mark" aria-hidden="true"><strong>≈ 2.200 m</strong><span>Mexiko-Stadt</span><i></i><small>Vorbereitung in der Höhe</small></div>';
 const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude"><img src="/assets/images/hoehe-mexiko.png" alt="Grafische Darstellung der Höhenvorbereitung auf die Olympischen Spiele 1968 in Mexiko-Stadt"></figure>';
 const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu Adams Erben heute ↓</a>\n';
-const builtIndexHtml = indexHtml
+
+function replaceLaborVisuals(html) {
+  return html
+    .replace(
+      /<div class="training-note"[^>]*>[\s\S]*?<\/div>/,
+      trainingImage
+    )
+    .replace(
+      /\s*<div class="oar-diagram"[^>]*>[\s\S]*?<\/div>/,
+      `\n${oarImage}`
+    )
+    .replace(
+      /<div class="altitude-mark"[^>]*>[\s\S]*?<\/div>/,
+      altitudeImage
+    );
+}
+
+const builtIndexHtml = replaceLaborVisuals(indexHtml)
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
   .replace('<a href="#stimmen">Stimmen</a>', '<a href="#rudern-verstehen">Rudern verstehen</a><a href="#stimmen">Stimmen</a>')
   .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
-  .replace(trainingNote, trainingImage)
-  .replace(oarDiagram, oarImage)
-  .replace(altitudeMark, altitudeImage)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
   .replace('</head>', `${rowingStyles}${previewStyles}${previewRobots}</head>`);
 await writeFile(indexPath, builtIndexHtml);
