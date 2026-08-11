@@ -1,0 +1,17 @@
+.book-honors {
+  margin-top: 1.85rem;
+  padding-top: 1.55rem;
+  border-top: 1px solid var(--line);
+}
+
+.book-honors .card-kicker {
+  margin-bottom: .7rem;
+}
+
+.book-honors > p:not(.card-kicker) {
+  margin: 0;
+}
+
+.book-honors .inline-actions {
+  margin-top: 1.05rem;
+}
