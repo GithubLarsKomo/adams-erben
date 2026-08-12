@@ -1,0 +1,76 @@
+name: Fetch brand assets
+
+on:
+  push:
+    branches:
+      - feat/karl-adam-local-cooperation
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-assets:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/karl-adam-local-cooperation
+
+      - name: Skip when assets already exist
+        id: assets
+        shell: bash
+        run: |
+          if [[ -f src/assets/images/world-rowing.png && -f src/assets/images/drv.png && -f src/assets/images/schubschlag.png ]]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch supplied temporary logos
+        if: steps.assets.outputs.ready != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/assets/images /tmp/adams-brand-assets
+          curl --fail --location --retry 3 --silent --show-error \
+            'https://d2cx26qpfwuhvu.cloudfront.net/worldrowing/wp-content/uploads/2020/12/04182712/WR-Logo-Dark.png' \
+            --output src/assets/images/world-rowing.png
+          curl --fail --location --retry 3 --silent --show-error \
+            'https://www.rudern.de/sites/default/files/styles/content_full_desktop_1x/public/images/drv-logo.webp?itok=8KBhu-lW' \
+            --output /tmp/adams-brand-assets/drv.webp
+          curl --fail --location --retry 3 --silent --show-error \
+            'https://cdn.podcastcms.de/images/podcasts/315/2776815/schubschlag.png' \
+            --output src/assets/images/schubschlag.png
+
+      - name: Convert DRV logo to PNG
+        if: steps.assets.outputs.ready != 'true'
+        shell: bash
+        run: |
+          python -m pip install --quiet pillow
+          python - <<'PY'
+          from PIL import Image
+          image = Image.open('/tmp/adams-brand-assets/drv.webp')
+          image.save('src/assets/images/drv.png', 'PNG')
+          PY
+
+      - name: Validate image assets
+        if: steps.assets.outputs.ready != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s src/assets/images/world-rowing.png
+          test -s src/assets/images/drv.png
+          test -s src/assets/images/schubschlag.png
+          file src/assets/images/world-rowing.png src/assets/images/drv.png src/assets/images/schubschlag.png
+
+      - name: Commit cached brand assets
+        if: steps.assets.outputs.ready != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/assets/images/world-rowing.png src/assets/images/drv.png src/assets/images/schubschlag.png
+          git commit -m 'chore: cache rowing source logos'
+          git push origin HEAD:feat/karl-adam-local-cooperation
