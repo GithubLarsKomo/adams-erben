@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs && node scripts/patch-hero-mobile.mjs",
     "sync:drv": "node scripts/sync-drv.mjs && node scripts/validate-drv-output.mjs",
     "validate:drv-output": "node scripts/validate-drv-output.mjs",
     "test:drv-output": "node scripts/validate-drv-output.test.mjs",
@@ -31,7 +31,7 @@
     "test:contact-governance": "node scripts/lib/contact-governance.test.mjs",
     "test:contact-domain-evidence": "node scripts/lib/contact-domain-evidence.test.mjs",
     "poc:enrich": "node scripts/enrichment-poc.mjs",
-    "poc:enrich:review": "node scripts/review-enrichment-poc.mjs",
+    "poc:enrich:review": "node scripts/review-enrichment-poc.test.mjs",
     "poc:enrich:diagnose": "node scripts/diagnose-enrichment-fallbacks.mjs",
     "test:enrich-review": "node scripts/review-enrichment-poc.test.mjs",
     "poc:discover:prepare": "node scripts/prepare-discovery-poc.mjs",
