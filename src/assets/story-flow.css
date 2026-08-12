@@ -1,0 +1,299 @@
+/* Story flow and persistent navigation layer. Loaded last by patch-story-flow.mjs. */
+
+:root {
+  --story-header-height: 76px;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  width: 100%;
+  max-width: none;
+  min-height: var(--story-header-height);
+  margin: 0;
+  padding: .65rem max(1rem, calc((100vw - var(--content)) / 2));
+  background: rgba(255, 253, 248, .94);
+  border-bottom: 1px solid rgba(11, 35, 54, .09);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(11, 35, 54, .045);
+}
+
+.site-header .brand {
+  flex: 0 0 auto;
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(.65rem, 1.25vw, 1.15rem);
+  flex-wrap: nowrap;
+}
+
+.site-header nav a {
+  white-space: nowrap;
+  font-size: .92rem;
+}
+
+.site-header nav .nav-cta {
+  padding: .58rem .85rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--white);
+}
+
+.site-header nav .nav-cta:hover {
+  background: var(--accent-dark);
+  color: var(--white);
+}
+
+.header-actions {
+  display: none;
+  align-items: center;
+  gap: .55rem;
+  margin-left: auto;
+}
+
+.header-find-club {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: .55rem .8rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--white);
+  font-size: .84rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-find-club:hover {
+  background: var(--accent-dark);
+  color: var(--white);
+}
+
+.menu-toggle {
+  display: inline-grid;
+  place-content: center;
+  gap: 4px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid rgba(11, 35, 54, .14);
+  border-radius: 50%;
+  background: var(--white);
+}
+
+.menu-toggle span {
+  display: block;
+  width: 17px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--navy);
+  transition: transform .18s ease, opacity .18s ease;
+}
+
+.site-header.nav-open .menu-toggle span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.site-header.nav-open .menu-toggle span:nth-child(2) { opacity: 0; }
+.site-header.nav-open .menu-toggle span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+main section[id] {
+  scroll-margin-top: calc(var(--story-header-height) + 18px);
+}
+
+/* The film is the immediate bridge from the hero into the story, not a late-page appendix. */
+.story-film-bridge {
+  margin-top: 1.25rem;
+  padding: clamp(1.4rem, 3vw, 2.25rem);
+}
+
+.story-film-bridge h2 {
+  font-size: clamp(1.75rem, 3vw, 2.65rem);
+}
+
+.story-film-bridge .film-links {
+  margin-top: .8rem;
+}
+
+.external-resource,
+.podcast-feature {
+  margin-top: 1.5rem;
+  padding: clamp(1.25rem, 2.5vw, 1.8rem);
+  border: 1px solid rgba(11, 35, 54, .12);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.external-resource {
+  background: rgba(255,255,255,.72);
+}
+
+.external-resource h4,
+.podcast-feature h3 {
+  margin: .2rem 0 .45rem;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--navy);
+}
+
+.external-resource h4 { font-size: 1.35rem; }
+.podcast-feature h3 { font-size: clamp(1.5rem, 2.5vw, 2rem); }
+.external-resource p,
+.podcast-feature p { margin-top: 0; }
+.external-resource > div,
+.podcast-feature > div { max-width: 760px; }
+
+.podcast-feature {
+  background: var(--navy);
+  color: var(--white);
+}
+
+.podcast-feature .card-kicker { color: #92d6ea !important; }
+.podcast-feature h3 { color: var(--white); }
+.podcast-feature p { color: #dcebf0; }
+
+.official-search-note {
+  margin: .8rem 0 0;
+  padding: .8rem 1rem;
+  border-left: 3px solid var(--navy);
+  background: var(--foam);
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.official-search-note a {
+  font-weight: 800;
+}
+
+.listening-tip {
+  margin-top: 1rem;
+  padding-top: .85rem;
+  border-top: 1px solid currentColor;
+  border-top-color: rgba(255,255,255,.18);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.listening-tip a {
+  color: inherit;
+  font-weight: 800;
+}
+
+.eight-copy .listening-tip,
+.distance-mark .listening-tip {
+  border-top-color: rgba(11,35,54,.15);
+  color: var(--muted);
+}
+
+.listening-tip-center {
+  text-align: center;
+}
+
+@media (max-width: 1120px) {
+  .site-header nav {
+    gap: .7rem;
+  }
+
+  .site-header nav a {
+    font-size: .84rem;
+  }
+}
+
+@media (max-width: 920px) {
+  :root {
+    --story-header-height: 68px;
+  }
+
+  .site-header {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: var(--story-header-height);
+    padding: .55rem 1rem !important;
+    align-items: center;
+    gap: .7rem;
+    overflow: visible;
+  }
+
+  .site-header .brand-mark {
+    width: 42px;
+    height: 42px;
+  }
+
+  .site-header .brand strong {
+    font-size: .98rem;
+  }
+
+  .header-actions {
+    display: flex;
+  }
+
+  .site-header nav {
+    display: none !important;
+    position: absolute;
+    top: calc(100% + 1px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: .65rem 1rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .2rem;
+    overflow: visible;
+    background: rgba(255, 253, 248, .985);
+    border-bottom: 1px solid rgba(11,35,54,.12);
+    box-shadow: 0 18px 32px rgba(11,35,54,.12);
+  }
+
+  .site-header.nav-open nav {
+    display: flex !important;
+  }
+
+  .site-header nav a {
+    min-height: 44px;
+    padding: .65rem .75rem;
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    font-size: .96rem;
+  }
+
+  .site-header nav a:hover {
+    background: var(--foam);
+  }
+
+  .site-header nav .nav-cta {
+    margin-top: .35rem;
+    justify-content: center;
+  }
+
+  .external-resource,
+  .podcast-feature {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header .brand small {
+    display: none;
+  }
+
+  .site-header .brand strong {
+    display: none;
+  }
+
+  .header-find-club {
+    font-size: .8rem;
+    padding-inline: .72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-toggle span { transition: none; }
+}
