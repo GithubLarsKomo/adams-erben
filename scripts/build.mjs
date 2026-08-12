@@ -17,6 +17,7 @@ await cp(src, dist, { recursive: true });
 
 const indexPath = path.join(dist, 'index.html');
 const indexHtml = await readFile(indexPath, 'utf8');
+const appJs = await readFile(path.join(src, 'assets', 'app.js'), 'utf8');
 const rowingExplainerPath = path.join(src, 'partials', 'rowing-explainer.html');
 const rowingExplainerHtml = await readFile(rowingExplainerPath, 'utf8');
 const academyPath = path.join(src, 'partials', 'ruderakademie.html');
@@ -38,6 +39,12 @@ const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude">
 const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu Adams Erben heute ↓</a>\n';
 const editorialLaborNote = '      <p class="source-note">Die Darstellung trennt bewusst zwischen belegten historischen Praktiken und heutiger Einordnung. Detailformulierungen werden vor Veröffentlichung zusätzlich gegen Karl-Adams Primärtexte sowie die Biografie von Dirk Andresen und Timo Reinke geprüft.</p>\n';
 const editorialHistoryNote = '          <p class="source-note">Ein weiterer kontroverser Presse-/Rudersport-Beitrag wird erst nach eindeutiger Quellenprüfung ergänzt.</p>\n';
+
+for (const obsoleteHelper of ['ensureNearbyControls', 'applyDirectContactCopy', 'ensureImageSlotStyles', 'hydrateImageSlots', 'data-nearby-styles']) {
+  if (appJs.includes(obsoleteHelper)) {
+    throw new Error(`[build] obsolete runtime page scaffolding found in app.js: ${obsoleteHelper}`);
+  }
+}
 
 function replaceLaborVisuals(html) {
   return html
@@ -125,12 +132,6 @@ function renderPage(html) {
     </aside>`);
   }
 
-  const searchPanel = $('#vereine .search-panel');
-  if (searchPanel.length && !$('#vereine .official-search-note').length) {
-    searchPanel.after(`
-    <p class="official-search-note">Adams Erben bietet einen eigenen, vereinsnahen Einstieg. Alternativ kannst du direkt die <a href="https://www.rudern.de/service/vereinssuche" target="_blank" rel="noopener noreferrer">offizielle Vereinssuche des Deutschen Ruderverbands ↗</a> nutzen.</p>`);
-  }
-
   const voiceGrid = $('#stimmen .voice-grid');
   if (voiceGrid.length && !$('#stimmen .podcast-feature').length) {
     voiceGrid.after(`
@@ -191,6 +192,10 @@ function validatePage($, desiredOrder) {
     ['.hero-skiff[src="/assets/images/hero-skiff.png"]', 'hero image'],
     ['#ruderakademie', 'Ruderakademie section'],
     ['#rudern-verstehen', 'rowing explainer'],
+    ['#find-nearby', 'static nearby search button'],
+    ['#radius-filter', 'static nearby radius selector'],
+    ['link[href="/assets/image-slots.css"]', 'static image styles'],
+    ['.rrc-visual .asset-media-photo img[src="/assets/images/rrc-heute.jpg"]', 'static RRC image'],
     ['a[href="https://worldrowing.com/"]', 'World Rowing link'],
     ['a[href="https://www.rudern.de/service/vereinssuche"]', 'DRV club search link'],
     ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link']
@@ -209,28 +214,18 @@ function validatePage($, desiredOrder) {
   if (outputText.includes('zuständigen Landesruderverband und erst danach an den DRV geroutet')) {
     throw new Error('[build] obsolete association fallback copy survived rendering');
   }
+  if (!outputText.includes('Direkter Kontakt – kein Verbands-Fallback')) {
+    throw new Error('[build] direct-only contact explanation missing');
+  }
+  if (!outputText.includes('ausschließlich an die ausgewählte Organisation übermittelt werden')) {
+    throw new Error('[build] direct-only consent copy missing');
+  }
 }
 
 const preparedIndexHtml = replaceLaborVisuals(indexHtml)
   .replaceAll('__APP_MODE__', previewMode ? 'preview' : 'production')
   .replaceAll('https://adams-erben.de/', canonicalUrl)
   .replace('<script src="/assets/app.js" defer></script>', '<script type="module" src="/assets/app.js"></script>')
-  .replace(
-    'Adams Erben bringt deine Anfrage zum passenden Verein oder – falls nötig – zur zuständigen Verbandsstelle.',
-    'Wenn der Verein eine öffentliche E-Mail-Adresse bereitstellt, kannst du direkt anfragen. Andernfalls führt Adams Erben zur Vereinswebsite oder zeigt den verfügbaren Standort.'
-  )
-  .replace(
-    '<h3>Sicheres Kontakt-Routing</h3><p>Eine Anfrage geht zuerst an den gewählten Verein. Fehlt dort eine öffentliche Kontaktadresse, wird sie an den zuständigen Landesruderverband und erst danach an den DRV geroutet.</p>',
-    '<h3>Direkter Kontakt – kein Verbands-Fallback</h3><p>Eine Anfrage wird nur angeboten, wenn für die ausgewählte Organisation selbst eine freigegebene öffentliche E-Mail-Adresse vorliegt. Fehlt sie, wird nicht an Landesruderverband oder DRV umgeleitet.</p>'
-  )
-  .replace(
-    'Die Empfängeradresse wird ausschließlich serverseitig aus dem gewählten Verein bestimmt und kann nicht frei eingegeben werden.',
-    'Die Empfängeradresse wird ausschließlich serverseitig aus dem direkten, freigegebenen Kontakt der ausgewählten Organisation bestimmt. Es gibt kein Fallback an einen Verband.'
-  )
-  .replace(
-    'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme an den angezeigten Verein bzw. den zuständigen Verband übermittelt werden.',
-    'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme ausschließlich an die ausgewählte Organisation übermittelt werden.'
-  )
   .replace(editorialLaborNote, '')
   .replace(editorialHistoryNote, '')
   .replace(academyCityParagraph, `${academyCityParagraph}\n          ${academyCityLink}`)
