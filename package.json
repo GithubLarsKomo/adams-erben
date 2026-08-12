@@ -31,7 +31,7 @@
     "test:contact-governance": "node scripts/lib/contact-governance.test.mjs",
     "test:contact-domain-evidence": "node scripts/lib/contact-domain-evidence.test.mjs",
     "poc:enrich": "node scripts/enrichment-poc.mjs",
-    "poc:enrich:review": "node scripts/review-enrichment-poc.test.mjs",
+    "poc:enrich:review": "node scripts/review-enrichment-poc.mjs",
     "poc:enrich:diagnose": "node scripts/diagnose-enrichment-fallbacks.mjs",
     "test:enrich-review": "node scripts/review-enrichment-poc.test.mjs",
     "poc:discover:prepare": "node scripts/prepare-discovery-poc.mjs",
