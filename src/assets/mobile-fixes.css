@@ -104,6 +104,25 @@ canvas {
   clip-path: inset(50%) !important;
 }
 
+/* Adams Erben brand identity: full lockup on desktop, compact mark on smaller screens. */
+.brand {
+  flex: 0 0 auto;
+  min-width: 0;
+  line-height: 1;
+}
+
+.brand::before {
+  content: "";
+  display: block;
+  width: 206px;
+  height: 74px;
+  background: url("/assets/images/adams-erben-logo.png") center / contain no-repeat;
+}
+
+.brand > * {
+  display: none !important;
+}
+
 @media (max-width: 920px) {
   /* Base all outer geometry on the viewport, not on a possibly widened descendant. */
   main > section,
@@ -124,6 +143,17 @@ canvas {
     padding-left: 1rem;
     padding-right: 1rem;
     overflow: hidden;
+  }
+
+  .brand {
+    flex: 0 0 52px;
+    width: 52px;
+  }
+
+  .brand::before {
+    width: 52px;
+    height: 52px;
+    background-image: url("/assets/images/adams-erben-mark.png");
   }
 
   .site-header nav {
