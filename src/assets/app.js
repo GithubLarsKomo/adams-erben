@@ -5,58 +5,6 @@ const NEAREST_LIMIT = 5;
 const APP_MODE = document.querySelector('meta[name="adams-erben-mode"]')?.content || 'production';
 const PREVIEW_MODE = APP_MODE === 'preview';
 
-function ensureNearbyControls() {
-  const panel = document.querySelector('.search-panel');
-  if (!panel || document.querySelector('#find-nearby')) return;
-  const controls = document.createElement('div');
-  controls.className = 'nearby-controls';
-  controls.innerHTML = `
-    <div class="nearby-copy">
-      <strong>Vereine in deiner Nähe</strong>
-      <span>Ort oder PLZ oben eingeben. Die Entfernung wird lokal als Luftlinie berechnet – ohne Karten- oder Geocoding-Dienst.</span>
-    </div>
-    <label><span>Umkreis</span><select id="radius-filter"><option value="25">25 km</option><option value="50" selected>50 km</option><option value="100">100 km</option><option value="all">Alle</option></select></label>
-    <div class="nearby-actions">
-      <button class="button button-primary button-small" id="find-nearby" type="button">In der Nähe suchen</button>
-      <button class="button button-ghost button-small" id="use-location" type="button">Standort verwenden</button>
-    </div>
-    <p class="nearby-status" id="nearby-status" aria-live="polite"></p>`;
-  panel.insertAdjacentElement('afterend', controls);
-
-  if (!document.querySelector('style[data-nearby-styles]')) {
-    const style = document.createElement('style');
-    style.dataset.nearbyStyles = 'true';
-    style.textContent = `
-      .nearby-controls{margin-top:.8rem;padding:1rem;border:1px solid var(--line);border-radius:16px;background:var(--foam);display:grid;grid-template-columns:minmax(260px,2fr) minmax(130px,.5fr) auto;gap:.8rem;align-items:end}
-      .nearby-copy{display:grid;gap:.2rem}.nearby-copy span,.nearby-status{color:var(--muted);font-size:.82rem}.nearby-controls label{display:grid;gap:.35rem;font-size:.8rem;font-weight:750;color:var(--muted)}
-      .nearby-controls select{width:100%;border:1px solid #cfd7db;border-radius:11px;background:var(--white);color:var(--ink);padding:.65rem .8rem}.nearby-actions{display:flex;gap:.5rem;flex-wrap:wrap}.nearby-status{grid-column:1/-1;margin:0;min-height:1.3em}
-      .club-distance{display:block;margin-top:.35rem;color:var(--navy-2);font-size:.82rem;font-weight:800}.club-route-neutral{color:var(--muted)}.club-address-fallback{font-size:.86rem;color:var(--ink)}
-      @media(max-width:920px){.nearby-controls{grid-template-columns:1fr 1fr}.nearby-copy,.nearby-status{grid-column:1/-1}.nearby-actions{align-self:end}}
-      @media(max-width:640px){.nearby-controls{grid-template-columns:1fr}.nearby-copy,.nearby-status{grid-column:auto}}
-    `;
-    document.head.append(style);
-  }
-}
-
-function applyDirectContactCopy() {
-  const journey = document.querySelector('.journey .principles article:nth-child(2) p');
-  if (journey) journey.textContent = 'Wenn der Verein eine öffentliche E-Mail-Adresse bereitstellt, kannst du direkt anfragen. Andernfalls führt Adams Erben zur Vereinswebsite oder zeigt den verfügbaren Standort.';
-  const policyCard = document.querySelector('#ueber .principles article:nth-child(2)');
-  if (policyCard) {
-    const heading = policyCard.querySelector('h3');
-    const copy = policyCard.querySelector('p');
-    if (heading) heading.textContent = 'Direkter Kontakt – kein Verbands-Fallback';
-    if (copy) copy.textContent = 'Eine Anfrage wird nur angeboten, wenn für die ausgewählte Organisation selbst eine freigegebene öffentliche E-Mail-Adresse vorliegt. Fehlt sie, wird nicht an Landesruderverband oder DRV umgeleitet.';
-  }
-  const routingNote = document.querySelector('.routing-note');
-  if (routingNote) routingNote.textContent = 'Die Empfängeradresse wird ausschließlich serverseitig aus dem direkten, freigegebenen Kontakt der ausgewählten Organisation bestimmt. Es gibt kein Fallback an einen Verband.';
-  const consent = document.querySelector('#contact-form .consent span');
-  if (consent) consent.innerHTML = 'Ich stimme zu, dass meine Angaben zum Zweck der Kontaktaufnahme ausschließlich an die ausgewählte Organisation übermittelt werden. Details stehen in der <a href="/datenschutz.php" target="_blank">Datenschutzerklärung</a>.';
-}
-
-ensureNearbyControls();
-applyDirectContactCopy();
-
 const searchInput = document.querySelector('#search');
 const typeFilter = document.querySelector('#type-filter');
 const stateFilter = document.querySelector('#state-filter');
@@ -350,44 +298,6 @@ async function submitContact(event) {
   }
 }
 
-function ensureImageSlotStyles() {
-  if (document.querySelector('link[data-image-slot-styles]')) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = '/assets/image-slots.css';
-  link.dataset.imageSlotStyles = 'true';
-  document.head.append(link);
-}
-
-function singleImageFigure({ src, alt, caption, variant = 'photo' }) {
-  const figure = document.createElement('figure');
-  figure.className = `asset-media asset-media-${variant}`;
-  const image = document.createElement('img');
-  image.src = src;
-  image.alt = alt;
-  image.loading = 'lazy';
-  image.decoding = 'async';
-  figure.append(image);
-  if (caption) {
-    const figcaption = document.createElement('figcaption');
-    figcaption.textContent = caption;
-    figure.append(figcaption);
-  }
-  return figure;
-}
-
-function replaceSinglePlaceholder(selector, config) {
-  const placeholder = document.querySelector(selector);
-  if (!placeholder) return;
-  placeholder.replaceWith(singleImageFigure(config));
-}
-
-function hydrateImageSlots() {
-  ensureImageSlotStyles();
-  replaceSinglePlaceholder('.asset-placeholder-logo', { src: '/assets/images/rrc-vintage-logo.png', alt: 'Logo des Ratzeburger Ruderclubs', caption: '', variant: 'logo' });
-  replaceSinglePlaceholder('.asset-placeholder-photo', { src: '/assets/images/rrc-heute.jpg', alt: 'Ratzeburger Ruderclub heute', caption: 'Ratzeburger Ruderclub heute', variant: 'photo' });
-}
-
 async function init() {
   try {
     const response = await fetch('/data/clubs.json', { headers: { Accept: 'application/json' } });
@@ -422,5 +332,4 @@ document.addEventListener('click', (event) => {
 });
 contactForm?.addEventListener('submit', submitContact);
 contactDialog?.addEventListener('click', (event) => { if (event.target === contactDialog) contactDialog.close(); });
-hydrateImageSlots();
 init();
