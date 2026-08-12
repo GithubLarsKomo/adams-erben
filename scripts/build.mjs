@@ -40,6 +40,25 @@ const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu A
 const editorialLaborNote = '      <p class="source-note">Die Darstellung trennt bewusst zwischen belegten historischen Praktiken und heutiger Einordnung. Detailformulierungen werden vor Veröffentlichung zusätzlich gegen Karl-Adams Primärtexte sowie die Biografie von Dirk Andresen und Timo Reinke geprüft.</p>\n';
 const editorialHistoryNote = '          <p class="source-note">Ein weiterer kontroverser Presse-/Rudersport-Beitrag wird erst nach eindeutiger Quellenprüfung ergänzt.</p>\n';
 
+const brandAssets = {
+  worldRowing: {
+    local: '/assets/images/world-rowing.png',
+    fallback: 'https://d2cx26qpfwuhvu.cloudfront.net/worldrowing/wp-content/uploads/2020/12/04182712/WR-Logo-Dark.png'
+  },
+  drv: {
+    local: '/assets/images/drv.png',
+    fallback: 'https://www.rudern.de/sites/default/files/styles/content_full_desktop_1x/public/images/drv-logo.webp?itok=8KBhu-lW'
+  },
+  schubschlag: {
+    local: '/assets/images/schubschlag.png',
+    fallback: 'https://cdn.podcastcms.de/images/podcasts/315/2776815/schubschlag.png'
+  }
+};
+
+function brandImage({ local, fallback }, alt) {
+  return `<img src="${local}" alt="${alt}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${fallback}'">`;
+}
+
 for (const obsoleteHelper of ['ensureNearbyControls', 'applyDirectContactCopy', 'ensureImageSlotStyles', 'hydrateImageSlots', 'data-nearby-styles']) {
   if (appJs.includes(obsoleteHelper)) {
     throw new Error(`[build] obsolete runtime page scaffolding found in app.js: ${obsoleteHelper}`);
@@ -122,49 +141,90 @@ function renderPage(html) {
   const rowingOutro = $('#rudern-verstehen .rowing-outro');
   if (rowingOutro.length && !rowingOutro.find('.external-resource-world-rowing').length) {
     rowingOutro.append(`
-    <aside class="external-resource external-resource-world-rowing" aria-label="Rudern international weiterentdecken">
-      <div>
-        <p class="card-kicker">International weiterentdecken</p>
-        <h4>Rudern weltweit</h4>
-        <p>Wer nach Bootsklassen, Rennformaten und Rudern in Deutschland weiter hinausblicken möchte, findet beim Weltverband World Rowing den internationalen Sport.</p>
+    <aside class="source-link-card source-link-card-world external-resource external-resource-world-rowing" aria-label="Rudern international weiterentdecken">
+      <div class="source-link-card-logo">${brandImage(brandAssets.worldRowing, 'World Rowing')}</div>
+      <div class="source-link-card-copy">
+        <p class="source-link-card-kicker">International · Sport und Technik</p>
+        <h4>World Rowing</h4>
+        <p>Bootsklassen, Rennformate, Regeln und Rudern weltweit: der internationale Blick auf den Sport.</p>
       </div>
       <a class="button button-secondary" href="https://worldrowing.com/" target="_blank" rel="noopener noreferrer">Zu World Rowing ↗</a>
+    </aside>`);
+  }
+
+  const officialSearchNote = $('#vereine .official-search-note').first();
+  if (officialSearchNote.length && !$('#vereine .source-link-card-drv').length) {
+    officialSearchNote.replaceWith(`
+    <aside class="source-link-card source-link-card-drv" aria-label="Offizielle Vereinssuche des Deutschen Ruderverbands">
+      <div class="source-link-card-logo">${brandImage(brandAssets.drv, 'Deutscher Ruderverband')}</div>
+      <div class="source-link-card-copy">
+        <p class="source-link-card-kicker">Offiziell · Deutschland</p>
+        <h4>Deutscher Ruderverband</h4>
+        <p>Adams Erben bietet einen vereinsnahen Einstieg. Ergänzend führt die offizielle DRV-Vereinssuche direkt zum Verbandsangebot.</p>
+      </div>
+      <a class="button button-secondary" href="https://www.rudern.de/service/vereinssuche" target="_blank" rel="noopener noreferrer">DRV-Vereinssuche ↗</a>
     </aside>`);
   }
 
   const voiceGrid = $('#stimmen .voice-grid');
   if (voiceGrid.length && !$('#stimmen .podcast-feature').length) {
     voiceGrid.after(`
-    <article class="podcast-feature">
-      <div>
-        <p class="card-kicker">Noch mehr Stimmen aus dem Rudersport</p>
+    <article class="source-link-card source-link-card-podcast podcast-feature">
+      <div class="source-link-card-logo">${brandImage(brandAssets.schubschlag, 'Schubschlag Podcast')}</div>
+      <div class="source-link-card-copy">
+        <p class="source-link-card-kicker">Weiterhören · Menschen und Geschichten</p>
         <h3>Schubschlag</h3>
-        <p>Carsten Brzeski und Matthias Zander sprechen mit Menschen aus dem Rudersport über Erfahrungen, Entwicklungen und Geschichten aus vielen Jahrzehnten.</p>
+        <p>Carsten Brzeski und Matthias Zander erzählen Rudern über Leidenschaft, Freundschaft, Lebensphilosophie und die Menschen des Sports – klein und groß, Ost und West.</p>
       </div>
       <a class="button button-secondary" href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">Schubschlag hören ↗</a>
     </article>`);
   }
 
   const trainingCard = $('#labor .lab-card-training').first();
-  if (trainingCard.length && !trainingCard.find('.listening-tip').length) {
+  if (trainingCard.length && !trainingCard.find('.listening-tip-training').length) {
     trainingCard.append(`
-    <p class="listening-tip"><strong>Hörtipp · Schubschlag:</strong> <a href="https://www.podcast.de/episode/624998733/folge-26-wissen-macht-schnell" target="_blank" rel="noopener noreferrer">Folge 26 „Wissen macht schnell“ ↗</a></p>`);
+    <p class="listening-tip listening-tip-training"><strong>Hörtipp · Schubschlag:</strong> <a href="https://www.podcast.de/episode/624998733/folge-26-wissen-macht-schnell" target="_blank" rel="noopener noreferrer">Folge 26 „Wissen macht schnell“ ↗</a></p>`);
+  }
+
+  const materialCard = $('#labor .lab-card-boat').first();
+  if (materialCard.length && !materialCard.find('.listening-tip-material').length) {
+    materialCard.append(`
+    <p class="listening-tip listening-tip-material"><strong>Hörtipp · Schubschlag:</strong> Folge 148 „The Normal One“ – Bootsbauer, Bootsmeister und Ruderliebhaber Klaus Altena · <a href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">zum Podcast ↗</a></p>`);
   }
 
   const eightCopy = $('#rudern-verstehen .eight-explainer .eight-copy');
-  if (eightCopy.length && !eightCopy.find('.listening-tip').length) {
+  if (eightCopy.length && !eightCopy.find('.listening-tip-eight').length) {
     eightCopy.append(`
-    <p class="listening-tip"><strong>Hörtipp · Schubschlag:</strong> <a href="https://www.podcast.de/episode/624998413/folge-58-mythos-deutschland-achter" target="_blank" rel="noopener noreferrer">Folge 58 „Mythos Deutschland-Achter“ ↗</a></p>`);
+    <p class="listening-tip listening-tip-eight"><strong>Hörtipp · Schubschlag:</strong> <a href="https://www.podcast.de/episode/624998413/folge-58-mythos-deutschland-achter" target="_blank" rel="noopener noreferrer">Folge 58 „Mythos Deutschland-Achter“ ↗</a></p>`);
+  }
+
+  const ageCopy = $('#rudern-verstehen .age-band .age-copy');
+  if (ageCopy.length && !ageCopy.find('.listening-tip-masters').length) {
+    ageCopy.append(`
+    <p class="listening-tip listening-tip-masters"><strong>Hörtipp · Schubschlag:</strong> <a href="https://www.podcast.de/episode/626692170/folge-85-je-oller-je-doller" target="_blank" rel="noopener noreferrer">Folge 85 „Je oller, je doller“ – Mastersrudern als Sport fürs ganze Leben ↗</a></p>`);
+  }
+
+  const touringCards = $('#rudern-verstehen .touring-cards');
+  if (touringCards.length && !$('#rudern-verstehen .listening-tip-touring').length) {
+    touringCards.after(`
+    <p class="listening-tip listening-tip-light listening-tip-touring"><strong>Hörtipp · Schubschlag:</strong> Folge 152 „Auf in's Abenteuerland“ – ein Jahr durch Südamerika, von Ruderclub zu Ruderclub · <a href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">zum Podcast ↗</a></p>`);
   }
 
   const distanceMark = $('#rudern-verstehen .distance-mark');
-  if (distanceMark.length && !distanceMark.find('.listening-tip').length) {
+  if (distanceMark.length && !distanceMark.find('.listening-tip-distance').length) {
     distanceMark.append(`
-    <p class="listening-tip listening-tip-center"><strong>Hörtipp · Schubschlag:</strong> Folge 149 „Die beste Regatta Europas“ über den Fari Cup · <a href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">zum Podcast ↗</a></p>`);
+    <p class="listening-tip listening-tip-center listening-tip-distance"><strong>Hörtipp · Schubschlag:</strong> Folge 149 „Die beste Regatta Europas“ über den Fari Cup · <a href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">zum Podcast ↗</a></p>`);
+  }
+
+  const fundingOptions = $('#foerderung .funding-options').first();
+  if (fundingOptions.length && !fundingOptions.find('.listening-tip-volunteering').length) {
+    fundingOptions.append(`
+    <p class="listening-tip listening-tip-light listening-tip-volunteering"><strong>Hörtipp · Schubschlag:</strong> Folge 157 „Leistungssport, Ehrenamt und ein Bundesverdienstkreuz“ – Wolfgang Fritsch über Rudern, Training und jahrzehntelanges Engagement · <a href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">zum Podcast ↗</a></p>`);
   }
 
   if (!$('link[href="/assets/mobile-fixes.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/mobile-fixes.css">');
   if (!$('link[href="/assets/story-flow.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/story-flow.css">');
+  if (!$('link[href="/assets/source-links.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/source-links.css">');
   if (!$('script[src="/assets/story-nav.js"]').length) $('body').append('<script src="/assets/story-nav.js" defer></script>');
 
   validatePage($, desiredOrder);
@@ -195,10 +255,18 @@ function validatePage($, desiredOrder) {
     ['#find-nearby', 'static nearby search button'],
     ['#radius-filter', 'static nearby radius selector'],
     ['link[href="/assets/image-slots.css"]', 'static image styles'],
+    ['link[href="/assets/source-links.css"]', 'source-link styles'],
     ['.rrc-visual .asset-media-photo img[src="/assets/images/rrc-heute.jpg"]', 'static RRC image'],
+    ['.source-link-card-world img[src="/assets/images/world-rowing.png"]', 'World Rowing logo slot'],
+    ['.source-link-card-drv img[src="/assets/images/drv.png"]', 'DRV logo slot'],
+    ['.source-link-card-podcast img[src="/assets/images/schubschlag.png"]', 'Schubschlag logo slot'],
     ['a[href="https://worldrowing.com/"]', 'World Rowing link'],
     ['a[href="https://www.rudern.de/service/vereinssuche"]', 'DRV club search link'],
-    ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link']
+    ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link'],
+    ['.listening-tip-material', 'material podcast tip'],
+    ['.listening-tip-masters', 'Masters podcast tip'],
+    ['.listening-tip-touring', 'touring podcast tip'],
+    ['.listening-tip-volunteering', 'volunteering podcast tip']
   ];
   for (const [selector, label] of required) {
     if (!$(selector).length) throw new Error(`[build] required ${label} missing`);
