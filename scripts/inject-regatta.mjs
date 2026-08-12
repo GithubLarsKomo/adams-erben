@@ -53,6 +53,14 @@ if (!regatta.prev().hasClass('city-story')) {
   throw new Error('[regatta] regatta section is not directly after city-story');
 }
 
+if (!regatta.find('.regatta-layout > .regatta-copy').length || !regatta.find('.regatta-layout > .regatta-media').length) {
+  throw new Error('[regatta] expected two-column story layout missing');
+}
+
+if (regatta.find('.regatta-timeline > li').length !== 4) {
+  throw new Error('[regatta] expected four historical milestones');
+}
+
 if (!regatta.find('.regatta-media--2x1').length) {
   throw new Error('[regatta] expected 2:1 image presentation missing');
 }
