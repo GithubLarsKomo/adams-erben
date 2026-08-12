@@ -81,6 +81,7 @@ const dataOriginCopy = document.querySelector('#data-origin-copy');
 
 let organizations = [];
 let postalIndex = buildPostalIndex([]);
+let postalIndexPromise = null;
 let visibleCount = PAGE_SIZE;
 let nearbyOrigin = null;
 
@@ -239,7 +240,34 @@ function populateStates() {
   }
 }
 
-function findNearbyFromSearch() {
+async function ensurePostalIndex() {
+  if (!postalIndexPromise) {
+    postalIndexPromise = (async () => {
+      try {
+        const response = await fetch('/data/postal-locations.json', { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        postalIndex = buildPostalIndex(Array.isArray(data.locations) ? data.locations : []);
+        return true;
+      } catch (error) {
+        console.warn('Lokaler Ortsindex konnte nicht geladen werden:', error);
+        postalIndex = buildPostalIndex([]);
+        return false;
+      }
+    })();
+  }
+  return postalIndexPromise;
+}
+
+async function findNearbyFromSearch() {
+  if (nearbyStatus) nearbyStatus.textContent = 'Lokales Ortsverzeichnis wird geladen …';
+  const postalReady = await ensurePostalIndex();
+  if (!postalReady) {
+    nearbyOrigin = null;
+    if (nearbyStatus) nearbyStatus.textContent = 'Das lokale Ortsverzeichnis konnte nicht geladen werden. Bitte versuche es später erneut.';
+    render();
+    return;
+  }
   const origin = resolveLocalLocation(searchInput?.value || '', postalIndex);
   if (!origin) {
     nearbyOrigin = null;
@@ -261,11 +289,14 @@ function useBrowserLocation() {
   }
   if (nearbyStatus) nearbyStatus.textContent = 'Standortfreigabe wird angefragt …';
   navigator.geolocation.getCurrentPosition(
-    (position) => {
+    async (position) => {
+      const postalReady = await ensurePostalIndex();
       nearbyOrigin = { latitude: position.coords.latitude, longitude: position.coords.longitude, label: 'deinem aktuellen Standort' };
       if (typeFilter) typeFilter.value = 'club';
       if (stateFilter) stateFilter.value = 'all';
-      if (nearbyStatus) nearbyStatus.textContent = 'Standort übernommen. Die Koordinaten werden nur lokal im Browser für die Entfernungsberechnung verwendet.';
+      if (nearbyStatus) nearbyStatus.textContent = postalReady
+        ? 'Standort übernommen. Die Koordinaten werden nur lokal im Browser für die Entfernungsberechnung verwendet.'
+        : 'Standort übernommen. Das Ortsverzeichnis ist derzeit nicht verfügbar; Vereine ohne eigene Koordinaten können fehlen.';
       render();
     },
     () => { if (nearbyStatus) nearbyStatus.textContent = 'Standort konnte nicht verwendet werden. Nutze stattdessen Ort oder PLZ.'; },
@@ -328,15 +359,6 @@ function ensureImageSlotStyles() {
   document.head.append(link);
 }
 
-function imageExists(src) {
-  return new Promise((resolve) => {
-    const image = new Image();
-    image.onload = () => resolve(true);
-    image.onerror = () => resolve(false);
-    image.src = src;
-  });
-}
-
 function singleImageFigure({ src, alt, caption, variant = 'photo' }) {
   const figure = document.createElement('figure');
   figure.className = `asset-media asset-media-${variant}`;
@@ -354,59 +376,21 @@ function singleImageFigure({ src, alt, caption, variant = 'photo' }) {
   return figure;
 }
 
-async function replaceSinglePlaceholder(selector, config) {
+function replaceSinglePlaceholder(selector, config) {
   const placeholder = document.querySelector(selector);
-  if (!placeholder || !(await imageExists(config.src))) return;
+  if (!placeholder) return;
   placeholder.replaceWith(singleImageFigure(config));
 }
 
-async function replaceThenNowPlaceholder() {
-  const placeholder = document.querySelector('.asset-placeholder-wide');
-  if (!placeholder) return;
-  const items = [
-    { src: '/assets/images/ratzeburg-historisch.jpg', alt: 'Historisches Motiv der Ratzeburger Rudergeschichte', caption: 'Damals · historisches Motiv' },
-    { src: '/assets/images/ratzeburg-heute.jpg', alt: 'Ratzeburg und der Rudersport heute', caption: 'Heute · aktuelles Motiv' }
-  ];
-  const availability = await Promise.all(items.map((item) => imageExists(item.src)));
-  const available = items.filter((_, index) => availability[index]);
-  if (!available.length) return;
-  if (available.length === 1) {
-    placeholder.replaceWith(singleImageFigure({ ...available[0], variant: 'photo' }));
-    return;
-  }
-  const container = document.createElement('div');
-  container.className = 'then-now-media';
-  for (const item of available) container.append(singleImageFigure({ ...item, variant: 'photo' }));
-  placeholder.replaceWith(container);
-}
-
-async function hydrateImageSlots() {
+function hydrateImageSlots() {
   ensureImageSlotStyles();
-  await Promise.all([
-    replaceSinglePlaceholder('.asset-placeholder-logo', { src: '/assets/images/rrc-vintage-logo.png', alt: 'Logo des Ratzeburger Ruderclubs', caption: '', variant: 'logo' }),
-    replaceSinglePlaceholder('.asset-placeholder-photo', { src: '/assets/images/rrc-heute.jpg', alt: 'Ratzeburger Ruderclub heute', caption: 'Ratzeburger Ruderclub heute', variant: 'photo' }),
-    replaceThenNowPlaceholder()
-  ]);
-}
-
-async function loadPostalIndex() {
-  try {
-    const response = await fetch('/data/postal-locations.json', { headers: { Accept: 'application/json' } });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
-    postalIndex = buildPostalIndex(Array.isArray(data.locations) ? data.locations : []);
-  } catch (error) {
-    console.warn('Lokaler Ortsindex konnte nicht geladen werden:', error);
-    postalIndex = buildPostalIndex([]);
-  }
+  replaceSinglePlaceholder('.asset-placeholder-logo', { src: '/assets/images/rrc-vintage-logo.png', alt: 'Logo des Ratzeburger Ruderclubs', caption: '', variant: 'logo' });
+  replaceSinglePlaceholder('.asset-placeholder-photo', { src: '/assets/images/rrc-heute.jpg', alt: 'Ratzeburger Ruderclub heute', caption: 'Ratzeburger Ruderclub heute', variant: 'photo' });
 }
 
 async function init() {
   try {
-    const [response] = await Promise.all([
-      fetch('/data/clubs.json', { headers: { Accept: 'application/json' } }),
-      loadPostalIndex()
-    ]);
+    const response = await fetch('/data/clubs.json', { headers: { Accept: 'application/json' } });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     organizations = Array.isArray(data.organizations) ? data.organizations : [];
