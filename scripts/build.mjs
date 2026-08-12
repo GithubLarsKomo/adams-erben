@@ -103,10 +103,10 @@ function renderPage(html) {
   for (const selector of desiredOrder) {
     const section = main.children(selector).first();
     if (!section.length) throw new Error(`[build] expected section missing: ${selector}`);
-    orderedSections.push(section.detach());
+    orderedSections.push(section.remove());
   }
 
-  const leftovers = main.children('section').detach();
+  const leftovers = main.children('section').remove();
   for (const section of orderedSections) main.append(section);
   if (leftovers.length) $('#ueber').before(leftovers);
 
