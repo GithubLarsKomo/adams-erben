@@ -1,0 +1,174 @@
+/* Final responsive guardrails. Loaded last by scripts/patch-hero-mobile.mjs. */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+.hero,
+.hero > *,
+.featured-card,
+.featured-card > *,
+.city-grid,
+.city-grid > *,
+.voice-grid,
+.voice-grid > *,
+.lab-grid,
+.lab-grid > *,
+.history-grid,
+.history-grid > *,
+.funding-grid,
+.funding-grid > *,
+.principles,
+.principles > *,
+.rowing-explainer,
+.rowing-explainer > *,
+.rowing-rhythm-grid,
+.rowing-rhythm-grid > *,
+.touring-cards,
+.touring-cards > * {
+  min-width: 0;
+}
+
+/* Use a real image element for the opening visual instead of relying on an SVG/background combination. */
+.hero-art-photo {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 16 / 9;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #102f45;
+  box-shadow: 0 24px 60px rgba(3, 18, 28, .28);
+}
+
+.hero-art-photo .hero-skiff {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* The navigation may scroll horizontally on small screens; the page itself must not. */
+.site-header nav {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 920px) {
+  main > section,
+  .site-footer {
+    width: min(calc(100% - 2rem), var(--content)) !important;
+    max-width: calc(100% - 2rem);
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .site-header {
+    width: 100% !important;
+    max-width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .site-header nav {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.35rem;
+  }
+
+  .hero-copy,
+  .hero-art-photo {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-art-photo {
+    margin: .25rem 0 0;
+  }
+
+  .rrc-card,
+  .city-grid,
+  .history-grid,
+  .funding-grid,
+  .lab-grid,
+  .rowing-rhythm-grid,
+  .touring-cards {
+    max-width: 100%;
+  }
+
+  .eight-scroll {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  main > section,
+  .site-footer {
+    width: calc(100% - 2rem) !important;
+    max-width: calc(100% - 2rem);
+  }
+
+  .site-header {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero {
+    padding: 1.5rem 1.15rem !important;
+  }
+
+  .hero h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .button,
+  .text-link {
+    max-width: 100%;
+  }
+
+  .text-link {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .partner-strip,
+  .distance-callout,
+  .race-strip,
+  .age-band,
+  .gig-explainer,
+  .eight-explainer,
+  .rowing-panel,
+  .touring-card,
+  .lab-card,
+  .story-card,
+  .book-card,
+  .context-card,
+  .funding-primary,
+  .funding-options {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
