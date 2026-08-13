@@ -22,14 +22,18 @@ const rowingExplainerPath = path.join(src, 'partials', 'rowing-explainer.html');
 const rowingExplainerHtml = await readFile(rowingExplainerPath, 'utf8');
 const academyPath = path.join(src, 'partials', 'ruderakademie.html');
 const academyHtml = await readFile(academyPath, 'utf8');
+const regattaPath = path.join(src, 'partials', 'ratzeburg-regatta.html');
+const regattaHtml = await readFile(regattaPath, 'utf8');
 const previewStyles = previewMode ? '  <link rel="stylesheet" href="/assets/preview.css">\n' : '';
 const previewRobots = previewMode ? '  <meta name="robots" content="noindex,nofollow">\n' : '';
 const rowingStyles = '  <link rel="stylesheet" href="/assets/rowing-explainer.css">\n  <link rel="stylesheet" href="/assets/storyboard-overrides.css">\n';
 const academyStyles = '  <link rel="stylesheet" href="/assets/ruderakademie.css">\n';
+const regattaStyles = '  <link rel="stylesheet" href="/assets/regatta.css">\n';
 const canonicalUrl = previewMode ? 'https://preview.adams-erben.de/' : 'https://adams-erben.de/';
 const legalFooterLink = '<a href="/datenschutz.php">Datenschutz</a><a href="/rechtliche-hinweise.php">Rechtliche Hinweise</a>';
 const voicesAnchor = '    <section class="voices" id="stimmen" aria-labelledby="voices-title">';
 const historyAnchor = '    <section class="history" id="geschichte" aria-labelledby="history-title">';
+const laborAnchor = '    <section class="labor" id="labor" aria-labelledby="labor-title">';
 const academyCityParagraph = '<p>Die rund zweistündige Themenführung folgt den Spuren Karl Adams und der Ratzeburger Rudergeschichte: vom Karl-Adam-Gedenkstein beim RRC über die frühere Gelehrtenschule und das historische Bootshaus bis zur Ruderakademie.</p>';
 const academyCityLink = '<a class="text-link city-academy-link" href="#ruderakademie">Mehr zur Ruderakademie und ihrer Verbindung zu Karl Adam ↓</a>';
 const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.png" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
@@ -114,6 +118,7 @@ function renderPage(html) {
     '#film',
     '#ratzeburg',
     '.city-story',
+    '#regatta',
     '#labor',
     '#geschichte',
     '#ruderakademie',
@@ -221,6 +226,10 @@ function renderPage(html) {
     fundingOptions.append(`
     <p class="listening-tip listening-tip-light listening-tip-volunteering"><strong>Hörtipp · Schubschlag:</strong> Folge 157 „Leistungssport, Ehrenamt und ein Bundesverdienstkreuz“ – Wolfgang Fritsch über Rudern, Training und jahrzehntelanges Engagement · <a href="https://www.podcast.de/podcast/2776815/schubschlag" target="_blank" rel="noopener noreferrer">zum Podcast ↗</a></p>`);
   }
+  if (fundingOptions.length && !fundingOptions.find('.regatta-volunteering-link').length) {
+    fundingOptions.append(`
+    <p class="regatta-volunteering-link"><strong>Mitmachen in groß:</strong> Wie viel ehrenamtliche Arbeit möglich macht, zeigt seit Jahrzehnten die <a href="#regatta">Internationale Ratzeburger Ruderregatta</a> – vom Auf- und Abbau bis zum Rennbetrieb.</p>`);
+  }
 
   if (!$('link[href="/assets/mobile-fixes.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/mobile-fixes.css">');
   if (!$('link[href="/assets/story-flow.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/story-flow.css">');
@@ -250,12 +259,15 @@ function validatePage($, desiredOrder) {
     ['#primary-navigation', 'primary navigation'],
     ['.header-actions .menu-toggle', 'mobile menu toggle'],
     ['.hero-skiff[src="/assets/images/hero-skiff.png"]', 'hero image'],
+    ['#regatta', 'regatta section'],
+    ['#regatta img[src="/assets/images/ratzeburg-regatta.jpg"]', 'regatta source image'],
     ['#ruderakademie', 'Ruderakademie section'],
     ['#rudern-verstehen', 'rowing explainer'],
     ['#find-nearby', 'static nearby search button'],
     ['#radius-filter', 'static nearby radius selector'],
     ['link[href="/assets/image-slots.css"]', 'static image styles'],
     ['link[href="/assets/source-links.css"]', 'source-link styles'],
+    ['link[href="/assets/regatta.css"]', 'regatta styles'],
     ['.rrc-visual .asset-media-photo img[src="/assets/images/rrc-heute.jpg"]', 'static RRC image'],
     ['.source-link-card-world img[src="/assets/images/world-rowing.png"]', 'World Rowing logo slot'],
     ['.source-link-card-drv img[src="/assets/images/drv.png"]', 'DRV logo slot'],
@@ -297,10 +309,11 @@ const preparedIndexHtml = replaceLaborVisuals(indexHtml)
   .replace(editorialLaborNote, '')
   .replace(editorialHistoryNote, '')
   .replace(academyCityParagraph, `${academyCityParagraph}\n          ${academyCityLink}`)
+  .replace(laborAnchor, `${regattaHtml}\n\n${laborAnchor}`)
   .replace(voicesAnchor, `${rowingExplainerHtml.replace(redundantOutroLink, '')}\n\n${voicesAnchor}`)
   .replace(historyAnchor, `${academyHtml}\n\n${historyAnchor}`)
   .replace('<a href="/datenschutz.php">Datenschutz</a>', legalFooterLink)
-  .replace('</head>', `${rowingStyles}${academyStyles}${previewStyles}${previewRobots}</head>`);
+  .replace('</head>', `${rowingStyles}${academyStyles}${regattaStyles}${previewStyles}${previewRobots}</head>`);
 
 await writeFile(indexPath, renderPage(preparedIndexHtml));
 
