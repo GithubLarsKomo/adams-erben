@@ -28,6 +28,11 @@
 .deutschlandachter-copy small{color:var(--muted);font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .deutschlandachter-copy strong{font-size:.9rem;line-height:1.25}
 
+.world-best-time-callout{margin:clamp(1.2rem,2.5vw,1.8rem) 0 clamp(1.6rem,3vw,2.2rem)}
+.world-best-time-copy{max-width:760px;margin:0;color:var(--muted);line-height:1.6}
+.world-best-time-copy strong{color:var(--navy)}
+.world-rowing-race-link .regatta-stream-logo img{filter:brightness(0) invert(1)}
+
 /* Podcast tips are editorial crosslinks, not sponsor badges. */
 .listening-tip{max-width:100%;overflow-wrap:anywhere}
 .listening-tip-light{margin:1rem 0 0;padding:.8rem 0 0;border-top:1px solid rgba(11,35,54,.14);color:var(--muted);font-size:.82rem;line-height:1.5}
