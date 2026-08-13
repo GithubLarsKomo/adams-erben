@@ -1,21 +1,21 @@
 /* International Ratzeburg regatta story.
-   The section deliberately borrows the site's existing typography, palette and
-   controls while giving the long rowing image enough horizontal space. */
+   Uses the same contained editorial-card language as the academy and other
+   major story blocks instead of a full-bleed background band. */
 
 .regatta-story {
   position: relative;
-  isolation: isolate;
-  padding: clamp(3.5rem, 7vw, 5.75rem) 0;
-  background: linear-gradient(180deg, rgba(220, 235, 240, .52), rgba(247, 245, 239, .32));
-  box-shadow: 0 0 0 100vmax rgba(220, 235, 240, .38);
-  clip-path: inset(0 -100vmax);
+  padding: clamp(1.5rem, 3vw, 2.4rem);
+  border: 1px solid rgba(11, 35, 54, .11);
+  border-radius: 28px;
+  background: var(--white);
+  box-shadow: var(--shadow);
 }
 
 .regatta-layout {
   display: grid;
-  grid-template-columns: minmax(0, .94fr) minmax(430px, 1.06fr);
-  gap: clamp(2rem, 4.8vw, 4.75rem);
-  align-items: center;
+  grid-template-columns: minmax(0, .96fr) minmax(430px, 1.04fr);
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  align-items: start;
 }
 
 .regatta-copy {
@@ -27,8 +27,8 @@
   margin: .25rem 0 1rem;
   color: var(--navy);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.1rem, 4vw, 3.55rem);
-  line-height: 1.06;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  line-height: 1.04;
   letter-spacing: -.035em;
 }
 
@@ -49,9 +49,9 @@
   margin: 0;
   overflow: hidden;
   border: 1px solid rgba(11, 35, 54, .11);
-  border-radius: var(--radius);
+  border-radius: 20px;
   background: var(--white);
-  box-shadow: 0 18px 46px rgba(11, 35, 54, .10);
+  box-shadow: 0 12px 34px rgba(11, 35, 54, .09);
 }
 
 .regatta-media--3x1 {
@@ -229,7 +229,7 @@
   padding: .95rem 1.05rem;
   border-left: 3px solid var(--accent);
   border-radius: 0 12px 12px 0;
-  background: rgba(255, 253, 248, .72);
+  background: var(--foam);
   color: var(--muted);
   font-size: .88rem;
   line-height: 1.55;
@@ -252,6 +252,12 @@
   font-weight: 800;
 }
 
+/* World Rowing follows the complete regatta card as an institutional
+   continuation, using the same full content width as the DRV source card. */
+.regatta-story > .source-link-card-world {
+  margin-top: 1.25rem;
+}
+
 /* Keep the visual transition into Adams Labor compact: the regatta is the
    bridge from Ratzeburg as a place into Adam's sporting ideas. */
 .regatta-story + .labor {
@@ -271,13 +277,14 @@
   }
 
   .regatta-media {
-    width: min(100%, 900px);
+    width: 100%;
   }
 }
 
 @media (max-width: 720px) {
   .regatta-story {
-    padding: 3.25rem 0;
+    padding: 1.1rem;
+    border-radius: 22px;
   }
 
   .regatta-timeline {
@@ -293,7 +300,7 @@
     padding: .9rem;
     border: 1px solid rgba(11, 35, 54, .10);
     border-radius: 14px;
-    background: rgba(255, 253, 248, .62);
+    background: var(--foam);
     text-align: left;
   }
 
