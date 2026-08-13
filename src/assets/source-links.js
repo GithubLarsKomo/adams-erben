@@ -1,4 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
+  if (!document.querySelector('#world-best-time-styles')) {
+    const style = document.createElement('style');
+    style.id = 'world-best-time-styles';
+    style.textContent = `
+      .race-strip-with-record{overflow:hidden}
+      .race-record{margin-top:clamp(1.8rem,3.5vw,2.6rem);padding-top:clamp(1.5rem,3vw,2.1rem);border-top:1px solid rgba(255,255,255,.18)}
+      .race-record-question{margin:0 0 .55rem;color:#9bdced;font-size:.72rem;font-weight:900;letter-spacing:.11em;text-transform:uppercase}
+      .race-record-heading{display:flex;align-items:baseline;gap:.85rem;flex-wrap:wrap;margin-bottom:.9rem}
+      .race-record-time{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.6rem,6vw,5.2rem);line-height:.92;letter-spacing:-.055em;color:var(--white)}
+      .race-record-place{color:#f9ad66;font-size:.76rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+      .race-record-copy{max-width:860px;margin:0;color:#d7e7ed!important;font-size:clamp(.95rem,1.35vw,1.05rem);line-height:1.65}
+      .race-record-copy strong{color:var(--white)}
+      .race-record-source{display:flex;align-items:center;justify-content:space-between;gap:1.25rem;width:100%;margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.12);color:#dcebf0;text-decoration:none;font-size:.82rem;font-weight:800;transition:color .15s ease,border-color .15s ease}
+      .race-record-source:hover{color:var(--white);border-top-color:rgba(155,220,237,.45)}
+      .race-record-source:focus-visible{outline:3px solid rgba(155,220,237,.38);outline-offset:5px}
+      .race-record-source img{display:block;width:auto;max-width:118px;max-height:36px;object-fit:contain;filter:brightness(0) invert(1)}
+      .race-record-source span{margin-left:auto;text-align:right}
+      @media(max-width:640px){.race-record-heading{display:block}.race-record-place{display:block;margin-top:.45rem}.race-record-source{align-items:flex-start}.race-record-source img{max-width:96px}.race-record-source span{max-width:55%}}
+    `;
+    document.head.append(style);
+  }
+
   const moveAfter = (cardSelector, targetSelector) => {
     const card = document.querySelector(cardSelector);
     const target = document.querySelector(targetSelector);
