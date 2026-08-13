@@ -1,0 +1,96 @@
+name: Consolidate WebP assets
+
+on:
+  push:
+    branches:
+      - feat/karl-adam-local-cooperation
+    paths:
+      - .github/workflows/consolidate-webp.yml
+
+permissions:
+  contents: write
+
+jobs:
+  consolidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/karl-adam-local-cooperation
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Replace legacy image references
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          replacements = {
+              '/assets/images/hero-skiff.png': '/assets/images/hero-skiff.webp',
+              '/assets/images/hoehe-mexiko.png': '/assets/images/hoehe-mexiko.webp',
+              '/assets/images/measured-training.png': '/assets/images/measured-training.webp',
+              '/assets/images/moselpokal.png': '/assets/images/moselpokal.webp',
+              '/assets/images/ratzeburg-regatta.jpg': '/assets/images/ratzeburg-regatta.webp',
+              '/assets/images/rrc-heute.jpg': '/assets/images/rrc-heute.webp',
+              '/assets/images/schubschlag.png': '/assets/images/schubschlag.webp',
+              '/assets/images/schubschlag-mark.png': '/assets/images/schubschlag-mark.webp',
+              '/assets/images/schubschlag-text.png': '/assets/images/schubschlag-text.webp',
+              '/assets/images/sportdeutschland-tv.png': '/assets/images/sportdeutschland-tv.webp',
+              '/assets/images/tafelbild.png': '/assets/images/tafelbild.webp',
+              '/assets/images/deutschlandachter.png': '/assets/images/deutschlandachter.webp',
+          }
+
+          roots = [Path('src'), Path('scripts')]
+          suffixes = {'.html', '.js', '.mjs', '.css', '.md', '.json'}
+          for root in roots:
+              for path in root.rglob('*'):
+                  if not path.is_file() or path.suffix.lower() not in suffixes:
+                      continue
+                  text = path.read_text(encoding='utf-8')
+                  updated = text
+                  for old, new in replacements.items():
+                      updated = updated.replace(old, new)
+                  if updated != text:
+                      path.write_text(updated, encoding='utf-8')
+
+          regatta = Path('src/partials/ratzeburg-regatta.html')
+          text = regatta.read_text(encoding='utf-8')
+          text = re.sub(
+              r'\n<script>\s*\(\(\) => \{\s*const replacements = new Map\([\s\S]*?</script>\s*$',
+              '\n',
+              text,
+          )
+          regatta.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Ensure no legacy local image references remain
+        shell: bash
+        run: |
+          if git grep -nE '/assets/images/(hero-skiff\.png|hoehe-mexiko\.png|measured-training\.png|moselpokal\.png|ratzeburg-regatta\.jpg|rrc-heute\.jpg|schubschlag(-mark|-text)?\.png|sportdeutschland-tv\.png|tafelbild\.png|deutschlandachter\.png)' -- src scripts; then
+            echo 'Legacy local image reference found.' >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate build
+        env:
+          SKIP_DRV_SYNC: '1'
+        run: npm run build
+
+      - name: Commit consolidated references
+        shell: bash
+        run: |
+          git rm .github/workflows/consolidate-webp.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src scripts
+          git commit -m 'Consolidate optimized WebP image references'
+          git push origin HEAD:feat/karl-adam-local-cooperation
