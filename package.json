@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "postbuild": "node scripts/inject-regatta.mjs",
+    "postbuild": "node scripts/inject-regatta.mjs && node -e \"require('node:fs').copyFileSync('src/assets/images/ratzeburg-regatta.jpg','dist/assets/images/ratzeburg-regatta.jpg')\"",
     "sync:drv": "node scripts/sync-drv.mjs && node scripts/validate-drv-output.mjs",
     "validate:drv-output": "node scripts/validate-drv-output.mjs",
     "test:drv-output": "node scripts/validate-drv-output.test.mjs",
