@@ -152,19 +152,75 @@
 }
 
 .regatta-source {
-  margin: .7rem 0 0;
+  margin: .9rem 0 0;
   font-size: .78rem;
 }
 
-.regatta-source a {
-  color: var(--muted);
-  font-weight: 700;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+.regatta-stream {
+  max-width: 690px;
 }
 
-.regatta-source a:hover {
+.regatta-stream-link {
+  display: inline-flex;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(11, 35, 54, .12);
+  border-radius: 14px;
+  background: rgba(255, 253, 248, .94);
+  box-shadow: 0 8px 22px rgba(11, 35, 54, .07);
+  text-decoration: none;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.regatta-stream-link:hover {
+  border-color: rgba(166, 52, 43, .34);
+  box-shadow: 0 12px 28px rgba(11, 35, 54, .11);
+  transform: translateY(-1px);
+}
+
+.regatta-stream-link:focus-visible {
+  outline: 3px solid rgba(166, 52, 43, .28);
+  outline-offset: 3px;
+}
+
+.regatta-stream-logo {
+  display: flex;
+  flex: 0 0 154px;
+  align-items: center;
+  justify-content: center;
+  padding: .8rem 1rem;
+  background: var(--navy);
+}
+
+.regatta-stream-logo img {
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  height: auto;
+}
+
+.regatta-stream-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: .18rem;
+  padding: .72rem .95rem .76rem;
+}
+
+.regatta-stream-kicker {
   color: var(--accent);
+  font-size: .65rem;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+.regatta-stream-copy strong {
+  color: var(--navy);
+  font-size: .84rem;
+  line-height: 1.4;
 }
 
 .regatta-note {
@@ -263,6 +319,25 @@
     width: 100%;
     justify-content: center;
     text-align: center;
+  }
+
+  .regatta-stream-link {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .regatta-stream-logo {
+    min-height: 52px;
+    flex-basis: auto;
+    padding: .7rem .9rem;
+  }
+
+  .regatta-stream-logo img {
+    max-width: 150px;
+  }
+
+  .regatta-stream-copy {
+    padding: .76rem .9rem .88rem;
   }
 
   .regatta-media--3x1,
