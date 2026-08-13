@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   };
 
-  const worldRowing = moveAfter('.external-resource-world-rowing', '#regatta .regatta-note');
+  const worldRowing = moveAfter('.external-resource-world-rowing', '#regatta .regatta-layout');
   if (worldRowing) {
     worldRowing.setAttribute('aria-label', 'World Rowing als heutiger internationaler Bezug');
     const kicker = worldRowing.querySelector('.source-link-card-kicker');
@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const sportEurope = document.querySelector('#regatta .regatta-source');
-  if (sportEurope && !sportEurope.querySelector('.regatta-source-logo')) {
-    sportEurope.classList.add('regatta-source-branded');
-    sportEurope.insertAdjacentHTML('afterbegin', '<span class="regatta-source-logo"><img src="https://sporteurope.tv/assets/images/logo/setv_bg_white.svg" alt="Sporteurope.TV" loading="lazy" decoding="async"></span>');
+  if (sportEurope) {
+    sportEurope.className = 'regatta-source regatta-stream';
+    sportEurope.innerHTML = '<a class="regatta-stream-link" href="https://sporteurope.tv/deutscherruderverband/67-internationale-ratzebuger-ruderregatta-sonntag" target="_blank" rel="noopener noreferrer"><span class="regatta-stream-logo"><img src="/assets/images/sportdeutschland-tv.png" alt="Sporteurope.TV" loading="lazy" decoding="async"></span><span class="regatta-stream-copy"><span class="regatta-stream-kicker">67. Internationale Ratzeburger Ruderregatta</span><strong>Regatta-Sonntag im Re-Live auf Sporteurope.TV ↗</strong></span></a>';
   }
 
   const drv = moveBefore('#vereine .source-link-card-drv', '#ruderakademie .academy-network');
