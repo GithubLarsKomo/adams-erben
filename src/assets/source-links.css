@@ -68,13 +68,25 @@
 }
 
 .source-link-card-world {
+  width: 100%;
   max-width: none;
+  margin: 1rem 0 0;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
   text-align: left;
   background: #f6fafc;
 }
 
+.source-link-card-world .source-link-card-logo img {
+  max-width: 86px;
+}
+
+.source-link-card-world h4 {
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
+}
+
 .source-link-card-drv {
-  margin: .9rem 0 0;
+  width: 100%;
+  margin: 1.1rem 0;
   background: var(--foam);
 }
 
@@ -99,6 +111,42 @@
 
 .source-link-card-podcast .source-link-card-copy > p:last-child {
   color: #dcebf0;
+}
+
+/* Sporteurope.TV: compact branded replay source beneath the regatta actions. */
+.regatta-source-branded {
+  display: grid;
+  grid-template-columns: 138px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgba(171,52,39,.22);
+  border-radius: 16px;
+  background: var(--white);
+  box-shadow: 0 4px 14px rgba(11,35,54,.035);
+}
+
+.regatta-source-branded .regatta-source-logo {
+  display: grid;
+  place-items: center;
+  min-height: 62px;
+  padding: .65rem .8rem;
+  background: #102a43;
+}
+
+.regatta-source-branded .regatta-source-logo img {
+  display: block;
+  width: 100%;
+  max-width: 112px;
+  max-height: 38px;
+  object-fit: contain;
+}
+
+.regatta-source-branded > a {
+  display: flex;
+  align-items: center;
+  padding: .7rem 1rem;
+  text-decoration: none;
 }
 
 /* Podcast tips are editorial crosslinks, not sponsor badges. */
@@ -149,6 +197,10 @@
     grid-column: 1 / -1;
     justify-self: start;
   }
+
+  .source-link-card-world {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
@@ -168,5 +220,13 @@
 
   .source-link-card .button {
     width: 100%;
+  }
+
+  .regatta-source-branded {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+
+  .regatta-source-branded .regatta-source-logo {
+    padding: .55rem;
   }
 }
