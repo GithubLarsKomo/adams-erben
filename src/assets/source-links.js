@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (biographyActions && !document.querySelector('#geschichte .deutschlandachter-link')) {
     biographyActions.insertAdjacentHTML('afterend', `
       <a class="deutschlandachter-link" href="https://deutschlandachter.de/" target="_blank" rel="noopener noreferrer" aria-label="Zu den heutigen Erben des Deutschland-Achters" style="margin-top:1rem;display:inline-flex;align-items:center;gap:.85rem;max-width:100%;padding:.65rem .85rem;border:1px solid rgba(11,35,54,.12);border-radius:14px;background:var(--foam);color:var(--navy);text-decoration:none">
-        <span class="deutschlandachter-logo" style="display:flex;align-items:center;justify-content:center;flex:0 0 96px;width:96px;height:48px;overflow:hidden;background:#fff;border-radius:8px"><img src="/assets/images/deutschlandachter.png" alt="Deutschland-Achter" loading="lazy" decoding="async" style="display:block;width:auto!important;height:auto!important;max-width:88px!important;max-height:42px!important;object-fit:contain!important"></span>
+        <span class="deutschlandachter-logo" style="display:flex;align-items:center;justify-content:center;flex:0 0 96px;width:96px;height:48px;overflow:hidden;background:#fff;border-radius:8px"><img src="/assets/images/deutschlandachter.webp" alt="Deutschland-Achter" loading="lazy" decoding="async" style="display:block;width:auto!important;height:auto!important;max-width:88px!important;max-height:42px!important;object-fit:contain!important"></span>
         <span class="deutschlandachter-copy" style="display:grid;gap:.1rem;min-width:0"><small style="color:var(--muted);font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Der Deutschland-Achter heute</small><strong style="font-size:.9rem;line-height:1.25">Zu den heutigen Erben des Deutschland-Achters ↗</strong></span>
       </a>`);
   }
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = podcast.querySelector('h3');
     const copyText = podcast.querySelector('.source-link-card-copy > p:last-child');
     if (logo) {
-      logo.src = '/assets/images/schubschlag.png';
+      logo.src = '/assets/images/schubschlag.webp';
       logo.alt = 'Schubschlag';
       logo.removeAttribute('onerror');
       logo.style.maxWidth = '150px';

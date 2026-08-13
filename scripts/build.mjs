@@ -36,10 +36,10 @@ const historyAnchor = '    <section class="history" id="geschichte" aria-labelle
 const laborAnchor = '    <section class="labor" id="labor" aria-labelledby="labor-title">';
 const academyCityParagraph = '<p>Die rund zweistündige Themenführung folgt den Spuren Karl Adams und der Ratzeburger Rudergeschichte: vom Karl-Adam-Gedenkstein beim RRC über die frühere Gelehrtenschule und das historische Bootshaus bis zur Ruderakademie.</p>';
 const academyCityLink = '<a class="text-link city-academy-link" href="#ruderakademie">Mehr zur Ruderakademie und ihrer Verbindung zu Karl Adam ↓</a>';
-const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.png" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
-const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.png" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
+const measuredTrainingImage = '<figure class="lab-image-frame lab-image-frame-measured-training"><img src="/assets/images/measured-training.webp" alt="Grafische Darstellung der systematischen Trainingssteuerung mit Belastungs- und Erholungsphasen"></figure>';
+const trainingImage = '<figure class="lab-image-frame lab-image-frame-training"><img src="/assets/images/tafelbild.webp" alt="Tafelbild zum Winter- und Krafttraining im Rudern"></figure>';
 const oarImage = '          <figure class="lab-image-frame lab-image-frame-oars"><img src="/assets/images/oars-over-time.png" alt="Entwicklung und Veränderung von Riemen und Ruderblättern im Zeitverlauf"></figure>';
-const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude"><img src="/assets/images/hoehe-mexiko.png" alt="Grafische Darstellung der Höhenvorbereitung auf die Olympischen Spiele 1968 in Mexiko-Stadt"></figure>';
+const altitudeImage = '<figure class="lab-image-frame lab-image-frame-altitude"><img src="/assets/images/hoehe-mexiko.webp" alt="Grafische Darstellung der Höhenvorbereitung auf die Olympischen Spiele 1968 in Mexiko-Stadt"></figure>';
 const redundantOutroLink = '    <a class="text-link" href="#stimmen">Weiter zu Adams Erben heute ↓</a>\n';
 const editorialLaborNote = '      <p class="source-note">Die Darstellung trennt bewusst zwischen belegten historischen Praktiken und heutiger Einordnung. Detailformulierungen werden vor Veröffentlichung zusätzlich gegen Karl-Adams Primärtexte sowie die Biografie von Dirk Andresen und Timo Reinke geprüft.</p>\n';
 const editorialHistoryNote = '          <p class="source-note">Ein weiterer kontroverser Presse-/Rudersport-Beitrag wird erst nach eindeutiger Quellenprüfung ergänzt.</p>\n';
@@ -54,7 +54,7 @@ const brandAssets = {
     fallback: 'https://www.rudern.de/sites/default/files/styles/content_full_desktop_1x/public/images/drv-logo.webp?itok=8KBhu-lW'
   },
   schubschlag: {
-    local: '/assets/images/schubschlag.png',
+    local: '/assets/images/schubschlag.webp',
     fallback: 'https://cdn.podcastcms.de/images/podcasts/315/2776815/schubschlag.png'
   }
 };
@@ -90,7 +90,7 @@ function renderPage(html) {
 
   heroArt.replaceWith(`
       <figure class="hero-art hero-art-photo" aria-hidden="true">
-        <img class="boat hero-skiff" src="/assets/images/hero-skiff.png" alt="" width="1200" height="675" decoding="async" fetchpriority="high">
+        <img class="boat hero-skiff" src="/assets/images/hero-skiff.webp" alt="" width="1200" height="675" decoding="async" fetchpriority="high">
       </figure>`);
 
   nav.attr('id', 'primary-navigation').html(`
@@ -258,9 +258,9 @@ function validatePage($, desiredOrder) {
   const required = [
     ['#primary-navigation', 'primary navigation'],
     ['.header-actions .menu-toggle', 'mobile menu toggle'],
-    ['.hero-skiff[src="/assets/images/hero-skiff.png"]', 'hero image'],
+    ['.hero-skiff[src="/assets/images/hero-skiff.webp"]', 'hero image'],
     ['#regatta', 'regatta section'],
-    ['#regatta img[src="/assets/images/ratzeburg-regatta.jpg"]', 'regatta source image'],
+    ['#regatta img[src="/assets/images/ratzeburg-regatta.webp"]', 'regatta source image'],
     ['#ruderakademie', 'Ruderakademie section'],
     ['#rudern-verstehen', 'rowing explainer'],
     ['#find-nearby', 'static nearby search button'],
@@ -268,10 +268,10 @@ function validatePage($, desiredOrder) {
     ['link[href="/assets/image-slots.css"]', 'static image styles'],
     ['link[href="/assets/source-links.css"]', 'source-link styles'],
     ['link[href="/assets/regatta.css"]', 'regatta styles'],
-    ['.rrc-visual .asset-media-photo img[src="/assets/images/rrc-heute.jpg"]', 'static RRC image'],
+    ['.rrc-visual .asset-media-photo img[src="/assets/images/rrc-heute.webp"]', 'static RRC image'],
     ['.source-link-card-world img[src="/assets/images/world-rowing.png"]', 'World Rowing logo slot'],
     ['.source-link-card-drv img[src="/assets/images/drv.png"]', 'DRV logo slot'],
-    ['.source-link-card-podcast img[src="/assets/images/schubschlag.png"]', 'Schubschlag logo slot'],
+    ['.source-link-card-podcast img[src="/assets/images/schubschlag.webp"]', 'Schubschlag logo slot'],
     ['a[href="https://worldrowing.com/"]', 'World Rowing link'],
     ['a[href="https://www.rudern.de/service/vereinssuche"]', 'DRV club search link'],
     ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link'],
