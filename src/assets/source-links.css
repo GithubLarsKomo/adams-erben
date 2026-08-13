@@ -1,232 +1,33 @@
-/* Branded editorial source cards for World Rowing, DRV and Schubschlag. */
-
-.source-link-card {
-  margin-top: 1rem;
-  padding: 1rem;
-  display: grid;
-  grid-template-columns: minmax(78px, 110px) minmax(0, 1fr) auto;
-  gap: 1rem;
-  align-items: center;
-  border: 1px solid rgba(11,35,54,.12);
-  border-radius: 18px;
-  background: var(--white);
-  color: var(--navy);
-  box-shadow: 0 8px 24px rgba(11,35,54,.045);
-}
-
-.source-link-card-logo {
-  display: grid;
-  place-items: center;
-  min-width: 0;
-  min-height: 58px;
-  padding: .35rem;
-  border-radius: 12px;
-  background: rgba(255,255,255,.86);
-}
-
-.source-link-card-logo img {
-  display: block;
-  width: 100%;
-  max-width: 104px;
-  max-height: 54px;
-  object-fit: contain;
-}
-
-.source-link-card-copy {
-  min-width: 0;
-}
-
-.source-link-card-kicker {
-  margin: 0 0 .18rem;
-  color: var(--accent);
-  font-size: .68rem;
-  font-weight: 900;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
-
-.source-link-card h3,
-.source-link-card h4 {
-  margin: 0 0 .3rem;
-  font-family: Georgia, "Times New Roman", serif;
-  color: var(--navy);
-  line-height: 1.1;
-}
-
-.source-link-card h3 { font-size: clamp(1.45rem, 2.4vw, 2rem); }
-.source-link-card h4 { font-size: clamp(1.2rem, 2vw, 1.55rem); }
-
-.source-link-card-copy > p:last-child {
-  margin: 0;
-  color: var(--muted);
-  font-size: .88rem;
-  line-height: 1.5;
-}
-
-.source-link-card .button {
-  white-space: nowrap;
-}
-
-.source-link-card-world {
-  width: 100%;
-  max-width: none;
-  margin: 1rem 0 0;
-  grid-template-columns: 96px minmax(0, 1fr) auto;
-  text-align: left;
-  background: #f6fafc;
-}
-
-.source-link-card-world .source-link-card-logo img {
-  max-width: 86px;
-}
-
-.source-link-card-world h4 {
-  font-size: clamp(1.25rem, 2vw, 1.55rem);
-}
-
-.source-link-card-drv {
-  width: 100%;
-  margin: 1.1rem 0;
-  background: var(--foam);
-}
-
-.source-link-card-podcast {
-  margin-top: 1.5rem;
-  background: var(--navy);
-  color: var(--white);
-}
-
-.source-link-card-podcast .source-link-card-logo {
-  background: var(--white);
-}
-
-.source-link-card-podcast .source-link-card-kicker {
-  color: #92d6ea;
-}
-
-.source-link-card-podcast h3,
-.source-link-card-podcast .source-link-card-copy > p:last-child {
-  color: var(--white);
-}
-
-.source-link-card-podcast .source-link-card-copy > p:last-child {
-  color: #dcebf0;
-}
-
-/* Sporteurope.TV: compact branded replay source beneath the regatta actions. */
-.regatta-source-branded {
-  display: grid;
-  grid-template-columns: 138px minmax(0, 1fr);
-  align-items: stretch;
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid rgba(171,52,39,.22);
-  border-radius: 16px;
-  background: var(--white);
-  box-shadow: 0 4px 14px rgba(11,35,54,.035);
-}
-
-.regatta-source-branded .regatta-source-logo {
-  display: grid;
-  place-items: center;
-  min-height: 62px;
-  padding: .65rem .8rem;
-  background: #102a43;
-}
-
-.regatta-source-branded .regatta-source-logo img {
-  display: block;
-  width: 100%;
-  max-width: 112px;
-  max-height: 38px;
-  object-fit: contain;
-}
-
-.regatta-source-branded > a {
-  display: flex;
-  align-items: center;
-  padding: .7rem 1rem;
-  text-decoration: none;
-}
+/* Shared editorial source cards: World Rowing, DRV and Schubschlag. */
+.source-link-card{margin-top:1rem;padding:1rem;display:grid;grid-template-columns:minmax(78px,110px) minmax(0,1fr) auto;gap:1rem;align-items:center;border:1px solid rgba(11,35,54,.12);border-radius:18px;background:var(--white);color:var(--navy);box-shadow:0 8px 24px rgba(11,35,54,.045)}
+.source-link-card-logo{display:grid;place-items:center;min-width:0;min-height:58px;padding:.35rem;border-radius:12px;background:rgba(255,255,255,.86)}
+.source-link-card-logo img{display:block;width:100%;max-width:104px;max-height:54px;object-fit:contain}
+.source-link-card-copy{min-width:0}
+.source-link-card-kicker{margin:0 0 .18rem;color:var(--accent);font-size:.68rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.source-link-card h3,.source-link-card h4{margin:0 0 .3rem;font-family:Georgia,"Times New Roman",serif;color:var(--navy);line-height:1.1}
+.source-link-card h3{font-size:clamp(1.45rem,2.4vw,2rem)}
+.source-link-card h4{font-size:clamp(1.2rem,2vw,1.55rem)}
+.source-link-card-copy>p:last-child{margin:0;color:var(--muted);font-size:.88rem;line-height:1.5}
+.source-link-card .button{white-space:nowrap}
+.source-link-card-world{width:100%;max-width:none;margin:1rem 0 0;grid-template-columns:96px minmax(0,1fr) auto;text-align:left;background:#f6fafc}
+.source-link-card-world .source-link-card-logo img{max-width:86px}
+.source-link-card-world h4{font-size:clamp(1.25rem,2vw,1.55rem)}
+.source-link-card-drv{width:100%;margin:1.1rem 0;background:var(--foam)}
+.source-link-card-podcast{width:100%;margin-top:1.5rem;background:var(--navy);color:var(--white)}
+#foerderung>.source-link-card-podcast{margin-top:0;margin-bottom:clamp(2.5rem,5vw,4.5rem)}
+.source-link-card-podcast .source-link-card-logo{background:var(--white)}
+.source-link-card-podcast .source-link-card-kicker{color:#92d6ea}
+.source-link-card-podcast h3,.source-link-card-podcast .source-link-card-copy>p:last-child{color:var(--white)}
+.source-link-card-podcast .source-link-card-copy>p:last-child{color:#dcebf0}
 
 /* Podcast tips are editorial crosslinks, not sponsor badges. */
-.listening-tip {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
+.listening-tip{max-width:100%;overflow-wrap:anywhere}
+.listening-tip-light{margin:1rem 0 0;padding:.8rem 0 0;border-top:1px solid rgba(11,35,54,.14);color:var(--muted);font-size:.82rem;line-height:1.5}
+.listening-tip-light a{color:var(--navy-2);font-weight:800}
+.lab-card .listening-tip-material,.lab-card .listening-tip-training{margin-top:1rem}
+.age-copy .listening-tip-masters{color:var(--muted);border-top-color:rgba(11,35,54,.15)}
+.listening-tip-touring{margin-left:.15rem;margin-right:.15rem}
+.funding-options .listening-tip-volunteering{margin-top:1.1rem}
 
-.listening-tip-light {
-  margin: 1rem 0 0;
-  padding: .8rem 0 0;
-  border-top: 1px solid rgba(11,35,54,.14);
-  color: var(--muted);
-  font-size: .82rem;
-  line-height: 1.5;
-}
-
-.listening-tip-light a {
-  color: var(--navy-2);
-  font-weight: 800;
-}
-
-.lab-card .listening-tip-material,
-.lab-card .listening-tip-training {
-  margin-top: 1rem;
-}
-
-.age-copy .listening-tip-masters {
-  color: var(--muted);
-  border-top-color: rgba(11,35,54,.15);
-}
-
-.listening-tip-touring {
-  margin-left: .15rem;
-  margin-right: .15rem;
-}
-
-.funding-options .listening-tip-volunteering {
-  margin-top: 1.1rem;
-}
-
-@media (max-width: 920px) {
-  .source-link-card {
-    grid-template-columns: 86px minmax(0, 1fr);
-  }
-
-  .source-link-card .button {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
-
-  .source-link-card-world {
-    grid-template-columns: 82px minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .source-link-card {
-    grid-template-columns: 72px minmax(0, 1fr);
-    padding: .9rem;
-  }
-
-  .source-link-card-logo {
-    min-height: 48px;
-    padding: .25rem;
-  }
-
-  .source-link-card-logo img {
-    max-height: 44px;
-  }
-
-  .source-link-card .button {
-    width: 100%;
-  }
-
-  .regatta-source-branded {
-    grid-template-columns: 100px minmax(0, 1fr);
-  }
-
-  .regatta-source-branded .regatta-source-logo {
-    padding: .55rem;
-  }
-}
+@media(max-width:920px){.source-link-card{grid-template-columns:86px minmax(0,1fr)}.source-link-card .button{grid-column:1/-1;justify-self:start}.source-link-card-world{grid-template-columns:82px minmax(0,1fr)}}
+@media(max-width:640px){.source-link-card{grid-template-columns:72px minmax(0,1fr);padding:.9rem}.source-link-card-logo{min-height:48px;padding:.25rem}.source-link-card-logo img{max-height:44px}.source-link-card .button{width:100%}#foerderung>.source-link-card-podcast{margin-bottom:2.25rem}}
