@@ -1,0 +1,32 @@
+name: Migrate regatta image
+
+on:
+  push:
+    branches:
+      - feat/karl-adam-local-cooperation
+    paths:
+      - .github/workflows/migrate-regatta-image.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/karl-adam-local-cooperation
+      - name: Reconstruct source image
+        run: |
+          cat scripts/assets/ratzeburg-regatta-0{1,2,3,4}.b64 | tr -d '\n\r ' | base64 -d > src/assets/images/ratzeburg-regatta.jpg
+          file src/assets/images/ratzeburg-regatta.jpg
+          test "$(stat -c%s src/assets/images/ratzeburg-regatta.jpg)" -gt 10000
+      - name: Commit source image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/assets/images/ratzeburg-regatta.jpg
+          git diff --cached --quiet && exit 0
+          git commit -m "Add regatta image as source asset"
+          git push origin HEAD:feat/karl-adam-local-cooperation
