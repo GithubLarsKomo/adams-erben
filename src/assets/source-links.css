@@ -33,6 +33,21 @@
 .world-best-time-copy strong{color:var(--navy)}
 .world-rowing-race-link .regatta-stream-logo img{filter:brightness(0) invert(1)}
 
+/* Record example integrated into the dark 2,000 m race card. */
+.race-strip-with-record{overflow:hidden}
+.race-strip-with-record .race-record{margin-top:clamp(1.5rem,3vw,2.2rem);padding-top:clamp(1.25rem,2.5vw,1.75rem);border-top:1px solid rgba(255,255,255,.16);color:#fff}
+.race-strip-with-record .race-record-question{margin:0 0 .45rem;color:#9edcec;font-size:.72rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.race-strip-with-record .race-record-heading{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1rem;margin-bottom:.8rem}
+.race-strip-with-record .race-record-time{display:block;color:#fff;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.35rem,5vw,4.4rem);line-height:.95;letter-spacing:-.045em}
+.race-strip-with-record .race-record-place{color:#f9ad66;font-size:.78rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.race-strip-with-record .race-record-copy{max-width:900px;margin:0;color:#d7e7ed;font-size:clamp(.9rem,1.35vw,1rem);line-height:1.65}
+.race-strip-with-record .race-record-copy strong{color:#fff}
+.race-strip-with-record .race-record-source{display:flex;align-items:center;justify-content:space-between;gap:1rem;width:100%;margin-top:clamp(1.2rem,2.5vw,1.6rem);padding-top:1rem;border-top:1px solid rgba(255,255,255,.12);color:#dff3f8;text-decoration:none;font-size:.8rem;font-weight:850;transition:color .18s ease,border-color .18s ease}
+.race-strip-with-record .race-record-source:hover{color:#fff;border-top-color:rgba(158,220,235,.48)}
+.race-strip-with-record .race-record-source:focus-visible{outline:3px solid rgba(158,220,235,.38);outline-offset:4px}
+.race-strip-with-record .race-record-source img{display:block!important;flex:0 0 auto!important;width:auto!important;height:auto!important;max-width:118px!important;max-height:42px!important;margin:0!important;object-fit:contain!important;filter:brightness(0) invert(1)}
+.race-strip-with-record .race-record-source>span{margin-left:auto;text-align:right}
+
 /* Podcast tips are editorial crosslinks, not sponsor badges. */
 .listening-tip{max-width:100%;overflow-wrap:anywhere}
 .listening-tip-light{margin:1rem 0 0;padding:.8rem 0 0;border-top:1px solid rgba(11,35,54,.14);color:var(--muted);font-size:.82rem;line-height:1.5}
@@ -43,4 +58,4 @@
 .funding-options .listening-tip-volunteering{margin-top:1.1rem}
 
 @media(max-width:920px){.source-link-card{grid-template-columns:86px minmax(0,1fr)}.source-link-card .button{grid-column:1/-1;justify-self:start}.source-link-card-world{grid-template-columns:82px minmax(0,1fr)}}
-@media(max-width:640px){.source-link-card{grid-template-columns:72px minmax(0,1fr);padding:.9rem}.source-link-card-logo{min-height:48px;padding:.25rem}.source-link-card-logo img{max-height:44px}.source-link-card .button{width:100%}#foerderung>.source-link-card-podcast{margin-bottom:2.25rem}.deutschlandachter-link{width:100%;align-items:flex-start}.deutschlandachter-logo{flex-basis:72px}.deutschlandachter-logo img{max-width:66px}}
+@media(max-width:640px){.source-link-card{grid-template-columns:72px minmax(0,1fr);padding:.9rem}.source-link-card-logo{min-height:48px;padding:.25rem}.source-link-card-logo img{max-height:44px}.source-link-card .button{width:100%}#foerderung>.source-link-card-podcast{margin-bottom:2.25rem}.deutschlandachter-link{width:100%;align-items:flex-start}.deutschlandachter-logo{flex-basis:72px}.deutschlandachter-logo img{max-width:66px}.race-strip-with-record .race-record-source{align-items:flex-start;flex-direction:column}.race-strip-with-record .race-record-source>span{margin-left:0;text-align:left}.race-strip-with-record .race-record-source img{max-width:104px!important;max-height:38px!important}}
