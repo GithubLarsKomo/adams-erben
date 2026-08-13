@@ -15,10 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return card;
   };
 
-  const worldRowing = moveAfter(
-    '.external-resource-world-rowing',
-    '#regatta .regatta-note'
-  );
+  const worldRowing = moveAfter('.external-resource-world-rowing', '#regatta .regatta-note');
   if (worldRowing) {
     worldRowing.setAttribute('aria-label', 'World Rowing als heutiger internationaler Bezug');
     const kicker = worldRowing.querySelector('.source-link-card-kicker');
@@ -30,16 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const sportEurope = document.querySelector('#regatta .regatta-source');
   if (sportEurope && !sportEurope.querySelector('.regatta-source-logo')) {
     sportEurope.classList.add('regatta-source-branded');
-    sportEurope.insertAdjacentHTML(
-      'afterbegin',
-      '<span class="regatta-source-logo"><img src="https://sporteurope.tv/assets/images/logo/setv_bg_white.svg" alt="Sporteurope.TV" loading="lazy" decoding="async"></span>'
-    );
+    sportEurope.insertAdjacentHTML('afterbegin', '<span class="regatta-source-logo"><img src="https://sporteurope.tv/assets/images/logo/setv_bg_white.svg" alt="Sporteurope.TV" loading="lazy" decoding="async"></span>');
   }
 
-  const drv = moveBefore(
-    '#vereine .source-link-card-drv',
-    '#ruderakademie .academy-network'
-  );
+  const drv = moveBefore('#vereine .source-link-card-drv', '#ruderakademie .academy-network');
   if (drv) {
     drv.setAttribute('aria-label', 'Deutscher Ruderverband als heutiger institutioneller Bezug');
     const kicker = drv.querySelector('.source-link-card-kicker');
@@ -53,10 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const podcast = moveAfter(
-    '#stimmen .podcast-feature',
-    '.about.journey .principles'
-  );
+  const podcast = moveBefore('#stimmen .podcast-feature', '#foerderung');
   if (podcast) {
     podcast.setAttribute('aria-label', 'Schubschlag – vom Wasser aus erzählt');
     const kicker = podcast.querySelector('.source-link-card-kicker');
