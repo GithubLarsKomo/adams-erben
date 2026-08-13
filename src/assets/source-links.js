@@ -87,6 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  const biographyActions = document.querySelector('#geschichte .book-card > .inline-actions');
+  if (biographyActions && !document.querySelector('#geschichte .deutschlandachter-link')) {
+    biographyActions.insertAdjacentHTML('afterend', `
+      <a class="deutschlandachter-link" href="https://deutschlandachter.de/" target="_blank" rel="noopener noreferrer" aria-label="Zu den heutigen Erben des Deutschland-Achters">
+        <span class="deutschlandachter-logo"><img src="/assets/images/deutschlandachter.png" alt="Deutschland-Achter" loading="lazy" decoding="async"></span>
+        <span class="deutschlandachter-copy"><small>Der Deutschland-Achter heute</small><strong>Zu den heutigen Erben des Deutschland-Achters ↗</strong></span>
+      </a>`);
+  }
+
   const podcast = moveBefore('#stimmen .podcast-feature', '#foerderung .section-heading');
   if (podcast) {
     podcast.setAttribute('aria-label', 'Schubschlag – vom Wasser aus erzählt');
