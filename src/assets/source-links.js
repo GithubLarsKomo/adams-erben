@@ -44,12 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const podcast = moveBefore('#stimmen .podcast-feature', '#foerderung');
+  const podcast = moveBefore('#stimmen .podcast-feature', '#foerderung .section-heading');
   if (podcast) {
     podcast.setAttribute('aria-label', 'Schubschlag – vom Wasser aus erzählt');
+    const logo = podcast.querySelector('.source-link-card-logo img');
     const kicker = podcast.querySelector('.source-link-card-kicker');
     const title = podcast.querySelector('h3');
     const copy = podcast.querySelector('.source-link-card-copy > p:last-child');
+    if (logo) {
+      logo.src = '/assets/images/schubschlag-mark.png';
+      logo.alt = 'Schubschlag';
+      logo.removeAttribute('onerror');
+    }
     if (kicker) kicker.textContent = 'Die Geschichten gehen weiter';
     if (title) title.textContent = 'Schubschlag – vom Wasser aus erzählt';
     if (copy) copy.textContent = 'Rudern besteht nicht nur aus Zeiten, Technik und Medaillen. Der Podcast erzählt von Menschen, Freundschaften und Erinnerungen über Generationen hinweg – bevor vielleicht die eigene Geschichte auf dem Wasser beginnt.';
