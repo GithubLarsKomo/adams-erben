@@ -29,12 +29,16 @@ jobs:
           node --check scripts/build.mjs
           node --check scripts/risk-preflight.mjs
           node --check scripts/risk-protection.mjs
+          node --check scripts/contact-personal-safety.test.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
           node --check scripts/validate-drv-output.test.mjs
           node --check src/assets/app.js
           node --check src/assets/nearest.js
+
+      - name: Personal contact safety
+        run: npm run test:risk-contact
 
       - name: DRV output validator tests
         run: npm run test:drv-output
@@ -44,6 +48,14 @@ jobs:
 
       - name: Local nearest-club tests
         run: npm run test:nearest
+
+      - name: Assert source contains no remote runtime fallbacks
+        shell: bash
+        run: |
+          if grep -R -E -i 'onerror=.*https?://|fallback[[:space:]]*:[[:space:]]*["'"']https?://' src scripts legal; then
+            echo 'Source must not contain remote runtime fallback mechanisms.' >&2
+            exit 1
+          fi
 
       - name: Build safe preview with checked-in seed
         env:
@@ -63,7 +75,7 @@ jobs:
       - name: Assert no third-party runtime asset hotlinks
         shell: bash
         run: |
-          if grep -R -E -i '(src|srcset)=["'"']https?://' dist/index.html; then
+          if grep -R -E -i '(src|srcset|poster)=["'"']https?://' dist/index.html; then
             echo 'Generated page must not load runtime assets directly from third parties.' >&2
             exit 1
           fi
@@ -71,6 +83,12 @@ jobs:
             echo 'Generated page must not contain runtime fallback handlers.' >&2
             exit 1
           fi
+
+      - name: Assert GeoNames attribution
+        shell: bash
+        run: |
+          grep -q 'GeoNames' dist/index.html
+          grep -q 'CC BY 4.0' dist/index.html
 
       - name: Validate generated search data
         run: |
