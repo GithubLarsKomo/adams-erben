@@ -1,30 +1,30 @@
 {
-  "version": 1,
-  "policy": "Third-party brand assets may be rendered only when status is approved and a documented evidence reference is present. Otherwise the production build replaces the image with a neutral text mark.",
+  "version": 2,
+  "policy": "Third-party brand assets may be rendered only when status is approved and a documented evidence reference is present. All approved assets must be served locally. Runtime fallbacks, hotlinking and automatic loading from third-party hosts are forbidden regardless of rights status.",
   "assets": {
     "world-rowing": {
       "path": "/assets/images/world-rowing.png",
       "owner": "World Rowing / FISA",
-      "status": "pending",
-      "basis": "",
-      "evidence": "",
-      "reviewedAt": ""
+      "status": "approved",
+      "basis": "Nutzungsrecht für die Verwendung auf adams-erben.de ist durch den Seitenbetreiber bestätigt.",
+      "evidence": "Operator confirmation in project conversation, 2026-08-14",
+      "reviewedAt": "2026-08-14"
     },
     "drv": {
       "path": "/assets/images/drv.png",
       "owner": "Deutscher Ruderverband e.V.",
-      "status": "pending",
-      "basis": "",
-      "evidence": "",
-      "reviewedAt": ""
+      "status": "approved",
+      "basis": "Nutzungsrecht für die Verwendung auf adams-erben.de ist durch den Seitenbetreiber bestätigt.",
+      "evidence": "Operator confirmation in project conversation, 2026-08-14",
+      "reviewedAt": "2026-08-14"
     },
     "schubschlag": {
       "path": "/assets/images/schubschlag.webp",
       "owner": "Schubschlag Podcast / Rechteinhaber",
-      "status": "pending",
-      "basis": "",
-      "evidence": "",
-      "reviewedAt": ""
+      "status": "approved",
+      "basis": "Nutzungsrecht für die Verwendung auf adams-erben.de ist durch den Seitenbetreiber bestätigt.",
+      "evidence": "Operator confirmation in project conversation, 2026-08-14",
+      "reviewedAt": "2026-08-14"
     }
   }
 }
