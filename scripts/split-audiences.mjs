@@ -22,6 +22,17 @@ function setCanonical($, url) {
   else $('head').append(`<link rel="canonical" href="${url}">`);
 }
 
+function setSocialPreview($, base) {
+  const imageUrl = `${base}/assets/images/hero-skiff.webp`;
+  $('meta[name="twitter:card"]').attr('content', 'summary_large_image');
+  const ogImage = $('meta[property="og:image"]');
+  if (ogImage.length) ogImage.attr('content', imageUrl);
+  else $('head').append(`<meta property="og:image" content="${imageUrl}">`);
+  const twitterImage = $('meta[name="twitter:image"]');
+  if (twitterImage.length) twitterImage.attr('content', imageUrl);
+  else $('head').append(`<meta name="twitter:image" content="${imageUrl}">`);
+}
+
 function siteBase($) {
   const current = $('meta[property="og:url"]').attr('content') || 'https://adams-erben.de/';
   return current.includes('preview.adams-erben.de')
@@ -40,6 +51,7 @@ function renderRowingPage(html) {
   $('meta[property="og:title"]').attr('content', 'Rudern verstehen – Adams Erbe im Sport von heute');
   $('meta[property="og:description"]').attr('content', 'Die redaktionelle Vertiefung zu Karl Adam, Ratzeburg, Training, Technik und Ruderkultur.');
   setCanonical($, `${base}/rudern/`);
+  setSocialPreview($, base);
 
   $('#film').remove();
 
@@ -92,6 +104,7 @@ function renderLandingPage(html) {
   $('meta[property="og:title"]').attr('content', 'Adams Erben – Vom Kinosaal ins Boot');
   $('meta[property="og:description"]').attr('content', 'Der Film macht neugierig. Adams Erben zeigt den Weg ins echte Ruderboot und zum Verein in deiner Nähe.');
   setCanonical($, `${base}/`);
+  setSocialPreview($, base);
 
   const removeSelectors = [
     '.city-story',
@@ -118,7 +131,10 @@ function renderLandingPage(html) {
     <a href="/rudern/">Mehr entdecken</a>
     <a class="nav-cta" href="#quick-finder">Rudern ausprobieren</a>
   `);
-  $('.header-find-club').attr('href', '#quick-finder').text('Rudern ausprobieren');
+  $('.header-find-club')
+    .attr('href', '#quick-finder')
+    .attr('data-compact-label', 'Verein finden')
+    .text('Rudern ausprobieren');
   $('.skip-link').attr('href', '#quick-finder').text('Direkt Rudern ausprobieren');
 
   const quickFinder = `
@@ -136,11 +152,18 @@ function renderLandingPage(html) {
         </div>
         <div class="quick-finder-secondary">
           <button class="button button-ghost button-small" id="quick-use-location" type="button">Standort verwenden</button>
+          <button class="button button-ghost button-small" id="open-full-directory" type="button">Alle Vereine &amp; Filter</button>
           <span>Keine Verbandskenntnisse nötig · deutschlandweit</span>
         </div>
       </form>
     </section>`;
   $('#film').after(quickFinder);
+
+  const directory = $('#vereine');
+  directory.addClass('landing-directory').attr('hidden', '');
+  directory.find('#directory-title').text('Alle Rudervereine durchsuchen');
+  directory.find('#directory-title').next('p').text('Wenn du genauer suchen möchtest, stehen hier zusätzlich Filter, Umkreis und die vollständige Vereinsübersicht bereit.');
+  $('#quick-finder').after(directory);
 
   const depthTeaser = `
     <section class="depth-teaser" id="mehr-entdecken" aria-labelledby="depth-title">
@@ -173,10 +196,7 @@ function renderLandingPage(html) {
   steps.eq(1).find('h3').text('2. Verein kennenlernen');
   steps.eq(1).find('p').text('Öffne die Vereinswebsite oder frage direkt an, wenn der Verein einen freigegebenen Kontakt bereitstellt.');
   steps.eq(2).find('h3').text('3. Rudern ausprobieren');
-
-  const directoryHeading = $('#directory-title');
-  directoryHeading.text('Alle Rudervereine durchsuchen');
-  directoryHeading.next('p').text('Wenn du genauer suchen möchtest, stehen hier zusätzlich Filter, Umkreis und die vollständige Vereinsübersicht bereit.');
+  journey.append('<p class="landing-final-cta"><a class="button button-primary" href="#quick-finder">Jetzt Verein in der Nähe finden</a></p>');
 
   const about = $('#ueber');
   about.before(`
@@ -199,6 +219,18 @@ function renderLandingPage(html) {
         const radius = document.getElementById('radius-filter');
         const useLocation = document.getElementById('use-location');
         const directory = document.getElementById('vereine');
+        const openDirectory = document.getElementById('open-full-directory');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const scrollBehavior = reduceMotion ? 'auto' : 'smooth';
+
+        const revealDirectory = () => {
+          if (directory) directory.hidden = false;
+        };
+
+        const showDirectory = () => {
+          revealDirectory();
+          directory?.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+        };
 
         form?.addEventListener('submit', (event) => {
           event.preventDefault();
@@ -207,19 +239,28 @@ function renderLandingPage(html) {
             quickInput?.focus();
             return;
           }
+          revealDirectory();
           if (fullInput) {
             fullInput.value = value;
             fullInput.dispatchEvent(new Event('input', { bubbles: true }));
           }
           if (radius) radius.value = '50';
-          directory?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          window.setTimeout(() => nearbyButton?.click(), 250);
+          nearbyButton?.click();
+          directory?.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
         });
 
         document.getElementById('quick-use-location')?.addEventListener('click', () => {
-          directory?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          window.setTimeout(() => useLocation?.click(), 250);
+          revealDirectory();
+          useLocation?.click();
+          directory?.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
         });
+
+        openDirectory?.addEventListener('click', () => {
+          showDirectory();
+          window.setTimeout(() => fullInput?.focus({ preventScroll: true }), reduceMotion ? 0 : 250);
+        });
+
+        if (window.location.hash === '#vereine') revealDirectory();
       })();
     </script>`);
 
@@ -228,10 +269,11 @@ function renderLandingPage(html) {
 
 function validateLanding(html) {
   const $ = cheerio.load(html);
-  const required = ['#quick-finder', '#film', '#ratzeburg', '#stimmen', '#vereine', 'a[href="/rudern/"]'];
+  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '#stimmen', '#vereine', 'a[href="/rudern/"]'];
   for (const selector of required) {
     if (!$(selector).length) throw new Error(`[split-audiences] landing page missing ${selector}`);
   }
+  if (!$('#vereine').is('[hidden]')) throw new Error('[split-audiences] landing directory must be progressively disclosed');
   const forbidden = ['#labor', '#geschichte', '#ruderakademie', '#rudern-verstehen', '#foerderung'];
   for (const selector of forbidden) {
     if ($(selector).length) throw new Error(`[split-audiences] landing page unexpectedly contains ${selector}`);
