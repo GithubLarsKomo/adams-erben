@@ -1710,3 +1710,441 @@ Vertrauen schaffen, Quellen nachvollziehen oder Kontakt/Korrekturhinweis senden.
 - [ ] jede Kern-URL besitzt ein klares Next-Step-/Conversion-Ziel;
 - [ ] keine zwei Kernseiten haben dasselbe primäre Keyword-Set;
 - [ ] die P0-Seiten `/`, `/karl-adam/`, `/adams-acht/` und `/deutschlandachter-1960/` sind vor Veröffentlichung anhand dieser Matrix redaktionell abgenommen.
+
+---
+
+## 45. P0-Content- und Implementierungs-Backlog
+
+Dieser Abschnitt übersetzt die Strategie und Matrix in unmittelbar umsetzbare Arbeitspakete. P0 umfasst die technische Grundlage sowie die drei priorisierten redaktionellen Detailseiten `/karl-adam/`, `/adams-acht/` und `/deutschlandachter-1960/` plus die notwendige Anpassung der Homepage.
+
+### 45.1 P0-A — Gemeinsame technische Seitenbasis
+
+**Ziel**
+
+Eine wiederverwendbare Seitenarchitektur schaffen, mit der alle P0- und späteren P1-Seiten als statisch crawlbare HTML-Seiten gebaut werden können.
+
+**Arbeitspakete**
+
+- [ ] zentrale Seitenkonfiguration für `path`, `title`, `description`, `canonical`, `ogImage`, `index`, `entity`, optional `reviewedAt`;
+- [ ] gemeinsames HTML-Grundlayout mit Header, Navigation, Breadcrumb-Bereich, `<main>`, Quellenbereich und Footer;
+- [ ] pro Seite genau eine H1;
+- [ ] server-/buildseitig erzeugter sichtbarer Content ohne Abhängigkeit von Client-JavaScript;
+- [ ] selbstreferenzierende Canonical-URL;
+- [ ] Open-Graph- und Twitter/X-Metadaten;
+- [ ] `BreadcrumbList` für Detailseiten;
+- [ ] `WebPage` oder `Article` JSON-LD als wiederverwendbare Basis;
+- [ ] optionale Entity-spezifische JSON-LD-Erweiterung, z. B. `Person` für Karl Adam;
+- [ ] automatische Aufnahme indexierbarer Seiten in `sitemap.xml`;
+- [ ] `robots.txt` bereitstellen;
+- [ ] Navigation und Footer um echte HTML-Links zu Kernseiten erweitern;
+- [ ] Build-Check für SEO-/CBO-Pflichtfelder ergänzen.
+
+**Abnahmekriterien**
+
+- jede P0-Seite wird ohne JavaScript mit vollständigem Hauptinhalt ausgeliefert;
+- alle P0-Seiten antworten mit HTTP 200;
+- jede Seite hat individuellen Title, Description und Canonical;
+- jede Seite enthält genau eine H1;
+- Sitemap enthält alle P0-Seiten und keine nicht indexierbaren Varianten;
+- Lighthouse SEO Zielwert >= 95 auf Homepage und mindestens einer Detailseite.
+
+---
+
+### 45.2 P0-B — Homepage neu als SEO-/CBO-Hub ausrichten
+
+**URL**
+
+`/`
+
+**Ziel**
+
+Die bestehende Story-Homepage bleibt visuell und emotional erhalten, wird aber zu einem klaren semantischen Hub für Karl Adam, Deutschlandachter, Adams Acht und heutiges Rudern.
+
+**Meta-Daten**
+
+- **Title:** `Karl Adam, Deutschlandachter & Rudern heute | Adams Erben`
+- **Description:** `Karl Adam prägte von Ratzeburg aus den Rudersport. Entdecke den Deutschlandachter, seine Trainingsideen und finde einen Ruderverein in deiner Nähe.`
+- **Canonical:** `https://adams-erben.de/`
+- **OG Type:** `website`
+- **Twitter Card:** `summary_large_image`
+
+**Content-Anpassungen**
+
+- [ ] Hero-Claim beibehalten: `Der Film endet im Kino. Adams Erbe lebt im Bootshaus weiter.`;
+- [ ] im ersten sichtbaren Textabschnitt die Begriffe `Karl Adam`, `Deutschlandachter`, `Ratzeburg` und `Rudern` natürlich einordnen;
+- [ ] einen kurzen Abschnitt `Adams Erben in Kürze` oder gleichwertig integrieren, der Zweck und Unabhängigkeit erklärt;
+- [ ] sichtbare interne Links auf die drei P0-Detailseiten integrieren;
+- [ ] bestehende lange Detailinhalte, die künftig eigene Seiten erhalten, auf der Homepage kürzen und mit `Mehr erfahren` verlinken, statt sie vollständig zu duplizieren;
+- [ ] `Verein finden` weiterhin als primären Conversion-Pfad sichtbar halten.
+
+**JSON-LD**
+
+- `WebSite`;
+- passende Projekt-/`Organization`-Beschreibung ohne offizielle Partnerschaften zu behaupten.
+
+**Abnahmekriterien**
+
+- Homepage konkurriert nicht mit `/karl-adam/` um die vollständige Karl-Adam-Biografie;
+- alle drei P0-Seiten sind aus dem sichtbaren Homepage-Content erreichbar;
+- keine bisherige zentrale Conversion-Funktion geht verloren.
+
+---
+
+### 45.3 P0-C — `/karl-adam/` bauen
+
+**Priorität**
+
+P0.1 — höchste redaktionelle Priorität.
+
+**Zielintention**
+
+`Wer war Karl Adam und warum ist er für den Rudersport wichtig?`
+
+**H1**
+
+`Karl Adam: Rudertrainer, Deutschlandachter und seine Ideen`
+
+**Meta-Daten**
+
+- **Title:** `Karl Adam: Rudertrainer, Deutschlandachter & Ideen | Adams Erben`
+- **Description:** `Wer war Karl Adam? Seine Rolle in Ratzeburg, beim Deutschlandachter, seine Trainingsideen, Wirkung und die historische Einordnung seiner NS-Biografie.`
+- **Canonical:** `https://adams-erben.de/karl-adam/`
+- **OG Image:** eigenes Adams-Erben-Motiv, keine ungeklärten historischen Fotos.
+
+**Seitenstruktur**
+
+1. H1 + kurze sachliche Einleitung;
+2. Faktenblock `Karl Adam in Kürze`;
+3. H2 `Wer war Karl Adam?`;
+4. H2 `Warum wurde Ratzeburg zu seinem Wirkungsort?`;
+5. H2 `Welche Rolle spielte Karl Adam beim Deutschlandachter?`;
+6. H2 `Was veränderte Karl Adam im Training und an der Technik?`;
+7. H2 `Was bedeutete der mündige Athlet?`;
+8. H2 `Wie wirkte Karl Adams Ansatz international weiter?`;
+9. H2 `Wie ist Karl Adams NS-Vergangenheit einzuordnen?`;
+10. H2 `Was lebt von seinen Ideen heute weiter?`;
+11. H2 `Quellen und weiterführende Vertiefung`.
+
+**CBO-Kurzüberblick**
+
+Direkt nach der H1 ein 100–180 Wörter langer sachlicher Überblick, der mindestens folgende Entitäten eindeutig verbindet:
+
+- Karl Adam;
+- Ratzeburg;
+- Ratzeburger Ruderclub e.V.;
+- Deutschlandachter;
+- Training / Technik;
+- historische Verantwortung.
+
+**Faktenblock — Pflichtfelder nach Verifikation**
+
+- vollständiger Name;
+- Geburts- und Sterbedaten;
+- Beruf / fachlicher Hintergrund;
+- zentrale Funktion im Rudersport;
+- zentraler Wirkungsort;
+- wesentliche sporthistorische Erfolge;
+- zentrale historische Einordnung.
+
+**Quellen-Gates**
+
+Vor Veröffentlichung müssen mindestens folgende Faktenklassen verifiziert sein:
+
+- Lebensdaten;
+- berufliche Funktionen;
+- Vereins-/Verbandsrollen;
+- olympische Erfolge und Jahre;
+- konkrete Trainingszuschreibungen;
+- NSDAP-/SA-/Institutionenangaben;
+- DRV-Entscheidungen zur historischen Einordnung.
+
+Bevorzugte Quellen: Stadtarchiv Ratzeburg, Hall of Fame des deutschen Sports, DRV, Primärtexte Karl Adams, belastbare sporthistorische Forschung, Andresen/Reinke.
+
+**Interne Links**
+
+Pflichtlinks zu:
+
+- `/deutschlandachter-1960/`;
+- `/adams-acht/`;
+- später `/karl-adam-trainingsmethoden/`;
+- später `/ratzeburg/`;
+- Homepage.
+
+**JSON-LD**
+
+- `WebPage` oder `Article`;
+- `Person` für Karl Adam mit ausschließlich verifizierten Attributen;
+- `sameAs` nur auf eindeutig passende Identitätsquellen.
+
+**Abnahmekriterien**
+
+- mindestens fünf Matrix-CBO-Fragen werden im Inhalt klar beantwortet;
+- NS-Kontext ist nicht in Fußnote oder Randbereich versteckt;
+- zentrale Aussagen besitzen sichtbare Quellen;
+- Seite enthält keine unbelegte `Adam erfand X`-Formulierung;
+- Seite ist eigenständig verständlich, ohne Homepage lesen zu müssen.
+
+---
+
+### 45.4 P0-D — `/adams-acht/` bauen
+
+**Priorität**
+
+P0.2 — zeitkritisch wegen des Filmstarts.
+
+**Zielintention**
+
+`Was ist der historische Hintergrund des Films Adams Acht?`
+
+**H1**
+
+`Adams Acht: Die wahre Geschichte hinter dem Film`
+
+Falls die Formulierung `wahre Geschichte` redaktionell zu stark erscheint, alternativ:
+
+`Adams Acht: Historischer Hintergrund zu Karl Adam und dem Deutschlandachter`
+
+**Meta-Daten**
+
+- **Title:** `Adams Acht: Wahre Geschichte, Karl Adam & Deutschlandachter | Adams Erben`
+- **Description:** `Historischer Hintergrund zu Adams Acht: Karl Adam, Ratzeburg, Deutschlandachter und die belegten Ereignisse hinter dem Kinofilm – unabhängig eingeordnet.`
+- **Canonical:** `https://adams-erben.de/adams-acht/`
+
+**Seitenstruktur**
+
+1. H1 + Unabhängigkeitshinweis;
+2. Kurzüberblick `Worum geht es bei Adams Acht?`;
+3. H2 `Auf welcher historischen Geschichte basiert Adams Acht?`;
+4. H2 `Wer war Karl Adam?` mit Kurzfassung und Link zur Pillar-Page;
+5. H2 `Was war der Deutschlandachter von 1960?` mit Kurzfassung und Link;
+6. H2 `Welche Rolle spielt Ratzeburg?`;
+7. H2 `Was ist historisch belegt – und wo beginnt filmische Verdichtung?`;
+8. H2 `Welche Ideen Karl Adams wirken bis heute weiter?`;
+9. H2 `Nach dem Film: selbst ins Boot steigen`;
+10. H2 `Offizielle Film- und Hintergrundquellen`.
+
+**Pflicht-Hinweis**
+
+Im oberen sichtbaren Seitenbereich klar formulieren:
+
+`Adams Erben ist eine unabhängige Initiative und keine offizielle Website des Films, der Produktion oder des Verleihs.`
+
+**Quellen-Gates**
+
+- Filminhalt, Starttermin, Besetzung, Regie, Produktion und Verleih ausschließlich aus offiziellen Film-/Verleihquellen;
+- historische Aussagen unabhängig davon gegen historische Referenzquellen prüfen;
+- filmische Interpretation nicht als historische Tatsache formulieren;
+- keine Filmstills, Key Art, Trailer-Thumbnails oder Logos ohne dokumentierte Nutzungsfreigabe.
+
+**Interne Links**
+
+Pflichtlinks zu:
+
+- `/karl-adam/`;
+- `/deutschlandachter-1960/`;
+- später `/ratzeburg/`;
+- später `/karl-adam-trainingsmethoden/`;
+- `/ruderverein-finden/` bzw. bestehender Vereinssuche.
+
+**JSON-LD**
+
+- primär `WebPage` oder `Article`;
+- `Movie` nur ergänzend und nur bei vollständig korrekten, offiziell belegten Daten;
+- Adams Erben niemals als Produzent, Verleih oder Rechteinhaber auszeichnen.
+
+**Abnahmekriterien**
+
+- Unabhängigkeit ist vor dem ersten langen Inhaltsabschnitt sichtbar;
+- Seite beantwortet mindestens `Worum geht es?`, `Was ist historisch?`, `Wer war Karl Adam?`, `Welche Rolle spielte Ratzeburg?`;
+- keine Filmasset-Nutzung ohne Rechte;
+- Nutzer gelangt mit maximal einem Klick zu Karl Adam und Deutschlandachter 1960.
+
+---
+
+### 45.5 P0-E — `/deutschlandachter-1960/` bauen
+
+**Priorität**
+
+P0.3.
+
+**Zielintention**
+
+`Wer war der Deutschlandachter von 1960 und warum war der Olympiasieg in Rom bedeutsam?`
+
+**H1**
+
+`Der Deutschlandachter 1960: Olympiasieg in Rom`
+
+**Meta-Daten**
+
+- **Title:** `Deutschlandachter 1960: Olympiasieger von Rom | Adams Erben`
+- **Description:** `Der Deutschlandachter 1960: Mannschaft, Karl Adams Rolle, Vorbereitung, Olympiasieg in Rom und die Bedeutung für die deutsche Achtertradition.`
+- **Canonical:** `https://adams-erben.de/deutschlandachter-1960/`
+
+**Seitenstruktur**
+
+1. H1 + 80–140 Wörter Kurzüberblick;
+2. Faktenblock `Der Achter von Rom in Kürze`;
+3. H2 `Wer saß im Deutschlandachter 1960?`;
+4. H2 `Welche Vereine bildeten die Mannschaft?`;
+5. H2 `Welche Rolle spielte Karl Adam?`;
+6. H2 `Wie wurde der Achter auf Rom vorbereitet?`;
+7. H2 `Wie verlief das olympische Rennen?`;
+8. H2 `Warum war der Sieg sporthistorisch bedeutend?`;
+9. H2 `Wie entstand daraus die deutsche Achtertradition?`;
+10. H2 `Quellen und historische Medien`.
+
+**Faktenblock / HTML-Tabelle**
+
+Nach Quellenprüfung maschinenlesbar ausweisen:
+
+- Wettbewerb;
+- Datum des Finals;
+- Austragungsort;
+- Medaille / Platzierung;
+- offizielle Ergebniszeit, sofern eindeutig belegt;
+- acht Ruderer;
+- Steuermann;
+- beteiligte Vereine;
+- Trainer-/Betreuerrolle Karl Adams.
+
+Die Mannschaftsliste darf nicht aus Erinnerung oder Sekundärzusammenfassungen ungeprüft übernommen werden.
+
+**Quellen-Gates**
+
+Mindestens zwei unabhängige belastbare Quellen für Mannschaft und Ergebnisdaten, davon möglichst eine Primär-/offizielle Ergebnisquelle.
+
+Bevorzugte Reihenfolge:
+
+1. olympische / World-Rowing-Ergebnisarchive;
+2. DRV;
+3. zeitgenössische Archive;
+4. sporthistorische Fachliteratur.
+
+**Interne Links**
+
+Pflichtlinks zu:
+
+- `/karl-adam/`;
+- `/adams-acht/`;
+- später `/karl-adam-trainingsmethoden/`;
+- später `/ratzeburg/`;
+- `/rudern-verstehen/` sobald vorhanden.
+
+**JSON-LD**
+
+- `Article` oder `WebPage`;
+- keine künstliche `SportsEvent`-Auszeichnung, wenn die notwendigen Eventdaten nicht vollständig und korrekt gepflegt werden können.
+
+**Abnahmekriterien**
+
+- Mannschaft und Ergebnis sind eindeutig als HTML-Text oder Tabelle vorhanden;
+- mindestens vier Matrix-CBO-Fragen werden direkt beantwortet;
+- Karl Adams Rolle wird präzise beschrieben, ohne ihn unzutreffend als alleinigen Urheber des Erfolgs darzustellen;
+- sporthistorische Bedeutung ist vom reinen Rennergebnis getrennt eingeordnet.
+
+---
+
+### 45.6 P0-F — Quellen- und Faktenprüfung vor Content-Freigabe
+
+Für jede der drei Detailseiten wird vor Merge ein kleiner redaktioneller Quellencheck durchgeführt.
+
+**Prüfliste pro Fakt**
+
+- [ ] konkrete Behauptung identifiziert;
+- [ ] Quelle mit URL / bibliografischer Angabe dokumentiert;
+- [ ] Quelle entspricht der in der Matrix vorgesehenen Qualitätsklasse;
+- [ ] Primärquelle bevorzugt, sofern verfügbar;
+- [ ] strittige Aussage als strittig gekennzeichnet;
+- [ ] direkte Zitate nur mit Rechte-/Zitatrecht-Prüfung und sparsam;
+- [ ] keine Aussage wird allein aus generativen Systemen übernommen;
+- [ ] bei historischen Kontroversen wird die Gegenposition bzw. Unsicherheit geprüft.
+
+**Empfohlene technische Ablage**
+
+Quellen können zunächst in einer strukturierten Content-/Daten-Datei oder in den Seiten-Metadaten referenziert werden. Die sichtbare Seite muss jedoch selbst die für Leser relevanten Quellen ausgeben.
+
+---
+
+### 45.7 P0-G — Interne Linkarchitektur
+
+Nach Fertigstellung der drei Seiten muss folgender Mindestgraph bestehen:
+
+- `/` → `/karl-adam/`
+- `/` → `/adams-acht/`
+- `/` → `/deutschlandachter-1960/`
+- `/karl-adam/` ↔ `/deutschlandachter-1960/`
+- `/adams-acht/` → `/karl-adam/`
+- `/adams-acht/` → `/deutschlandachter-1960/`
+- `/deutschlandachter-1960/` → `/karl-adam/`
+- jede Detailseite → `/`
+
+Linktexte beschreibend formulieren, z. B. `Karl Adam und seine Trainingsideen`, nicht generisch `hier klicken`.
+
+---
+
+### 45.8 P0-H — CBO-Benchmark für den ersten Release
+
+Vor Produktionsfreigabe mindestens folgende Fragen gegen die veröffentlichte oder lokal crawlbare Version testen:
+
+**Karl Adam**
+
+1. Wer war Karl Adam?
+2. Was veränderte Karl Adam im Rudertraining?
+3. Welche Rolle spielte Karl Adam beim Deutschlandachter?
+4. Wie ist Karl Adams NS-Vergangenheit einzuordnen?
+
+**Adams Acht**
+
+5. Basiert Adams Acht auf einer wahren Geschichte?
+6. Was ist der historische Hintergrund des Films Adams Acht?
+7. Welche Verbindung hat Adams Acht zu Ratzeburg?
+
+**Deutschlandachter 1960**
+
+8. Wer gewann 1960 den olympischen Achter?
+9. Wer saß im deutschen Achter von Rom 1960?
+10. Welche Rolle spielte Karl Adam beim Olympiasieg 1960?
+
+**Bewertung**
+
+Pro Frage dokumentieren:
+
+- passende Ziel-URL auffindbar: ja/nein;
+- direkte Antwort auf Seite vorhanden: ja/nein;
+- zentrale Entitäten korrekt benannt: ja/nein;
+- Quellen sichtbar: ja/nein;
+- Fehlinterpretationsrisiko: niedrig/mittel/hoch.
+
+---
+
+### 45.9 P0-I — Merge-/Release-Gate
+
+P0 darf erst als vollständig umgesetzt gelten, wenn:
+
+- [ ] gemeinsame technische Seitenbasis vorhanden ist;
+- [ ] Homepage-Metadaten angepasst sind;
+- [ ] `/karl-adam/` veröffentlichtungsfähig ist;
+- [ ] `/adams-acht/` veröffentlichtungsfähig ist;
+- [ ] `/deutschlandachter-1960/` veröffentlichtungsfähig ist;
+- [ ] alle drei Seiten in Sitemap enthalten sind;
+- [ ] alle drei Seiten individuelle Canonicals besitzen;
+- [ ] Quellen-Gates erfüllt sind;
+- [ ] interne Linkarchitektur vollständig ist;
+- [ ] mindestens zehn P0-CBO-Fragen lokal gegen die Seitenstruktur geprüft wurden;
+- [ ] keine ungeklärten Film-/Bildrechte durch die neuen Seiten entstehen;
+- [ ] historische Einordnung von Karl Adam einschließlich NS-Kontext redaktionell erhalten bleibt;
+- [ ] Vereinssuche und bestehende Kernfunktionen durch die neue Seitenarchitektur nicht regressieren.
+
+### 45.10 Empfohlene Umsetzungsreihenfolge
+
+1. gemeinsame Multi-Page-/Meta-Basis;
+2. Homepage als Hub anpassen;
+3. `/karl-adam/` inklusive Quellenprüfung;
+4. `/deutschlandachter-1960/` inklusive Mannschafts-/Ergebnisprüfung;
+5. `/adams-acht/` mit Links auf die nun vorhandenen historischen Seiten;
+6. Sitemap / robots / JSON-LD finalisieren;
+7. interne Linkprüfung;
+8. Lighthouse / mobile / Build-Checks;
+9. P0-CBO-Benchmark;
+10. redaktionelles Release-Gate.
