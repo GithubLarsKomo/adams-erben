@@ -52,8 +52,12 @@ jobs:
       - name: Assert source contains no remote runtime fallbacks
         shell: bash
         run: |
-          if grep -R -E -i 'onerror=.*https?://|fallback[[:space:]]*:[[:space:]]*["'"']https?://' src scripts legal; then
-            echo 'Source must not contain remote runtime fallback mechanisms.' >&2
+          if grep -R -E -i 'onerror=' src scripts legal; then
+            echo 'Source must not contain runtime fallback handlers.' >&2
+            exit 1
+          fi
+          if grep -R -E -i 'd2cx26qpfwuhvu\.cloudfront\.net|cdn\.podcastcms\.de|rudern\.de/sites/default/files' src scripts legal; then
+            echo 'Source must not contain known third-party runtime asset hosts.' >&2
             exit 1
           fi
 
