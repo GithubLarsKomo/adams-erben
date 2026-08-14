@@ -37,6 +37,14 @@ jobs:
           node --check src/assets/app.js
           node --check src/assets/nearest.js
 
+      - name: No remote asset fallback in build source
+        shell: bash
+        run: |
+          if grep -nE "fallback:[[:space:]]*['\"]https?://|onerror=.*https?://" scripts/build.mjs; then
+            echo 'Remote runtime asset fallbacks are forbidden.' >&2
+            exit 1
+          fi
+
       - name: DRV output validator tests
         run: npm run test:drv-output
 
@@ -50,6 +58,57 @@ jobs:
         env:
           SKIP_DRV_SYNC: '1'
         run: npm run build
+
+      - name: HTTP smoke test for canonical pages and local brand assets
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --directory dist >/tmp/adams-erben-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          sleep 1
+
+          pages=(
+            /
+            /karl-adam/
+            /adams-acht/
+            /deutschlandachter-1960/
+            /ratzeburg/
+            /karl-adam-trainingsmethoden/
+            /rudern-verstehen/
+            /rudern-lernen/
+            /ruderverein-finden/
+            /ueber-adams-erben/
+          )
+
+          for page in "${pages[@]}"; do
+            status=$(curl --silent --show-error --output /tmp/adams-page.html --write-out '%{http_code}' "http://127.0.0.1:4173${page}")
+            if [ "$status" != "200" ]; then
+              echo "Expected HTTP 200 for ${page}, got ${status}" >&2
+              cat /tmp/adams-erben-http.log >&2
+              exit 1
+            fi
+            if ! grep -qi '<!doctype html' /tmp/adams-page.html; then
+              echo "Expected HTML document for ${page}" >&2
+              exit 1
+            fi
+          done
+
+          assets=(
+            /assets/images/world-rowing.png
+            /assets/images/drv.png
+            /assets/images/schubschlag.webp
+          )
+
+          for asset in "${assets[@]}"; do
+            status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:4173${asset}")
+            if [ "$status" != "200" ]; then
+              echo "Expected local brand asset ${asset}, got HTTP ${status}" >&2
+              exit 1
+            fi
+          done
+
+          kill "$server_pid"
+          trap - EXIT
 
       - name: Assert browser data contains no email addresses
         shell: bash
