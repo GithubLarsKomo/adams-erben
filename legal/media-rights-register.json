@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "policy": "Every non-trivial visual asset used in production must have an attributable rights status. review-required assets may be used in preview but require explicit approval before production release. Third-party brand logos are governed separately by legal/asset-rights.json.",
+  "statuses": {
+    "project-controlled": "Created for or controlled by the Adams Erben project; retain creation/source evidence.",
+    "approved": "External asset with documented usage permission or license.",
+    "review-required": "Rights chain must be checked before production use."
+  },
+  "assets": {
+    "/assets/images/adams-erben-logo.png": { "type": "brand", "status": "project-controlled", "note": "Adams Erben project mark." },
+    "/assets/images/adams-erben-mark.png": { "type": "brand", "status": "project-controlled", "note": "Adams Erben project mark." },
+    "/assets/images/hero-skiff.webp": { "type": "illustration", "status": "project-controlled", "note": "Project-created visual." },
+    "/assets/images/hoehe-mexiko.webp": { "type": "illustration", "status": "project-controlled", "note": "Project-created explanatory visual." },
+    "/assets/images/measured-training.webp": { "type": "illustration", "status": "project-controlled", "note": "Project-created explanatory visual." },
+    "/assets/images/oars-over-time.png": { "type": "illustration", "status": "project-controlled", "note": "Project-created explanatory visual." },
+    "/assets/images/deutschlandachter.webp": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
+    "/assets/images/faricup.png": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
+    "/assets/images/moselpokal.webp": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
+    "/assets/images/rrc-heute.webp": { "type": "photograph", "status": "review-required", "note": "Verify photographer/rightsholder and web publication permission; check recognizable persons if applicable." },
+    "/assets/images/ratzeburg-regatta.webp": { "type": "photograph", "status": "review-required", "note": "Verify photographer/rightsholder and web publication permission; check recognizable persons if applicable." }
+  }
+}
