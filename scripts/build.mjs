@@ -45,22 +45,13 @@ const editorialLaborNote = '      <p class="source-note">Die Darstellung trennt 
 const editorialHistoryNote = '          <p class="source-note">Ein weiterer kontroverser Presse-/Rudersport-Beitrag wird erst nach eindeutiger Quellenprüfung ergänzt.</p>\n';
 
 const brandAssets = {
-  worldRowing: {
-    local: '/assets/images/world-rowing.png',
-    fallback: 'https://d2cx26qpfwuhvu.cloudfront.net/worldrowing/wp-content/uploads/2020/12/04182712/WR-Logo-Dark.png'
-  },
-  drv: {
-    local: '/assets/images/drv.png',
-    fallback: 'https://www.rudern.de/sites/default/files/styles/content_full_desktop_1x/public/images/drv-logo.webp?itok=8KBhu-lW'
-  },
-  schubschlag: {
-    local: '/assets/images/schubschlag.webp',
-    fallback: 'https://cdn.podcastcms.de/images/podcasts/315/2776815/schubschlag.png'
-  }
+  worldRowing: { local: '/assets/images/world-rowing.png' },
+  drv: { local: '/assets/images/drv.png' },
+  schubschlag: { local: '/assets/images/schubschlag.webp' }
 };
 
-function brandImage({ local, fallback }, alt) {
-  return `<img src="${local}" alt="${alt}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${fallback}'">`;
+function brandImage({ local }, alt) {
+  return `<img src="${local}" alt="${alt}" loading="lazy" decoding="async">`;
 }
 
 for (const obsoleteHelper of ['ensureNearbyControls', 'applyDirectContactCopy', 'ensureImageSlotStyles', 'hydrateImageSlots', 'data-nearby-styles']) {
