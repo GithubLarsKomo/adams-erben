@@ -77,16 +77,19 @@ jobs:
           fi
 
       - name: Assert no third-party runtime asset hotlinks
-        shell: bash
         run: |
-          if grep -R -E -i '(src|srcset|poster)=["'"']https?://' dist/index.html; then
-            echo 'Generated page must not load runtime assets directly from third parties.' >&2
-            exit 1
-          fi
-          if grep -R -E -i 'onerror=' dist/index.html; then
-            echo 'Generated page must not contain runtime fallback handlers.' >&2
-            exit 1
-          fi
+          node - <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('dist/index.html', 'utf8');
+          if (/(?:src|srcset|poster)\s*=\s*["']https?:\/\//i.test(html)) {
+            console.error('Generated page must not load runtime assets directly from third parties.');
+            process.exit(1);
+          }
+          if (/onerror\s*=/i.test(html)) {
+            console.error('Generated page must not contain runtime fallback handlers.');
+            process.exit(1);
+          }
+          NODE
 
       - name: Assert GeoNames attribution
         shell: bash
