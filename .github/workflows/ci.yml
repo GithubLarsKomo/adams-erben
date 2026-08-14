@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/seo-discoverability]
   pull_request:
 
 permissions:
@@ -27,6 +27,9 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check scripts/build.mjs
+          node --check scripts/postbuild-seo.mjs
+          node --check scripts/seo-pages.mjs
+          node --check scripts/validate-seo-output.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
@@ -43,7 +46,7 @@ jobs:
       - name: Local nearest-club tests
         run: npm run test:nearest
 
-      - name: Build with checked-in seed
+      - name: Production build with SEO validation
         env:
           SKIP_DRV_SYNC: '1'
         run: npm run build
@@ -72,3 +75,9 @@ jobs:
           php -l legal/impressum.php
           php -l legal/datenschutz.php
           php -l legal/rechtliche-hinweise.php
+
+      - name: Preview build with noindex validation
+        env:
+          SKIP_DRV_SYNC: '1'
+          PREVIEW_MODE: '1'
+        run: npm run build
