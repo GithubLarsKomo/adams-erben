@@ -27,6 +27,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check scripts/build.mjs
+          node --check scripts/build-local.mjs
           node --check scripts/split-audiences.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
@@ -44,10 +45,8 @@ jobs:
       - name: Local nearest-club tests
         run: npm run test:nearest
 
-      - name: Build with checked-in seed
-        env:
-          SKIP_DRV_SYNC: '1'
-        run: npm run build
+      - name: Local build with checked-in seed
+        run: npm run build:local
 
       - name: Validate audience pages
         run: |
