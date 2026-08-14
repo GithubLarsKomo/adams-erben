@@ -117,6 +117,36 @@ function addHomepageLinks($) {
   }
 }
 
+function addDetailCrossLinks($, currentPath) {
+  const nav = $('.site-header nav[aria-label="Hauptnavigation"]').first();
+  const p0Links = [
+    ['/karl-adam/', 'Karl Adam'],
+    ['/adams-acht/', 'Adams Acht'],
+    ['/deutschlandachter-1960/', 'Achter 1960']
+  ];
+
+  for (const [href, label] of p0Links) {
+    if (!nav.find(`a[href="${href}"]`).length) {
+      const clubLink = nav.find('a[href="/#vereine"], a[href="#vereine"]').first();
+      const link = `<a href="${href}"${href === currentPath ? ' aria-current="page"' : ''}>${label}</a>`;
+      if (clubLink.length) clubLink.before(link);
+      else nav.append(link);
+    }
+  }
+
+  if (currentPath === '/karl-adam/') {
+    const nextLinks = $('.next-card .next-links').first();
+    if (nextLinks.length) {
+      if (!nextLinks.find('a[href="/adams-acht/"]').length) {
+        nextLinks.prepend('<a class="button button-secondary" href="/adams-acht/">Adams Acht</a>');
+      }
+      if (!nextLinks.find('a[href="/deutschlandachter-1960/"]').length) {
+        nextLinks.prepend('<a class="button button-primary" href="/deutschlandachter-1960/">Deutschlandachter 1960</a>');
+      }
+    }
+  }
+}
+
 for (const page of pages) {
   const filePath = path.join(dist, page.file);
   let html;
@@ -152,6 +182,8 @@ for (const page of pages) {
   if (page.path === '/') {
     addHomepageStructuredData($);
     addHomepageLinks($);
+  } else {
+    addDetailCrossLinks($, page.path);
   }
 
   await writeFile(filePath, $.html());
