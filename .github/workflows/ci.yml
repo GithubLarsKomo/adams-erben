@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, risk-protection]
   pull_request:
 
 permissions:
@@ -27,6 +27,8 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check scripts/build.mjs
+          node --check scripts/risk-preflight.mjs
+          node --check scripts/risk-protection.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
@@ -43,9 +45,11 @@ jobs:
       - name: Local nearest-club tests
         run: npm run test:nearest
 
-      - name: Build with checked-in seed
+      - name: Build safe preview with checked-in seed
         env:
+          PREVIEW_MODE: '1'
           SKIP_DRV_SYNC: '1'
+          DRV_DATA_USAGE_APPROVED: '0'
         run: npm run build
 
       - name: Assert browser data contains no email addresses
@@ -53,6 +57,18 @@ jobs:
         run: |
           if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
             echo 'Public browser data must not contain email addresses.' >&2
+            exit 1
+          fi
+
+      - name: Assert no third-party runtime asset hotlinks
+        shell: bash
+        run: |
+          if grep -R -E -i '(src|srcset)=["'"']https?://' dist/index.html; then
+            echo 'Generated page must not load runtime assets directly from third parties.' >&2
+            exit 1
+          fi
+          if grep -R -E -i 'onerror=' dist/index.html; then
+            echo 'Generated page must not contain runtime fallback handlers.' >&2
             exit 1
           fi
 
