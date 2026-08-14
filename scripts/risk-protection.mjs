@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
 
@@ -7,12 +7,15 @@ const previewMode = process.env.PREVIEW_MODE === '1';
 const distIndex = path.join(root, 'dist', 'index.html');
 const rightsPath = path.join(root, 'legal', 'asset-rights.json');
 const mediaRightsPath = path.join(root, 'legal', 'media-rights-register.json');
+const dataSourcesPath = path.join(root, 'legal', 'datenquellen.php');
 const buildSourcePath = path.join(root, 'scripts', 'build.mjs');
 const contactGovernancePath = path.join(root, 'scripts', 'lib', 'contact-governance.mjs');
+const publicRecipientsPath = path.join(root, 'dist', 'data', 'recipients.json');
 const legalFiles = [
   path.join(root, 'legal', 'impressum.php'),
   path.join(root, 'legal', 'datenschutz.php'),
-  path.join(root, 'legal', 'rechtliche-hinweise.php')
+  path.join(root, 'legal', 'rechtliche-hinweise.php'),
+  dataSourcesPath
 ];
 
 function fail(message) {
@@ -95,6 +98,14 @@ if (/autoApproved\s*:\s*true[\s\S]{0,180}personal/i.test(contactGovernanceSource
   fail('Contact governance appears to auto-approve a personal contact path.');
 }
 
+// Private routing data must never be copied into the browser-visible data tree.
+try {
+  await access(publicRecipientsPath);
+  fail('Private recipients.json is present below dist/data and would be publicly accessible.');
+} catch (error) {
+  if (error?.message?.startsWith('[risk-protection]')) throw error;
+}
+
 const legalText = (await Promise.all(legalFiles.map((file) => readFile(file, 'utf8')))).join('\n');
 const requiredPrivacyPhrases = [
   'Art. 6 Abs. 1 lit. f DSGVO',
@@ -124,6 +135,14 @@ if (!legalNotice.includes('kein automatisches Fallback')) {
 const outputText = $.text();
 if (!outputText.includes('GeoNames') || !outputText.includes('CC BY 4.0')) {
   fail('Visible GeoNames / CC BY 4.0 attribution is missing from generated page.');
+}
+if (!$('footer.site-footer a[href="/datenquellen.php"]').length) {
+  fail('Generated footer must link to the public data sources and licenses page.');
+}
+
+const dataSources = await readFile(dataSourcesPath, 'utf8');
+for (const phrase of ['Datenquellen und Lizenzen', 'GeoNames', 'CC BY 4.0', 'kein offizielles Angebot des Deutschen Ruderverbands']) {
+  if (!dataSources.includes(phrase)) fail(`Data sources page missing required transparency phrase: ${phrase}`);
 }
 
 console.log(`[risk-protection] checks passed (${previewMode ? 'preview' : 'production'} mode)`);
