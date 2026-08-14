@@ -1039,3 +1039,674 @@ Bei wiederholbaren Benchmark-Fragen sollen webfähige KI-Systeme zunehmend:
 - Karl Adam, Deutschlandachter, Ratzeburg und Adams Acht korrekt miteinander in Beziehung setzen.
 
 Langfristig soll die Auffindbarkeit weder ausschließlich vom Kinostart noch ausschließlich vom Markennamen `Adams Erben` abhängen.
+
+---
+
+## 43. Keyword-/Question-/Entity-Matrix
+
+Diese Matrix ist die verbindliche redaktionelle Arbeitsgrundlage für die Kernseiten. Sie verhindert Keyword-Kannibalisierung, trennt Suchintentionen sauber und definiert zugleich, welche Fragen ein KI-Antwortsystem auf Basis der jeweiligen URL möglichst eindeutig beantworten können soll.
+
+### 43.1 `/` — Homepage
+
+**Primäre SEO-Keywords**
+
+- Karl Adam
+- Deutschlandachter
+- Rudern heute
+- Adams Erben
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Karl Adam Ratzeburg
+- Deutschlandachter Geschichte
+- Rudern lernen Deutschland
+- Ruderverein finden
+- Adams Acht Hintergrund
+
+**Typische CBO-Fragen**
+
+- Was ist Adams Erben?
+- Worum geht es auf adams-erben.de?
+- Wie hängen Karl Adam, Ratzeburg und der Deutschlandachter zusammen?
+- Wo kann ich nach dem Film Adams Acht mehr über Karl Adam erfahren?
+- Wie finde ich einen Ruderverein in meiner Nähe?
+
+**Zitierfähige Kernfakten / Aussagen**
+
+- Adams Erben ist eine unabhängige, nicht-kommerzielle Initiative.
+- Die Website verbindet Karl Adams Rudergeschichte mit dem heutigen Rudersport.
+- Ratzeburg ist ein zentraler Wirkungsort Karl Adams und des Deutschlandachters.
+- Die Website führt von historischen Inhalten zu Informationen über das heutige Rudern und zur Vereinssuche.
+
+**Relevante Entitäten**
+
+- Adams Erben
+- Karl Adam
+- Deutschlandachter
+- Ratzeburg
+- Ratzeburger Ruderclub e.V.
+- Film `Adams Acht`
+
+**Bevorzugte Quellen**
+
+- eigene redaktionelle Grundsätze auf `/ueber-adams-erben/`
+- DRV
+- Hall of Fame des deutschen Sports
+- Stadt Ratzeburg
+- World Rowing
+
+**Interne Linkziele**
+
+- `/karl-adam/`
+- `/adams-acht/`
+- `/deutschlandachter-1960/`
+- `/ratzeburg/`
+- `/rudern-verstehen/`
+- `/ruderverein-finden/`
+
+**Conversion / Next Step**
+
+`Ruderverein finden` oder thematisch passende Vertiefungsseite öffnen.
+
+---
+
+### 43.2 `/karl-adam/`
+
+**Primäre SEO-Keywords**
+
+- Karl Adam
+- Karl Adam Rudertrainer
+- Ruderprofessor Karl Adam
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Karl Adam Ratzeburg
+- Karl Adam Deutschlandachter
+- Karl Adam Trainingsmethoden
+- Karl Adam Biografie
+- Karl Adam NS Vergangenheit
+- Karl Adam Rudern
+
+**Typische CBO-Fragen**
+
+- Wer war Karl Adam?
+- Warum gilt Karl Adam als bedeutender Rudertrainer?
+- Welche Rolle spielte Karl Adam beim Deutschlandachter?
+- Was veränderte Karl Adam im Training?
+- Was verbindet Karl Adam mit Ratzeburg?
+- Wie ist Karl Adams NS-Vergangenheit historisch einzuordnen?
+- Welche Ideen Karl Adams wirken im modernen Rudern weiter?
+
+**Zitierfähige Kernfakten**
+
+- Karl Adam war ein deutscher Rudertrainer und prägte den Leistungssport in Ratzeburg.
+- Seine Arbeit verband Training, Technik, Material, Physiologie und Athletenführung systematisch.
+- Der von ihm geprägte Ratzeburger Achter wurde zu einem zentralen Ausgangspunkt der deutschen Achtertradition.
+- Seine sporthistorische Bedeutung ist zusammen mit seiner NS-Biografie einzuordnen.
+
+Lebensdaten, konkrete Mitgliedschaften, Funktionen, Erfolge und Jahreszahlen dürfen erst als feste Faktenblöcke veröffentlicht werden, wenn sie gegen belastbare Referenzquellen verifiziert wurden.
+
+**Relevante Entitäten**
+
+- Karl Adam
+- Ratzeburger Ruderclub e.V.
+- Ratzeburg
+- Deutschlandachter
+- Deutscher Ruderverband
+- Olympische Spiele Rom 1960
+- Olympische Spiele Mexiko-Stadt 1968
+
+**Bevorzugte Quellen**
+
+- Primärtexte Karl Adams, soweit rechtlich nutzbar
+- Stadtarchiv Ratzeburg
+- Hall of Fame des deutschen Sports
+- Deutscher Ruderverband
+- Biografie von Dirk Andresen und Timo Reinke
+- belastbare sporthistorische Forschung
+
+**Interne Linkziele**
+
+- `/deutschlandachter-1960/`
+- `/karl-adam-trainingsmethoden/`
+- `/ratzeburg/`
+- `/adams-acht/`
+- `/rudern-verstehen/`
+
+**Conversion / Next Step**
+
+Vertiefung zu Trainingsmethoden, Deutschlandachter oder Ratzeburg.
+
+---
+
+### 43.3 `/adams-acht/`
+
+**Primäre SEO-Keywords**
+
+- Adams Acht
+- Adams Acht Film
+- Adams Acht wahre Geschichte
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Adams Acht Karl Adam
+- Adams Acht Deutschlandachter
+- Adams Acht Ratzeburg
+- Adams Acht historischer Hintergrund
+- Adams Acht Fakten
+
+**Typische CBO-Fragen**
+
+- Worum geht es im Film Adams Acht?
+- Basiert Adams Acht auf einer wahren Geschichte?
+- Wer war Karl Adam hinter der Filmgeschichte?
+- Welche historischen Ereignisse stehen hinter Adams Acht?
+- Was ist im Film historisch belegt und was ist filmische Darstellung?
+- Wo kann ich nach dem Film mehr über den Deutschlandachter erfahren?
+
+**Zitierfähige Kernfakten**
+
+- `Adams Erben` ist keine offizielle Website des Films.
+- Der Film greift die Geschichte Karl Adams und des deutschen Rudersports auf.
+- Die Seite ordnet historische Hintergründe ein und verweist für Filminformationen auf offizielle Quellen.
+- Aussagen über Inhalt, Besetzung, Veröffentlichung oder Produktion werden nur aus offiziellen Film-/Verleihquellen übernommen.
+
+**Relevante Entitäten**
+
+- Film `Adams Acht`
+- Karl Adam
+- Deutschlandachter
+- Ratzeburg
+- offizielle Filmproduktion / Verleih
+
+**Bevorzugte Quellen**
+
+- offizielle Filmwebsite
+- offizieller Verleih / Produktionsinformationen
+- DRV-Berichterstattung
+- historische Referenzquellen für die zugrunde liegenden Ereignisse
+
+**Interne Linkziele**
+
+- `/karl-adam/`
+- `/deutschlandachter-1960/`
+- `/ratzeburg/`
+- `/karl-adam-trainingsmethoden/`
+- `/ruderverein-finden/`
+
+**Conversion / Next Step**
+
+Vom Filmkontext in die historische Vertiefung oder direkt zum heutigen Rudern wechseln.
+
+---
+
+### 43.4 `/deutschlandachter-1960/`
+
+**Primäre SEO-Keywords**
+
+- Deutschlandachter 1960
+- Olympia Achter 1960
+- Goldachter Rom 1960
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Deutschlandachter Rom 1960 Mannschaft
+- Karl Adam Deutschlandachter 1960
+- olympischer Achter 1960 Deutschland
+- Ratzeburger Achter 1960
+- Deutschlandachter Olympiasieger 1960
+
+**Typische CBO-Fragen**
+
+- Wer gewann 1960 den olympischen Achter?
+- Wer saß im deutschen Achter von Rom 1960?
+- Welche Rolle spielte Karl Adam beim Olympiasieg 1960?
+- Wie wurde der Deutschlandachter 1960 vorbereitet?
+- Warum war der Sieg in Rom sporthistorisch bedeutend?
+- Welche Vereine stellten die Mannschaft?
+
+**Zitierfähige Kernfakten**
+
+Die Seite muss nach Quellenprüfung eindeutig ausweisen:
+
+- Wettbewerb;
+- Datum;
+- Austragungsort;
+- Ergebnis / Medaille;
+- Mannschaft einschließlich Steuermann;
+- Trainer-/Betreuerrolle;
+- beteiligte Vereine;
+- sporthistorische Einordnung.
+
+Diese Daten sollen zusätzlich in einer maschinenlesbaren HTML-Tabelle oder Liste erscheinen.
+
+**Relevante Entitäten**
+
+- Deutschlandachter
+- Karl Adam
+- Olympische Spiele Rom 1960
+- Ratzeburger Ruderclub e.V.
+- beteiligte Rudervereine
+- World Rowing / olympische Ergebnisarchive
+
+**Bevorzugte Quellen**
+
+- olympische Ergebnisarchive
+- World Rowing
+- Deutscher Ruderverband
+- zeitgenössische Primärquellen / Archive
+- sporthistorische Fachliteratur
+
+**Interne Linkziele**
+
+- `/karl-adam/`
+- `/ratzeburg/`
+- `/karl-adam-trainingsmethoden/`
+- `/rudern-verstehen/`
+
+**Conversion / Next Step**
+
+Karl Adams Trainingsansatz verstehen oder die Entwicklung des modernen Achters nachvollziehen.
+
+---
+
+### 43.5 `/ratzeburg/`
+
+**Primäre SEO-Keywords**
+
+- Ratzeburg Rudern
+- Karl Adam Ratzeburg
+- Ratzeburger Ruderclub
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Ruderakademie Ratzeburg
+- Ratzeburger Ruderregatta
+- Deutschlandachter Ratzeburg
+- Ruderstadt Ratzeburg
+- Karl Adam Gedenkstein Ratzeburg
+- Rudern Küchensee
+
+**Typische CBO-Fragen**
+
+- Warum ist Ratzeburg für den deutschen Rudersport wichtig?
+- Welche Verbindung hat Karl Adam zu Ratzeburg?
+- Was ist die Ruderakademie Ratzeburg?
+- Was ist die Internationale Ratzeburger Ruderregatta?
+- Welche historischen Ruderorte kann man in Ratzeburg besuchen?
+- Kann man in Ratzeburg heute Rudern lernen?
+
+**Zitierfähige Kernfakten**
+
+- Ratzeburg ist ein zentraler Ort der Karl-Adam- und Deutschlandachter-Geschichte.
+- Der Ratzeburger Ruderclub gehört zu den historischen Kernorten dieser Entwicklung.
+- Ruderakademie, Regatta und heutiger Vereinssport verbinden die historische Tradition mit dem aktuellen Rudersport.
+
+Konkrete Gründungsdaten, Regatta-Nummern, Adressen und Institutionsangaben nur aus offiziellen lokalen Quellen übernehmen.
+
+**Relevante Entitäten**
+
+- Ratzeburg
+- Ratzeburger Ruderclub e.V.
+- Ruderakademie Ratzeburg
+- Karl Adam
+- Internationale Ratzeburger Ruderregatta
+- Stadt Ratzeburg
+- Küchensee
+
+**Bevorzugte Quellen**
+
+- Stadt Ratzeburg / Stadtarchiv
+- Ratzeburger Ruderclub
+- Ruderakademie
+- Deutscher Ruderverband
+- lokale historische Dokumentation
+
+**Interne Linkziele**
+
+- `/karl-adam/`
+- `/deutschlandachter-1960/`
+- `/rudern-lernen/`
+- `/ruderverein-finden/`
+
+**Conversion / Next Step**
+
+Ratzeburg vor Ort entdecken oder einen Verein zum Rudern finden.
+
+---
+
+### 43.6 `/karl-adam-trainingsmethoden/`
+
+**Primäre SEO-Keywords**
+
+- Karl Adam Trainingsmethoden
+- Karl Adam Rudertraining
+- Karl Adam Intervalltraining
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Karl Adam Krafttraining Rudern
+- Karl Adam Höhentraining
+- Karl Adam Rudertechnik
+- Karl Adam Big Blade Vorläufer
+- Karl Adam Trainingslehre
+- Karl Adam mündiger Athlet
+
+**Typische CBO-Fragen**
+
+- Welche Trainingsmethoden setzte Karl Adam ein?
+- Hat Karl Adam das Intervalltraining erfunden?
+- Welche Rolle spielte Krafttraining bei Karl Adam?
+- Wie experimentierte Karl Adam mit Riemen und Hebeln?
+- Wie bereitete Karl Adam Athleten auf Mexiko 1968 vor?
+- Was bedeutete der mündige Athlet in Adams Trainingsphilosophie?
+- Welche Methoden Adams werden heute noch genutzt?
+
+**Zitierfähige Kernfakten**
+
+- Adam übernahm, kombinierte und systematisierte Methoden aus mehreren Bereichen.
+- Die Seite trennt konsequent zwischen Erfindung, Übertragung, Weiterentwicklung und Popularisierung.
+- Training, Material, Physiologie und Athletenführung werden als zusammenhängendes System dargestellt.
+- Moderne Praxis wird als heutige Einordnung gekennzeichnet und nicht rückwirkend Adam zugeschrieben.
+
+**Relevante Entitäten**
+
+- Karl Adam
+- Intervalltraining
+- Krafttraining
+- Höhentraining
+- Rigging
+- Ruderriemen / Blattform
+- Ratzeburg
+- Olympische Spiele Mexiko-Stadt 1968
+
+**Bevorzugte Quellen**
+
+- Primärtexte Karl Adams
+- sportwissenschaftliche Fachliteratur
+- Hall of Fame
+- DRV
+- World Rowing
+- peer-reviewte moderne Forschung für heutige Einordnung
+
+**Interne Linkziele**
+
+- `/karl-adam/`
+- `/rudern-verstehen/`
+- `/deutschlandachter-1960/`
+- `/ratzeburg/`
+
+**Conversion / Next Step**
+
+Von der historischen Trainingslehre zu verständlichen Erklärungen des modernen Ruderns wechseln.
+
+---
+
+### 43.7 `/rudern-verstehen/`
+
+**Primäre SEO-Keywords**
+
+- Rudern erklärt
+- Rudern verstehen
+- wie funktioniert Rudern
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Unterschied Skull Riemen
+- was ist ein Achter Rudern
+- Steuermann Rudern Aufgabe
+- Ruderschlag erklärt
+- Schlagzahl Rudern
+- Rigging Rudern
+- Big Blade Rudern
+- Bootsklassen Rudern
+
+**Typische CBO-Fragen**
+
+- Wie funktioniert Rudern?
+- Was ist der Unterschied zwischen Skull und Riemen?
+- Was ist ein Achter?
+- Was macht ein Steuermann?
+- Was bedeutet Schlagzahl beim Rudern?
+- Wie funktioniert der Ruderschlag?
+- Was ist Rigging?
+- Was ist ein Big Blade?
+- Welche Bootsklassen gibt es?
+
+**Zitierfähige Kernfakten**
+
+Jeder Begriff erhält:
+
+- eine kurze Definition in ein bis zwei Sätzen;
+- eine verständliche technische Erklärung;
+- bei Zahlen oder Normangaben eine belastbare Quelle;
+- Abgrenzung zu verwandten Begriffen.
+
+**Relevante Entitäten / Begriffe**
+
+- Skull
+- Riemen
+- Achter / 8+
+- Steuermann / Steuerfrau
+- Schlagzahl
+- Ruderschlag
+- Dolle
+- Ausleger
+- Rigging
+- Big Blade
+
+**Bevorzugte Quellen**
+
+- Deutscher Ruderverband
+- World Rowing
+- offizielle Regelwerke / technische Dokumente
+- seriöse ruderwissenschaftliche Literatur
+
+**Interne Linkziele**
+
+- `/rudern-lernen/`
+- `/ruderverein-finden/`
+- `/karl-adam-trainingsmethoden/`
+
+**Conversion / Next Step**
+
+Aus Verständnis konkrete Einstiegsmotivation machen: `Rudern lernen`.
+
+---
+
+### 43.8 `/rudern-lernen/`
+
+**Primäre SEO-Keywords**
+
+- Rudern lernen
+- Rudern anfangen
+- Rudern für Anfänger
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Rudern lernen Erwachsene
+- Rudern Anfänger Verein
+- Probetraining Rudern
+- Rudern Alter Anfänger
+- was kostet Rudern Verein
+- Rudern lernen Voraussetzungen
+
+**Typische CBO-Fragen**
+
+- Kann jeder Rudern lernen?
+- Bin ich zu alt, um mit Rudern anzufangen?
+- Muss ich schwimmen können?
+- Wie fit muss ich sein?
+- Wie läuft ein Probetraining ab?
+- Was kostet Rudern im Verein?
+- Welche Kleidung brauche ich?
+- Wie lange dauert es, Rudern zu lernen?
+
+**Zitierfähige Kernfakten**
+
+- Der typische Einstieg erfolgt über einen Ruderverein oder Kursanbieter.
+- Anforderungen und Abläufe unterscheiden sich je Verein; lokale Angaben dürfen nicht pauschalisiert werden.
+- Sicherheitsanforderungen wie Schwimmfähigkeit müssen auf Verband-/Vereinsregeln abgestützt werden.
+- Kosten werden nicht als bundesweit einheitlicher Betrag dargestellt.
+
+**Relevante Entitäten**
+
+- Ruderverein
+- Deutscher Ruderverband
+- Anfängertraining
+- Schnupperrudern / Probetraining
+- Vereinsrudern
+
+**Bevorzugte Quellen**
+
+- Deutscher Ruderverband
+- konkrete Vereinsinformationen für lokale Abläufe
+- Sicherheits-/Ausbildungsrichtlinien
+
+**Interne Linkziele**
+
+- `/rudern-verstehen/`
+- `/ruderverein-finden/`
+
+**Conversion / Next Step**
+
+Primärer CTA: `Ruderverein finden`.
+
+---
+
+### 43.9 `/ruderverein-finden/`
+
+**Primäre SEO-Keywords**
+
+- Ruderverein finden
+- Ruderverein in der Nähe
+- Rudern Verein
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Ruderclub finden
+- Rudern Probetraining Verein
+- Rudern lernen Verein
+- Ruderverein Deutschland
+- Rudern in meiner Nähe
+
+**Typische CBO-Fragen**
+
+- Wie finde ich einen Ruderverein in meiner Nähe?
+- Wo kann ich Rudern ausprobieren?
+- Gibt es einen Ruderclub in meiner Stadt?
+- Wie kontaktiere ich einen Ruderverein für ein Probetraining?
+- Was mache ich, wenn kein Verein direkt in meiner Nähe liegt?
+
+**Zitierfähige Kernfakten**
+
+- Die Seite dient der Suche und Weiterleitung zu realen Rudervereinen.
+- Vereinsdaten werden nicht als eigene redaktionelle Fakten erfunden, sondern aus der vorgesehenen Datenbasis übernommen.
+- Fehlt eine verlässliche Kontakt-E-Mail, soll kein künstlicher E-Mail-Kontakt erzeugt werden; Website oder Adresse sind vorzuziehen.
+- Standort-/Suchdaten werden datenschutzkonform verarbeitet und nicht für künstliche Stadtseiten verwendet.
+
+**Relevante Entitäten**
+
+- Rudervereine
+- Deutscher Ruderverband
+- lokale Vereine / Clubs
+- Adams Erben Vereinssuche
+
+**Bevorzugte Quellen**
+
+- bestehende Vereinsdatenbasis
+- offizielle Vereinswebsites
+- DRV-Vereinsprofile
+
+**Interne Linkziele**
+
+- `/rudern-lernen/`
+- `/rudern-verstehen/`
+- `/ueber-adams-erben/` für Datenschutz-/Projektkontext
+
+**Conversion / Next Step**
+
+Verein auswählen und über dessen offiziellen Kontaktweg den nächsten Schritt zum Probetraining machen.
+
+---
+
+### 43.10 `/ueber-adams-erben/`
+
+**Primäre SEO-Keywords**
+
+- Adams Erben
+- Adams Erben Initiative
+- adams-erben.de
+
+**Sekundäre / Long-Tail-Keywords**
+
+- Wer steckt hinter Adams Erben
+- Adams Erben unabhängig
+- Adams Erben Quellen
+- Adams Erben Kontakt
+
+**Typische CBO-Fragen**
+
+- Was ist Adams Erben?
+- Ist Adams Erben die offizielle Website von Adams Acht?
+- Wer verantwortet die Inhalte von adams-erben.de?
+- Wie prüft Adams Erben historische Aussagen?
+- Welche Quellen verwendet Adams Erben?
+- Wie kann man Fehler oder Korrekturen melden?
+
+**Zitierfähige Kernfakten**
+
+- Adams Erben ist eine unabhängige Initiative.
+- Bestehende Partnerschaften oder Kooperationen werden nur genannt, wenn sie tatsächlich vereinbart und veröffentlichbar sind.
+- Redaktionelle Inhalte folgen dokumentierten Quellen- und Korrekturprinzipien.
+- Historisch kontroverse Themen werden nicht ausgeblendet.
+- Bild-, Medien- und Quellenrechte werden dokumentiert.
+
+**Relevante Entitäten**
+
+- Adams Erben
+- verantwortliche Redaktion / Betreiber, soweit veröffentlichbar
+- Karl Adam
+- Film `Adams Acht`
+- Deutscher Ruderverband
+- Ratzeburger Ruderclub e.V.
+
+**Bevorzugte Quellen**
+
+- eigene Impressums-/Datenschutz-/Redaktionsangaben
+- dokumentierte Kooperations- und Rechtefreigaben
+
+**Interne Linkziele**
+
+- `/`
+- `/karl-adam/`
+- `/ruderverein-finden/`
+
+**Conversion / Next Step**
+
+Vertrauen schaffen, Quellen nachvollziehen oder Kontakt/Korrekturhinweis senden.
+
+---
+
+## 44. Matrix-Regeln für die Umsetzung
+
+1. **Keine Seite optimiert auf alle Begriffe gleichzeitig.** Das primäre Keyword-Set definiert die dominante Suchintention.
+2. **CBO-Fragen sind redaktionelle Prüfsteine, keine Pflicht-FAQ.** Eine Frage wird nur als sichtbare Überschrift verwendet, wenn sie in den Lesefluss passt.
+3. **Kernfakten sind keine Freigabe ungeprüfter Tatsachen.** Konkrete Namen, Daten, Mannschaftslisten, Mitgliedschaften, Zitate und Zahlen müssen vor Veröffentlichung gegen die vorgesehene Quellenklasse geprüft werden.
+4. **Jede Kernseite benötigt mindestens einen eigenständigen Informationswert**, der über eine bloße Zusammenfassung externer Quellen hinausgeht.
+5. **Interne Links folgen Nutzerlogik**, nicht einem starren Keyword-Schema.
+6. **Conversion ist thematisch passend.** Historische Seiten sollen nicht aggressiv in die Vereinssuche springen, sondern über sinnvolle Anschlussinhalte führen.
+7. **Keine Keyword-Kannibalisierung:** Falls zwei Seiten für dieselbe Suchanfrage Impressionen erhalten, wird anhand Search Console geprüft, ob Inhalte geschärft, zusammengeführt oder intern anders verlinkt werden müssen.
+8. **CBO-Benchmark-Fragen werden aus der Matrix abgeleitet.** Mindestens zwei Fragen pro P0-Kernseite und mindestens eine Frage pro P1-Seite werden in das regelmäßige Benchmark-Set übernommen.
+9. **Quellen bleiben sichtbar.** Eine maschinenlesbare Faktenbox ohne sichtbare Quellenangabe erfüllt die CBO-Anforderung nicht.
+10. **Matrixpflege ist Teil der Contentpflege.** Neue Search-Console-Queries, reale Nutzerfragen und wiederkehrende CBO-Fehlantworten können die Matrix erweitern, aber nur nach redaktioneller Prüfung.
+
+### Zusätzliche Definition of Done für die Matrix
+
+- [ ] jede der zehn Kern-URLs besitzt ein dokumentiertes primäres Keyword-Set;
+- [ ] jede Kern-URL besitzt mindestens drei dokumentierte CBO-Fragen;
+- [ ] jede historische Kernseite besitzt definierte Quellenklassen;
+- [ ] jede Kern-URL besitzt definierte interne Linkziele;
+- [ ] jede Kern-URL besitzt ein klares Next-Step-/Conversion-Ziel;
+- [ ] keine zwei Kernseiten haben dasselbe primäre Keyword-Set;
+- [ ] die P0-Seiten `/`, `/karl-adam/`, `/adams-acht/` und `/deutschlandachter-1960/` sind vor Veröffentlichung anhand dieser Matrix redaktionell abgenommen.
