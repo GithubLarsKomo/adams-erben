@@ -49,6 +49,26 @@ const pages = [
     ogDescription: 'Mannschaft, Trainer, Finale und die Entstehung einer deutschen Achtertradition.',
     ogImage: '/assets/images/deutschlandachter.webp',
     index: true
+  },
+  {
+    path: '/ratzeburg/',
+    file: 'ratzeburg/index.html',
+    title: 'Ratzeburg: Ruderstadt, Karl Adam & Ruderakademie | Adams Erben',
+    description: 'Warum Ratzeburg eine besondere Ruderstadt ist: Karl Adam, Ratzeburger Ruderclub, Küchensee, Ruderakademie und Internationale Ruderregatta im Überblick.',
+    ogTitle: 'Ratzeburg: Ruderstadt, Karl Adam & Ruderakademie',
+    ogDescription: 'Karl Adam, RRC, Küchensee, Ruderakademie und Regatta: Warum Ratzeburg bis heute ein besonderer Ort des Ruderns ist.',
+    ogImage: '/assets/images/ratzeburg-regatta.webp',
+    index: true
+  },
+  {
+    path: '/karl-adam-trainingsmethoden/',
+    file: 'karl-adam-trainingsmethoden/index.html',
+    title: 'Karl Adams Trainingsmethoden: Intervall, Kraft & Technik | Adams Erben',
+    description: 'Karl Adams Trainingsmethoden erklärt: Intervalltraining, Kraft, Schlagzahl, Material, mündige Athleten und Höhenvorbereitung – historisch sauber eingeordnet.',
+    ogTitle: 'Karl Adams Trainingsmethoden: Intervall, Kraft & Technik',
+    ogDescription: 'Was Karl Adam im Rudern tatsächlich veränderte – und was er nicht erfand. Training, Technik, Material und Athletenführung quellenbasiert erklärt.',
+    ogImage: '/assets/images/measured-training.webp',
+    index: true
   }
 ];
 
@@ -115,17 +135,32 @@ function addHomepageLinks($) {
     if (existingLinks.length) existingLinks.after(links);
     else filmSection.append(links);
   }
+
+  const ratzeburgActions = $('#ratzeburg .featured-actions').first();
+  if (ratzeburgActions.length && !ratzeburgActions.find('a[href="/ratzeburg/"]').length) {
+    ratzeburgActions.append('<a class="button button-secondary" href="/ratzeburg/">Ratzeburg als Ruderstadt</a>');
+  }
+
+  const laborHeading = $('#labor .lab-heading').first();
+  if (laborHeading.length && !$('#labor .seo-training-detail-links').length) {
+    laborHeading.append(`
+      <div class="film-links seo-training-detail-links">
+        <a class="button button-secondary" href="/karl-adam-trainingsmethoden/">Karl Adams Trainingsmethoden vertiefen</a>
+      </div>`);
+  }
 }
 
 function addDetailCrossLinks($, currentPath) {
   const nav = $('.site-header nav[aria-label="Hauptnavigation"]').first();
-  const p0Links = [
+  const coreLinks = [
     ['/karl-adam/', 'Karl Adam'],
     ['/adams-acht/', 'Adams Acht'],
-    ['/deutschlandachter-1960/', 'Achter 1960']
+    ['/deutschlandachter-1960/', 'Achter 1960'],
+    ['/ratzeburg/', 'Ratzeburg'],
+    ['/karl-adam-trainingsmethoden/', 'Trainingsmethoden']
   ];
 
-  for (const [href, label] of p0Links) {
+  for (const [href, label] of coreLinks) {
     if (!nav.find(`a[href="${href}"]`).length) {
       const clubLink = nav.find('a[href="/#vereine"], a[href="#vereine"]').first();
       const link = `<a href="${href}"${href === currentPath ? ' aria-current="page"' : ''}>${label}</a>`;
@@ -137,11 +172,16 @@ function addDetailCrossLinks($, currentPath) {
   if (currentPath === '/karl-adam/') {
     const nextLinks = $('.next-card .next-links').first();
     if (nextLinks.length) {
-      if (!nextLinks.find('a[href="/adams-acht/"]').length) {
-        nextLinks.prepend('<a class="button button-secondary" href="/adams-acht/">Adams Acht</a>');
-      }
-      if (!nextLinks.find('a[href="/deutschlandachter-1960/"]').length) {
-        nextLinks.prepend('<a class="button button-primary" href="/deutschlandachter-1960/">Deutschlandachter 1960</a>');
+      const additions = [
+        ['/deutschlandachter-1960/', 'Deutschlandachter 1960', 'button button-primary'],
+        ['/adams-acht/', 'Adams Acht', 'button button-secondary'],
+        ['/ratzeburg/', 'Ratzeburg', 'button button-secondary'],
+        ['/karl-adam-trainingsmethoden/', 'Trainingsmethoden', 'button button-secondary']
+      ];
+      for (const [href, label, className] of additions.reverse()) {
+        if (!nextLinks.find(`a[href="${href}"]`).length) {
+          nextLinks.prepend(`<a class="${className}" href="${href}">${label}</a>`);
+        }
       }
     }
   }
