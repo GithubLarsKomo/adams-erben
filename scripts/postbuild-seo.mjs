@@ -96,6 +96,14 @@ function enforceLocalRuntimeAssets($) {
   $('img[onerror]').removeAttr('onerror');
   const appMode = $('meta[name="adams-erben-mode"]');
   if (appMode.length) appMode.attr('content', previewMode ? 'preview' : 'production');
+
+  $('a[target="_blank"]').each((_, element) => {
+    const node = $(element);
+    const relTokens = new Set((node.attr('rel') || '').split(/\s+/).filter(Boolean));
+    relTokens.add('noopener');
+    relTokens.add('noreferrer');
+    node.attr('rel', [...relTokens].join(' '));
+  });
 }
 
 function addHomepageLinks($) {
