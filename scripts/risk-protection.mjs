@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
 
@@ -6,6 +6,7 @@ const root = process.cwd();
 const previewMode = process.env.PREVIEW_MODE === '1';
 const distIndex = path.join(root, 'dist', 'index.html');
 const rightsPath = path.join(root, 'legal', 'asset-rights.json');
+const buildSourcePath = path.join(root, 'scripts', 'build.mjs');
 const legalFiles = [
   path.join(root, 'legal', 'impressum.php'),
   path.join(root, 'legal', 'datenschutz.php'),
@@ -25,53 +26,52 @@ if (!previewMode && process.env.DRV_DATA_USAGE_APPROVED !== '1') {
 }
 
 const rights = JSON.parse(await readFile(rightsPath, 'utf8'));
+const buildSource = await readFile(buildSourcePath, 'utf8');
 const html = await readFile(distIndex, 'utf8');
 const $ = cheerio.load(html, { decodeEntities: false });
 
-// No runtime hotlink fallbacks: remove every inline error fallback and reject external runtime assets.
-$('[onerror]').removeAttr('onerror');
+// Privacy invariant: there must be no remote fallback mechanism in source or output.
+if (/onerror\s*=/i.test(buildSource) || /\bfallback\s*:\s*['"]https?:\/\//i.test(buildSource)) {
+  fail('Build source contains a remote runtime fallback mechanism.');
+}
+if (/onerror\s*=/i.test(html)) {
+  fail('Generated HTML contains an onerror handler; runtime fallbacks are forbidden.');
+}
 
 const externalRuntimeAssets = [];
-for (const attr of ['src', 'srcset']) {
+const runtimeAttributes = ['src', 'srcset', 'poster', 'data'];
+for (const attr of runtimeAttributes) {
   $(`[${attr}]`).each((_, element) => {
     const value = String($(element).attr(attr) || '').trim();
     if (/^https?:\/\//i.test(value)) externalRuntimeAssets.push(`${element.tagName}[${attr}=${value}]`);
   });
 }
-$('link[rel="stylesheet"][href],script[src]').each((_, element) => {
+$('link[href],script[src],source[src],track[src]').each((_, element) => {
   const attr = element.tagName === 'link' ? 'href' : 'src';
   const value = String($(element).attr(attr) || '').trim();
   if (/^https?:\/\//i.test(value)) externalRuntimeAssets.push(`${element.tagName}[${attr}=${value}]`);
+});
+$('style').each((_, element) => {
+  const css = String($(element).html() || '');
+  if (/url\(\s*['"]?https?:\/\//i.test(css)) externalRuntimeAssets.push('style[url(http...)]');
 });
 if (externalRuntimeAssets.length) {
   fail(`External runtime assets are forbidden: ${externalRuntimeAssets.join(', ')}`);
 }
 
-// Third-party logos are shown only with documented approval. Pending assets become neutral text marks.
-const textLabels = {
-  'world-rowing': 'World Rowing',
-  drv: 'Deutscher Ruderverband',
-  schubschlag: 'Schubschlag'
-};
+// Approved third-party logos must exist locally; pending assets may never silently fall back remotely.
 for (const [key, entry] of Object.entries(rights.assets || {})) {
   if (!entry?.path) continue;
   const images = $(`img[src="${entry.path}"]`);
   if (!images.length) continue;
-  if (isApprovedRight(entry)) continue;
-
-  images.each((_, image) => {
-    const $image = $(image);
-    const label = textLabels[key] || $image.attr('alt') || entry.owner || 'Externe Quelle';
-    $image.replaceWith(`<strong class="brand-textmark" data-rights-status="pending">${label}</strong>`);
-  });
+  if (!isApprovedRight(entry)) {
+    fail(`Third-party asset ${key} is rendered without documented approval.`);
+  }
 }
 
-const output = $.html();
-if (/onerror\s*=/i.test(output)) fail('Generated HTML still contains onerror handlers.');
-if (/https?:\/\/(?:d2cx26qpfwuhvu\.cloudfront\.net|www\.rudern\.de\/sites\/default\/files|cdn\.podcastcms\.de)\//i.test(output)) {
-  fail('Generated HTML still contains a forbidden third-party logo fallback URL.');
+if (/https?:\/\/(?:d2cx26qpfwuhvu\.cloudfront\.net|www\.rudern\.de\/sites\/default\/files|cdn\.podcastcms\.de)\//i.test(html)) {
+  fail('Generated HTML contains a forbidden third-party logo host.');
 }
-await writeFile(distIndex, output);
 
 const legalText = (await Promise.all(legalFiles.map((file) => readFile(file, 'utf8')))).join('\n');
 const requiredPrivacyPhrases = [
@@ -97,6 +97,11 @@ for (const phrase of forbiddenRoutingPhrases) {
 }
 if (!legalNotice.includes('kein automatisches Fallback')) {
   fail('Legal notice must explicitly state that there is no automatic association fallback.');
+}
+
+const outputText = $.text();
+if (!outputText.includes('GeoNames') || !outputText.includes('CC BY 4.0')) {
+  fail('Visible GeoNames / CC BY 4.0 attribution is missing from generated page.');
 }
 
 console.log(`[risk-protection] checks passed (${previewMode ? 'preview' : 'production'} mode)`);
