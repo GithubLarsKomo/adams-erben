@@ -92,6 +92,12 @@ function removeEditorialPlaceholdersFromProduction($) {
   });
 }
 
+function enforceLocalRuntimeAssets($) {
+  $('img[onerror]').removeAttr('onerror');
+  const appMode = $('meta[name="adams-erben-mode"]');
+  if (appMode.length) appMode.attr('content', previewMode ? 'preview' : 'production');
+}
+
 function addHomepageLinks($) {
   appendLinkOnce($('.hero .hero-actions').first(), '/karl-adam/', 'Karl Adam entdecken');
 
@@ -198,6 +204,7 @@ for (const page of pages) {
 
   const $ = cheerio.load(html, { decodeEntities: false });
   removeEditorialPlaceholdersFromProduction($);
+  enforceLocalRuntimeAssets($);
 
   $('title').text(page.title);
   setMeta($, 'meta[name="description"]', { name: 'description', content: page.description });
