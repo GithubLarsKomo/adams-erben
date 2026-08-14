@@ -1,10 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
-import { pages, productionOrigin } from './seo-pages.mjs';
+import { pages, productionOrigin, previewOrigin } from './seo-pages.mjs';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
+const previewMode = process.env.PREVIEW_MODE === '1';
+const expectedOrigin = previewMode ? previewOrigin : productionOrigin;
 const failures = [];
 
 function fail(pagePath, message) {
@@ -62,7 +64,8 @@ for (const page of pages) {
   const ogUrl = text($, 'meta[property="og:url"]');
   const ogImage = text($, 'meta[property="og:image"]');
   const twitterCard = text($, 'meta[name="twitter:card"]');
-  const expectedCanonical = `${productionOrigin}${page.path}`;
+  const robotsMeta = text($, 'meta[name="robots"]');
+  const expectedCanonical = `${expectedOrigin}${page.path}`;
 
   if ($('html').attr('lang') !== 'de') fail(page.path, 'html lang must be de');
   if ($('h1').length !== 1) fail(page.path, `expected exactly one h1, found ${$('h1').length}`);
@@ -75,9 +78,14 @@ for (const page of pages) {
   if (ogTitle !== page.ogTitle) fail(page.path, 'og:title differs from central page configuration');
   if (ogDescription !== page.ogDescription) fail(page.path, 'og:description differs from central page configuration');
   if (ogUrl !== expectedCanonical) fail(page.path, `og:url must be ${expectedCanonical}`);
-  if (!ogImage.startsWith(`${productionOrigin}/assets/images/`)) fail(page.path, 'og:image must use a local Adams Erben image on the production origin');
+  if (!ogImage.startsWith(`${expectedOrigin}/assets/images/`)) fail(page.path, `og:image must use a local image on ${expectedOrigin}`);
   if (twitterCard !== 'summary_large_image') fail(page.path, 'twitter:card must be summary_large_image');
-  if ($('meta[name="robots"]').length) fail(page.path, 'production output must not contain robots noindex metadata');
+
+  if (previewMode) {
+    if (robotsMeta !== 'noindex,nofollow') fail(page.path, 'preview output must contain robots noindex,nofollow');
+  } else if (robotsMeta) {
+    fail(page.path, 'production output must not contain robots noindex metadata');
+  }
 
   if (titles.has(title)) fail(page.path, `duplicate title also used by ${titles.get(title)}`);
   else titles.set(title, page.path);
@@ -125,16 +133,21 @@ try {
 } catch {
   failures.push('robots.txt: missing');
 }
-if (robots && !robots.includes(`Sitemap: ${productionOrigin}/sitemap.xml`)) {
-  failures.push('robots.txt: missing production sitemap declaration');
+
+if (robots) {
+  if (previewMode) {
+    if (!robots.includes('Disallow: /')) failures.push('robots.txt: preview must disallow crawling');
+  } else if (!robots.includes(`Sitemap: ${productionOrigin}/sitemap.xml`)) {
+    failures.push('robots.txt: missing production sitemap declaration');
+  }
 }
 
 if (pages.length !== 10) failures.push(`central SEO configuration: expected 10 core pages, found ${pages.length}`);
 
 if (failures.length) {
-  console.error('[seo-validate] failed');
+  console.error(`[seo-validate] failed (${previewMode ? 'preview' : 'production'})`);
   for (const failure of failures) console.error(` - ${failure}`);
   process.exit(1);
 }
 
-console.log(`[seo-validate] ${pages.length} core pages, metadata, JSON-LD, links, sitemap and robots validated`);
+console.log(`[seo-validate] ${pages.length} core pages validated (${previewMode ? 'preview' : 'production'})`);
