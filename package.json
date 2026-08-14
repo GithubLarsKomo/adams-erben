@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs && node scripts/postbuild-seo.mjs",
+    "build": "node scripts/build.mjs && node scripts/postbuild-seo.mjs && node scripts/validate-seo-output.mjs",
+    "validate:seo": "node scripts/validate-seo-output.mjs",
     "sync:drv": "node scripts/sync-drv.mjs && node scripts/validate-drv-output.mjs",
     "validate:drv-output": "node scripts/validate-drv-output.mjs",
     "test:drv-output": "node scripts/validate-drv-output.test.mjs",
