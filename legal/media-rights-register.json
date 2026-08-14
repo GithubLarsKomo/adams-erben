@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "policy": "Every non-trivial visual asset used in production must have an attributable rights status. review-required assets may be used in preview but require explicit approval before production release. Third-party brand logos are governed separately by legal/asset-rights.json.",
   "statuses": {
     "project-controlled": "Created for or controlled by the Adams Erben project; retain creation/source evidence.",
@@ -13,9 +13,45 @@
     "/assets/images/hoehe-mexiko.webp": { "type": "illustration", "status": "project-controlled", "note": "Project-created explanatory visual." },
     "/assets/images/measured-training.webp": { "type": "illustration", "status": "project-controlled", "note": "Project-created explanatory visual." },
     "/assets/images/oars-over-time.png": { "type": "illustration", "status": "project-controlled", "note": "Project-created explanatory visual." },
-    "/assets/images/deutschlandachter.webp": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
-    "/assets/images/faricup.png": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
-    "/assets/images/moselpokal.webp": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
+    "/assets/images/deutschlandachter.webp": {
+      "type": "media-badge",
+      "status": "review-required",
+      "prospectiveRightsholder": "Deutschland-Achter GmbH / Team Deutschland-Achter",
+      "rightsContact": "Carsten Oberhagemann, Pressesprecher und Geschäftsführer",
+      "rightsContactChannel": "presse@deutschlandachter.de",
+      "contactSource": "https://deutschlandachter.de/presse/",
+      "contactVerifiedAt": "2026-08-14",
+      "outreachStatus": "draft-prepared",
+      "draftDeliveredToOperator": "info@adams-erben.de",
+      "draftDeliveredAt": "2026-08-14",
+      "note": "Production use remains blocked until explicit permission for this concrete asset and the described local editorial use is documented."
+    },
+    "/assets/images/faricup.png": {
+      "type": "media-badge",
+      "status": "review-required",
+      "prospectiveRightsholder": "Ruder-Club Favorite Hammonia / Fari Cup",
+      "rightsContact": "Hanns-Christian Neumann, Gesamtleitung Fari Cup",
+      "rightsContactChannel": "orgateam@faricup.de",
+      "contactSource": "https://www.faricup.de/",
+      "contactVerifiedAt": "2026-08-14",
+      "outreachStatus": "draft-prepared",
+      "draftDeliveredToOperator": "info@adams-erben.de",
+      "draftDeliveredAt": "2026-08-14",
+      "note": "Production use remains blocked until explicit permission for this concrete asset and the described local editorial use is documented."
+    },
+    "/assets/images/moselpokal.webp": {
+      "type": "media-badge",
+      "status": "review-required",
+      "prospectiveRightsholder": "Bernkasteler Ruderverein 1874 e.V. / Rudergesellschaft Zeltingen 1927 e.V. as organizers of Grüner Moselpokal",
+      "rightsContact": "Kay Urban, Regattaleitung, Bernkasteler RV",
+      "rightsContactChannel": "Official regatta contact channel/contact form",
+      "contactSource": "https://www.regatta-gruener-moselpokal.de/kontakt/",
+      "contactVerifiedAt": "2026-08-14",
+      "outreachStatus": "draft-prepared",
+      "draftDeliveredToOperator": "info@adams-erben.de",
+      "draftDeliveredAt": "2026-08-14",
+      "note": "Production use remains blocked until explicit permission for this concrete asset and the described local editorial use is documented."
+    },
     "/assets/images/rrc-heute.webp": {
       "type": "photograph",
       "status": "approved",
