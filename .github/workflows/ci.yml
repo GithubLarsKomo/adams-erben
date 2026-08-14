@@ -110,6 +110,55 @@ jobs:
           kill "$server_pid"
           trap - EXIT
 
+      - name: Lighthouse SEO release gate
+        shell: bash
+        run: |
+          chrome_path=$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)
+          if [ -z "$chrome_path" ]; then
+            echo 'Chrome/Chromium is required for the Lighthouse release gate.' >&2
+            exit 1
+          fi
+          export CHROME_PATH="$chrome_path"
+
+          python3 -m http.server 4173 --directory dist >/tmp/adams-erben-lighthouse-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          sleep 1
+
+          npx --yes lighthouse@13.3.0 http://127.0.0.1:4173/ \
+            --only-categories=seo \
+            --output=json \
+            --output-path=/tmp/lighthouse-home.json \
+            --chrome-flags='--headless --no-sandbox --disable-dev-shm-usage' \
+            --quiet
+
+          npx --yes lighthouse@13.3.0 http://127.0.0.1:4173/karl-adam/ \
+            --only-categories=seo \
+            --output=json \
+            --output-path=/tmp/lighthouse-karl-adam.json \
+            --chrome-flags='--headless --no-sandbox --disable-dev-shm-usage' \
+            --quiet
+
+          node - <<'NODE'
+          const fs = require('fs');
+          const reports = [
+            ['homepage', '/tmp/lighthouse-home.json'],
+            ['karl-adam', '/tmp/lighthouse-karl-adam.json']
+          ];
+          for (const [name, file] of reports) {
+            const report = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const score = report.categories?.seo?.score ?? 0;
+            console.log(`${name} Lighthouse SEO: ${Math.round(score * 100)}`);
+            if (score < 0.95) {
+              console.error(`${name} must reach Lighthouse SEO >= 95`);
+              process.exitCode = 1;
+            }
+          }
+          NODE
+
+          kill "$server_pid"
+          trap - EXIT
+
       - name: Assert browser data contains no email addresses
         shell: bash
         run: |
