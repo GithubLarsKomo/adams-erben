@@ -40,7 +40,7 @@
     "test:discover": "node scripts/discover-websites.test.mjs"
   },
   "dependencies": {
-    "adm-zip": "0.5.16",
+    "adm-zip": "0.6.0",
     "cheerio": "1.1.2"
   }
 }
