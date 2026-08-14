@@ -7,6 +7,7 @@ const root = process.cwd();
 const dist = path.join(root, 'dist');
 const previewMode = process.env.PREVIEW_MODE === '1';
 const expectedOrigin = previewMode ? previewOrigin : productionOrigin;
+const expectedAppMode = previewMode ? 'preview' : 'production';
 const failures = [];
 
 function fail(pagePath, message) {
@@ -119,13 +120,33 @@ for (const page of pages) {
     if (!targetId || !$(`#${targetId}`).length) fail(page.path, `skip link target #${targetId} does not exist`);
   }
 
-  $('script[src="/assets/app.js"]').each((_, element) => {
+  const appScripts = $('script[src="/assets/app.js"]');
+  appScripts.each((_, element) => {
     if ($(element).attr('type') !== 'module') fail(page.path, '/assets/app.js must be loaded as type="module"');
   });
+  if (appScripts.length) {
+    const appMode = $('meta[name="adams-erben-mode"]').attr('content')?.trim() || '';
+    if (appMode !== expectedAppMode) fail(page.path, `adams-erben-mode must be ${expectedAppMode}, found ${appMode || '(missing)'}`);
+  }
 
   $('img').each((_, element) => {
     if ($(element).attr('alt') === undefined) fail(page.path, `image ${$(element).attr('src') || '(unknown src)'} is missing alt attribute`);
+    if ($(element).attr('onerror')) fail(page.path, `image ${$(element).attr('src') || '(unknown src)'} contains a runtime fallback`);
   });
+
+  const remoteResourceSelectors = [
+    'img[src^="http://"], img[src^="https://"]',
+    'script[src^="http://"], script[src^="https://"]',
+    'link[rel="stylesheet"][href^="http://"], link[rel="stylesheet"][href^="https://"]',
+    'source[src^="http://"], source[src^="https://"]',
+    'iframe[src^="http://"], iframe[src^="https://"]'
+  ];
+  for (const selector of remoteResourceSelectors) {
+    $(selector).each((_, element) => {
+      const url = $(element).attr('src') || $(element).attr('href') || '(unknown resource)';
+      fail(page.path, `third-party runtime resource is not allowed: ${url}`);
+    });
+  }
 
   $('a[target="_blank"]').each((_, element) => {
     const relTokens = new Set(($(element).attr('rel') || '').split(/\s+/).filter(Boolean));
