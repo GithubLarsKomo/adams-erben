@@ -45,22 +45,13 @@ const editorialLaborNote = '      <p class="source-note">Die Darstellung trennt 
 const editorialHistoryNote = '          <p class="source-note">Ein weiterer kontroverser Presse-/Rudersport-Beitrag wird erst nach eindeutiger Quellenprüfung ergänzt.</p>\n';
 
 const brandAssets = {
-  worldRowing: {
-    local: '/assets/images/world-rowing.png',
-    fallback: 'https://d2cx26qpfwuhvu.cloudfront.net/worldrowing/wp-content/uploads/2020/12/04182712/WR-Logo-Dark.png'
-  },
-  drv: {
-    local: '/assets/images/drv.png',
-    fallback: 'https://www.rudern.de/sites/default/files/styles/content_full_desktop_1x/public/images/drv-logo.webp?itok=8KBhu-lW'
-  },
-  schubschlag: {
-    local: '/assets/images/schubschlag.webp',
-    fallback: 'https://cdn.podcastcms.de/images/podcasts/315/2776815/schubschlag.png'
-  }
+  worldRowing: '/assets/images/world-rowing.png',
+  drv: '/assets/images/drv.png',
+  schubschlag: '/assets/images/schubschlag.webp'
 };
 
-function brandImage({ local, fallback }, alt) {
-  return `<img src="${local}" alt="${alt}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${fallback}'">`;
+function brandImage(local, alt) {
+  return `<img src="${local}" alt="${alt}" loading="lazy" decoding="async">`;
 }
 
 for (const obsoleteHelper of ['ensureNearbyControls', 'applyDirectContactCopy', 'ensureImageSlotStyles', 'hydrateImageSlots', 'data-nearby-styles']) {
@@ -231,6 +222,11 @@ function renderPage(html) {
     <p class="regatta-volunteering-link"><strong>Mitmachen in groß:</strong> Wie viel ehrenamtliche Arbeit möglich macht, zeigt seit Jahrzehnten die <a href="#regatta">Internationale Ratzeburger Ruderregatta</a> – vom Auf- und Abbau bis zum Rennbetrieb.</p>`);
   }
 
+  const footerNav = $('.site-footer nav[aria-label="Rechtliches"]');
+  if (footerNav.length && !footerNav.find('.geonames-attribution').length) {
+    footerNav.append('<a class="geonames-attribution" href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">Geodaten: GeoNames · CC BY 4.0 ↗</a>');
+  }
+
   if (!$('link[href="/assets/mobile-fixes.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/mobile-fixes.css">');
   if (!$('link[href="/assets/story-flow.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/story-flow.css">');
   if (!$('link[href="/assets/source-links.css"]').length) $('head').append('<link rel="stylesheet" href="/assets/source-links.css">');
@@ -275,6 +271,7 @@ function validatePage($, desiredOrder) {
     ['a[href="https://worldrowing.com/"]', 'World Rowing link'],
     ['a[href="https://www.rudern.de/service/vereinssuche"]', 'DRV club search link'],
     ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link'],
+    ['a.geonames-attribution[href="https://www.geonames.org/"]', 'GeoNames attribution'],
     ['.listening-tip-material', 'material podcast tip'],
     ['.listening-tip-masters', 'Masters podcast tip'],
     ['.listening-tip-touring', 'touring podcast tip'],
