@@ -27,8 +27,10 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check scripts/build.mjs
+          node --check scripts/postbuild-legal-links.mjs
           node --check scripts/risk-preflight.mjs
           node --check scripts/risk-protection.mjs
+          node --check scripts/privacy-static.test.mjs
           node --check scripts/contact-personal-safety.test.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
@@ -36,6 +38,9 @@ jobs:
           node --check scripts/validate-drv-output.test.mjs
           node --check src/assets/app.js
           node --check src/assets/nearest.js
+
+      - name: Static browser privacy guard
+        run: npm run test:privacy-static
 
       - name: Personal contact safety
         run: npm run test:risk-contact
@@ -64,6 +69,7 @@ jobs:
       - name: Build safe preview with checked-in seed
         env:
           PREVIEW_MODE: '1'
+          DRV_SYNC_MODE: 'disabled'
           SKIP_DRV_SYNC: '1'
           DRV_DATA_USAGE_APPROVED: '0'
         run: npm run build
@@ -73,6 +79,10 @@ jobs:
         run: |
           if grep -R -E -i '[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}' dist/data; then
             echo 'Public browser data must not contain email addresses.' >&2
+            exit 1
+          fi
+          if find dist -type f -name 'recipients.json' -print -quit | grep -q .; then
+            echo 'Private recipients.json must never be present in dist.' >&2
             exit 1
           fi
 
@@ -91,11 +101,13 @@ jobs:
           }
           NODE
 
-      - name: Assert GeoNames attribution
+      - name: Assert GeoNames attribution and data sources link
         shell: bash
         run: |
           grep -q 'GeoNames' dist/index.html
           grep -q 'CC BY 4.0' dist/index.html
+          grep -q '/datenquellen.php' dist/index.html
+          grep -q 'Datenquellen und Lizenzen' legal/datenquellen.php
 
       - name: Validate generated search data
         run: |
@@ -113,3 +125,4 @@ jobs:
           php -l legal/impressum.php
           php -l legal/datenschutz.php
           php -l legal/rechtliche-hinweise.php
+          php -l legal/datenquellen.php
