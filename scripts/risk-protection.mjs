@@ -6,7 +6,9 @@ const root = process.cwd();
 const previewMode = process.env.PREVIEW_MODE === '1';
 const distIndex = path.join(root, 'dist', 'index.html');
 const rightsPath = path.join(root, 'legal', 'asset-rights.json');
+const mediaRightsPath = path.join(root, 'legal', 'media-rights-register.json');
 const buildSourcePath = path.join(root, 'scripts', 'build.mjs');
+const contactGovernancePath = path.join(root, 'scripts', 'lib', 'contact-governance.mjs');
 const legalFiles = [
   path.join(root, 'legal', 'impressum.php'),
   path.join(root, 'legal', 'datenschutz.php'),
@@ -26,7 +28,9 @@ if (!previewMode && process.env.DRV_DATA_USAGE_APPROVED !== '1') {
 }
 
 const rights = JSON.parse(await readFile(rightsPath, 'utf8'));
+const mediaRights = JSON.parse(await readFile(mediaRightsPath, 'utf8'));
 const buildSource = await readFile(buildSourcePath, 'utf8');
+const contactGovernanceSource = await readFile(contactGovernancePath, 'utf8');
 const html = await readFile(distIndex, 'utf8');
 const $ = cheerio.load(html, { decodeEntities: false });
 
@@ -59,7 +63,7 @@ if (externalRuntimeAssets.length) {
   fail(`External runtime assets are forbidden: ${externalRuntimeAssets.join(', ')}`);
 }
 
-// Approved third-party logos must exist locally; pending assets may never silently fall back remotely.
+// Approved third-party logos must exist locally and have documented rights.
 for (const [key, entry] of Object.entries(rights.assets || {})) {
   if (!entry?.path) continue;
   const images = $(`img[src="${entry.path}"]`);
@@ -69,8 +73,26 @@ for (const [key, entry] of Object.entries(rights.assets || {})) {
   }
 }
 
+// Other visual media: production must not render assets still marked review-required.
+if (!previewMode) {
+  for (const [assetPath, entry] of Object.entries(mediaRights.assets || {})) {
+    const rendered = $(`img[src="${assetPath}"]`).length > 0 || $(`[poster="${assetPath}"]`).length > 0;
+    if (rendered && entry?.status === 'review-required') {
+      fail(`Production blocked: rendered media asset still requires rights review: ${assetPath}`);
+    }
+  }
+}
+
 if (/https?:\/\/(?:d2cx26qpfwuhvu\.cloudfront\.net|www\.rudern\.de\/sites\/default\/files|cdn\.podcastcms\.de)\//i.test(html)) {
   fail('Generated HTML contains a forbidden third-party logo host.');
+}
+
+// Personal contacts must never become automatically eligible.
+if (!contactGovernanceSource.includes("governanceState === 'auto-approved-functional'")) {
+  fail('Contact governance no longer limits automatic approval to functional contacts.');
+}
+if (/autoApproved\s*:\s*true[\s\S]{0,180}personal/i.test(contactGovernanceSource)) {
+  fail('Contact governance appears to auto-approve a personal contact path.');
 }
 
 const legalText = (await Promise.all(legalFiles.map((file) => readFile(file, 'utf8')))).join('\n');
