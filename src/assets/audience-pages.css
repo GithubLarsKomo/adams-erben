@@ -29,7 +29,7 @@
   grid-template-columns: minmax(0, .9fr) minmax(360px, 1.1fr);
   gap: 2.5rem;
   align-items: center;
-  margin-block: 2rem 4rem;
+  margin-block: 2rem 2.25rem;
   padding: clamp(1.5rem, 3vw, 3rem);
   background: var(--navy, #0b2336);
   color: #fff;
@@ -89,6 +89,16 @@
   border-color: rgba(255, 255, 255, .45);
 }
 
+/* The complete directory remains available on the cinema page, but only after intent is explicit. */
+.audience-page-landing .landing-directory {
+  margin-top: .25rem;
+  margin-bottom: 4rem;
+}
+
+.audience-page-landing .landing-directory[hidden] {
+  display: none !important;
+}
+
 .depth-teaser {
   margin-block: 4rem;
   padding: clamp(1.25rem, 2.5vw, 2.25rem);
@@ -130,8 +140,13 @@
 }
 
 .depth-teaser-cta,
-.landing-more-link {
+.landing-more-link,
+.landing-final-cta {
   margin-top: 1.25rem;
+}
+
+.landing-final-cta {
+  text-align: center;
 }
 
 .professional-link {
@@ -160,6 +175,11 @@
 }
 
 @media (max-width: 920px) {
+  /* The compact AE mark is 52px high plus 8px vertical header padding on each side. */
+  .audience-page {
+    --story-header-height: 68px;
+  }
+
   .audience-intro-rowing,
   .quick-finder,
   .professional-link {
@@ -174,8 +194,24 @@
     width: 100%;
   }
 
+  .quick-finder-secondary {
+    align-items: stretch;
+  }
+
   .depth-teaser-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Preserve the persistent action without crowding the AE mark and menu on very narrow screens. */
+  .audience-page-landing .header-find-club[data-compact-label] {
+    font-size: 0;
+  }
+
+  .audience-page-landing .header-find-club[data-compact-label]::after {
+    content: attr(data-compact-label);
+    font-size: .78rem;
   }
 }
 
