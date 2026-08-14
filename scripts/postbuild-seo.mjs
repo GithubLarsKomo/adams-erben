@@ -1,4 +1,4 @@
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
 
@@ -28,6 +28,26 @@ const pages = [
     ogTitle: 'Karl Adam: Rudertrainer, Deutschlandachter & Ideen',
     ogDescription: 'Karl Adam, Ratzeburg, der Deutschlandachter und die Ideen, die das Rudern veränderten – mit kritischer historischer Einordnung.',
     ogImage: '/assets/images/hero-skiff.webp',
+    index: true
+  },
+  {
+    path: '/adams-acht/',
+    file: 'adams-acht/index.html',
+    title: 'Adams Acht: Historischer Hintergrund & Karl Adam | Adams Erben',
+    description: 'Historischer Hintergrund zu Adams Acht: Karl Adam, Ratzeburg, Deutschlandachter 1960 und die belegten Ereignisse hinter dem Kinofilm – unabhängig eingeordnet.',
+    ogTitle: 'Adams Acht: Historischer Hintergrund zu Karl Adam und dem Deutschlandachter',
+    ogDescription: 'Was hinter dem Kinofilm historisch belegt ist – und wo Spielfilm und Geschichte auseinandergehalten werden müssen.',
+    ogImage: '/assets/images/hero-skiff.webp',
+    index: true
+  },
+  {
+    path: '/deutschlandachter-1960/',
+    file: 'deutschlandachter-1960/index.html',
+    title: 'Deutschlandachter 1960: Olympiasieg in Rom | Adams Erben',
+    description: 'Der Deutschlandachter 1960: Mannschaft, Karl Adams Rolle, Vorbereitung, Olympiasieg in Rom und die Bedeutung für die deutsche Achtertradition.',
+    ogTitle: 'Deutschlandachter 1960: Olympiasieg in Rom',
+    ogDescription: 'Mannschaft, Trainer, Finale und die Entstehung einer deutschen Achtertradition.',
+    ogImage: '/assets/images/deutschlandachter.webp',
     index: true
   }
 ];
@@ -79,14 +99,21 @@ function addHomepageStructuredData($) {
 }
 
 function addHomepageLinks($) {
-  const nav = $('.site-header nav[aria-label="Hauptnavigation"]').first();
-  if (nav.length && !nav.find('a[href="/karl-adam/"]').length) {
-    nav.prepend('<a href="/karl-adam/">Karl Adam</a>');
-  }
-
   const heroActions = $('.hero .hero-actions').first();
   if (heroActions.length && !heroActions.find('a[href="/karl-adam/"]').length) {
     heroActions.append('<a class="button button-secondary" href="/karl-adam/">Karl Adam entdecken</a>');
+  }
+
+  const filmSection = $('#film').first();
+  if (filmSection.length && !filmSection.find('.seo-film-detail-links').length) {
+    const links = `
+      <div class="film-links seo-film-detail-links">
+        <a class="button button-secondary" href="/adams-acht/">Historischer Hintergrund zu Adams Acht</a>
+        <a class="button button-secondary" href="/deutschlandachter-1960/">Deutschlandachter 1960</a>
+      </div>`;
+    const existingLinks = filmSection.find('.film-links').last();
+    if (existingLinks.length) existingLinks.after(links);
+    else filmSection.append(links);
   }
 }
 
