@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://adams-erben.de/sitemap.xml
