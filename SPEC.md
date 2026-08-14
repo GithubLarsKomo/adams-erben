@@ -1,508 +1,588 @@
-# SPEC — Karl-Adam-/Ratzeburg-Kooperationsbranch
+# SPEC — Risk Protection
 
-Status: Konzept / lokal zu bewerten  
-Branch: `feat/karl-adam-local-cooperation`  
-Basis: `feat/mvp-wayfinder`  
-Stand: 2026-08-10
+Status: Umsetzungsspezifikation  
+Branch: `risk-protection`  
+Basis: `feat/karl-adam-local-cooperation`  
+Stand: 2026-08-14
 
 ## 1. Ziel
 
-`adams-erben.de` bleibt primär eine unabhängige, nicht-kommerzielle Kontaktbrücke vom Kinofilm **„Adams Acht“** in den realen Rudersport. Der lokale Ratzeburg-/Karl-Adam-Kontext soll die Seite inhaltlich vertiefen, ohne daraus eine zweite Karl-Adam-Biografie oder Konkurrenz zu `karladam.de` zu machen.
+Dieser Branch reduziert die rechtlichen und datenschutzbezogenen Risiken von `adams-erben.de` vor einer öffentlichen Produktivsetzung.
 
-Leitidee:
+Die Maßnahmen betreffen insbesondere:
 
-> **Der Film endet im Kino. Adams Erbe lebt im Bootshaus weiter.**
+- Anbieterkennzeichnung nach DDG und journalistisch-redaktionelle Verantwortlichkeit nach MStV;
+- Datenschutz nach DSGVO und Endgerätezugriffe nach TDDDG;
+- automatisierte Nutzung von Vereins- und Verbandsdaten;
+- Urheber-, Datenbank-, Marken- und Kennzeichenrechte;
+- Nutzung externer Logos, Bilder und Medien;
+- GeoNames-Lizenzierung;
+- Kontaktformular, SMTP-Versand und Missbrauchsschutz;
+- technische Verifikation, dass Rechtstexte und reales Laufzeitverhalten übereinstimmen.
 
-Die historische Vertiefung verweist gezielt auf `karladam.de`, die Karl-Adam-Biografie, Ausstellung, DRV-Quellen und weitere belastbare Quellen. `adams-erben.de` beantwortet vor allem die Anschlussfrage: **Was lebt davon heute weiter — und wie komme ich selbst ins Boot?**
+Leitprinzip:
+
+> **Keine rechtliche Aussage auf der Website darf weiter gehen als das technisch und organisatorisch tatsächlich umgesetzte Verhalten.**
 
 ## 2. Nicht-Ziele
 
-- keine vollständige Karl-Adam-Biografie duplizieren;
-- keine Konkurrenzseite zu `karladam.de` oder `dergoldachter.de`;
-- keine unlizenzierte Übernahme historischer Fotos, Filmstills, Logos oder Buchinhalte;
-- keine Verharmlosung oder Heroisierung der NS-Vergangenheit;
-- keine Monetarisierung über Buch-/Partnerlinks;
-- keine Verschlechterung der bestehenden Vereinssuche oder des Kontakt-Routings;
-- kein Deploy dieses Branches in Preview/Production vor lokaler Freigabe.
-
-## 3. Informationsarchitektur
-
-Empfohlene Reihenfolge auf der Startseite:
-
-1. Hero / Leitmotiv
-2. Ratzeburger Ruderclub als besonderer Ort
-3. Kern-CTA: deutschlandweit Verein finden
-4. Stimmen: „Adams Erben heute“
-5. Adams Labor: prä-Adam → Adam → heute
-6. Ratzeburg erleben: Ruderführung
-7. Karl Adam vertiefen: Biografie, Ausstellung, `karladam.de`, kritische historische Einordnung
-8. Rudersport ermöglichen: Karl-Adam-Stiftung + weitere Förderwege
-9. Vereinssuche / Kontaktvermittlung erneut als Abschluss-CTA
-10. Unabhängigkeit / Datenschutz / Quellen
-
-Die Suche muss sowohl früh auf der Seite als auch nach den redaktionellen Inhalten erreichbar bleiben.
+- keine umfassende anwaltliche Rechtsberatung ersetzen;
+- keine Einführung von Tracking, Analytics oder Marketing-Cookies;
+- keine Einbettung externer Video-, Karten- oder Social-Media-Widgets;
+- keine Erweiterung der Vereinsdaten über den für die Vereinssuche erforderlichen Umfang hinaus;
+- keine Veröffentlichung ungeklärter Fotos, Logos oder historischer Medien;
+- keine Änderung des Grundsatzes „direkter Kontakt zur ausgewählten Organisation, kein Verbands-Fallback“;
+- keine unnötige Verschlechterung der UX durch Consent-Banner, solange technisch keine einwilligungspflichtigen Endgerätezugriffe stattfinden.
 
 ---
 
-## 4. Hero
+## 3. Priorisierung
 
-### 4.1 Headline
+### P0 — vor jeder Produktivsetzung zwingend
 
-**Der Film endet im Kino.  
-Adams Erbe lebt im Bootshaus weiter.**
+1. Remote-Fallbacks für Logos vollständig entfernen.
+2. Impressum in Production nur bei vollständiger Betreiberkonfiguration auslieferbar machen.
+3. Widerspruch zum Kontakt-Routing in `rechtliche-hinweise.php` beseitigen.
+4. Datenschutzerklärung an tatsächliche Rate-Limit-, Hosting-, SMTP- und Empfänger-Verarbeitung anpassen.
+5. Nutzung fremder Logos nur bei dokumentierter Rechtebasis erlauben; sonst Textdarstellung.
+6. DRV-Datensynchronisation rechtlich absichern oder bis zur Klärung technisch begrenzen.
+7. Rechtstexte und Produktions-Build automatisiert auf Widersprüche prüfen.
 
-### 4.2 Lead
+### P1 — vor öffentlicher Bewerbung
 
-Kurzer Übergang von Film und Geschichte zum lebendigen Rudersport. Keine Aussage, die eine offizielle Partnerschaft mit Film, DRV, RRC, Stadt, Karl-Adam-Stiftung oder `karladam.de` suggeriert, solange diese nicht ausdrücklich vereinbart ist.
+1. GeoNames-Attribution sichtbar auf der Website ergänzen.
+2. Asset-Rechtekataster für Fotos, Logos und Medien einführen.
+3. personenbezogene Vereinskontakte auf Organisations-/Funktionsadressen beschränken bzw. manuell freigeben.
+4. konkrete Speicherfristen für Server-/Proxy-/SMTP-Logs dokumentieren.
+5. Datenschutzrechte und Einwilligungswiderruf präzisieren.
+6. technische Datenschutzprüfung des Production-Builds durchführen.
 
-### 4.3 Primärer CTA
+### P2 — Governance / laufender Betrieb
 
-`Ruderverein finden`
-
-Sekundäre Links können zum Film und zur historischen Vertiefung führen.
-
----
-
-## 5. Ratzeburger Ruderclub e.V.
-
-Der RRC bleibt visuell hervorgehobener Verein und lokaler Ankerpunkt der Geschichte.
-
-### 5.1 Inhalte
-
-- Name: **Ratzeburger Ruderclub e.V.**
-- kurze Einordnung als zentraler historischer Ort des Karl-Adam-/Deutschlandachter-Kontexts;
-- heutiges Foto des RRC/Bootshauses;
-- optional historisches Foto aus der Karl-Adam-Zeit, vorzugsweise von/über Dirk Andresen bereitgestellt;
-- Clublogo: vorzugsweise Clubfahne oder Vintage-Logo mit Stadtwappen;
-- Bild-/Logo-Credits sichtbar oder im Mediennachweis;
-- Alt-Texte für alle inhaltlichen Bilder.
-
-### 5.2 Aktionen
-
-Drei gleichwertig verständliche Aktionen:
-
-1. `Kontakt aufnehmen` — bestehender Adams-Erben-Kontaktweg;
-2. `RRC-Website` — `https://www.rrc-online.de/`;
-3. `DRV-Profil` — offizielles DRV-Profil.
-
-### 5.3 Rechte-Gate
-
-Historische Fotos und Logo erst nach dokumentierter Nutzungsfreigabe integrieren. Bis dahin neutrale Platzhalter/ungebrandete Darstellung.
+1. regelmäßige Rechte- und Datenschutzprüfung bei neuen Assets oder Diensten;
+2. dokumentierter Prozess für Berichtigung, Entfernung und Suppression von Vereinskontaktdaten;
+3. regelmäßige Überprüfung von externen Links und Quellen;
+4. jährliche oder anlassbezogene Aktualisierung der Rechtstexte.
 
 ---
 
-## 6. Stimmen — „Adams Erben heute“
+## 4. Anbieterkennzeichnung / Impressum
 
-Ziel: Karl Adams Wirkung nicht abstrakt erklären, sondern durch sechs Menschen verschiedener Generationen in die Gegenwart übersetzen. Die Personen sollen idealerweise ca. 16 bis 84 Jahre abdecken und unterschiedliche Perspektiven auf Leistungs-, Breiten-, Jugend- und Mastersrudern zeigen.
+### 4.1 Anforderungen
 
-### 6.1 Darstellungsform
+`legal/impressum.php` MUSS in Production mindestens folgende Angaben vollständig enthalten:
 
-- sechs Portrait-/Zitatkarten oder Sprechblasen;
-- jeweils Name, Alter, optional Verein/Rolle nach Zustimmung;
-- ein starkes Originalzitat pro Person;
-- auf Mobilgeräten gut lesbar, kein Auto-Karussell;
-- bis echte Zitate vorliegen: klar als **Platzhalter** gekennzeichnete Dummy-Texte, niemals fingierte Aussagen realer Personen.
+- Name/Firma des Betreibers;
+- ladungsfähige Anschrift;
+- E-Mail-Adresse;
+- bei juristischer Person: Rechtsform und vertretungsberechtigte Person;
+- soweit einschlägig: Register und Registernummer;
+- soweit einschlägig: Umsatzsteuer-ID/Wirtschafts-ID;
+- Verantwortlicher für journalistisch-redaktionelle Inhalte nach § 18 Abs. 2 MStV mit Name und Anschrift.
 
-### 6.2 Sechs geschärfte Interviewfragen
+Die Überschrift soll lauten:
 
-Die Fragen sollen kurze, persönliche und zitierfähige Antworten provozieren und nicht wie ein Fragebogen über Trainingslehre wirken.
+`Angaben gemäß § 5 DDG`
 
-1. **Welche Idee von Karl Adam ist für dich heute noch überraschend modern — und warum?**
-2. **Acht Menschen, ein Boot: Was muss passieren, damit aus starken Einzelnen wirklich eine Mannschaft wird?**
-3. **Was würdest du jemandem sagen, der nach „Adams Acht“ zum ersten Mal überlegt, Rudern auszuprobieren?**
-4. **Was hat dich das Rudern über Vertrauen, Verantwortung oder Zusammenarbeit außerhalb des Bootes gelehrt?**
-5. **Was bringt dich an einem Tag aufs Wasser, an dem Motivation allein nicht reicht?**
-6. **Wenn du eine Sache aus dem Rudern an die nächste Generation weitergeben könntest: Welche wäre es?**
+Für redaktionelle Inhalte:
 
-Redaktionell gilt: Nicht jede Person muss dieselbe Frage beantworten. Die sechs veröffentlichten Zitate sollen zusammen ein Mosaik ergeben, keine sechs Varianten derselben Aussage.
+`Verantwortlich für journalistisch-redaktionelle Inhalte gemäß § 18 Abs. 2 MStV`
 
-### 6.3 Platzhalterstruktur
+### 4.2 Deployment-Gate
 
-Bis Interviews vorliegen:
+In Production DARF der Build bzw. Containerstart nicht erfolgreich sein, wenn mindestens eine dieser Variablen fehlt:
 
-- `Stimme 1 — 16 Jahre — Jugendrudern — Platzhalter`
-- `Stimme 2 — ca. 20–30 Jahre — Leistungs-/Hochschulrudern — Platzhalter`
-- `Stimme 3 — ca. 30–45 Jahre — Vereins-/Mannschaftsperspektive — Platzhalter`
-- `Stimme 4 — ca. 45–60 Jahre — Trainer-/Breitensportperspektive — Platzhalter`
-- `Stimme 5 — ca. 60–75 Jahre — langjährige Vereinserfahrung — Platzhalter`
-- `Stimme 6 — ca. 84 Jahre — Zeit-/Generationenperspektive — Platzhalter`
+- `SITE_OPERATOR_NAME`
+- `SITE_OPERATOR_ADDRESS`
+- `SITE_OPERATOR_EMAIL`
+- `SITE_RESPONSIBLE_NAME`
 
----
+Ein bloßer Warnhinweis in der ausgelieferten Seite reicht nicht aus.
 
-## 7. Adams Labor — Innovation sichtbar machen
+Preview darf weiterhin Platzhalter verwenden, MUSS aber `noindex,nofollow` setzen.
 
-### 7.1 Ziel
+### 4.3 Unabhängigkeitshinweis
 
-Keine bloße Liste von „Erfindungen“, sondern eine visuelle Entwicklung:
+Der vorhandene Hinweis auf die Unabhängigkeit von Film, Produktion, Verleih, DRV, World Rowing, Vereinen und sonstigen Organisationen soll erhalten und sprachlich konsistent verwendet werden.
 
-**Vor Adam → Adams Intervention → Heute**
-
-Jede Station muss unterscheiden zwischen:
-
-- historisch belegtem Zustand vor/zu Adams Zeit;
-- Adams eigenem Beitrag bzw. seiner Rolle bei Verbreitung/Weiterentwicklung;
-- heutiger Trainings-/Technikpraxis.
-
-Keine pauschalen „Adam erfand X“-Aussagen ohne belastbaren Beleg.
-
-### 7.2 Kandidaten für Module
-
-1. **Trainingssteuerung / Intervallprinzipien**  
-   Vor Adam: stärker erfahrungs-/dauerorientierte Trainingspraxis.  
-   Adam: systematische Belastungs-/Erholungssteuerung, quantitative Betrachtung.  
-   Heute: periodisierte Trainingsplanung, Leistungsdiagnostik, individuelle Belastungssteuerung.
-
-2. **Krafttraining**  
-   Vor Adam: im Rudern keineswegs selbstverständlich bzw. teils skeptisch gesehen.  
-   Adam: gezieltere Einbindung von Kraftarbeit.  
-   Heute: strukturierter Bestandteil von Leistungs- und Präventionstraining.
-
-3. **Riemen, Blattform und Hebel**  
-   Vor Adam: konventionelle Blatt-/Hebelkonzepte.  
-   Adam: experimenteller Umgang mit Geometrie, Hebeln und „Schaufel“-Blättern.  
-   Heute: moderne Big-Blade-/Materialkonzepte und biomechanische Optimierung.
-
-4. **Rhythmus, Schlagzahl und Messbarkeit**  
-   Vor Adam: stärker trainer-/erfahrungsbasierte Beurteilung.  
-   Adam: Mathematik/Physik, Stoppuhr, systematische Analyse.  
-   Heute: Telemetrie, Ergometerdaten, GPS, Sensorik, Video- und Datenanalyse.
-
-5. **Der mündige Athlet / Team als System**  
-   Adam: Athleten sollten verstehen, diskutieren und Verantwortung übernehmen.  
-   Heute: Athletenzentrierung, Feedback, gemeinsame Renn-/Trainingsmodelle.
-
-### 7.3 UX
-
-Desktop: drei Spalten oder horizontale Timeline.  
-Mobile: vertikale Sequenz je Innovation.  
-Jedes Modul erhält `Quelle(n)`/`Mehr erfahren` statt langer Fußnoten im Fließtext.
+Er darf keine behauptete Partnerschaft, Empfehlung oder Freigabe suggerieren.
 
 ---
 
-## 8. Ratzeburg erleben — „Ratzeburg, die Ruderstadt“
+## 5. Datenschutz / TDDDG
 
-Ein eigener Abschnitt verlinkt die bereits bestehende offizielle Themenführung der Stadt statt eine konkurrierende Führung nachzubauen.
+### 5.1 Grundsatz
 
-### 8.1 Inhalt
+Die Website soll weiterhin ohne nicht notwendige Cookies, Analytics, Werbetracker, externe Fonts, externe Karten oder eingebettete Videoplayer funktionieren.
 
-- Titel: **Auf Adams Spuren durch Ratzeburg**
-- Beschreibung der rund zweistündigen Themenführung;
-- Stationen beispielhaft: Karl-Adam-Gedenkstein/RRC, ehemalige Lauenburgische Gelehrtenschule, frühere Turnhalle, historisches Bootshaus, Ruderakademie;
-- Link zur offiziellen Stadt-/Tourismus-Seite;
-- Kontakt der Tourist-Information;
-- nach Rücksprache: **Guido Klossek** als Stadtführer/Ansprechpartner nennen und ggf. Portrait/Zitat integrieren.
+Solange keine Informationen auf dem Endgerät gespeichert oder ausgelesen werden, die eine Einwilligung nach § 25 TDDDG erfordern, soll kein Consent-Banner eingeführt werden.
 
-### 8.2 Verifizierte Basisquelle
+### 5.2 Technische Wahrheitspflicht
 
-Stadt Ratzeburg, „Ratzeburg, die Ruderstadt“:  
-`https://www.ratzeburg.de/index.php?FID=2559.13514.1&ModID=7&object=tx%2C2559.534`
+Die Datenschutzerklärung MUSS dem realen Verhalten des Production-Builds entsprechen.
 
-Aktuell veröffentlichter Kontakt der Tourist-Information:  
-`tourist-info@ratzeburg.de`, Tel. `04541 80 00 886`.
+Insbesondere darf die Aussage „externe Anbieter werden erst nach Anklicken eines Links aufgerufen“ nur bestehen bleiben, wenn beim normalen Seitenabruf kein Browserrequest an Drittanbieter ausgelöst wird.
 
-Dynamische Termine/Preise nicht hart codieren, wenn nicht regelmäßig gepflegt. Besser: „Aktuelle Termine und Preise bei der Stadt Ratzeburg“.
+### 5.3 Remote-Assets
 
----
+Alle Laufzeit-Fallbacks auf Drittserver sind zu entfernen.
 
-## 9. Karl Adam vertiefen — Buch, Ausstellung, karladam.de
+Insbesondere unzulässig im Production-Build:
 
-### 9.1 Prinzip
+- World-Rowing-Logo von CloudFront nachladen;
+- DRV-Logo von `rudern.de` nachladen;
+- Schubschlag-Logo von PodcastCMS nachladen;
+- beliebige andere `onerror`-, CSS-, JS- oder HTML-Fallbacks auf externe Asset-Hosts.
 
-`adams-erben.de` liefert einen kompakten Kontext und leitet für die vertiefte Biografie bewusst weiter.
+Regel:
 
-### 9.2 Biografie
+- lokales freigegebenes Asset vorhanden → anzeigen;
+- Asset fehlt → neutrale Textdarstellung/Placeholder;
+- niemals automatisches Hotlinking.
 
-Direkter Link auf die Karl-Adam-Biografie von Dirk Andresen/Timo Reinke an einer inhaltlich passenden Stelle, vorzugsweise nach „Adams Labor“ oder der historischen Einordnung.
+### 5.4 Externe Medien
 
-Hinweis unmittelbar am Link:
+YouTube, Sportdeutschland.tv, World Rowing, Podcastseiten und andere Medienplattformen sollen ausschließlich als normale externe Links geöffnet werden.
 
-> **Hinweis: Dies ist keine bezahlte Werbung. Adams Erben erhält für den Link oder einen Buchkauf keine Vergütung.**
-
-Linkziel:  
-`https://www.dergoldachter.de/buecher/karl-adam`
-
-### 9.3 Ausstellung
-
-Link auf die Karl-Adam-Ausstellung / Veranstaltungsseite von Der Goldachter. Später ggf. dauerhafter Archiv-/Ausstellungslink, falls vorhanden.
-
-### 9.4 karladam.de
-
-Sobald `karladam.de` öffentlich und inhaltlich belastbar ist:
-
-- Linklabel z. B. `Karl Adam — Leben, Buch und Filme`;
-- keine Spiegelung der dortigen Inhalte;
-- optional Gegenseitigkeitslink von `karladam.de` bei „Hier lernen Sie rudern“ zu `adams-erben.de`.
+Kein eingebetteter Player ohne separate erneute Datenschutzprüfung.
 
 ---
 
-## 10. Historische Verantwortung / NS-Vergangenheit
+## 6. Hosting und Serverprotokolle
 
-### 10.1 Ziel
+Die Datenschutzerklärung MUSS nennen:
 
-Karl Adams sporthistorische Bedeutung und seine NS-Biografie gehören gemeinsam zur Darstellung. Der Abschnitt darf weder als Anklagekasten noch als Fußnote erscheinen, sondern als Einladung zu einer quellenbasierten Auseinandersetzung mit deutscher Nachkriegs- und Sportgeschichte.
+- Hostinganbieter;
+- verarbeitete technische Daten (insbesondere IP-Adresse, Zeitpunkt, Ressource, Browser-/Geräteinformationen, Statuscode);
+- Rechtsgrundlage Art. 6 Abs. 1 lit. f DSGVO;
+- Zweck: sicherer und zuverlässiger Betrieb;
+- tatsächliche Speicherfrist bzw. nachvollziehbare Kriterien für die Speicherfrist.
 
-Redaktionelle Leitfrage:
+Vor Release MUSS die reale Aufbewahrungszeit von mindestens folgenden Komponenten geprüft und dokumentiert werden:
 
-> **Wie ging eine erfolgreiche Nachkriegsgeneration mit eigener Verstrickung in die NS-Zeit um — und was können wir aus der späteren Aufarbeitung lernen?**
+- Reverse Proxy;
+- Webserver;
+- Container-/Plattformlogs;
+- Hostingprovider;
+- ggf. SMTP-Logs.
 
-### 10.2 Gesicherter Mindestkontext
-
-Karl Adam war Mitglied von NSDAP und SA und lehrte an einer Nationalpolitischen Erziehungsanstalt. Der DRV hat seine eigene Verbandsvergangenheit aufgearbeitet, weist aber selbst darauf hin, dass die bisherige Wedemeyer-Studie primär Funktionäre der Jahre 1933–1945 untersucht und Personen, die wie Adam erst nach 1945 Verbandsbedeutung erlangten, nicht systematisch erfasste.
-
-### 10.3 Primär-/Referenzlinks
-
-- DRV 2025: **„Karl-Adam-Preis wird nicht mehr vergeben“**  
-  `https://www.rudern.de/news/karl-adam-preis-wird-nicht-mehr-vergeben`
-- DRV 2025: **„Karl Adam bleibt Ehrenpreisträger des DRV“**  
-  `https://www.rudern.de/news/karl-adam-bleibt-ehrenpreistraeger-des-drv`
-- DRV / sporthistorische Publikation (Hutmacher):  
-  `https://www.rudern.de/sites/default/files/downloads/news/Veroeffentlichung_Dissertation_Hutmacher.pdf`
-- ergänzende kontroverse journalistische Einordnung: Zeit-Artikel zur NS-Vergangenheit von Sportlern / Karl Adam; zusätzlich Rudersport-Berichterstattung zur Einstellung des Karl-Adam-Preises.
-
-### 10.4 Redaktionsregel
-
-Der Abschnitt soll unterschiedliche Ebenen sauber trennen:
-
-1. nachweisbare biografische Fakten;
-2. Adams eigene spätere Darstellung bzw. Umgang damit;
-3. Rezeption durch Zeitzeugen und Nachkriegssport;
-4. heutige Bewertung/DRV-Entscheidungen;
-5. offene Forschungsfragen.
-
-Keine psychologischen Motive als Tatsachen darstellen. Für Formulierungen wie „repräsentativ für seine Generation“ nur belastbare historische Literatur oder bewusst als Fragestellung formulieren.
+Keine erfundene Standardfrist verwenden.
 
 ---
 
-## 11. Rudersport ermöglichen — Karl-Adam-Stiftung und weitere Förderung
+## 7. Kontaktformular
 
-### 11.1 Kernbotschaft
+### 7.1 Routing
 
-Rudern lebt nicht nur von großen Namen, sondern von Booten, Stegen, Trainern, Jugendarbeit, Ehrenamt und Menschen, die dies finanzieren. Der Abschnitt soll deshalb von der Karl-Adam-Stiftung in die breitere Förderlandschaft überleiten.
+Grundsatz bleibt unverändert:
 
-### 11.2 Karl-Adam-Stiftung
+> Eine Anfrage wird ausschließlich an den direkten, freigegebenen Kontakt der vom Nutzer ausdrücklich ausgewählten Organisation übermittelt.
 
-Darstellung:
+Es gibt KEIN automatisches Fallback an Landesruderverband oder DRV.
 
-- gemeinnützige Stiftung zur Förderung des Rudersports in Ratzeburg, insbesondere des RRC;
-- konkrete historische Förderbeispiele dürfen nur mit Quelle genannt werden;
-- möglicher CTA: `Karl-Adam-Stiftung kennenlernen / unterstützen`.
+Wenn kein freigegebener direkter Kontakt vorhanden ist:
 
-Quellenbasis:
+- kein Kontaktformular anbieten;
+- stattdessen Vereinswebsite bzw. verfügbare Orts-/Adressinformation anzeigen.
 
-- RRC: `https://www.rrc-online.de/2004/allgemein/karl-adam-stiftung/`
-- Beispiel gemeinsame Finanzierung Trainerboot „ROM 60“ durch Karl-Adam-Stiftung, Landesportverband und Spenden:  
-  `https://www.rudern.de/news/2016/neues-trainerboot-karl-adam-in-ratzeburg`
+### 7.2 Einwilligung
 
-### 11.3 Vorsitz / Zitat — VERIFIKATIONS-GATE
+Die Datenschutzerklärung MUSS ergänzen:
 
-Der Nutzer nennt **Prof. em. Dr. Frank T. König** als aktuellen Vorsitzenden und wünscht ein Zitat von ihm. Öffentlich auffindbare ältere Quellen nennen dagegen Holger Knaack als Vorsitzenden und Frank T. König als Vorstandsmitglied. Deshalb vor Veröffentlichung zwingend aktuell verifizieren.
+- Rechtsgrundlage Art. 6 Abs. 1 lit. a DSGVO;
+- Hinweis auf jederzeitigen Widerruf mit Wirkung für die Zukunft;
+- Rechtmäßigkeit der bisherigen Verarbeitung bleibt vom Widerruf unberührt;
+- nach Übermittlung verarbeitet die ausgewählte Organisation die Nachricht grundsätzlich in eigener Verantwortung.
 
-Bis zur Bestätigung:
+### 7.3 SMTP
 
-- kein Amtstitel bei Frank König publizieren;
-- Zitatplatzhalter: `[Zitat Stiftung — nach persönlicher Freigabe]`;
-- idealerweise schriftliche Freigabe von Wortlaut, Funktion und Namensnennung dokumentieren.
+Die Datenschutzerklärung MUSS den eingesetzten SMTP-Dienstleister und dessen Rolle benennen.
 
-Geeignete Frage für das gewünschte Zitat:
+Dokumentiert werden müssen:
 
-> **Was ermöglicht Förderung im Rudersport, das Mitgliedsbeiträge und Ehrenamt allein nicht leisten können — und warum lohnt es sich gerade heute, darin zu investieren?**
+- Anbieter;
+- Sitz/Adresse;
+- ggf. Auftragsverarbeitungsvertrag;
+- ggf. Drittlandtransfer und Transfermechanismus;
+- für die Zustellung verarbeitete Daten;
+- Speicher-/Logfristen soweit relevant.
 
-Alternative kürzer:
+### 7.4 Rate Limiting / Missbrauchsschutz
 
-> **Was kann eine Stiftung bewirken, damit aus Interesse am Rudern echte Teilhabe wird?**
+Der bestehende IP-basierte Schutz ist datenschutzrechtlich transparent zu beschreiben.
 
-### 11.4 Weitere Förderwege
+Die Datenschutzerklärung soll sinngemäß erklären:
 
-Nicht als vollständige Förderdatenbank starten. Stattdessen kompakte Orientierung mit externen Links und Hinweis, dass Programme/Voraussetzungen sich ändern.
+- IP-Adresse wird nicht im Klartext in der Rate-Limit-Datei gespeichert;
+- es wird unter Verwendung eines serverseitigen Geheimnisses ein Hashwert gebildet;
+- gespeichert werden Hashwert und Zeitpunkte vorheriger Anfragen;
+- Zweck: Schutz vor Spam und Missbrauch;
+- Rechtsgrundlage Art. 6 Abs. 1 lit. f DSGVO;
+- Speicherdauer derzeit maximal 24 Stunden, sofern Code und Betrieb dies tatsächlich so umsetzen.
 
-Kategorien:
+### 7.5 Eigene Nachrichtenspeicherung
 
-- Landessportverbände;
-- Kreissportverbände;
-- Landes-/kommunale Sportförderung;
-- Sportstiftungen;
-- Vereins-/Projektförderung;
-- lokale Bürger-/Regionalstiftungen;
-- Spenden und zweckgebundene Förderpartnerschaften.
+Wenn die Anwendung keine eigene Nachrichten-Datenbank führt, darf dies weiterhin genannt werden.
 
-Beispiel Schleswig-Holstein:
+Es MUSS aber klargestellt werden, dass:
 
-- LSV SH — Förderung & Zuschüsse: `https://www.lsv-sh.de/foerderung-zuschuesse/`
-- Stiftung zur Förderung des Sports in Schleswig-Holstein: `https://www.lsv-sh.de/foerderung-zuschuesse/stiftung`
-- Projektmittelförderung Land SH: `https://www.lsv-sh.de/foerderung-zuschuesse/projektmittelfoerderung/projektmittelfoerderung-land-sh`
-
-UX-Titel beispielsweise: **„Rudern braucht Rückenwind“**.
-
----
-
-## 12. Kontaktvermittlung bleibt Kernfunktion
-
-Alle redaktionellen Erweiterungen sind dem funktionalen Kern nachgeordnet.
-
-### 12.1 Muss unverändert funktionieren
-
-- statische Suche über Vereine, weitere DRV-Mitglieder, LRV und DRV;
-- Suche nach Name, Ort, PLZ, Bundesland;
-- Kontakt-Dialog aus RRC-Karte und allen geeigneten Vereinseinträgen;
-- serverseitig bestimmte Zieladresse;
-- Routing: Verein → LRV → DRV;
-- keine Empfänger-E-Mail im öffentlichen Datensatz;
-- Consent-/Datenschutzlogik;
-- Preview-/Production-Modus sauber getrennt;
-- Health-/Produktions-Gates bleiben bestehen.
-
-### 12.2 Branch-spezifische Anforderung
-
-Dieser Branch soll **lokal mit voll funktionsfähigem Kontaktformular** testbar sein. Dafür wird neben dem bestehenden rein statischen `php -S`-Pfad ein dokumentierter lokaler Full-Stack-Testpfad benötigt, der die PHP-/SMTP-/Routing-Komponenten verwendet.
-
-Mindestens:
-
-- lokale Container-Ausführung oder äquivalente PHP-Runtime;
-- Test-/Sink-SMTP statt realer Zustellung, sofern möglich;
-- `build-private/recipients.json` vorhanden;
-- RRC-CTA nutzt denselben produktionsnahen Routingpfad wie normale Vereinskontakte;
-- E2E-/Smoke-Test prüft Suche → RRC/Club → Dialog → valide Übermittlung → erwartetes serverseitiges Routing;
-- keine echten Mails an Vereine während lokaler Entwicklung.
+- SMTP-Systeme technische Zustellungsdaten speichern können;
+- der empfangende Verein/Verband die Nachricht nach Erhalt eigenständig weiterverarbeiten und speichern kann.
 
 ---
 
-## 13. Content-/Datenmodell
+## 8. Vereins- und Verbandsdaten
 
-Redaktionelle Inhalte nicht unstrukturiert über `index.html` verteilen. Ziel ist ein einfach wartbares statisches Datenmodell, z. B.:
+### 8.1 Organisationsdaten
 
-```text
-src/content/
-  local-ratzeburg.json
-  voices.json
-  adams-lab.json
-  history-links.json
-  funding.json
-```
+Öffentliche Tatsachenangaben wie Name, Ort, PLZ, Website, DRV-Profil und Verbandszuordnung sollen auf das für die Vereinssuche erforderliche Maß beschränkt bleiben.
 
-oder äquivalente kleine JS-/JSON-Struktur ohne neues Framework.
+### 8.2 DRV-Datenbestand / Datenbankrecht
 
-Jeder externe Inhaltseintrag sollte soweit sinnvoll enthalten:
+Die dauerhafte automatisierte Synchronisation eines wesentlichen Teils des DRV-Vereinsverzeichnisses soll vor öffentlicher Produktivnutzung bevorzugt durch eine dokumentierte Vereinbarung abgesichert werden.
 
-```json
-{
-  "title": "...",
-  "url": "...",
-  "source": "...",
-  "checkedAt": "YYYY-MM-DD",
-  "kind": "primary|secondary|partner",
-  "note": "..."
-}
-```
+Zielreihenfolge:
 
-Bilder zusätzlich mit `credit`, `license/permission`, `alt` und optional `date`.
+1. offizieller Export / API;
+2. ausdrücklich abgestimmter automatisierter Abruf;
+3. nur wenn 1/2 nicht erreichbar: rechtlich geprüfter, begrenzter Abruf mit dokumentierter Begründung.
 
----
+Die Abstimmung soll mindestens klären:
 
-## 14. Designprinzipien
+- zulässige Datenfelder;
+- Aktualisierungsfrequenz;
+- Quellenkennzeichnung;
+- Nutzung von Funktions-E-Mail-Adressen;
+- Logo-/Kennzeichennutzung;
+- technische Abrufmodalitäten.
 
-- bestehende ruhige, marine/helle Gestaltung fortführen;
-- Ratzeburg-Inhalte hochwertiger/editorialer, aber nicht museal gestalten;
-- historische Fotos und heutige Fotos bewusst gegenüberstellen;
-- „Adams Labor“ darf technisch/diagrammatisch wirken;
-- Stimmen menschlich und warm, ohne Social-Media-Look;
-- keine künstlichen Zitate oder KI-generierten historischen Bilder als dokumentarisches Material;
-- Fokusindikatoren, Tastaturbedienung, semantische Überschriften und ausreichende Kontraste erhalten;
-- `prefers-reduced-motion` beachten, falls Übergänge ergänzt werden.
+`robots.txt` ist als technische Zugriffsvorgabe zu respektieren, ersetzt aber keine Nutzungs-/Rechteklärung.
 
----
+### 8.3 Release-Gate für DRV-Sync
 
-## 15. Kooperation / Attribution
+Bis eine belastbare Freigabe oder rechtliche Bewertung dokumentiert ist, darf Production nicht stillschweigend davon ausgehen, dass vollständiges Crawling freigegeben ist.
 
-Solange keine formale Partnerschaft vereinbart ist, neutrale Formulierungen wie:
+Es soll einen expliziten Betriebsmodus geben, z. B.:
 
-- „Weiterführend bei Der Goldachter …“
-- „Mit freundlicher Genehmigung …“ nur bei tatsächlicher Genehmigung;
-- „In Zusammenarbeit mit …“ nur nach expliziter Zustimmung.
+- `DRV_SYNC_MODE=approved`
+- `DRV_SYNC_MODE=limited`
+- `DRV_SYNC_MODE=disabled`
 
-Für `karladam.de` ist eine wechselseitige funktionale Verlinkung besonders sinnvoll:
+`approved` darf nur bewusst gesetzt werden.
 
-`karladam.de → Hier lernen Sie rudern → adams-erben.de`
+### 8.4 Quellenhinweis
 
-`adams-erben.de → Karl Adam vertiefen → karladam.de`
+Auf der Website muss deutlich bleiben:
+
+- Adams Erben ist kein offizielles Angebot des DRV;
+- offizielle Angaben bleiben die Angaben des jeweiligen Vereins/Verbands bzw. der offiziellen DRV-Quelle.
 
 ---
 
-## 16. Implementierungsreihenfolge
+## 9. Personenbezogene Vereinskontakte
 
-### Phase A — lokal, ohne Rechteabhängigkeiten
+### 9.1 Datenminimierung
 
-1. Hero-Motto ändern.
-2. RRC-Karte um Website-Link und Bild-/Logo-Slots erweitern.
-3. Stimmen-Komponente mit sechs klar markierten Platzhaltern.
-4. Adams-Labor-Komponente mit sachlich vorsichtigen Draft-Texten.
-5. Ruderführungs-Abschnitt mit offiziellem Stadtlink/Kontakt.
-6. Vertiefungs-/Historienabschnitt mit Buch-, DRV- und `karladam.de`-Slot.
-7. Förderungsabschnitt mit Stiftung und Förderkategorien.
-8. Vereinssuche/Kontaktfunktion vollständig erhalten.
-9. lokalen Full-Stack-Kontakttest dokumentieren und smoke-testen.
+Automatisch freigegeben werden sollen bevorzugt reine Organisations-/Funktionsadressen, z. B.:
 
-### Phase B — nach Partner-/Rechtefreigaben
+- `info@...`
+- `kontakt@...`
+- `geschaeftsstelle@...`
+- `rudern@...`
 
-1. RRC-Logo auswählen und integrieren.
-2. heutiges RRC-Foto integrieren.
-3. historisches Dirk-Andresen-Foto integrieren.
-4. echte sechs Ruderer interviewen und Platzhalter ersetzen.
-5. Guido Klossek nach Rücksprache namentlich/mit Zitat integrieren.
-6. Stiftungsvorsitz/Funktion verifizieren und autorisiertes Zitat einbauen.
-7. `karladam.de`-Ziel verifizieren und Gegenseitigkeitslink abstimmen.
-8. Ausstellung aktualisieren.
+Rollenadressen wie `vorstand@...` oder `trainer@...` benötigen erhöhte Prüfung.
 
-### Phase C — redaktionelle Qualität
+Personalisierte Adressen wie `vorname.nachname@...` dürfen nicht allein aufgrund ihrer öffentlichen Sichtbarkeit automatisch als Routingempfänger freigegeben werden.
 
-1. historische Aussagen einzeln belegen;
-2. NS-Abschnitt gegen Primär-/Fachquellen prüfen;
-3. „Adams Labor“ auf Erfindungs-/Prioritätsbehauptungen prüfen;
-4. Bildrechte-/Credits-Audit;
-5. Accessibility-/Mobile-/Performance-Audit;
-6. finaler Kontakt-Routing-Smoke-Test.
+### 9.2 Art.-14-Governance
+
+Falls personenbezogene Kontaktdaten aus öffentlichen Quellen verarbeitet werden, MUSS dokumentiert werden:
+
+- Quelle;
+- Zeitpunkt der Erhebung/Verifikation;
+- Zweck;
+- Rechtsgrundlage;
+- Speicherdauer;
+- Empfängerkategorien;
+- Umgang mit Informationspflichten nach Art. 14 DSGVO;
+- Berichtigungs-/Lösch-/Widerspruchs-/Suppression-Prozess.
+
+### 9.3 Suppression
+
+Wenn eine Organisation oder betroffene Person die Entfernung bzw. Nichtwiederaufnahme verlangt, soll ein lokaler Suppression-Datensatz diesen Wunsch gegenüber späteren Crawling-Ergebnissen priorisieren.
 
 ---
 
-## 17. Acceptance Criteria
+## 10. Logos, Marken und Kennzeichen
 
-Der Branch ist lokal abnahmefähig, wenn:
+### 10.1 Grundsatz
 
-- [ ] Hero verwendet exakt das neue Leitmotiv.
-- [ ] RRC hat drei Aktionen: Kontakt, RRC-Website, DRV-Profil.
-- [ ] RRC besitzt Slots für heutiges Bild, historisches Bild und Logo mit Rechte-Metadaten.
-- [ ] sechs generationenübergreifende Stimmen-Platzhalter sind sichtbar und eindeutig als Platzhalter gekennzeichnet.
-- [ ] die sechs Interviewfragen sind redaktionell hinterlegt.
-- [ ] „Adams Labor“ zeigt mindestens vier belastbare Vorher→Adam→Heute-Ketten.
-- [ ] Ratzeburger Ruderführung ist mit offizieller Quelle und Kontakt eingebaut.
-- [ ] Biografie ist direkt verlinkt und als unbezahlter Hinweis gekennzeichnet.
-- [ ] Ausstellung und zukünftiges `karladam.de` sind als Vertiefungsziele vorgesehen.
-- [ ] ein eigenständiger, ausgewogener Abschnitt zur NS-Vergangenheit/Aufarbeitung ist vorhanden.
-- [ ] DRV-Quellen und ergänzende journalistische Kontroverse sind sauber getrennt.
-- [ ] Karl-Adam-Stiftung und weitere Förderwege werden dargestellt.
-- [ ] Funktion/Vorsitz Frank König bleibt bis Verifikation unveröffentlicht bzw. als TODO markiert.
-- [ ] Kontaktvermittlung arbeitet lokal full-stack und nutzt das bestehende sichere serverseitige Routing.
-- [ ] keine Empfänger-E-Mail gelangt in öffentliche Artefakte.
-- [ ] keine realen Vereinsmails werden durch lokale Tests versandt.
-- [ ] keine neuen geschützten Assets werden ohne Freigabe ausgeliefert.
-- [ ] kein Preview-/Production-Deploy erfolgt ohne explizite Freigabe.
+Fremde Logos dürfen nur als lokale Assets verwendet werden, wenn eine belastbare Rechtebasis dokumentiert ist.
+
+Betroffen sind insbesondere:
+
+- Deutscher Ruderverband;
+- World Rowing;
+- Schubschlag;
+- Ratzeburger Ruderclub;
+- sonstige Vereine, Verbände, Medien, Stiftungen und Partner.
+
+### 10.2 Fehlende Freigabe
+
+Wenn keine dokumentierte Freigabe vorliegt:
+
+- Logo nicht anzeigen;
+- Organisation ausschließlich typografisch nennen;
+- Link auf offizielles Angebot zulässig, sofern inhaltlich korrekt und keine besondere Rechtsverletzung erkennbar ist.
+
+### 10.3 Keine Partnerschaft suggerieren
+
+Logo-Kacheln und Texte dürfen nicht den Eindruck erwecken, die betreffende Organisation unterstütze, sponsere oder autorisiere Adams Erben, sofern dies nicht tatsächlich vereinbart ist.
+
+### 10.4 Rechtliche Hinweise anpassen
+
+Die Aussage, fremde Logos würden „ohne gesonderte Freigabe nicht als eigene Gestaltungselemente verwendet“, darf nur bestehen bleiben, wenn der Build diese Regel technisch erzwingt.
 
 ---
 
-## 18. Offene Entscheidungen / Partner-Inputs
+## 11. Bilder, Fotos und historische Medien
 
-1. Welches RRC-Logo: Clubfahne oder Vintage-Logo mit Stadtwappen?
-2. Welches heutige RRC-Foto?
-3. Welches historische Foto kann Dirk Andresen freigeben?
-4. Welche sechs Personen decken 16–84 Jahre sinnvoll ab?
-5. Darf Guido Klossek als Ansprechpartner/Zitatgeber erscheinen?
-6. Wer ist aktuell formal Vorsitzender der Karl-Adam-Stiftung und wie lautet die gewünschte Funktionsbezeichnung?
-7. Welches autorisierte Stiftungszitat wird verwendet?
-8. Welche endgültige URL/Struktur erhält `karladam.de`?
-9. Welche Ausstellungseite soll dauerhaft verlinkt werden?
-10. Soll die kritische historische Vertiefung nur verlinken oder eine kurze eigene redaktionelle Zusammenfassung enthalten?
+### 11.1 Asset-Rechtekataster
 
-## 19. Leitplanke für die Umsetzung
+Für jedes nicht rein intern erzeugte Asset soll ein dokumentierter Datensatz vorhanden sein mit mindestens:
 
-Die redaktionellen Module dürfen die Hauptaufgabe nie verdrängen. Auf jeder längeren inhaltlichen Strecke soll ein natürlicher Weg zurück zur Vereinsfindung bestehen.
+- Dateiname;
+- Titel/Motiv;
+- Urheber/Fotograf;
+- Rechteinhaber;
+- Quelle;
+- Nutzungsgrundlage;
+- erlaubte Nutzungsarten;
+- Bearbeitung erlaubt ja/nein;
+- Namensnennung erforderlich ja/nein;
+- erkennbar abgebildete Personen ja/nein;
+- Freigabe-/Lizenzbeleg;
+- Datum der Prüfung.
 
-**Erfolgskriterium des gesamten Konzepts:** Ein Besucher kommt wegen des Films oder Karl Adam auf die Seite, versteht mehr über Ort, Innovation, Menschen und Ambivalenzen — und kann anschließend tatsächlich einen Ruderverein finden und sicher kontaktieren.
+Empfohlener Ablageort:
+
+`docs/legal/assets-rights.csv` oder `docs/legal/assets-rights.md`
+
+### 11.2 Build-Gate
+
+Für als „rights-required“ markierte Assets soll der Production-Build nur freigegebene Dateien akzeptieren.
+
+Optionales Metadatenmodell:
+
+- `approved`
+- `pending`
+- `own-work`
+- `licensed`
+- `public-domain`
+- `remove`
+
+### 11.3 Personenabbildungen
+
+Bei erkennbaren Personen müssen Persönlichkeits-/Bildrechte vor Veröffentlichung geprüft und dokumentiert werden.
+
+Keine Annahme, dass eine öffentlich auffindbare Aufnahme automatisch erneut veröffentlicht werden darf.
+
+### 11.4 Filmassets
+
+Ohne ausdrückliche Freigabe keine:
+
+- Filmstills;
+- Filmplakate;
+- Trailerdateien;
+- Produktionslogos;
+- Screenshots aus dem Film.
+
+Der Filmtitel darf weiterhin sachlich beschreibend referenziert werden.
+
+---
+
+## 12. GeoNames
+
+GeoNames-Daten werden unter CC BY 4.0 verwendet.
+
+Die Website soll eine sichtbare Attribution enthalten, z. B. im Bereich `Datenquellen und Lizenzen`:
+
+> Postleitzahl-, Orts- und Geokoordinatendaten: GeoNames, CC BY 4.0. Für Adams Erben wurden ausschließlich die für Ortssuche und Entfernungsberechnung erforderlichen Felder übernommen und technisch aufbereitet.
+
+Zusätzlich:
+
+- Link auf GeoNames;
+- Link bzw. Hinweis auf CC BY 4.0;
+- Hinweis auf vorgenommene technische Aufbereitung/Änderungen.
+
+Die Attribution darf nicht nur im Repository stehen.
+
+---
+
+## 13. Rechtliche Hinweise
+
+`legal/rechtliche-hinweise.php` ist so anzupassen, dass keine Widersprüche zur Anwendung verbleiben.
+
+### 13.1 Kontaktvermittlung
+
+Die derzeit veraltete Aussage über ein Fallback an LRV/DRV ist zu ersetzen durch:
+
+> Das Kontaktformular wird ausschließlich angeboten, wenn für die vom Nutzer ausgewählte Organisation selbst ein freigegebener direkter Kontakt vorhanden ist. Besteht kein solcher Kontakt, erfolgt keine Weiterleitung an einen Landesruderverband oder den Deutschen Ruderverband. Stattdessen wird – soweit vorhanden – auf die Website der ausgewählten Organisation verwiesen.
+
+### 13.2 Fremdrechte
+
+Die Hinweise sollen unterscheiden zwischen:
+
+- eigenen Inhalten;
+- lizenzierten/freigegebenen Fremdinhalten;
+- bloßer Namens-/Kennzeichenreferenz;
+- extern verlinkten Inhalten.
+
+Keine pauschale Behauptung, die technisch oder redaktionell nicht eingehalten wird.
+
+---
+
+## 14. Datenschutzerklärung
+
+`legal/datenschutz.php` ist mindestens um folgende Punkte zu ergänzen bzw. zu präzisieren:
+
+1. tatsächliche Server-/Proxy-Logfristen;
+2. Rate-Limit-Verarbeitung einschließlich 24-h-Frist;
+3. Widerruf einer Einwilligung;
+4. Rolle des SMTP-Dienstleisters;
+5. ggf. Auftragsverarbeitung/Drittlandtransfer;
+6. eigenständige Weiterverarbeitung durch den ausgewählten Empfänger nach Zustellung;
+7. Umgang mit personenbezogenen Vereinskontakten aus öffentlichen Quellen;
+8. sichtbare Abgrenzung zwischen reinen Organisationsdaten und personenbezogenen Kontaktdaten;
+9. externe Links nur als Links, solange technisch zutreffend;
+10. Stand-Datum aktualisieren.
+
+---
+
+## 15. Datenquellen- und Lizenzseite
+
+Zusätzlich zu Impressum, Datenschutz und Rechtlichen Hinweisen soll eine kompakte Seite oder ein klarer Abschnitt `Datenquellen und Lizenzen` eingeführt werden.
+
+Mindestens aufführen:
+
+- DRV als Quelle von Vereins-/Verbandsinformationen;
+- Hinweis auf Unabhängigkeit vom DRV;
+- GeoNames + CC BY 4.0;
+- ggf. Bild-/Fotocredits;
+- ggf. weitere offene Daten/Lizenzen.
+
+Diese Seite ersetzt nicht die Datenschutz- oder Rechteklärung, erhöht aber Transparenz und Lizenzkonformität.
+
+---
+
+## 16. Technische Privacy- und Rights-Gates
+
+Der Build soll automatisierte Prüfungen enthalten.
+
+### 16.1 Externe Requests
+
+Production-Build statisch prüfen auf unerwünschte externe Ressourcen in:
+
+- `<script src>`;
+- `<link href>`;
+- `<img src>`;
+- `srcset`;
+- CSS `url(...)`;
+- Inline-JavaScript-Fallbacks;
+- `fetch()`/XHR-Aufrufe.
+
+Erlaubte externe URLs sollen standardmäßig nur Navigationslinks (`<a href>`) sein.
+
+### 16.2 Rechtstext-Konsistenz
+
+Build- oder Test-Assertions mindestens für:
+
+- kein Verbands-Fallback im Anwendungstext;
+- kein Remote-Logo-Fallback;
+- vollständige Betreiberangaben in Production;
+- Datenschutzerklärung enthält Rate-Limit-Hinweis;
+- Datenschutzerklärung enthält Widerrufshinweis;
+- GeoNames-Attribution vorhanden;
+- Rechtliche Hinweise verweisen nicht auf technisch nicht vorhandene Abläufe.
+
+### 16.3 Cookies / Storage
+
+Production-Test muss bestätigen:
+
+- keine nicht notwendigen Cookies;
+- kein unerwartetes `localStorage`;
+- kein unerwartetes `sessionStorage`;
+- kein IndexedDB-/Service-Worker-Tracking;
+- keine Drittanbieterrequests beim initialen Seitenaufruf.
+
+Wenn sich dies ändert, MUSS vor Merge die TDDDG-/Consent-Bewertung erneut erfolgen.
+
+---
+
+## 17. Security-Hardening mit Datenschutzbezug
+
+Zu prüfen bzw. einzuführen:
+
+- Content-Security-Policy bevorzugt `default-src 'self'` und engere Direktiven;
+- `Referrer-Policy` datensparsam konfigurieren;
+- `X-Content-Type-Options: nosniff`;
+- `Permissions-Policy`, insbesondere Geolocation nur im notwendigen Umfang;
+- HSTS bei stabiler HTTPS-Produktivumgebung;
+- keine sensitiven ENV-Werte in Client/Build-Artefakten;
+- `recipients.json` niemals öffentlich ausliefern;
+- keine E-Mail-Adressen in clientseitigen Vereinsdaten.
+
+Standortfunktion soll weiterhin browserseitig arbeiten und Koordinaten nicht an externe Geodienste übertragen.
+
+---
+
+## 18. Akzeptanzkriterien
+
+Der Branch ist fachlich abnahmebereit, wenn alle folgenden Bedingungen erfüllt sind:
+
+- [ ] Production-Build scheitert bei unvollständigem Impressum.
+- [ ] `impressum.php` enthält DDG-/MStV-konforme Struktur.
+- [ ] Keine Remote-Logo-/Bild-Fallbacks existieren.
+- [ ] Kein Drittanbieter-Request wird beim normalen Initialaufruf ausgelöst.
+- [ ] YouTube und andere Medien bleiben reine Links.
+- [ ] `rechtliche-hinweise.php` enthält kein LRV-/DRV-Fallback mehr.
+- [ ] `datenschutz.php` beschreibt Rate Limiting und tatsächliche Speicherfrist.
+- [ ] `datenschutz.php` enthält Widerrufshinweis zur Einwilligung.
+- [ ] SMTP-Anbieter und tatsächliche Datenverarbeitung sind beschrieben.
+- [ ] GeoNames-Attribution ist öffentlich sichtbar.
+- [ ] DRV-Sync besitzt einen expliziten rechtlichen/Betriebsmodus und läuft nicht stillschweigend „approved“.
+- [ ] personenbezogene E-Mail-Adressen werden nicht automatisch freigegeben.
+- [ ] Rechtebasis für jedes angezeigte Fremdlogo ist dokumentiert oder das Logo entfernt.
+- [ ] Asset-Rechtekataster ist vorhanden.
+- [ ] `recipients.json` bleibt serverseitig und nicht öffentlich.
+- [ ] Browser-Test bestätigt keine unerwarteten Cookies/Storage-Einträge.
+- [ ] Rechtstexte entsprechen dem tatsächlichen Production-Verhalten.
+
+---
+
+## 19. Empfohlene Umsetzungsreihenfolge
+
+1. Build: externe Asset-Fallbacks entfernen.
+2. Rechtliche Hinweise: Routing-Widerspruch korrigieren.
+3. Impressum: Production-Gate und Struktur härten.
+4. Datenschutz: Rate Limit, Widerruf, SMTP, Empfängerrolle, Speicherfristen.
+5. DRV-Sync: Betriebsmodus und Rechte-Gate einführen.
+6. Logo-/Asset-Rechteinventar erstellen und nicht freigegebene Assets deaktivieren.
+7. GeoNames-Attribution auf Website ergänzen.
+8. Privacy-/Rights-Tests in Build/CI aufnehmen.
+9. Security Header/CSP prüfen und härten.
+10. finalen Production-Build gegen Browser-Netzwerkverkehr und Rechtstexte testen.
+11. vor öffentlicher Bewerbung gezielte anwaltliche Prüfung der verbleibenden Punkte, insbesondere DRV-Datenbank und Fremdlogos.
+
+---
+
+## 20. Definition of Done
+
+`risk-protection` gilt als abgeschlossen, wenn:
+
+1. alle P0-Punkte umgesetzt sind;
+2. alle Akzeptanzkriterien erfüllt oder ausdrücklich dokumentiert ausgenommen sind;
+3. keine ungeklärten Drittanbieterrequests mehr bestehen;
+4. keine offensichtlichen Widersprüche zwischen Code, UX und Rechtstexten vorhanden sind;
+5. verbleibende externe Rechte-/Freigabefragen in einer nachvollziehbaren Liste dokumentiert sind;
+6. der Branch einen reproduzierbaren Production-Build erzeugt, der die Datenschutz- und Rechte-Gates besteht.
