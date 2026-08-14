@@ -59,6 +59,39 @@ function appendLinkOnce(container, href, label, className = 'button button-secon
   container.append(`<a class="${className}" href="${href}">${label}</a>`);
 }
 
+function removeEditorialPlaceholdersFromProduction($) {
+  if (previewMode) return;
+
+  $('.preview-banner, .preview-contact-note').remove();
+  $('#stimmen').remove();
+  $('.site-header nav a[href="#stimmen"], .site-header nav a[href="/#stimmen"]').remove();
+
+  $('[class*="placeholder"]').each((_, element) => {
+    const node = $(element);
+    const container = node.closest('figure, article, blockquote').first();
+    if (container.length) container.remove();
+    else node.remove();
+  });
+
+  $('.foundation-quote').filter((_, element) => /Zitatplatzhalter|vor Veröffentlichung/i.test($(element).text())).remove();
+  $('.partner-strip').filter((_, element) => /nach Abstimmung|im Aufbau/i.test($(element).text())).remove();
+
+  $('.source-note, .diagram-caption').each((_, element) => {
+    const node = $(element);
+    if (/Storyboard|Platzhalter|vor Veröffentlichung|wird erst|zusätzlich.+geprüft/i.test(node.text())) node.remove();
+  });
+
+  $('#data-origin-heading').text('Öffentliche Vereinsdaten');
+  $('#data-origin-copy').text('Die Suchdaten stammen aus der freigegebenen Datenquelle des Deutschen Ruderverbands. E-Mail-Adressen werden nicht als offene Sammelliste an den Browser ausgeliefert.');
+
+  $('#ueber .principles article').each((_, element) => {
+    const article = $(element);
+    if (/Rechte vor Reichweite/i.test(article.find('h3').text())) {
+      article.find('p').text('Historische Fotos, Clublogos, Filmstills und Partnerassets erscheinen nur nach geklärter Nutzungsgrundlage. Nicht freigegebene Medien werden nicht veröffentlicht.');
+    }
+  });
+}
+
 function addHomepageLinks($) {
   appendLinkOnce($('.hero .hero-actions').first(), '/karl-adam/', 'Karl Adam entdecken');
 
@@ -164,6 +197,8 @@ for (const page of pages) {
   }
 
   const $ = cheerio.load(html, { decodeEntities: false });
+  removeEditorialPlaceholdersFromProduction($);
+
   $('title').text(page.title);
   setMeta($, 'meta[name="description"]', { name: 'description', content: page.description });
   setCanonical($, absoluteUrl(page.path));
@@ -173,7 +208,7 @@ for (const page of pages) {
   setMeta($, 'meta[property="og:description"]', { property: 'og:description', content: page.ogDescription });
   setMeta($, 'meta[property="og:url"]', { property: 'og:url', content: absoluteUrl(page.path) });
   setMeta($, 'meta[property="og:image"]', { property: 'og:image', content: `${origin}${page.ogImage}` });
-  setMeta($, 'meta[property="og:image:alt"]', { property: 'og:image:alt', content: 'Adams Erben – Rudern zwischen Geschichte und Gegenwart' });
+  setMeta($, 'meta[property="og:image:alt"]', { property: 'og:image:alt', content: page.ogImageAlt });
   setMeta($, 'meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
 
   if (previewMode) {
