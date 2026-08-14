@@ -4,10 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/risk-preflight.mjs && node scripts/build.mjs && node scripts/risk-protection.mjs",
+    "build": "node scripts/risk-preflight.mjs && node scripts/build.mjs && node scripts/postbuild-legal-links.mjs && node scripts/risk-protection.mjs",
     "risk:check": "node scripts/risk-protection.mjs",
     "risk:preflight": "node scripts/risk-preflight.mjs",
     "test:risk-contact": "node scripts/contact-personal-safety.test.mjs",
+    "test:privacy-static": "node scripts/privacy-static.test.mjs",
     "sync:drv": "node scripts/risk-preflight.mjs && node scripts/sync-drv.mjs && node scripts/validate-drv-output.mjs",
     "validate:drv-output": "node scripts/validate-drv-output.mjs",
     "test:drv-output": "node scripts/validate-drv-output.test.mjs",
