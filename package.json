@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs && node scripts/split-audiences.mjs",
     "sync:drv": "node scripts/sync-drv.mjs && node scripts/validate-drv-output.mjs",
     "validate:drv-output": "node scripts/validate-drv-output.mjs",
     "test:drv-output": "node scripts/validate-drv-output.test.mjs",
