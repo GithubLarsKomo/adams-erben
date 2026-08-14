@@ -50,6 +50,33 @@ Historischer Gegenpol für die Damals-/Heute-Gegenüberstellung im Ratzeburg-Abs
 - Fotograf/Urheber, Quelle, Jahr und Nutzungsfreigabe dokumentieren;
 - Credit-Zeile vor Integration festlegen.
 
+**Recherche 2026-08-14 — Vorzugskandidat**
+
+Der derzeit beste öffentlich auffindbare Kandidat ist die historische Aufnahme auf der RRC-Seite **„Der Ratzeburger Ruderclub – Gedanken und Erinnerungen“** mit der Bildunterschrift:
+
+> **„Die Keimzelle des RRC: Das Kleine Bootshaus am großen See“**
+
+Quellen:
+- RRC-Seite: `https://www.rrc-online.de/2018/geschichte-und-erfolge/der-ratzeburger-ruderclub-gedanken-und-erinnerungen/`
+- dort referenzierte Bilddatei: `https://www.wordpress.ratzeburger-rc.de/wp-content/uploads/geschichte_01_c.jpg`
+
+**Bewertung**
+- Motiv ist inhaltlich sehr stark, weil es unmittelbar die frühe RRC-/Karl-Adam-Zeit und den historischen Ort zeigt;
+- die RRC-Seite ordnet den Clubaufstieg ausdrücklich in die Jahre 1955–1968 ein;
+- die Aufnahme eignet sich grundsätzlich besser für die Damals-/Heute-Idee als ein reines Mannschafts- oder Karl-Adam-Porträt, weil der Ort selbst der konstante Bezugspunkt ist;
+- ein heutiges Gegenbild sollte erst nach Sichtung eines ausreichend großen Originals bzw. Scans exakt festgelegt werden;
+- der aktuelle Web-Abruf ist **nicht** als geklärte Nutzungsfreigabe zu verstehen.
+
+**Rechte-/Qualitätsgate vor Übernahme**
+- Originaljahr und Fotograf/Bildgeber ermitteln;
+- Rechteinhaber und Freigabe für `adams-erben.de` schriftlich dokumentieren;
+- hochauflösenden Originalscan statt der alten WordPress-Webfassung beschaffen;
+- Originalauflösung und geeigneten 3:2-/4:3-Crop prüfen;
+- erst danach den exakten Kamerastandpunkt für A2 festlegen.
+
+**Recherchehinweis**  
+Der NDR zitiert Zeitzeuge Klaus Bittner 2025 mit der Aussage, Bootshaus, Steg und Platz seien seit rund 65 Jahren weitgehend unverändert. Das stützt die Idee, A2 als echte Re-Fotografie des historischen Orts anzulegen, ersetzt aber nicht die visuelle Perspektivprüfung des Originalbilds.
+
 ---
 
 #### A2 — Ratzeburg heute — Vergleichsansicht
@@ -511,8 +538,8 @@ Der Branch ist bildseitig abnahmefähig, wenn:
 
 | ID | Motiv | Priorität | Status |
 |---|---|---:|---|
-| A1 | Ratzeburg damals | A | offen |
-| A2 | Ratzeburg heute — Vergleichsansicht | A | offen |
+| A1 | Ratzeburg damals | A | in Recherche — RRC-Kandidat gefunden; Originalscan/Rechte offen |
+| A2 | Ratzeburg heute — Vergleichsansicht | A | offen — wartet auf Perspektivfreigabe A1 |
 | A3 | Ruderakademie Ratzeburg mit Dom | A | offen |
 | A4 | Achter 8+ | A | offen |
 | A5 | Gigboot | A | offen |
