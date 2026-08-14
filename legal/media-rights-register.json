@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "policy": "Every non-trivial visual asset used in production must have an attributable rights status. review-required assets may be used in preview but require explicit approval before production release. Third-party brand logos are governed separately by legal/asset-rights.json.",
   "statuses": {
     "project-controlled": "Created for or controlled by the Adams Erben project; retain creation/source evidence.",
@@ -16,7 +16,23 @@
     "/assets/images/deutschlandachter.webp": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
     "/assets/images/faricup.png": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
     "/assets/images/moselpokal.webp": { "type": "media-badge", "status": "review-required", "note": "Verify source, creator and permitted web use." },
-    "/assets/images/rrc-heute.webp": { "type": "photograph", "status": "review-required", "note": "Verify photographer/rightsholder and web publication permission; check recognizable persons if applicable." },
-    "/assets/images/ratzeburg-regatta.webp": { "type": "photograph", "status": "review-required", "note": "Verify photographer/rightsholder and web publication permission; check recognizable persons if applicable." }
+    "/assets/images/rrc-heute.webp": {
+      "type": "photograph",
+      "status": "approved",
+      "rightsholder": "Ratzeburger Ruderclub",
+      "basis": "Freigabe zur Verwendung auf adams-erben.de durch den Ratzeburger Ruderclub.",
+      "evidence": "Operator confirmation in project conversation, 2026-08-14",
+      "reviewedAt": "2026-08-14",
+      "note": "Publication permission confirmed; recognizable-person considerations remain applicable where relevant."
+    },
+    "/assets/images/ratzeburg-regatta.webp": {
+      "type": "photograph",
+      "status": "project-controlled",
+      "rightsholder": "Site operator / Adams Erben project",
+      "basis": "Eigenes Foto des Seitenbetreibers.",
+      "evidence": "Operator confirmation in project conversation, 2026-08-14",
+      "reviewedAt": "2026-08-14",
+      "note": "Owned photograph; recognizable-person considerations remain applicable where relevant."
+    }
   }
 }
