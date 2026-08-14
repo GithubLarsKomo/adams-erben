@@ -41,8 +41,13 @@ function jsonLdTypes($, pagePath) {
   return types;
 }
 
+function normalizeParagraph(value) {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
 const titles = new Map();
 const descriptions = new Map();
+const longParagraphs = new Map();
 const expectedPaths = new Set(pages.map((page) => page.path));
 
 for (const page of pages) {
@@ -63,6 +68,7 @@ for (const page of pages) {
   const ogDescription = text($, 'meta[property="og:description"]');
   const ogUrl = text($, 'meta[property="og:url"]');
   const ogImage = text($, 'meta[property="og:image"]');
+  const ogImageAlt = text($, 'meta[property="og:image:alt"]');
   const twitterCard = text($, 'meta[name="twitter:card"]');
   const robotsMeta = text($, 'meta[name="robots"]');
   const expectedCanonical = `${expectedOrigin}${page.path}`;
@@ -72,13 +78,17 @@ for (const page of pages) {
   if (!$('main').length) fail(page.path, 'missing main element');
   if (!title) fail(page.path, 'missing title');
   if (title !== page.title) fail(page.path, 'title differs from central page configuration');
+  if (title.length < 35 || title.length > 70) fail(page.path, `title length ${title.length} is outside 35-70 characters`);
   if (!description) fail(page.path, 'missing meta description');
   if (description !== page.description) fail(page.path, 'description differs from central page configuration');
+  if (description.length < 120 || description.length > 160) fail(page.path, `description length ${description.length} is outside 120-160 characters`);
   if (canonicalUrl !== expectedCanonical) fail(page.path, `canonical must be ${expectedCanonical}`);
   if (ogTitle !== page.ogTitle) fail(page.path, 'og:title differs from central page configuration');
   if (ogDescription !== page.ogDescription) fail(page.path, 'og:description differs from central page configuration');
   if (ogUrl !== expectedCanonical) fail(page.path, `og:url must be ${expectedCanonical}`);
   if (!ogImage.startsWith(`${expectedOrigin}/assets/images/`)) fail(page.path, `og:image must use a local image on ${expectedOrigin}`);
+  if (ogImageAlt !== page.ogImageAlt) fail(page.path, 'og:image:alt differs from central page configuration');
+  if (!ogImageAlt) fail(page.path, 'missing og:image:alt');
   if (twitterCard !== 'summary_large_image') fail(page.path, 'twitter:card must be summary_large_image');
 
   if (previewMode) {
@@ -98,14 +108,78 @@ for (const page of pages) {
   } else {
     if (!types.has('BreadcrumbList')) fail(page.path, 'detail page JSON-LD must contain BreadcrumbList');
     if (!types.has('WebPage') && !types.has('AboutPage')) fail(page.path, 'detail page JSON-LD must contain WebPage or AboutPage');
+    if (!$('[aria-current="page"]').length) fail(page.path, 'detail page should expose aria-current="page"');
   }
 
+  const skipLink = $('.skip-link[href^="#"]').first();
+  if (!skipLink.length) {
+    fail(page.path, 'missing in-page skip link');
+  } else {
+    const targetId = skipLink.attr('href').slice(1);
+    if (!targetId || !$(`#${targetId}`).length) fail(page.path, `skip link target #${targetId} does not exist`);
+  }
+
+  $('script[src="/assets/app.js"]').each((_, element) => {
+    if ($(element).attr('type') !== 'module') fail(page.path, '/assets/app.js must be loaded as type="module"');
+  });
+
+  $('img').each((_, element) => {
+    if ($(element).attr('alt') === undefined) fail(page.path, `image ${$(element).attr('src') || '(unknown src)'} is missing alt attribute`);
+  });
+
+  $('a[target="_blank"]').each((_, element) => {
+    const relTokens = new Set(($(element).attr('rel') || '').split(/\s+/).filter(Boolean));
+    if (!relTokens.has('noopener') || !relTokens.has('noreferrer')) {
+      fail(page.path, `external target=_blank link lacks noopener noreferrer: ${$(element).attr('href') || '(unknown href)'}`);
+    }
+  });
+
+  const linkedCorePaths = new Set();
   $('a[href^="/"]').each((_, element) => {
     const href = $(element).attr('href');
     if (!href || href.startsWith('/#') || href.endsWith('.php')) return;
     const normalized = href.split('#')[0].split('?')[0];
     if (normalized.endsWith('/') && !expectedPaths.has(normalized)) {
       fail(page.path, `internal core-style link points to unregistered path ${normalized}`);
+    }
+    if (expectedPaths.has(normalized) && normalized !== page.path) linkedCorePaths.add(normalized);
+  });
+
+  if (page.path === '/') {
+    for (const expectedPath of expectedPaths) {
+      if (expectedPath !== '/' && !linkedCorePaths.has(expectedPath)) fail(page.path, `homepage does not link to core page ${expectedPath}`);
+    }
+  } else if (linkedCorePaths.size < 2) {
+    fail(page.path, `detail page links to only ${linkedCorePaths.size} other core page(s); expected at least 2`);
+  }
+
+  if (!previewMode) {
+    const bodyClone = $('body').clone();
+    bodyClone.find('script, style').remove();
+    const visibleText = normalizeParagraph(bodyClone.text());
+    const forbiddenPatterns = [
+      /Platzhalter/i,
+      /Storyboard-Grafik/i,
+      /Später:/i,
+      /nach Abstimmung/i,
+      /vor Veröffentlichung/i,
+      /Geplanter Datenbestand/i,
+      /Vorschau enthält ausschließlich/i,
+      /Zitatplatzhalter/i
+    ];
+    for (const pattern of forbiddenPatterns) {
+      if (pattern.test(visibleText)) fail(page.path, `production output contains editorial placeholder text matching ${pattern}`);
+    }
+  }
+
+  $('p').each((_, element) => {
+    const paragraph = normalizeParagraph($(element).text());
+    if (paragraph.length < 180) return;
+    const previous = longParagraphs.get(paragraph);
+    if (previous && previous !== page.path) {
+      fail(page.path, `long paragraph is duplicated verbatim from ${previous}`);
+    } else {
+      longParagraphs.set(paragraph, page.path);
     }
   });
 }
