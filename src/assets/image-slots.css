@@ -113,7 +113,8 @@
 /* Ruderführung preview: the supplied memorial-stone photo is explicitly preview-only.
    It must be replaced by a rights-cleared own photo before production. */
 .city-story .story-card-visual .asset-placeholder-wide {
-  min-height: 100%;
+  min-height: 300px;
+  aspect-ratio: 16 / 9;
   justify-content: end;
   border-style: solid;
   border-color: rgba(11, 35, 54, .12);
@@ -162,6 +163,11 @@
 
   .rrc-visual .asset-media-photo img,
   .rrc-visual .asset-placeholder-photo {
+    aspect-ratio: 4 / 3;
+  }
+
+  .city-story .story-card-visual .asset-placeholder-wide {
+    min-height: 230px;
     aspect-ratio: 4 / 3;
   }
 }
