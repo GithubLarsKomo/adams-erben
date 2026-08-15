@@ -110,6 +110,40 @@
   color: var(--muted);
 }
 
+/* Ruderführung preview: the supplied memorial-stone photo is explicitly preview-only.
+   It must be replaced by a rights-cleared own photo before production. */
+.city-story .story-card-visual .asset-placeholder-wide {
+  min-height: 100%;
+  justify-content: end;
+  border-style: solid;
+  border-color: rgba(11, 35, 54, .12);
+  background:
+    linear-gradient(180deg, rgba(11, 35, 54, .02) 42%, rgba(11, 35, 54, .78) 100%),
+    url("/assets/images/karl-adam-gedenkstein-preview.webp") center / cover no-repeat,
+    var(--foam);
+  color: var(--white);
+}
+
+.city-story .story-card-visual .asset-placeholder-wide strong,
+.city-story .story-card-visual .asset-placeholder-wide span {
+  font-size: 0;
+}
+
+.city-story .story-card-visual .asset-placeholder-wide strong::after {
+  content: "Karl-Adam-Gedenkstein";
+  color: var(--white);
+  font-size: 1.25rem;
+}
+
+.city-story .story-card-visual .asset-placeholder-wide span::after {
+  content: "Vorschau · Gedenkstein nahe dem Ratzeburger Ruderclub auf einer Wiese der Stadt Ratzeburg. Das Motiv wird vor dem Produktionsstart durch ein eigenes, freigegebenes Foto ersetzt.";
+  display: block;
+  margin-top: .35rem;
+  color: rgba(255, 255, 255, .9);
+  font-size: .82rem;
+  line-height: 1.4;
+}
+
 @media (max-width: 640px) {
   .then-now-media {
     grid-template-columns: 1fr;
