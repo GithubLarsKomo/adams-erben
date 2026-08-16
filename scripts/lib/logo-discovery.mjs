@@ -37,7 +37,7 @@ function isYearToken(token) {
 
 function meaningfulTokens(value = '') {
   return normalizeToken(value).split(' ')
-    .filter((token) => token.length >= 3 && !isYearToken(token) && !GENERIC_NAME_TOKENS.has(token));
+    .filter((token) => token.length >= 3 && !GENERIC_NAME_TOKENS.has(token));
 }
 
 function organizationTokens(organization) {
@@ -79,11 +79,7 @@ export function organizationAliases(organization) {
   const build = (items) => items.map(abbreviationForWord).join('');
   const aliases = new Set([build(withoutCity), build(words)]);
   if (words.includes('eisenbahnsportverein')) aliases.add('esv');
-  const normalizedName = normalizeToken(name)
-    .replace(/\b(?:e v|ev)\b/g, '')
-    .replace(/\b(?:18|19|20)\d{2}\b/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const normalizedName = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
   if (normalizedName) aliases.add(normalizedName.replace(/\s+/g, ''));
   return [...aliases].filter((value) => value.length >= 2 && value.length <= 80);
 }
@@ -106,11 +102,7 @@ function aliasMatch(organization, text) {
 
 function exactNameMatch(organization, text) {
   const name = typeof organization === 'string' ? organization : organization?.name || '';
-  const core = normalizeToken(name)
-    .replace(/\b(?:e v|ev)\b/g, '')
-    .replace(/\b(?:18|19|20)\d{2}\b/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const core = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
   return core.length >= 5 && normalizeToken(text).includes(core);
 }
 
@@ -205,14 +197,22 @@ function candidateFullText(candidate) {
   return clean(`${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`);
 }
 
+function hasStrongSiteIdentity(candidate) {
+  return STRONG_SITE_IDENTITY.test(normalizeToken(candidateFullText(candidate)));
+}
+
+function hasQualifiedAliasEvidence(candidate, organization) {
+  const text = candidateDirectText(candidate);
+  if (!aliasMatch(organization, text)) return false;
+  const direct = normalizeToken(text);
+  return candidate?.kind === 'jsonld' || candidate?.kind === 'meta'
+    || DIRECT_LOGO_POSITIVE.test(direct) || hasStrongSiteIdentity(candidate);
+}
+
 function hasDirectOrganizationEvidence(candidate, organization) {
   const text = candidateDirectText(candidate);
   const tokens = organizationTokens(organization);
-  return tokenCoverage(tokens, text) > 0 || aliasMatch(organization, text) || exactNameMatch(organization, text);
-}
-
-function hasStrongSiteIdentity(candidate) {
-  return STRONG_SITE_IDENTITY.test(normalizeToken(candidateFullText(candidate)));
+  return tokenCoverage(tokens, text) > 0 || hasQualifiedAliasEvidence(candidate, organization) || exactNameMatch(organization, text);
 }
 
 function pageHasOrganizationEvidence(organization, pageIdentity) {
@@ -271,7 +271,7 @@ export function scoreLogoCandidate(candidate, organization = '') {
   const tokens = organizationTokens(organization);
   const matches = tokens.filter((token) => labelNorm.includes(token) || urlText.includes(token)).length;
   score += Math.min(45, matches * 15);
-  if (aliasMatch(organization, `${labelNorm} ${urlText}`)) score += 35;
+  if (hasQualifiedAliasEvidence(candidate, organization)) score += 35;
   if (exactNameMatch(organization, `${labelNorm} ${urlText}`)) score += 30;
 
   const width = parseDimension(candidate.width);
@@ -324,7 +324,7 @@ export function scoreEntityConfidence(candidate, organization, pageIdentity) {
   const directCoverage = tokenCoverage(tokens, directText);
   const pageAlias = aliasMatch(organization, pageText);
   const assetAlias = aliasMatch(organization, candidateText);
-  const directAlias = aliasMatch(organization, directText);
+  const directAlias = hasQualifiedAliasEvidence(candidate, organization);
   const pageExact = exactNameMatch(organization, pageText);
   const assetExact = exactNameMatch(organization, candidateText);
   const directExact = exactNameMatch(organization, directText);
