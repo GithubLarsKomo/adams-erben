@@ -29,8 +29,11 @@ jobs:
           node --check scripts/build.mjs
           node --check scripts/build-local.mjs
           node --check scripts/split-audiences.mjs
+          node --check scripts/postbuild-seo.mjs
+          node --check scripts/seo-pages.mjs
           node --check scripts/apply-site-shell.mjs
           node --check scripts/validate-site-shell.mjs
+          node --check scripts/validate-seo-output.mjs
           node --check scripts/lib/site-shell.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
@@ -61,6 +64,9 @@ jobs:
 
       - name: Validate shared site shell
         run: npm run validate:shell
+
+      - name: Validate SEO output
+        run: npm run validate:seo
 
       - name: Validate audience pages
         run: |
