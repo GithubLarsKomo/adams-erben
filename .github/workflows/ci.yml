@@ -59,7 +59,7 @@ jobs:
       - name: Local nearest-club tests
         run: npm run test:nearest
 
-      - name: Local build with checked-in seed
+      - name: Local production build with checked-in seed
         run: npm run build:local
 
       - name: Validate shared site shell
@@ -108,6 +108,11 @@ jobs:
       - name: Validate seed fallback routing metadata
         run: |
           node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('build-private/recipients.json','utf8')); if(d.routingMode!=='direct-only'||Object.keys(d.recipients||{}).length!==0) process.exit(1); console.log('routingMode:',d.routingMode)"
+
+      - name: Preview build with shared shell and SEO gates
+        env:
+          PREVIEW_MODE: '1'
+        run: npm run build:local
 
       - name: PHP syntax
         run: |
