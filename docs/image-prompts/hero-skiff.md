@@ -61,7 +61,9 @@ Period-appropriate sliding seat, foot stretcher, metal riggers and oarlocks.
 
 Wooden sculls with historically plausible blades.
 
-Visible subtle wear and varnished wooden texture.
+Visible subtle wear and varnished wooden texture, but the varnish must not appear mirror-glossy or luxury-polished.
+
+The boat should look used, maintained and functional rather than freshly restored for display.
 
 Absolutely no modern carbon fibre.
 
@@ -91,48 +93,122 @@ Preserve substantial quiet negative space toward the left side of the image for 
 Suitable for a full-width website hero.
 
 **LIGHT:**  
-clear to lightly hazy Northern German afternoon
+plain clear-to-lightly-hazy Northern German daylight, preferably late morning or afternoon
 
-Low-to-medium angle sunlight.
+Use ordinary available daylight rather than dramatic movie lighting.
 
-Warm skin tones may be present, but the scene must not resemble sunset photography.
+The light may be warm-neutral, but it must remain restrained and geographically plausible.
 
-No spectacular golden-hour glow.
+Skin highlights must stay soft and matte, never oily, metallic or airbrushed.
 
-No exaggerated rim light.
+Highlights on the boat and water must be subdued and broken rather than polished or specular.
+
+No sunset atmosphere.
+
+No golden-hour spectacle.
+
+No pronounced rim light.
+
+No artificial glow.
+
+No glossy advertising finish.
+
+**BACKGROUND / SHORELINE:**  
+Keep the background deliberately simple and geographically plausible.
+
+Show a single, mostly parallel shoreline running horizontally behind the sculler at medium-to-far distance, similar in visual logic to a real training course on the Ratzeburger See.
+
+The shoreline should consist primarily of dense mature mixed deciduous woodland with natural variations in height, tone and spacing.
+
+Include a narrow strip of reeds or low lakeside vegetation only where natural.
+
+The opposite bank should read as a quiet continuous green wooded edge rather than as a scenic destination or postcard view.
+
+The shore should be slightly softened by atmospheric distance and lens rendering, but remain recognizably photographic.
+
+No town skyline.
+
+No church.
+
+No Ratzeburg Dom.
+
+No bridges.
+
+No prominent buildings.
+
+No islands positioned as compositional focal points.
+
+No dramatic hills, cliffs or elevated terrain.
+
+The horizon should remain low, calm and visually subordinate to the rower.
+
+The background must not compete with the rowing action.
 
 **ENVIRONMENT:**  
-Ratzeburger See with calm but naturally textured water.
+Ratzeburger See with calm but naturally textured inland water.
 
-Low wooded shoreline.
+The scene should feel like a real training stretch on a Northern German lake rather than a tourism image.
 
-Mixed deciduous vegetation.
-
-Very subtle distant indication of Ratzeburg architecture may be visible, but the background must remain secondary.
-
-No cliffs.
-
-No mountains.
+Use restrained northern-European vegetation and a simple horizontal wooded bank.
 
 No Mediterranean vegetation.
 
 No dramatic coastline.
 
+No postcard composition.
+
 **WATER:**  
 Natural small ripples and minor wake from the shell.
 
-Sculls may produce small irregular droplets or surface disturbance.
+Sculls may produce small irregular droplets or subtle surface disturbance.
 
-Reflections should be imperfect and physically credible.
+Reflections should be imperfect, subdued and physically credible.
+
+Water should have varied local contrast and slight texture rather than a highly polished mirror appearance.
 
 Avoid symmetrical decorative splashes.
+
+Avoid glossy black-blue water.
+
+Avoid exaggerated sparkling highlights.
+
+**PHOTOGRAPHIC FINISH — CRITICAL:**  
+The image must have a matte, observational photographic finish.
+
+It should resemble a production still or sports photograph captured on 35 mm film, not a luxury campaign, digital concept render or modern sports advertisement.
+
+Use:
+
+- modest local contrast
+- restrained saturation
+- slightly compressed highlights
+- fine natural grain
+- gentle lens softness
+- subtle texture in skin and cotton
+- realistic, imperfect reflections
+- slight atmospheric softness in the distant shore
+- natural unevenness in exposure
+
+Avoid the polished modern 'cinematic' look.
+
+In particular, do not make skin, water, varnished wood, metal or fabric look lacquered, wet-polished or artificially luminous.
+
+Do not over-sharpen facial features, muscles, water droplets, wood grain or foliage.
+
+Do not apply clarity-heavy microcontrast.
+
+The image may look a little less perfect if that makes it more believable.
 
 **MOOD:**  
 quiet concentration and disciplined training
 
-The image should feel as though a cinematographer captured one excellent frame during an actual training outing.
+The image should feel as though a cinematographer or sports photographer captured one excellent frame during an actual training outing.
 
 It should not feel staged for a poster.
+
+The visual reference is the restrained, practical rowing photography used in the film publicity for *Adam's Acht*: functional daylight, real water, a wooded parallel bank, physically plausible rowing, and minimal scenic distraction.
+
+Use this only as a photographic-language reference, not as a composition to copy.
 
 ## Particularly important
 
@@ -146,6 +222,8 @@ Prioritize:
 - observation over drama
 - physical credibility over spectacular composition
 - rowing accuracy over visual effect
+- matte photographic texture over glossy digital finish
+- simple geography over scenic spectacle
 
 ## Do not include
 
@@ -166,11 +244,21 @@ Prioritize:
 - HDR
 - CGI appearance
 - concept-art appearance
+- glossy skin
+- glossy water
+- luxury-advertising finish
+- excessive skin highlights
+- excessive muscle definition
+- over-sharpened foliage
+- sparkling decorative water
 - implausible hands
 - disconnected oar handles
 - bent or malformed shafts
 - incorrect oarlocks
 - duplicate equipment
 - impossible water physics
+- town skyline
+- prominent architecture
+- Ratzeburg Dom
 
-The final result should resemble an authentic production still from a late-1950s German rowing story photographed today with exceptional historical authenticity.
+The final result should resemble an authentic, slightly imperfect production still from a late-1950s German rowing story: technically credible, quiet, matte, natural and observational.
