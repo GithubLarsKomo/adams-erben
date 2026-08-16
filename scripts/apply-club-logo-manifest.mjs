@@ -1,9 +1,10 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { applyLogoManifest, loadLogoManifest } from './lib/logo-manifest.mjs';
 
 const root = process.cwd();
 const clubsPath = path.join(root, 'dist', 'data', 'clubs.json');
+const publicManifestPath = path.join(root, 'dist', 'data', 'club-logos.json');
 const manifestPath = path.join(root, 'src', 'data', 'club-logos.json');
 
 let clubs;
@@ -29,5 +30,9 @@ clubs.logoManifest = {
 clubs.count = clubs.organizations.length;
 
 await writeFile(clubsPath, `${JSON.stringify(clubs, null, 2)}\n`);
+// The raw discovery/review manifest contains source URLs and candidate diagnostics.
+// It is build input only and must not be exposed as public browser data.
+await rm(publicManifestPath, { force: true });
+
 const withLogo = clubs.organizations.filter((organization) => organization.logoStatus === 'present').length;
 console.log(`[logos] applied manifest: ${withLogo}/${clubs.organizations.length} organizations have local logos`);
