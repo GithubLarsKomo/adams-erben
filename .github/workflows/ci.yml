@@ -28,6 +28,8 @@ jobs:
         run: |
           node --check scripts/build.mjs
           node --check scripts/build-local.mjs
+          node --check scripts/remove-local-snapshot.mjs
+          node --check scripts/assert-no-remote-runtime-fallbacks.mjs
           node --check scripts/split-audiences.mjs
           node --check scripts/postbuild-seo.mjs
           node --check scripts/seo-pages.mjs
@@ -73,16 +75,7 @@ jobs:
         run: npm run test:nearest
 
       - name: Assert source contains no remote runtime fallbacks
-        shell: bash
-        run: |
-          if grep -R -E -i 'onerror=' src scripts legal; then
-            echo 'Source must not contain runtime fallback handlers.' >&2
-            exit 1
-          fi
-          if grep -R -E -i 'd2cx26qpfwuhvu\.cloudfront\.net|cdn\.podcastcms\.de|rudern\.de/sites/default/files' src scripts legal; then
-            echo 'Source must not contain known third-party runtime asset hosts.' >&2
-            exit 1
-          fi
+        run: node scripts/assert-no-remote-runtime-fallbacks.mjs
 
       - name: Build safe local preview with checked-in seed
         run: npm run build:local
