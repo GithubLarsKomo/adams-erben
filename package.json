@@ -37,7 +37,9 @@
     "poc:discover:prepare": "node scripts/prepare-discovery-poc.mjs",
     "test:discover-prepare": "node scripts/prepare-discovery-poc.test.mjs",
     "poc:discover": "node scripts/discover-websites.mjs",
-    "test:discover": "node scripts/discover-websites.test.mjs"
+    "test:discover": "node scripts/discover-websites.test.mjs",
+    "generate:rowing-schemata": "node scripts/generate-rowing-schemata.mjs",
+    "test:rowing-schemata": "node scripts/generate-rowing-schemata.test.mjs"
   },
   "dependencies": {
     "adm-zip": "0.6.0",
