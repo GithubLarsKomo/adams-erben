@@ -1,10 +1,7 @@
 name: Club Logo Pilot
 
 on:
-  push:
-    branches: [feat/club-logo-enrichment]
-    paths:
-      - '.github/workflows/logo-pilot.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
