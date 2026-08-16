@@ -14,11 +14,12 @@ const GENERIC_ORG_WORDS = new Set([
 const COMMERCE = /\b(?:teamshop|webshop|fanshop|fan shop|merchandise|merch|shop)\b/i;
 const MARK_SEMANTICS = /\b(?:logo|wappen|flagge|signet|vereinslogo|clublogo)\b/i;
 const SITE_IDENTITY = /\b(?:brand logo|custom logo|site logo|header logo|navbar brand|logo image|logo link|seitenlogo)\b/i;
+const FOREIGN_ACRONYMS = new Set(['drv', 'nwrv', 'lrv', 'lsb', 'ksb']);
 
 const FOREIGN_IDENTITIES = [
-  { key: 'drv', pattern: /\b(?:deutscher ruderverband|drv)\b/i, target: /\bdeutscher ruderverband\b/i },
-  { key: 'lsb', pattern: /\b(?:landessportbund|lsb)\b/i, target: /\blandessportbund\b/i },
-  { key: 'ksb', pattern: /\b(?:kreissportbund|ksb)\b/i, target: /\bkreissportbund\b/i }
+  { acronym: 'drv', full: /\bdeutscher ruderverband\b/i },
+  { acronym: 'lsb', full: /\blandessportbund\b/i },
+  { acronym: 'ksb', full: /\bkreissportbund\b/i }
 ];
 
 function nameOf(organization) {
@@ -91,13 +92,18 @@ function embeddedShortAlias(organization, text = '') {
   const tokens = words(text);
   const aliases = organizationAliases(organization).filter((alias) => /^[a-z0-9]+$/.test(alias) && alias.length >= 2 && alias.length <= 4);
   if (aliases.some((alias) => tokens.includes(alias))) return false;
-  return aliases.some((alias) => tokens.some((token) => token.length > alias.length && token.length <= 6 && token.includes(alias)));
+  return aliases.some((alias) => tokens.some((token) => FOREIGN_ACRONYMS.has(token) && token !== alias && token.includes(alias)));
 }
 
 function hasForeignIdentity(candidate, organization, selectedUrl = '') {
   const text = sourceText(candidate, selectedUrl);
-  const target = normalizeToken(nameOf(organization));
-  return FOREIGN_IDENTITIES.some(({ pattern, target: targetPattern }) => pattern.test(text) && !targetPattern.test(target));
+  const tokenSet = new Set(words(text));
+  const targetText = normalizeToken(nameOf(organization));
+  const targetAliases = new Set(organizationAliases(organization));
+  return FOREIGN_IDENTITIES.some(({ acronym, full }) => {
+    if (full.test(text)) return !full.test(targetText);
+    return tokenSet.has(acronym) && !targetAliases.has(acronym);
+  });
 }
 
 function weakFunctionWordIdentity(candidate, organization, selectedUrl = '') {
@@ -135,35 +141,25 @@ export function evaluateV5Precision(candidate, organization, { selectedUrl = '' 
   const source = sourceText(candidate, selectedUrl);
   const full = fullText(candidate, selectedUrl);
 
-  // V5.1: short aliases must match token boundaries; e.g. RV must not match inside DRV.
   if (embeddedShortAlias(organization, source)
       && targetCoverage(organization, source) === 0
       && !exactTargetName(organization, source)) {
     return { allow: false, disposition: 'reject', reason: 'v5_alias_boundary_conflict', rule: 'alias-boundary' };
   }
-
-  // V5.2: grammatical words such as "für" cannot establish candidate identity on their own.
   if (weakFunctionWordIdentity(candidate, organization, selectedUrl)) {
     return { allow: false, disposition: 'reject', reason: 'v5_function_word_only_identity', rule: 'function-word-evidence' };
   }
-
-  // V5.3: merchandising/sub-brand assets and weak footer affiliations are not canonical organization logos.
   if (COMMERCE.test(full)) {
     return { allow: false, disposition: 'reject', reason: 'v5_commerce_or_teamshop', rule: 'commerce-subbrand' };
   }
   if (weakAffiliationFooter(candidate, organization, selectedUrl)) {
     return { allow: false, disposition: 'reject', reason: 'v5_weak_footer_affiliation', rule: 'commerce-subbrand' };
   }
-
-  // V5.4: an explicit foreign umbrella identity outweighs same-page/path identity.
   if (hasForeignIdentity(candidate, organization, selectedUrl)) {
     return { allow: false, disposition: 'reject', reason: 'v5_foreign_organization_identity', rule: 'identity-conflict' };
   }
-
-  // V5.5: JPEG/JPEG site-brand assets without logo semantics remain review-only because DOM classes can label photos as brand logos.
   if (rasterBrandingNeedsReview(candidate, selectedUrl)) {
     return { allow: false, disposition: 'review', reason: 'v5_raster_branding_requires_review', rule: 'raster-photo-protection' };
   }
-
   return { allow: true, disposition: candidate?.disposition || 'accept', reason: '', rule: '' };
 }
