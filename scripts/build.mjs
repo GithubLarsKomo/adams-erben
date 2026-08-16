@@ -318,6 +318,7 @@ const preparedIndexHtml = replaceLaborVisuals(indexHtml)
 await writeFile(indexPath, renderPage(preparedIndexHtml));
 
 const seedPath = path.join(dist, 'data', 'clubs.seed.json');
+const snapshotPath = path.join(dist, 'data', 'clubs.snapshot.json');
 const publicPath = path.join(dist, 'data', 'clubs.json');
 const postalSeedPath = path.join(dist, 'data', 'postal-locations.seed.json');
 const postalPublicPath = path.join(dist, 'data', 'postal-locations.json');
@@ -345,10 +346,23 @@ try {
 } catch (error) {
   if (process.env.REQUIRE_DRV_SYNC === '1') throw error;
   console.warn(`[build] ${error.message}; using checked-in seed data.`);
-  const seed = await readFile(seedPath, 'utf8');
+  let clubDataPath = seedPath;
+  let clubDataLabel = 'checked-in demo seed';
+  if (process.env.USE_CLUB_SNAPSHOT === '1') {
+    try {
+      await readFile(snapshotPath, 'utf8');
+      clubDataPath = snapshotPath;
+      clubDataLabel = 'checked-in full club snapshot';
+    } catch (snapshotError) {
+      if (snapshotError?.code !== 'ENOENT') throw snapshotError;
+      console.warn('[build] full club snapshot missing; falling back to demo seed.');
+    }
+  }
+  const clubData = await readFile(clubDataPath, 'utf8');
   const postalSeed = await readFile(postalSeedPath, 'utf8');
-  await writeFile(publicPath, seed);
+  await writeFile(publicPath, clubData);
   await writeFile(postalPublicPath, postalSeed);
+  console.warn(`[build] using ${clubDataLabel}.`);
   const fallbackReason = process.env.SKIP_DRV_SYNC === '1'
     ? 'DRV sync explicitly skipped'
     : error.message;
@@ -369,5 +383,6 @@ try {
 }
 
 await rm(seedPath, { force: true });
+await rm(snapshotPath, { force: true });
 await rm(postalSeedPath, { force: true });
 console.log(`[build] dist ready (${previewMode ? 'preview' : 'production'} mode)`);
