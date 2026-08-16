@@ -34,10 +34,43 @@ function organizationTokens(organization) {
   return meaningfulTokens(name).filter((token) => !cityTokens.has(token));
 }
 
+function canonicalNameWords(name = '') {
+  return normalizeToken(name)
+    .replace(/\bruder\s+club\b/g, 'ruderclub')
+    .replace(/\bruder\s+verein\b/g, 'ruderverein')
+    .replace(/\bruder\s+gesellschaft\b/g, 'rudergesellschaft')
+    .replace(/\bruder\s+gemeinschaft\b/g, 'rudergemeinschaft')
+    .replace(/\bruder\s+riege\b/g, 'ruderriege')
+    .split(' ')
+    .filter(Boolean);
+}
+
+function abbreviationForWord(word) {
+  const map = {
+    akademische: 'a', akademischer: 'a', akademischen: 'a', akademisches: 'a',
+    ruderclub: 'rc', ruderverein: 'rv', rudergesellschaft: 'rg', rudergemeinschaft: 'rg', ruderriege: 'rr',
+    ruderklub: 'rk', ruderverbindung: 'rv', turnverbindung: 'tv', landesruderverband: 'lrv', ruderverband: 'rv'
+  };
+  if (map[word]) return map[word];
+  if (/^(?:e|v|ev|der|die|das|und|von|zu|am|an|im|in)$/.test(word)) return '';
+  return word[0] || '';
+}
+
+export function organizationAliases(organization) {
+  const name = typeof organization === 'string' ? organization : organization?.name || '';
+  const city = typeof organization === 'string' ? '' : organization?.city || '';
+  const words = canonicalNameWords(name);
+  const cityWords = new Set(canonicalNameWords(city));
+  const withoutCity = words.filter((word) => !cityWords.has(word));
+  const build = (items) => items.map(abbreviationForWord).join('');
+  const aliases = new Set([build(withoutCity), build(words)]);
+  const normalizedName = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
+  if (normalizedName) aliases.add(normalizedName.replace(/\s+/g, ''));
+  return [...aliases].filter((value) => value.length >= 2 && value.length <= 80);
+}
+
 export function organizationAcronym(name = '') {
-  const tokens = normalizeToken(name).split(' ').filter((token) => token.length >= 2 && !/^(?:ev|e|v)$/.test(token));
-  const initials = tokens.map((token) => token[0]).join('');
-  return initials.length >= 2 && initials.length <= 8 ? initials : '';
+  return organizationAliases(name).find((value) => value.length <= 8) || '';
 }
 
 function tokenCoverage(tokens, text) {
@@ -47,11 +80,16 @@ function tokenCoverage(tokens, text) {
   return matches / tokens.length;
 }
 
-function acronymMatch(name, text) {
-  const acronym = organizationAcronym(name);
-  if (!acronym) return false;
+function aliasMatch(organization, text) {
   const normalized = normalizeToken(text).replace(/\s+/g, '');
-  return normalized.includes(acronym);
+  return organizationAliases(organization).some((alias) => normalized.includes(alias));
+}
+
+function exactNameMatch(organization, text) {
+  const name = typeof organization === 'string' ? organization : organization?.name || '';
+  const core = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
+  if (core.length < 5) return false;
+  return normalizeToken(text).includes(core);
 }
 
 function parseDimension(value) {
@@ -113,7 +151,6 @@ function elementContext($, element) {
 }
 
 export function scoreLogoCandidate(candidate, organization = '') {
-  const name = typeof organization === 'string' ? organization : organization?.name || '';
   const urlText = normalizeToken(candidate.url || '');
   const label = clean([candidate.label, candidate.context].filter(Boolean).join(' '));
   const labelNorm = normalizeToken(label);
@@ -131,7 +168,8 @@ export function scoreLogoCandidate(candidate, organization = '') {
   const tokens = organizationTokens(organization);
   const matches = tokens.filter((token) => labelNorm.includes(token) || urlText.includes(token)).length;
   score += Math.min(45, matches * 15);
-  if (acronymMatch(name, `${labelNorm} ${urlText}`)) score += 25;
+  if (aliasMatch(organization, `${labelNorm} ${urlText}`)) score += 35;
+  if (exactNameMatch(organization, `${labelNorm} ${urlText}`)) score += 30;
 
   const width = parseDimension(candidate.width);
   const height = parseDimension(candidate.height);
@@ -166,18 +204,21 @@ export function extractPageIdentity(html) {
 }
 
 export function scoreEntityConfidence(candidate, organization, pageIdentity) {
-  const name = organization?.name || String(organization || '');
   const tokens = organizationTokens(organization);
   const candidateText = `${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`;
   const pageText = pageIdentity?.text || '';
   const pageCoverage = tokenCoverage(tokens, pageText);
   const assetCoverage = tokenCoverage(tokens, candidateText);
-  const pageAcronym = acronymMatch(name, pageText);
-  const assetAcronym = acronymMatch(name, candidateText);
+  const pageAlias = aliasMatch(organization, pageText);
+  const assetAlias = aliasMatch(organization, candidateText);
+  const pageExact = exactNameMatch(organization, pageText);
+  const assetExact = exactNameMatch(organization, candidateText);
 
-  let confidence = Math.min(1, pageCoverage * 0.65 + assetCoverage * 0.35);
-  if (pageAcronym) confidence += 0.15;
-  if (assetAcronym) confidence += 0.2;
+  if (assetExact || ((candidate?.kind === 'jsonld' || candidate?.kind === 'meta') && pageExact)) return 1;
+  let confidence = Math.min(1, pageCoverage * 0.55 + assetCoverage * 0.35);
+  if (pageAlias) confidence += 0.15;
+  if (assetAlias) confidence += 0.35;
+  if (pageExact) confidence += 0.25;
   if ((candidate?.kind === 'jsonld' || candidate?.kind === 'meta') && pageCoverage >= 0.5) confidence += 0.15;
   return Math.min(1, Number(confidence.toFixed(3)));
 }
@@ -187,11 +228,14 @@ export function classifyLogoCandidate(candidate, organization, pageIdentity, { m
   const score = Number(candidate?.score || 0);
   const candidateText = `${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`;
   const tokens = organizationTokens(organization);
-  const assetIdentityEvidence = tokenCoverage(tokens, candidateText) > 0 || acronymMatch(organization?.name || String(organization || ''), candidateText);
+  const assetIdentityEvidence = tokenCoverage(tokens, candidateText) > 0 || aliasMatch(organization, candidateText) || exactNameMatch(organization, candidateText);
 
   if (NEGATIVE.test(normalizeToken(candidateText))) return { disposition: 'reject', reason: 'negative_logo_context', score, entityConfidence };
   if (PHOTO_NEGATIVE.test(normalizeToken(candidateText))) return { disposition: 'reject', reason: 'photo_or_banner_context', score, entityConfidence };
-  if (score < minScore) return { disposition: 'reject', reason: 'below_logo_score', score, entityConfidence };
+  if (score < minScore) {
+    if (score >= 40 && entityConfidence >= 0.8) return { disposition: 'review', reason: 'high_entity_low_logo_score', score, entityConfidence };
+    return { disposition: 'reject', reason: 'below_logo_score', score, entityConfidence };
+  }
   if (candidate?.kind === 'img' && !assetIdentityEvidence) {
     return { disposition: entityConfidence >= 0.25 ? 'review' : 'reject', reason: 'asset_identity_missing', score, entityConfidence };
   }
