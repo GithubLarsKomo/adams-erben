@@ -6,6 +6,7 @@ import {
   extractPageIdentity,
   isSameSite,
   isTrustedReferencedAsset,
+  organizationAliases,
   sanitizeSvg,
   scoreEntityConfidence,
   scoreLogoCandidate
@@ -28,6 +29,11 @@ const html = `<!doctype html>
 </body>
 </html>`;
 
+assert.ok(organizationAliases(organization).includes('rrc'));
+assert.ok(organizationAliases({ name: 'Akademischer Ruderclub Würzburg e.V.', city: 'Würzburg' }).includes('arc'));
+assert.ok(organizationAliases({ name: 'Akademischer Ruderclub Würzburg e.V.', city: 'Würzburg' }).includes('arcw'));
+assert.ok(organizationAliases({ name: 'Akademischer Ruderverein e.V. Kiel', city: 'Kiel' }).includes('arv'));
+
 const identity = extractPageIdentity(html);
 assert.match(identity.text, /Ratzeburger Ruderclub/);
 const candidates = extractLogoCandidates(html, pageUrl, organization);
@@ -43,6 +49,17 @@ assert.ok(hero.score < 70);
 assert.equal(classifyLogoCandidate(structured, organization, identity).disposition, 'accept');
 assert.notEqual(classifyLogoCandidate(sponsorLogo, organization, identity).disposition, 'accept');
 assert.ok(scoreEntityConfidence(clubLogo, organization, identity) >= 0.55);
+
+const rrcShortLogo = {
+  url: 'https://www.rrc-online.de/wp-content/uploads/cropped-rrc-logo.png', kind: 'img', score: 180,
+  label: 'RRC-Online.de', context: 'header logo', directlyReferenced: true
+};
+assert.equal(classifyLogoCandidate(rrcShortLogo, organization, identity).disposition, 'accept');
+
+const arcw = { name: 'Akademischer Ruderclub Würzburg e.V.', city: 'Würzburg' };
+const arcwIdentity = { text: 'Akademischer Ruderclub Würzburg e.V.' };
+const arcwLogo = { url: 'https://arcw.de/cropped-ARCW_Logo.png', kind: 'img', score: 175, label: 'arcw.de', context: 'header', directlyReferenced: true };
+assert.equal(classifyLogoCandidate(arcwLogo, arcw, arcwIdentity).disposition, 'accept');
 
 assert.equal(isSameSite('https://static.rrc-online.de/logo.svg', pageUrl), true);
 assert.equal(isSameSite('https://cdn.example.net/logo.svg', pageUrl), false);
