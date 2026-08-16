@@ -39,9 +39,9 @@ const sponsorLogo = candidates.find((item) => item.url.endsWith('/sponsors/acme-
 assert.ok(structured && clubLogo && hero && sponsorLogo);
 assert.ok(clubLogo.score > hero.score);
 assert.ok(clubLogo.score > sponsorLogo.score);
-assert.ok(sponsorLogo.score < 70);
 assert.ok(hero.score < 70);
 assert.equal(classifyLogoCandidate(structured, organization, identity).disposition, 'accept');
+assert.notEqual(classifyLogoCandidate(sponsorLogo, organization, identity).disposition, 'accept');
 assert.ok(scoreEntityConfidence(clubLogo, organization, identity) >= 0.55);
 
 assert.equal(isSameSite('https://static.rrc-online.de/logo.svg', pageUrl), true);
