@@ -9,7 +9,7 @@
     "sync:drv": "node scripts/sync-drv.mjs && node scripts/validate-drv-output.mjs && node scripts/apply-club-logo-manifest.mjs",
     "logos:sync": "node scripts/sync-club-logos.mjs && node scripts/apply-club-logo-manifest.mjs",
     "logos:apply": "node scripts/apply-club-logo-manifest.mjs",
-    "test:logos": "node scripts/lib/logo-discovery.test.mjs && node scripts/lib/logo-manifest.test.mjs",
+    "test:logos": "node scripts/lib/logo-discovery.test.mjs && node scripts/lib/logo-discovery-v4-live-regression.test.mjs && node scripts/lib/logo-manifest.test.mjs",
     "validate:drv-output": "node scripts/validate-drv-output.mjs",
     "test:drv-output": "node scripts/validate-drv-output.test.mjs",
     "test:nearest": "node scripts/nearest.test.mjs",
