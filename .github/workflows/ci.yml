@@ -27,6 +27,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check scripts/build.mjs
+          node --check scripts/build-deployment-snapshot.mjs
           node --check scripts/build-local.mjs
           node --check scripts/remove-local-snapshot.mjs
           node --check scripts/assert-no-remote-runtime-fallbacks.mjs
@@ -76,6 +77,12 @@ jobs:
 
       - name: Assert source contains no remote runtime fallbacks
         run: node scripts/assert-no-remote-runtime-fallbacks.mjs
+
+      - name: Deployment-safe snapshot build
+        env:
+          PREVIEW_MODE: '1'
+          DRV_DATA_USAGE_APPROVED: '0'
+        run: npm run build:deployment
 
       - name: Preview risk preflight
         env:
