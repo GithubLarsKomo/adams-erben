@@ -11,17 +11,30 @@ const root = process.cwd();
 const snapshotPath = path.join(root, 'dist', 'data', 'clubs.snapshot.json');
 const publicClubsPath = path.join(root, 'dist', 'data', 'clubs.json');
 
-await import('./risk-preflight.mjs');
-await import('./build.mjs');
+async function stage(name, action) {
+  console.log(`[build:local] ${name}`);
+  try {
+    await action();
+  } catch (error) {
+    const message = String(error?.message || error).replace(/[\r\n]+/g, ' ');
+    console.error(`::error title=Local build stage failed::${name}: ${message}`);
+    throw error;
+  }
+}
+
+await stage('risk preflight', () => import('./risk-preflight.mjs'));
+await stage('core page build', () => import('./build.mjs'));
 
 // The normal build remains production-safe and does not depend on the local snapshot.
 // For local review, replace the demo seed with the checked-in sanitized full club snapshot.
-await copyFile(snapshotPath, publicClubsPath);
-await rm(snapshotPath, { force: true });
+await stage('sanitized club snapshot', async () => {
+  await copyFile(snapshotPath, publicClubsPath);
+  await rm(snapshotPath, { force: true });
+});
 
-await import('./apply-club-logo-manifest.mjs');
-await import('./split-audiences.mjs');
-await import('./postbuild-seo.mjs');
-await import('./postbuild-legal-links.mjs');
-await import('./validate-seo-output.mjs');
-await import('./risk-protection.mjs');
+await stage('club logo manifest', () => import('./apply-club-logo-manifest.mjs'));
+await stage('audience split', () => import('./split-audiences.mjs'));
+await stage('SEO postbuild', () => import('./postbuild-seo.mjs'));
+await stage('legal footer links', () => import('./postbuild-legal-links.mjs'));
+await stage('SEO validation', () => import('./validate-seo-output.mjs'));
+await stage('risk protection', () => import('./risk-protection.mjs'));
