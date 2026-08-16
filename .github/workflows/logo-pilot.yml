@@ -1,7 +1,10 @@
 name: Club Logo Pilot
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [feat/club-logo-enrichment]
+    paths:
+      - '.github/workflows/logo-pilot.yml'
 
 permissions:
   contents: read
@@ -9,7 +12,7 @@ permissions:
 jobs:
   pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,9 +30,9 @@ jobs:
           REQUIRE_DRV_SYNC: '1'
         run: npm run sync:drv
 
-      - name: Run 100-organization logo pilot
+      - name: Run 500-organization logo pilot
         env:
-          LOGO_SYNC_LIMIT: '100'
+          LOGO_SYNC_LIMIT: '500'
           LOGO_SYNC_FORCE: '1'
           LOGO_SYNC_CONCURRENCY: '3'
         run: npm run logos:sync
@@ -44,7 +47,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: club-logo-pilot-100-v4
+          name: club-logo-pilot-500-v4
           if-no-files-found: warn
           retention-days: 7
           path: |
