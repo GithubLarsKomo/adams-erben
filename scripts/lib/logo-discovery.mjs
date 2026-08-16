@@ -169,8 +169,17 @@ function elementContext($, element) {
   return clean(parts.join(' '));
 }
 
+function assetPathText(rawUrl = '') {
+  try {
+    const url = new URL(rawUrl);
+    return clean(`${decodeURIComponent(url.pathname)} ${decodeURIComponent(url.search)}`);
+  } catch {
+    return clean(rawUrl);
+  }
+}
+
 function candidateDirectText(candidate) {
-  return clean(`${candidate?.label || ''} ${candidate?.directContext || ''} ${candidate?.url || ''}`);
+  return clean(`${candidate?.label || ''} ${candidate?.directContext || ''} ${assetPathText(candidate?.url || '')}`);
 }
 
 function candidateFullText(candidate) {
