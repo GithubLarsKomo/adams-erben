@@ -29,6 +29,20 @@ const variants = {
     ],
     ctaHref: '#vereine',
     ctaLabel: 'Verein finden'
+  },
+  content: {
+    skipHref: '#inhalt',
+    skipLabel: 'Zum Inhalt springen',
+    nav: [
+      ['/adams-acht/', 'Adams Acht'],
+      ['/karl-adam/', 'Karl Adam'],
+      ['/ratzeburg/', 'Ratzeburg'],
+      ['/rudern/', 'Rudern'],
+      ['/ueber-adams-erben/', 'Über'],
+      ['/ruderverein-finden/', 'Verein finden', 'nav-cta']
+    ],
+    ctaHref: '/ruderverein-finden/',
+    ctaLabel: 'Verein finden'
   }
 };
 
@@ -36,7 +50,7 @@ function renderFragment(html) {
   return cheerio.load(html, { decodeEntities: false }, false);
 }
 
-function renderHeader(template, config) {
+function renderHeader(template, config, currentPath) {
   const $ = renderFragment(template);
   const nav = $('[data-shell-slot="navigation"]');
   nav.empty();
@@ -44,6 +58,7 @@ function renderHeader(template, config) {
   for (const [href, label, className] of config.nav) {
     const link = $('<a></a>').attr('href', href).text(label);
     if (className) link.addClass(className);
+    if (currentPath && href === currentPath) link.attr('aria-current', 'page');
     nav.append(link);
   }
 
@@ -55,26 +70,26 @@ function renderHeader(template, config) {
   return $.html();
 }
 
-export function applySiteShell($, { variant, headerTemplate, footerTemplate }) {
+export function applySiteShell($, { variant, headerTemplate, footerTemplate, currentPath = '' }) {
   const config = variants[variant];
   if (!config) throw new Error(`[site-shell] unknown variant: ${variant}`);
 
   $('body').attr('data-shell-variant', variant);
+  if (currentPath) $('body').attr('data-shell-path', currentPath);
 
-  let skipLink = $('.skip-link').first();
-  if (!skipLink.length) {
-    skipLink = $('<a class="skip-link"></a>');
-    $('body').prepend(skipLink);
-  }
-  skipLink.attr('href', config.skipHref).text(config.skipLabel);
+  $('.skip-link').remove();
+  const skipLink = $('<a class="skip-link"></a>')
+    .attr('href', config.skipHref)
+    .text(config.skipLabel);
+  $('body').prepend(skipLink);
 
   $('.site-header').remove();
-  const headerHtml = renderHeader(headerTemplate, config);
+  const headerHtml = renderHeader(headerTemplate, config, currentPath);
   const previewBanner = $('#preview-banner').first();
   if (previewBanner.length) previewBanner.after(headerHtml);
   else skipLink.after(headerHtml);
 
-  $('.site-footer').remove();
+  $('.site-footer, .detail-footer').remove();
   $('body').append(footerTemplate);
 
   $('link[href="/assets/site-shell.css"]').remove();
