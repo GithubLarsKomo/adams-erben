@@ -1,0 +1,222 @@
+/* Audience-specific presentation for the two-page landing architecture. */
+.audience-page .audience-intro,
+.audience-page .quick-finder,
+.audience-page .depth-teaser,
+.audience-page .professional-link {
+  width: min(var(--content, 1180px), calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+.audience-intro,
+.quick-finder,
+.depth-teaser,
+.professional-link {
+  border-radius: var(--radius, 22px);
+}
+
+.audience-intro-rowing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem;
+  align-items: center;
+  margin-block: 2.5rem 4rem;
+  padding: 2rem;
+  background: var(--water, #dcebf0);
+}
+
+.quick-finder {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(360px, 1.1fr);
+  gap: 2.5rem;
+  align-items: center;
+  margin-block: 2rem 2.25rem;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  background: var(--navy, #0b2336);
+  color: #fff;
+}
+
+.quick-finder .eyebrow,
+.quick-finder h2 {
+  color: #fff;
+}
+
+.quick-finder-copy p:last-child {
+  margin-bottom: 0;
+  color: rgba(255, 255, 255, .82);
+}
+
+.quick-finder-form {
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .18);
+}
+
+.quick-finder-form > label {
+  display: block;
+  margin-bottom: .55rem;
+  font-weight: 800;
+}
+
+.quick-finder-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: .75rem;
+}
+
+.quick-finder-row input {
+  min-width: 0;
+  width: 100%;
+  min-height: 48px;
+  padding: .8rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+}
+
+.quick-finder-secondary {
+  display: flex;
+  gap: .8rem 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: .9rem;
+  font-size: .92rem;
+  color: rgba(255, 255, 255, .78);
+}
+
+.quick-finder .button-ghost {
+  color: #fff;
+  border-color: rgba(255, 255, 255, .45);
+}
+
+/* The complete directory remains available on the cinema page, but only after intent is explicit. */
+.audience-page-landing .landing-directory {
+  margin-top: .25rem;
+  margin-bottom: 4rem;
+}
+
+.audience-page-landing .landing-directory[hidden] {
+  display: none !important;
+}
+
+.depth-teaser {
+  margin-block: 4rem;
+  padding: clamp(1.25rem, 2.5vw, 2.25rem);
+  background: var(--foam, #f7f5ef);
+}
+
+.depth-teaser-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.depth-teaser-card {
+  display: grid;
+  gap: .45rem;
+  min-height: 150px;
+  padding: 1.25rem;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid rgba(11, 35, 54, .12);
+  color: inherit;
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.depth-teaser-card:hover,
+.depth-teaser-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(11, 35, 54, .1);
+}
+
+.depth-teaser-card strong {
+  font-size: 1.15rem;
+  color: var(--navy, #0b2336);
+}
+
+.depth-teaser-card span {
+  color: rgba(16, 32, 43, .76);
+}
+
+.depth-teaser-cta,
+.landing-more-link,
+.landing-final-cta {
+  margin-top: 1.25rem;
+}
+
+.landing-final-cta {
+  text-align: center;
+}
+
+.professional-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem;
+  align-items: center;
+  margin-block: 4rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: linear-gradient(135deg, #10202b, #123a57);
+  color: #fff;
+}
+
+.professional-link .eyebrow,
+.professional-link h2,
+.professional-link p {
+  color: #fff;
+}
+
+.audience-page-rowing .hero {
+  margin-bottom: 0;
+}
+
+.audience-page-rowing .story-film-bridge {
+  display: none;
+}
+
+@media (max-width: 920px) {
+  /* The compact AE mark is 52px high plus 8px vertical header padding on each side. */
+  .audience-page {
+    --story-header-height: 68px;
+  }
+
+  .audience-intro-rowing,
+  .quick-finder,
+  .professional-link {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-finder-row {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-finder-row .button {
+    width: 100%;
+  }
+
+  .quick-finder-secondary {
+    align-items: stretch;
+  }
+
+  .depth-teaser-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Preserve the persistent action without crowding the AE mark and menu on very narrow screens. */
+  .audience-page-landing .header-find-club[data-compact-label] {
+    font-size: 0;
+  }
+
+  .audience-page-landing .header-find-club[data-compact-label]::after {
+    content: attr(data-compact-label);
+    font-size: .78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .depth-teaser-card {
+    transition: none;
+  }
+}

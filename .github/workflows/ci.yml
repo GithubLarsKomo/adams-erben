@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment]
   pull_request:
 
 permissions:
@@ -27,12 +27,21 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check scripts/build.mjs
+          node --check scripts/build-local.mjs
+          node --check scripts/split-audiences.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
           node --check scripts/validate-drv-output.test.mjs
+          node --check scripts/sync-club-logos.mjs
+          node --check scripts/apply-club-logo-manifest.mjs
+          node --check scripts/lib/logo-discovery.mjs
+          node --check scripts/lib/logo-manifest.mjs
           node --check src/assets/app.js
           node --check src/assets/nearest.js
+
+      - name: Club logo enrichment tests
+        run: npm run test:logos
 
       - name: DRV output validator tests
         run: npm run test:drv-output
@@ -43,10 +52,33 @@ jobs:
       - name: Local nearest-club tests
         run: npm run test:nearest
 
-      - name: Build with checked-in seed
-        env:
-          SKIP_DRV_SYNC: '1'
-        run: npm run build
+      - name: Local build with checked-in seed
+        run: npm run build:local
+
+      - name: Validate audience pages
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const landing = fs.readFileSync('dist/index.html', 'utf8');
+          const rowing = fs.readFileSync('dist/rudern/index.html', 'utf8');
+          const checks = [
+            [landing.includes('id="quick-finder"'), 'landing quick finder'],
+            [landing.includes('id="vereine"') && landing.includes('hidden=""'), 'landing progressive directory'],
+            [landing.includes('href="/rudern/"'), 'landing link to rowing page'],
+            [!landing.includes('id="labor"'), 'landing excludes full Adams Labor'],
+            [rowing.includes('id="labor"'), 'rowing page includes Adams Labor'],
+            [rowing.includes('id="rudern-verstehen"'), 'rowing page includes rowing explainer'],
+            [!rowing.includes('id="film"'), 'rowing page excludes film-first section'],
+            [rowing.includes('href="/"'), 'rowing page links back to entry page']
+          ];
+          for (const [ok, label] of checks) {
+            if (!ok) {
+              console.error('Audience-page assertion failed:', label);
+              process.exit(1);
+            }
+          }
+          console.log('Audience pages validated.');
+          NODE
 
       - name: Assert browser data contains no email addresses
         shell: bash

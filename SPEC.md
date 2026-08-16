@@ -1,508 +1,1352 @@
-# SPEC — Karl-Adam-/Ratzeburg-Kooperationsbranch
+# SPEC — Adams Erben: Kinobesucher-Landingpage + Rudern-Vertiefungsseite
 
-Status: Konzept / lokal zu bewerten  
-Branch: `feat/karl-adam-local-cooperation`  
-Basis: `feat/mvp-wayfinder`  
-Stand: 2026-08-10
-
-## 1. Ziel
-
-`adams-erben.de` bleibt primär eine unabhängige, nicht-kommerzielle Kontaktbrücke vom Kinofilm **„Adams Acht“** in den realen Rudersport. Der lokale Ratzeburg-/Karl-Adam-Kontext soll die Seite inhaltlich vertiefen, ohne daraus eine zweite Karl-Adam-Biografie oder Konkurrenz zu `karladam.de` zu machen.
-
-Leitidee:
-
-> **Der Film endet im Kino. Adams Erbe lebt im Bootshaus weiter.**
-
-Die historische Vertiefung verweist gezielt auf `karladam.de`, die Karl-Adam-Biografie, Ausstellung, DRV-Quellen und weitere belastbare Quellen. `adams-erben.de` beantwortet vor allem die Anschlussfrage: **Was lebt davon heute weiter — und wie komme ich selbst ins Boot?**
-
-## 2. Nicht-Ziele
-
-- keine vollständige Karl-Adam-Biografie duplizieren;
-- keine Konkurrenzseite zu `karladam.de` oder `dergoldachter.de`;
-- keine unlizenzierte Übernahme historischer Fotos, Filmstills, Logos oder Buchinhalte;
-- keine Verharmlosung oder Heroisierung der NS-Vergangenheit;
-- keine Monetarisierung über Buch-/Partnerlinks;
-- keine Verschlechterung der bestehenden Vereinssuche oder des Kontakt-Routings;
-- kein Deploy dieses Branches in Preview/Production vor lokaler Freigabe.
-
-## 3. Informationsarchitektur
-
-Empfohlene Reihenfolge auf der Startseite:
-
-1. Hero / Leitmotiv
-2. Ratzeburger Ruderclub als besonderer Ort
-3. Kern-CTA: deutschlandweit Verein finden
-4. Stimmen: „Adams Erben heute“
-5. Adams Labor: prä-Adam → Adam → heute
-6. Ratzeburg erleben: Ruderführung
-7. Karl Adam vertiefen: Biografie, Ausstellung, `karladam.de`, kritische historische Einordnung
-8. Rudersport ermöglichen: Karl-Adam-Stiftung + weitere Förderwege
-9. Vereinssuche / Kontaktvermittlung erneut als Abschluss-CTA
-10. Unabhängigkeit / Datenschutz / Quellen
-
-Die Suche muss sowohl früh auf der Seite als auch nach den redaktionellen Inhalten erreichbar bleiben.
+Status: Umsetzungsgrundlage  
+Branch: `feat/landingpage-kinobesucher`  
+Basis: `feat/karl-adam-local-cooperation` @ `dd8318e87f9f4cd677653456af9cca99af77b3a7`  
+Stand: 2026-08-14  
+Zieltermin: vor dem Kinostart von **„Adams Acht“ am 17. September 2026**
 
 ---
 
-## 4. Hero
+## 1. Architekturentscheidung
 
-### 4.1 Headline
+Der aktuelle Stand von `adams-erben.de` enthält zwei sehr unterschiedliche Produkte in einer einzigen langen Seite:
+
+1. eine emotionale Landingpage für Menschen, die über den Film **„Adams Acht“** zum ersten Mal mit Karl Adam oder Rudern in Berührung kommen;
+2. eine redaktionell tiefe Fach-/Magazinseite zu Karl Adam, Ratzeburg, Trainingsinnovation, Ruderkultur, Ruderakademie, Regatta, Rudertechnik, World Rowing, DRV, Schubschlag, Wanderrudern, Förderung und historischer Einordnung.
+
+Diese beiden Produkte werden getrennt.
+
+### Verbindliche Zielarchitektur
+
+- `/` = **primäre Kinobesucher- und Einsteiger-Landingpage**
+- `/rudern/` = **redaktionelle Vertiefungsseite für Ruderer und stärker Interessierte**
+
+Die Startseite `/` wird standardmäßig ausgeliefert und ist der wichtigste Einstieg aus Film, Presse, Social Media, QR-Codes und Suchmaschinen.
+
+Die Vertiefungsseite `/rudern/` ist bewusst kein versteckter Bereich, sondern die zweite Informationsebene. Sie wird von der Startseite mehrfach natürlich verlinkt.
+
+### Leitprinzip
+
+> **Die Startseite beantwortet: „Der Film hat mich neugierig gemacht — wie komme ich ins Boot?“**  
+> **Die Vertiefungsseite beantwortet: „Ich möchte verstehen, was Karl Adam verändert hat und wie Rudern heute funktioniert.“**
+
+---
+
+## 2. Markenversprechen
+
+Die zentrale Leitidee bleibt unverändert:
+
+> **Der Film endet im Kino. Adams Erbe lebt im Bootshaus weiter.**
+
+Die Marke `Adams Erben` verbindet drei Ebenen:
+
+1. Karl Adams Geschichte;
+2. das lebendige Rudern von heute;
+3. den persönlichen Einstieg in einen Verein.
+
+`adams-erben.de` ist:
+
+- eine unabhängige Initiative zum Kinostart von „Adams Acht“;
+- keine offizielle Filmseite;
+- keine offizielle Website des DRV, RRC, World Rowing oder anderer genannter Organisationen;
+- keine vollständige Karl-Adam-Biografie;
+- eine redaktionelle Brücke von Geschichte zu Gegenwart;
+- ein niedrigschwelliger Weg, Rudern selbst auszuprobieren.
+
+---
+
+## 3. Zielgruppen
+
+### 3.1 Primäre Zielgruppe von `/`: Kinobesucher und Ruder-Neulinge
+
+Typischer Zustand:
+
+- hat „Adams Acht“ gesehen, einen Trailer gesehen oder davon gelesen;
+- kennt Karl Adam nur teilweise oder gar nicht;
+- kennt Rudersport, Bootsklassen und Verbandsstruktur kaum;
+- ist emotional neugierig;
+- fragt eher „Kann ich das auch?“ als „Welcher Verein ist zuständig?“;
+- nutzt sehr wahrscheinlich ein Smartphone;
+- benötigt schnell eine verständliche Handlungsmöglichkeit.
+
+Kernbedürfnisse:
+
+- Orientierung in wenigen Sekunden;
+- emotionaler Anschluss an den Film;
+- Abbau von Einstiegshürden;
+- echte Menschen statt abstrakter Sportwerbung;
+- schneller lokaler Verein;
+- einfache Kontaktaufnahme.
+
+### 3.2 Primäre Zielgruppe von `/rudern/`: Ruderer und vertieft Interessierte
+
+Typischer Zustand:
+
+- kennt Rudersport zumindest teilweise;
+- interessiert sich für Karl Adams Wirkung und Ratzeburg;
+- möchte mehr über Training, Technik, Institutionen, Regatta und Ruderkultur erfahren;
+- erwartet fachliche Genauigkeit und belastbare Quellen;
+- akzeptiert längere Inhalte, wenn sie Substanz haben.
+
+Kernbedürfnisse:
+
+- historische und technische Tiefe;
+- fachlich korrekte Darstellungen;
+- nachvollziehbare Quellen;
+- Verbindung von Adams Zeit mit modernem Rudern;
+- differenzierte historische Einordnung;
+- relevante externe Vertiefungen.
+
+### 3.3 Weitere Zielgruppen
+
+- Trainerinnen und Trainer;
+- Vereinsverantwortliche;
+- Rudereltern und Familien;
+- sporthistorisch Interessierte;
+- Menschen aus Ratzeburg und Umgebung;
+- Medien und Multiplikatoren;
+- potenzielle Förderer und Ehrenamtliche.
+
+---
+
+## 4. Erfolgskriterien
+
+### 4.1 Erfolg der Startseite `/`
+
+Eine Person ohne Ruderwissen soll innerhalb von etwa 60 Sekunden verstehen:
+
+1. „Adams Erben knüpft an den Film an, ist aber unabhängig.“
+2. „Karl Adams Ideen wirken im heutigen Rudern weiter.“
+3. „Rudern ist nicht nur olympischer Hochleistungssport.“
+4. „Ich kann Rudern selbst ausprobieren.“
+5. „Ich kann hier einen Verein in meiner Nähe finden.“
+
+### 4.2 Primäre Conversion
+
+**Start einer Vereinssuche mit Ort oder Postleitzahl.**
+
+### 4.3 Sekundäre Conversion
+
+**Kontaktaufnahme bzw. Klick zur Vereinswebsite mit dem Ziel, Rudern auszuprobieren.**
+
+### 4.4 Erfolg der Vertiefungsseite `/rudern/`
+
+Ein interessierter Besucher soll:
+
+- mindestens einen fachlichen Vertiefungsbereich leicht finden;
+- Karl Adams Wirkung differenziert verstehen;
+- historische und heutige Inhalte klar unterscheiden können;
+- jederzeit zurück zur Vereinssuche gelangen;
+- externe Quellen als Vertiefung, nicht als zufällige Linkliste erleben.
+
+---
+
+# TEIL A — STARTSEITE `/`
+
+## 5. Aufgabe der Startseite
+
+Die Startseite ist keine gekürzte Kopie des bisherigen Long-Pagers, sondern eine eigenständige Landingpage.
+
+Sie soll in etwa 5 Minuten vollständig erfassbar sein.
+
+### Zielgefühl
+
+- neugierig;
+- menschlich;
+- glaubwürdig;
+- hochwertig;
+- nicht museal;
+- nicht technisch;
+- nicht verbandsbürokratisch;
+- nicht wie klassische Sportwerbung.
+
+### Zentrale Nutzerfrage
+
+> **„Der Film hat mich neugierig gemacht. Kann ich Rudern selbst ausprobieren?“**
+
+Die Seite beantwortet diese Frage möglichst früh mit **Ja** und bietet sofort einen lokalen Einstieg.
+
+---
+
+## 6. Verbindliche Reihenfolge auf `/`
+
+1. **Hero**
+2. **Film-Brücke „Adams Acht“**
+3. **Quick Finder „Rudern ausprobieren“**
+4. **Ratzeburg als realer Ort der Geschichte**
+5. **Adams Erbe heute — 3–5 verdichtete Prinzipien**
+6. **Echte Stimmen aus dem Rudern**
+7. **„Rudern ist mehr als Rennen“ — kurzer Breiten-/Lebenssport-Teaser**
+8. **zweiter Conversion-CTA / Quick Finder oder kurze Vereinssuche**
+9. **Vertiefungs-Teaser zu `/rudern/`**
+10. **Unabhängigkeit / Rechtliches / Footer**
+
+Die vollständige lange Fachseite darf nicht mehr vollständig innerhalb `/` eingebettet werden.
+
+---
+
+## 7. Hero auf `/`
+
+### Headline
+
+Beibehalten:
 
 **Der Film endet im Kino.  
 Adams Erbe lebt im Bootshaus weiter.**
 
-### 4.2 Lead
+### Lead
 
-Kurzer Übergang von Film und Geschichte zum lebendigen Rudersport. Keine Aussage, die eine offizielle Partnerschaft mit Film, DRV, RRC, Stadt, Karl-Adam-Stiftung oder `karladam.de` suggeriert, solange diese nicht ausdrücklich vereinbart ist.
+Maximal 2–3 kurze Sätze.
 
-### 4.3 Primärer CTA
+Der Lead muss:
 
-`Ruderverein finden`
+- Filmbezug herstellen;
+- Karl Adam in die Gegenwart verlängern;
+- persönliche Teilnahme ermöglichen.
 
-Sekundäre Links können zum Film und zur historischen Vertiefung führen.
+Keine Fachbegriffe im ersten Absatz.
 
----
+### Primärer CTA
 
-## 5. Ratzeburger Ruderclub e.V.
+**Rudern ausprobieren**
 
-Der RRC bleibt visuell hervorgehobener Verein und lokaler Ankerpunkt der Geschichte.
+Ziel: Quick Finder.
 
-### 5.1 Inhalte
+### Sekundärer CTA
 
-- Name: **Ratzeburger Ruderclub e.V.**
-- kurze Einordnung als zentraler historischer Ort des Karl-Adam-/Deutschlandachter-Kontexts;
-- heutiges Foto des RRC/Bootshauses;
-- optional historisches Foto aus der Karl-Adam-Zeit, vorzugsweise von/über Dirk Andresen bereitgestellt;
-- Clublogo: vorzugsweise Clubfahne oder Vintage-Logo mit Stadtwappen;
-- Bild-/Logo-Credits sichtbar oder im Mediennachweis;
-- Alt-Texte für alle inhaltlichen Bilder.
+**Ratzeburg entdecken**
 
-### 5.2 Aktionen
+oder, wenn dramaturgisch besser:
 
-Drei gleichwertig verständliche Aktionen:
+**Mehr über Adams Erbe**
 
-1. `Kontakt aufnehmen` — bestehender Adams-Erben-Kontaktweg;
-2. `RRC-Website` — `https://www.rrc-online.de/`;
-3. `DRV-Profil` — offizielles DRV-Profil.
+### Unabhängigkeit
 
-### 5.3 Rechte-Gate
-
-Historische Fotos und Logo erst nach dokumentierter Nutzungsfreigabe integrieren. Bis dahin neutrale Platzhalter/ungebrandete Darstellung.
+Der bestehende Hinweis auf die Unabhängigkeit bleibt sichtbar, aber visuell sekundär.
 
 ---
 
-## 6. Stimmen — „Adams Erben heute“
+## 8. Film-Brücke auf `/`
 
-Ziel: Karl Adams Wirkung nicht abstrakt erklären, sondern durch sechs Menschen verschiedener Generationen in die Gegenwart übersetzen. Die Personen sollen idealerweise ca. 16 bis 84 Jahre abdecken und unterschiedliche Perspektiven auf Leistungs-, Breiten-, Jugend- und Mastersrudern zeigen.
+Direkt nach dem Hero.
 
-### 6.1 Darstellungsform
+### Aufgabe
 
-- sechs Portrait-/Zitatkarten oder Sprechblasen;
-- jeweils Name, Alter, optional Verein/Rolle nach Zustimmung;
-- ein starkes Originalzitat pro Person;
-- auf Mobilgeräten gut lesbar, kein Auto-Karussell;
-- bis echte Zitate vorliegen: klar als **Platzhalter** gekennzeichnete Dummy-Texte, niemals fingierte Aussagen realer Personen.
+- bestätigen, warum der Besucher hier ist;
+- „Adams Acht“ als Ausgangspunkt nennen;
+- offiziellen Trailer und Filmseite verlinken;
+- unmittelbar vom Zuschauen zum Mitmachen überleiten.
 
-### 6.2 Sechs geschärfte Interviewfragen
+### Muss enthalten
 
-Die Fragen sollen kurze, persönliche und zitierfähige Antworten provozieren und nicht wie ein Fragebogen über Trainingslehre wirken.
+- Filmstart: **17. September 2026**;
+- Trailer-Link;
+- offizielle Filmseite;
+- keine Filmstills/Poster ohne Rechtefreigabe;
+- keine Formulierung, die eine offizielle Partnerschaft suggeriert.
 
-1. **Welche Idee von Karl Adam ist für dich heute noch überraschend modern — und warum?**
-2. **Acht Menschen, ein Boot: Was muss passieren, damit aus starken Einzelnen wirklich eine Mannschaft wird?**
-3. **Was würdest du jemandem sagen, der nach „Adams Acht“ zum ersten Mal überlegt, Rudern auszuprobieren?**
-4. **Was hat dich das Rudern über Vertrauen, Verantwortung oder Zusammenarbeit außerhalb des Bootes gelehrt?**
-5. **Was bringt dich an einem Tag aufs Wasser, an dem Motivation allein nicht reicht?**
-6. **Wenn du eine Sache aus dem Rudern an die nächste Generation weitergeben könntest: Welche wäre es?**
+### Übergang
 
-Redaktionell gilt: Nicht jede Person muss dieselbe Frage beantworten. Die sechs veröffentlichten Zitate sollen zusammen ein Mosaik ergeben, keine sechs Varianten derselben Aussage.
+Sinngemäß:
 
-### 6.3 Platzhalterstruktur
+> **Der Film erzählt die Geschichte. Den nächsten Schlag kannst du selbst machen.**
 
-Bis Interviews vorliegen:
-
-- `Stimme 1 — 16 Jahre — Jugendrudern — Platzhalter`
-- `Stimme 2 — ca. 20–30 Jahre — Leistungs-/Hochschulrudern — Platzhalter`
-- `Stimme 3 — ca. 30–45 Jahre — Vereins-/Mannschaftsperspektive — Platzhalter`
-- `Stimme 4 — ca. 45–60 Jahre — Trainer-/Breitensportperspektive — Platzhalter`
-- `Stimme 5 — ca. 60–75 Jahre — langjährige Vereinserfahrung — Platzhalter`
-- `Stimme 6 — ca. 84 Jahre — Zeit-/Generationenperspektive — Platzhalter`
+Finaler Wortlaut redaktionell abstimmen.
 
 ---
 
-## 7. Adams Labor — Innovation sichtbar machen
+## 9. Quick Finder auf `/` — Kernfunktion
 
-### 7.1 Ziel
+Der Quick Finder ist die wichtigste neue Komponente.
 
-Keine bloße Liste von „Erfindungen“, sondern eine visuelle Entwicklung:
+### Position
 
-**Vor Adam → Adams Intervention → Heute**
+Direkt nach der Film-Brücke.
 
-Jede Station muss unterscheiden zwischen:
+### Ziel
 
-- historisch belegtem Zustand vor/zu Adams Zeit;
-- Adams eigenem Beitrag bzw. seiner Rolle bei Verbreitung/Weiterentwicklung;
-- heutiger Trainings-/Technikpraxis.
+Ein Nutzer kann mit **einer einzigen Eingabe** starten.
 
-Keine pauschalen „Adam erfand X“-Aussagen ohne belastbaren Beleg.
-
-### 7.2 Kandidaten für Module
-
-1. **Trainingssteuerung / Intervallprinzipien**  
-   Vor Adam: stärker erfahrungs-/dauerorientierte Trainingspraxis.  
-   Adam: systematische Belastungs-/Erholungssteuerung, quantitative Betrachtung.  
-   Heute: periodisierte Trainingsplanung, Leistungsdiagnostik, individuelle Belastungssteuerung.
-
-2. **Krafttraining**  
-   Vor Adam: im Rudern keineswegs selbstverständlich bzw. teils skeptisch gesehen.  
-   Adam: gezieltere Einbindung von Kraftarbeit.  
-   Heute: strukturierter Bestandteil von Leistungs- und Präventionstraining.
-
-3. **Riemen, Blattform und Hebel**  
-   Vor Adam: konventionelle Blatt-/Hebelkonzepte.  
-   Adam: experimenteller Umgang mit Geometrie, Hebeln und „Schaufel“-Blättern.  
-   Heute: moderne Big-Blade-/Materialkonzepte und biomechanische Optimierung.
-
-4. **Rhythmus, Schlagzahl und Messbarkeit**  
-   Vor Adam: stärker trainer-/erfahrungsbasierte Beurteilung.  
-   Adam: Mathematik/Physik, Stoppuhr, systematische Analyse.  
-   Heute: Telemetrie, Ergometerdaten, GPS, Sensorik, Video- und Datenanalyse.
-
-5. **Der mündige Athlet / Team als System**  
-   Adam: Athleten sollten verstehen, diskutieren und Verantwortung übernehmen.  
-   Heute: Athletenzentrierung, Feedback, gemeinsame Renn-/Trainingsmodelle.
-
-### 7.3 UX
-
-Desktop: drei Spalten oder horizontale Timeline.  
-Mobile: vertikale Sequenz je Innovation.  
-Jedes Modul erhält `Quelle(n)`/`Mehr erfahren` statt langer Fußnoten im Fließtext.
-
----
-
-## 8. Ratzeburg erleben — „Ratzeburg, die Ruderstadt“
-
-Ein eigener Abschnitt verlinkt die bereits bestehende offizielle Themenführung der Stadt statt eine konkurrierende Führung nachzubauen.
-
-### 8.1 Inhalt
-
-- Titel: **Auf Adams Spuren durch Ratzeburg**
-- Beschreibung der rund zweistündigen Themenführung;
-- Stationen beispielhaft: Karl-Adam-Gedenkstein/RRC, ehemalige Lauenburgische Gelehrtenschule, frühere Turnhalle, historisches Bootshaus, Ruderakademie;
-- Link zur offiziellen Stadt-/Tourismus-Seite;
-- Kontakt der Tourist-Information;
-- nach Rücksprache: **Guido Klossek** als Stadtführer/Ansprechpartner nennen und ggf. Portrait/Zitat integrieren.
-
-### 8.2 Verifizierte Basisquelle
-
-Stadt Ratzeburg, „Ratzeburg, die Ruderstadt“:  
-`https://www.ratzeburg.de/index.php?FID=2559.13514.1&ModID=7&object=tx%2C2559.534`
-
-Aktuell veröffentlichter Kontakt der Tourist-Information:  
-`tourist-info@ratzeburg.de`, Tel. `04541 80 00 886`.
-
-Dynamische Termine/Preise nicht hart codieren, wenn nicht regelmäßig gepflegt. Besser: „Aktuelle Termine und Preise bei der Stadt Ratzeburg“.
-
----
-
-## 9. Karl Adam vertiefen — Buch, Ausstellung, karladam.de
-
-### 9.1 Prinzip
-
-`adams-erben.de` liefert einen kompakten Kontext und leitet für die vertiefte Biografie bewusst weiter.
-
-### 9.2 Biografie
-
-Direkter Link auf die Karl-Adam-Biografie von Dirk Andresen/Timo Reinke an einer inhaltlich passenden Stelle, vorzugsweise nach „Adams Labor“ oder der historischen Einordnung.
-
-Hinweis unmittelbar am Link:
-
-> **Hinweis: Dies ist keine bezahlte Werbung. Adams Erben erhält für den Link oder einen Buchkauf keine Vergütung.**
-
-Linkziel:  
-`https://www.dergoldachter.de/buecher/karl-adam`
-
-### 9.3 Ausstellung
-
-Link auf die Karl-Adam-Ausstellung / Veranstaltungsseite von Der Goldachter. Später ggf. dauerhafter Archiv-/Ausstellungslink, falls vorhanden.
-
-### 9.4 karladam.de
-
-Sobald `karladam.de` öffentlich und inhaltlich belastbar ist:
-
-- Linklabel z. B. `Karl Adam — Leben, Buch und Filme`;
-- keine Spiegelung der dortigen Inhalte;
-- optional Gegenseitigkeitslink von `karladam.de` bei „Hier lernen Sie rudern“ zu `adams-erben.de`.
-
----
-
-## 10. Historische Verantwortung / NS-Vergangenheit
-
-### 10.1 Ziel
-
-Karl Adams sporthistorische Bedeutung und seine NS-Biografie gehören gemeinsam zur Darstellung. Der Abschnitt darf weder als Anklagekasten noch als Fußnote erscheinen, sondern als Einladung zu einer quellenbasierten Auseinandersetzung mit deutscher Nachkriegs- und Sportgeschichte.
-
-Redaktionelle Leitfrage:
-
-> **Wie ging eine erfolgreiche Nachkriegsgeneration mit eigener Verstrickung in die NS-Zeit um — und was können wir aus der späteren Aufarbeitung lernen?**
-
-### 10.2 Gesicherter Mindestkontext
-
-Karl Adam war Mitglied von NSDAP und SA und lehrte an einer Nationalpolitischen Erziehungsanstalt. Der DRV hat seine eigene Verbandsvergangenheit aufgearbeitet, weist aber selbst darauf hin, dass die bisherige Wedemeyer-Studie primär Funktionäre der Jahre 1933–1945 untersucht und Personen, die wie Adam erst nach 1945 Verbandsbedeutung erlangten, nicht systematisch erfasste.
-
-### 10.3 Primär-/Referenzlinks
-
-- DRV 2025: **„Karl-Adam-Preis wird nicht mehr vergeben“**  
-  `https://www.rudern.de/news/karl-adam-preis-wird-nicht-mehr-vergeben`
-- DRV 2025: **„Karl Adam bleibt Ehrenpreisträger des DRV“**  
-  `https://www.rudern.de/news/karl-adam-bleibt-ehrenpreistraeger-des-drv`
-- DRV / sporthistorische Publikation (Hutmacher):  
-  `https://www.rudern.de/sites/default/files/downloads/news/Veroeffentlichung_Dissertation_Hutmacher.pdf`
-- ergänzende kontroverse journalistische Einordnung: Zeit-Artikel zur NS-Vergangenheit von Sportlern / Karl Adam; zusätzlich Rudersport-Berichterstattung zur Einstellung des Karl-Adam-Preises.
-
-### 10.4 Redaktionsregel
-
-Der Abschnitt soll unterschiedliche Ebenen sauber trennen:
-
-1. nachweisbare biografische Fakten;
-2. Adams eigene spätere Darstellung bzw. Umgang damit;
-3. Rezeption durch Zeitzeugen und Nachkriegssport;
-4. heutige Bewertung/DRV-Entscheidungen;
-5. offene Forschungsfragen.
-
-Keine psychologischen Motive als Tatsachen darstellen. Für Formulierungen wie „repräsentativ für seine Generation“ nur belastbare historische Literatur oder bewusst als Fragestellung formulieren.
-
----
-
-## 11. Rudersport ermöglichen — Karl-Adam-Stiftung und weitere Förderung
-
-### 11.1 Kernbotschaft
-
-Rudern lebt nicht nur von großen Namen, sondern von Booten, Stegen, Trainern, Jugendarbeit, Ehrenamt und Menschen, die dies finanzieren. Der Abschnitt soll deshalb von der Karl-Adam-Stiftung in die breitere Förderlandschaft überleiten.
-
-### 11.2 Karl-Adam-Stiftung
-
-Darstellung:
-
-- gemeinnützige Stiftung zur Förderung des Rudersports in Ratzeburg, insbesondere des RRC;
-- konkrete historische Förderbeispiele dürfen nur mit Quelle genannt werden;
-- möglicher CTA: `Karl-Adam-Stiftung kennenlernen / unterstützen`.
-
-Quellenbasis:
-
-- RRC: `https://www.rrc-online.de/2004/allgemein/karl-adam-stiftung/`
-- Beispiel gemeinsame Finanzierung Trainerboot „ROM 60“ durch Karl-Adam-Stiftung, Landesportverband und Spenden:  
-  `https://www.rudern.de/news/2016/neues-trainerboot-karl-adam-in-ratzeburg`
-
-### 11.3 Vorsitz / Zitat — VERIFIKATIONS-GATE
-
-Der Nutzer nennt **Prof. em. Dr. Frank T. König** als aktuellen Vorsitzenden und wünscht ein Zitat von ihm. Öffentlich auffindbare ältere Quellen nennen dagegen Holger Knaack als Vorsitzenden und Frank T. König als Vorstandsmitglied. Deshalb vor Veröffentlichung zwingend aktuell verifizieren.
-
-Bis zur Bestätigung:
-
-- kein Amtstitel bei Frank König publizieren;
-- Zitatplatzhalter: `[Zitat Stiftung — nach persönlicher Freigabe]`;
-- idealerweise schriftliche Freigabe von Wortlaut, Funktion und Namensnennung dokumentieren.
-
-Geeignete Frage für das gewünschte Zitat:
-
-> **Was ermöglicht Förderung im Rudersport, das Mitgliedsbeiträge und Ehrenamt allein nicht leisten können — und warum lohnt es sich gerade heute, darin zu investieren?**
-
-Alternative kürzer:
-
-> **Was kann eine Stiftung bewirken, damit aus Interesse am Rudern echte Teilhabe wird?**
-
-### 11.4 Weitere Förderwege
-
-Nicht als vollständige Förderdatenbank starten. Stattdessen kompakte Orientierung mit externen Links und Hinweis, dass Programme/Voraussetzungen sich ändern.
-
-Kategorien:
-
-- Landessportverbände;
-- Kreissportverbände;
-- Landes-/kommunale Sportförderung;
-- Sportstiftungen;
-- Vereins-/Projektförderung;
-- lokale Bürger-/Regionalstiftungen;
-- Spenden und zweckgebundene Förderpartnerschaften.
-
-Beispiel Schleswig-Holstein:
-
-- LSV SH — Förderung & Zuschüsse: `https://www.lsv-sh.de/foerderung-zuschuesse/`
-- Stiftung zur Förderung des Sports in Schleswig-Holstein: `https://www.lsv-sh.de/foerderung-zuschuesse/stiftung`
-- Projektmittelförderung Land SH: `https://www.lsv-sh.de/foerderung-zuschuesse/projektmittelfoerderung/projektmittelfoerderung-land-sh`
-
-UX-Titel beispielsweise: **„Rudern braucht Rückenwind“**.
-
----
-
-## 12. Kontaktvermittlung bleibt Kernfunktion
-
-Alle redaktionellen Erweiterungen sind dem funktionalen Kern nachgeordnet.
-
-### 12.1 Muss unverändert funktionieren
-
-- statische Suche über Vereine, weitere DRV-Mitglieder, LRV und DRV;
-- Suche nach Name, Ort, PLZ, Bundesland;
-- Kontakt-Dialog aus RRC-Karte und allen geeigneten Vereinseinträgen;
-- serverseitig bestimmte Zieladresse;
-- Routing: Verein → LRV → DRV;
-- keine Empfänger-E-Mail im öffentlichen Datensatz;
-- Consent-/Datenschutzlogik;
-- Preview-/Production-Modus sauber getrennt;
-- Health-/Produktions-Gates bleiben bestehen.
-
-### 12.2 Branch-spezifische Anforderung
-
-Dieser Branch soll **lokal mit voll funktionsfähigem Kontaktformular** testbar sein. Dafür wird neben dem bestehenden rein statischen `php -S`-Pfad ein dokumentierter lokaler Full-Stack-Testpfad benötigt, der die PHP-/SMTP-/Routing-Komponenten verwendet.
-
-Mindestens:
-
-- lokale Container-Ausführung oder äquivalente PHP-Runtime;
-- Test-/Sink-SMTP statt realer Zustellung, sofern möglich;
-- `build-private/recipients.json` vorhanden;
-- RRC-CTA nutzt denselben produktionsnahen Routingpfad wie normale Vereinskontakte;
-- E2E-/Smoke-Test prüft Suche → RRC/Club → Dialog → valide Übermittlung → erwartetes serverseitiges Routing;
-- keine echten Mails an Vereine während lokaler Entwicklung.
-
----
-
-## 13. Content-/Datenmodell
-
-Redaktionelle Inhalte nicht unstrukturiert über `index.html` verteilen. Ziel ist ein einfach wartbares statisches Datenmodell, z. B.:
+### UI
 
 ```text
-src/content/
-  local-ratzeburg.json
-  voices.json
-  adams-lab.json
-  history-links.json
-  funding.json
+Rudern ausprobieren
+
+Ort oder Postleitzahl
+[________________________]  [Verein in der Nähe finden]
+
+Keine Erfahrung nötig · Rudern für viele Altersgruppen · deutschlandweit
 ```
 
-oder äquivalente kleine JS-/JSON-Struktur ohne neues Framework.
+### Nicht anzeigen
 
-Jeder externe Inhaltseintrag sollte soweit sinnvoll enthalten:
+Im Quick Finder nicht primär anzeigen:
 
-```json
-{
-  "title": "...",
-  "url": "...",
-  "source": "...",
-  "checkedAt": "YYYY-MM-DD",
-  "kind": "primary|secondary|partner",
-  "note": "..."
-}
+- Organisationstyp;
+- Landesruderverband;
+- DRV;
+- Bundesland;
+- Radius als Pflichtentscheidung;
+- administrative Datenfilter.
+
+### Technisches Verhalten
+
+- bestehende lokale PLZ-/Ortssuche wiederverwenden;
+- keine externe Maps-/Geocoding-API;
+- Standardradius 50 km;
+- vorzugsweise 3 nächste Rudervereine anzeigen;
+- falls kein Verein im Radius: nächstgelegene Vereine als Fallback;
+- „Standort verwenden“ optional sekundär;
+- Geolocation nur lokal für Distanzberechnung.
+
+### Ergebnisdarstellung
+
+Pro Verein primär:
+
+- Vereinsname;
+- Ort;
+- Entfernung;
+- CTA **„Rudern ausprobieren“** oder **„Probetraining anfragen“** bei direktem Kontakt;
+- andernfalls **„Vereinswebsite öffnen“**.
+
+Technische Hinweise zu Routing, Datenquelle oder Organisationstypen werden sekundär dargestellt.
+
+### Übergang zur Vollsuche
+
+Link:
+
+**Alle Vereine und Suchfilter anzeigen**
+
+Dieser kann entweder einen erweiterten Bereich auf `/` öffnen oder auf einen dedizierten Suchbereich führen. Die bestehende Vollsuche darf funktional nicht verloren gehen.
+
+---
+
+## 10. Ratzeburg auf `/`
+
+Ratzeburg ist der emotionale und reale Beweis dafür, dass Adams Geschichte bis heute an einem konkreten Ort weiterlebt.
+
+### Auf `/` bleiben
+
+- Ratzeburg als „besonderer Ort“;
+- RRC als zentraler historischer und heutiger Verein;
+- heutiges RRC-Bild;
+- sehr kurze Einordnung;
+- RRC-Website;
+- direkter Kontakt, sofern erlaubt;
+- Link zur Vertiefung auf `/rudern/`.
+
+### Auf `/rudern/` verschieben
+
+- ausführliche Stadtführung;
+- detaillierte Regatta-Historie;
+- Ruderakademie-Timeline;
+- Bundesstützpunkt-Netzwerk;
+- lange institutionelle Einordnung.
+
+### Teaser auf `/`
+
+Ein kurzer Satz darf auf Regatta und Ruderakademie verweisen, z. B.:
+
+> In Ratzeburg ist Adams Erbe bis heute sichtbar — im Ruderclub, in der internationalen Regatta und in der Ruderakademie.
+
+CTA:
+
+**Ratzeburg und Adams Erbe vertiefen → `/rudern/#ratzeburg`**
+
+---
+
+## 11. „Adams Erbe heute“ auf `/`
+
+Die ausführlichen fünf Labor-Karten werden nicht vollständig auf der Startseite gezeigt.
+
+Stattdessen eine verdichtete, schnell erfassbare Darstellung mit 3–5 Prinzipien.
+
+Empfohlen:
+
+1. **Training wird messbar**
+2. **Kraft wird systematisch**
+3. **Material wird zur Stellschraube**
+4. **Athleten sollen verstehen**
+5. **Das Boot wird als Einheit gedacht**
+
+Jeder Punkt:
+
+- kurze Headline;
+- maximal 1–2 Sätze;
+- visuelles Motiv;
+- optionaler Link zur Vertiefung.
+
+CTA:
+
+**Wie Karl Adam das Rudern verändert hat → `/rudern/#labor`**
+
+Keine Detaildiskussion zu Höhentraining, Rigging oder Trainingsperiodisierung auf `/`.
+
+---
+
+## 12. Stimmen auf `/`
+
+Die Stimmen werden auf der Startseite deutlich wichtiger als im aktuellen Long-Pager.
+
+### Ziel
+
+Nicht Fachwissen vermitteln, sondern soziale Eintrittsbarrieren senken.
+
+### Bevorzugte Perspektiven
+
+- Jugendliche/r;
+- später Einsteiger / Breitensport;
+- Leistungssport;
+- Trainer/in;
+- Masters;
+- sehr langjährig aktive Person.
+
+### Besonders relevante Fragen
+
+- „Was hat dich überrascht, als du das erste Mal in einem Ruderboot saßt?“
+- „Was würdest du jemandem sagen, der nach ‚Adams Acht‘ überlegt, Rudern auszuprobieren?“
+- „Was bleibt vom Rudern außerhalb des Bootes?“
+
+### Launch-Gate
+
+Keine sichtbaren Zitat-Platzhalter im Produktionsstand.
+
+Wenn echte Aussagen noch fehlen, Sektion reduzieren oder temporär weglassen.
+
+Keine künstlichen Zitate realer Personen.
+
+---
+
+## 13. „Rudern ist mehr als Rennen“ auf `/`
+
+Kinobesucher dürfen nicht den Eindruck bekommen, Rudern sei nur olympischer Hochleistungssport.
+
+Kurzer Teaser mit maximal drei Perspektiven:
+
+- Rennrudern;
+- gemeinsames Vereinsrudern;
+- Wanderrudern / Rudern als lebenslanger Sport.
+
+Keine ausführlichen Bootsklassen oder Trainingswochen.
+
+CTA:
+
+**Rudern verstehen → `/rudern/#rudern-verstehen`**
+
+---
+
+## 14. Zweite Conversion auf `/`
+
+Nach den Stimmen bzw. dem Breitenrudern-Teaser folgt erneut eine einfache Einladung.
+
+Bevorzugte Headline:
+
+> **Vielleicht beginnt Adams Erbe für dich mit dem ersten Schlag.**
+
+CTA:
+
+**Ruderverein in meiner Nähe finden**
+
+Der Nutzer darf nicht bis zum Seitenende scrollen müssen, um erneut zum Einstieg zu gelangen.
+
+---
+
+## 15. Vertiefungs-Teaser auf `/`
+
+Die Startseite verlinkt die zweite Seite als freiwillige Vertiefung.
+
+### Bezeichnung
+
+Nicht „Professional“ im sichtbaren UI.
+
+Bevorzugt:
+
+- **Mehr entdecken**
+- **Rudern & Adams Erbe**
+- **Rudern verstehen**
+- **Geschichte und Ruderkultur vertiefen**
+
+Empfohlene Seitentitel-Formulierung:
+
+**Rudern & Adams Erbe**
+
+### Teaser-Kacheln
+
+Maximal 3–4:
+
+1. **Warum Karl Adam das Training veränderte**
+2. **Was im Achter wirklich passiert**
+3. **Ratzeburg, Regatta und Ruderakademie**
+4. **Geschichte, Verantwortung und Quellen**
+
+Alle führen gezielt zu Ankern auf `/rudern/`.
+
+---
+
+# TEIL B — VERTIEFUNGSSEITE `/rudern/`
+
+## 16. Aufgabe von `/rudern/`
+
+`/rudern/` übernimmt den redaktionellen Tiefgang des heutigen Long-Pagers.
+
+Die Seite darf lang sein.
+
+Sie soll sich wie ein hochwertiges digitales Magazin bzw. eine interaktive Einführung in Adams Erbe und Rudern anfühlen.
+
+### Zielgefühl
+
+- substanziell;
+- fachlich glaubwürdig;
+- editorisch;
+- technisch präzise;
+- historisch differenziert;
+- nicht wie eine lose Sammlung von Artikeln oder Links.
+
+---
+
+## 17. Verbindliche Reihenfolge auf `/rudern/`
+
+Empfohlen:
+
+1. **Intro „Rudern & Adams Erbe“**
+2. **Adams Labor**
+3. **Internationale Ratzeburger Ruderregatta**
+4. **Ruderakademie Ratzeburg**
+5. **Rudern verstehen**
+6. **Deutschlandachter / Weltbestzeit 2017** innerhalb von „Rudern verstehen“
+7. **Rennrudern und Wanderrudern**
+8. **Stimmen / Schubschlag / Ruderkultur**
+9. **Historische Verantwortung / NS-Einordnung**
+10. **Biografie / Ausstellung / karladam.de**
+11. **Ratzeburger Stadtführung**
+12. **Förderung / Karl-Adam-Stiftung / Ehrenamt**
+13. **CTA zurück zur Vereinssuche / Startseite**
+
+Die Reihenfolge darf bei Umsetzung leicht optimiert werden, solange die thematische Logik erhalten bleibt.
+
+---
+
+## 18. Intro auf `/rudern/`
+
+Keine Wiederholung des vollständigen Startseiten-Heros.
+
+### Aufgabe
+
+- erklären, dass dies die Vertiefungsebene ist;
+- schnell Orientierung geben;
+- die großen Themenfelder sichtbar machen.
+
+Empfohlene Headline:
+
+> **Rudern verstehen. Adams Erbe einordnen.**
+
+Subline sinngemäß:
+
+> Training, Technik, Team, Ratzeburg und die Geschichte dahinter — für alle, die nach Film oder erstem Eindruck tiefer einsteigen möchten.
+
+### Persistenter Rückweg
+
+Im Header oder direkt im Intro:
+
+**Rudern ausprobieren / Verein finden → `/` bzw. Suchanker**
+
+---
+
+## 19. Adams Labor auf `/rudern/`
+
+Die bestehenden Inhalte bleiben grundsätzlich erhalten:
+
+- Training;
+- Kraft;
+- Material;
+- Führung;
+- Physiologie / Mexiko 1968.
+
+### Leitplanken
+
+- historische Praxis, Adams Beitrag und heutige Einordnung klar trennen;
+- keine unbelegten „Adam erfand X“-Aussagen;
+- Quellen sichtbar oder leicht erreichbar;
+- fachliche Bilder korrekt;
+- lange Inhalte dürfen hier vollständig gezeigt werden.
+
+### Zusätzliche UX
+
+Ein kurzer Inhaltsnavigator am Beginn des Abschnitts ist zulässig.
+
+---
+
+## 20. Internationale Ratzeburger Ruderregatta auf `/rudern/`
+
+Die vollständige bestehende Regatta-Story gehört auf die Vertiefungsseite.
+
+Beibehalten:
+
+- 1957;
+- 1965;
+- 1967;
+- 2026 / 67. Regatta;
+- Bild;
+- Sportdeutschland-/SportEurope-Re-Live;
+- historische Links.
+
+Kernbotschaft:
+
+> **Adams Erbe ist kein Museum.**
+
+Die Regatta verbindet Geschichte, internationale Gegenwart und Ehrenamt.
+
+---
+
+## 21. Ruderakademie auf `/rudern/`
+
+Die vollständige institutionelle Einordnung wird hier gezeigt.
+
+Beibehalten:
+
+- Entstehungsidee Anfang der 1960er;
+- Eröffnung 1968;
+- heutige modernisierte Nutzung;
+- Rolle als Trainings-/Bildungszentrum;
+- Einordnung in Bundesstützpunkt-/Leistungssystem;
+- keine Überbehauptung, dass alle heutigen Zentren aus Ratzeburg hervorgegangen seien.
+
+### Launch-Gate
+
+Der aktuelle sichtbare Bildplatzhalter muss ersetzt oder entfernt werden.
+
+---
+
+## 22. Rudern verstehen auf `/rudern/`
+
+Die aktuelle ausführliche Einführung gehört vollständig auf `/rudern/`.
+
+Beibehalten bzw. weiterentwickeln:
+
+- Skull vs. Riemen;
+- Einer und Achter;
+- Plätze 1–8;
+- Steuerperson;
+- Trainingswoche;
+- Saison;
+- 2.000-m-Rennen;
+- Weltbestzeit Deutschlandachter 2017;
+- Altersklassen;
+- Masters;
+- Gigboot;
+- Wanderrudern;
+- Langstreckenrennen.
+
+### Fachliche Launch-Gates
+
+- keine als „Storyboard-Grafik“ gekennzeichneten Platzhalter im Produktionsstand;
+- fachlich saubere Achterdarstellung;
+- korrekte Oar-/Rigger-/Crew-Geometrie;
+- korrekte Bootsdarstellungen im Wanderrudern.
+
+---
+
+## 23. World Rowing, DRV und Schubschlag auf `/rudern/`
+
+Diese Quellen und Vertiefungen bleiben wichtig, werden aber auf `/rudern/` gebündelt.
+
+### World Rowing
+
+- internationaler Blick;
+- Regeln, Bootsklassen, Wettkampfformate;
+- Weltbestzeit-Link.
+
+### DRV
+
+- offizielle Vereinssuche;
+- Ruderakademie;
+- historische Aufarbeitung;
+- Bundesstützpunkte;
+- weitere Primärquellen.
+
+### Schubschlag
+
+- Hauptkachel bei „Stimmen / Ruderkultur“;
+- kontextuelle Hörtipps bleiben möglich;
+- nicht in jeder Sektion so dominant, dass die Seite zur Podcast-Linkliste wird.
+
+---
+
+## 24. Historische Verantwortung auf `/rudern/`
+
+Die NS-Vergangenheit und spätere Aufarbeitung bleiben zwingender Bestandteil.
+
+### Ziel
+
+Keine Heldenverehrung ohne Kontext.
+
+### Darstellungsprinzip
+
+Trennen zwischen:
+
+1. nachweisbaren biografischen Fakten;
+2. Adams eigener späterer Darstellung;
+3. Nachkriegsrezeption;
+4. heutiger Bewertung;
+5. offenen Forschungsfragen.
+
+### Quellenbasis
+
+- DRV-Aufarbeitung;
+- Entscheidung zum Karl-Adam-Preis;
+- weitere belastbare sporthistorische Quellen;
+- journalistische Einordnung klar als solche kennzeichnen.
+
+Dieser Bereich darf nicht auf der Startseite zum Hauptthema werden, aber `/` muss durch seine Verlinkung zur Vertiefung transparent machen, dass die historische Ambivalenz nicht ausgeblendet wird.
+
+---
+
+## 25. Biografie, Ausstellung und karladam.de auf `/rudern/`
+
+### Prinzip
+
+Adams Erben ersetzt keine vollständige Biografie.
+
+Beibehalten:
+
+- Biografie von Dirk Andresen und Timo Reinke;
+- Hinweis: keine bezahlte Werbung / keine Provision;
+- Ausstellung;
+- `karladam.de` sobald öffentlich belastbar;
+- klare externe Verlinkung.
+
+---
+
+## 26. Ratzeburger Stadtführung auf `/rudern/`
+
+Die ausführliche Stadtführungsinformation wird aus `/` herausgenommen und auf `/rudern/` integriert.
+
+Beibehalten:
+
+- offizielle Themenführung;
+- Karl-Adam-Gedenkstein;
+- Gelehrtenschule;
+- historisches Bootshaus;
+- Ruderakademie;
+- offizielle Stadt-/Tourismuslinks;
+- dynamische Termine/Preise nicht hart codieren.
+
+---
+
+## 27. Förderung und Ehrenamt auf `/rudern/`
+
+Der ausführliche Abschnitt „Rudern braucht Rückenwind“ gehört auf `/rudern/`.
+
+Beibehalten:
+
+- Karl-Adam-Stiftung;
+- Vereinsarbeit;
+- Ehrenamt;
+- Fördermöglichkeiten;
+- Schubschlag-Hörtipp zum Ehrenamt, sofern weiterhin redaktionell passend.
+
+Auf `/` höchstens ein kurzer Satz, dass Vereine von Engagement leben.
+
+---
+
+# TEIL C — GEMEINSAME FUNKTIONEN UND TECHNIK
+
+## 28. Gemeinsame Komponenten
+
+Die Zwei-Seiten-Architektur darf nicht zu doppelter Pflege führen.
+
+Gemeinsam nutzen:
+
+- Header-Komponente;
+- Footer;
+- Logo/Branding;
+- Button-System;
+- Rechtliches;
+- Kontakt-Dialog;
+- Vereinssuche;
+- Nearest-/PLZ-Logik;
+- Club-Daten;
+- Routing;
+- Consent;
+- Quellen-/Logo-Komponenten soweit sinnvoll;
+- responsive Grundsysteme.
+
+Keine Copy/Paste-Duplikate derselben Logik in zwei HTML-Dateien, wenn eine Partial-/Build-Komponente möglich ist.
+
+---
+
+## 29. Routing und URLs
+
+### Primär
+
+- `https://adams-erben.de/`
+- `https://adams-erben.de/rudern/`
+
+### Ankerbeispiele auf `/rudern/`
+
+- `/rudern/#labor`
+- `/rudern/#regatta`
+- `/rudern/#ruderakademie`
+- `/rudern/#rudern-verstehen`
+- `/rudern/#geschichte`
+- `/rudern/#foerderung`
+
+### Rücklinks
+
+Jeder größere Vertiefungsbereich soll einen natürlichen Rückweg zur Handlung bieten:
+
+**Rudern selbst ausprobieren → Verein finden**
+
+Nicht in jeder Karte, aber mindestens nach größeren Kapiteln bzw. am Seitenende.
+
+---
+
+## 30. Navigation
+
+### Navigation auf `/`
+
+Empfohlen:
+
+- Adams Acht
+- Ratzeburg
+- Rudern ausprobieren
+- Verein finden
+- Mehr entdecken
+
+`Mehr entdecken` führt zu `/rudern/`.
+
+Der persistente CTA bleibt:
+
+**Rudern ausprobieren**
+
+Auf sehr kleinen Displays zulässig:
+
+**Verein finden**
+
+### Navigation auf `/rudern/`
+
+Empfohlen:
+
+- Adams Labor
+- Regatta
+- Ruderakademie
+- Rudern verstehen
+- Einordnung
+- Mehr / Förderung
+- **Rudern ausprobieren** als CTA
+
+Mobile weiterhin Hamburger + persistenter CTA.
+
+### Keine doppelte Navigation
+
+Die Startseite soll nicht alle Fachanker aus `/rudern/` im Hauptmenü tragen.
+
+---
+
+## 31. Vereinssuche und Kontaktlogik
+
+Die bestehende sichere Funktionalität ist ein nicht verhandelbares Regression-Gate.
+
+### Muss erhalten bleiben
+
+- Suche nach Vereinsname, Ort, PLZ und Bundesland;
+- lokale Nearest-Berechnung;
+- keine externe Geocoding-/Maps-Abhängigkeit;
+- optional lokale Geolocation;
+- direkter Kontakt nur für die ausgewählte Organisation;
+- kein LRV-/DRV-Fallback für Vereinskontakte;
+- keine Empfänger-E-Mail im öffentlichen Datensatz;
+- serverseitige Ermittlung der Empfängeradresse;
+- Consent-/Datenschutzlogik;
+- Preview-/Production-Modus;
+- DRV als offizielle ergänzende Vereinssuche.
+
+### Sprachliche Änderung
+
+Technische Funktion:
+
+**Verein finden**
+
+Nutzerorientierter Einstieg:
+
+**Rudern ausprobieren** / **Probetraining anfragen**
+
+---
+
+## 32. Build-Struktur
+
+Der Build muss zwei eigenständige Seiten erzeugen.
+
+Mögliche Struktur:
+
+```text
+src/
+  index.html                  # Landingpage-Basis
+  rudern/
+    index.html                # Vertiefungsseite-Basis
+  partials/
+    shared-header.html
+    shared-footer.html
+    quick-finder.html
+    club-search.html
+    contact-dialog.html
+    adams-lab.html
+    ratzeburg-regatta.html
+    ruderakademie.html
+    rowing-explainer.html
 ```
 
-Bilder zusätzlich mit `credit`, `license/permission`, `alt` und optional `date`.
+Alternativ kann `build.mjs` zwei Seitengerüste programmatisch rendern.
+
+### Wichtig
+
+- keine Framework-Migration nur für diese Änderung;
+- bestehende Cheerio-/Build-Architektur kann weiterverwendet werden;
+- gemeinsame Assets bleiben geteilt;
+- seitenbezogene CSS-Bundles dürfen getrennt sein, um Startseite schlank zu halten.
 
 ---
 
-## 14. Designprinzipien
+## 33. Performance
 
-- bestehende ruhige, marine/helle Gestaltung fortführen;
-- Ratzeburg-Inhalte hochwertiger/editorialer, aber nicht museal gestalten;
-- historische Fotos und heutige Fotos bewusst gegenüberstellen;
-- „Adams Labor“ darf technisch/diagrammatisch wirken;
-- Stimmen menschlich und warm, ohne Social-Media-Look;
-- keine künstlichen Zitate oder KI-generierten historischen Bilder als dokumentarisches Material;
-- Fokusindikatoren, Tastaturbedienung, semantische Überschriften und ausreichende Kontraste erhalten;
-- `prefers-reduced-motion` beachten, falls Übergänge ergänzt werden.
+Die Aufteilung soll die Startseite technisch leichter machen.
 
----
+### `/` soll nicht laden
 
-## 15. Kooperation / Attribution
+- alle Detail-CSS-Regeln von „Rudern verstehen“, wenn nicht benötigt;
+- schwere Diagramm-/Detailbilder der Vertiefungsseite;
+- alle redaktionellen JS-Komponenten der Fachseite;
+- unnötige Podcast-/Quellenassets.
 
-Solange keine formale Partnerschaft vereinbart ist, neutrale Formulierungen wie:
+### `/rudern/`
 
-- „Weiterführend bei Der Goldachter …“
-- „Mit freundlicher Genehmigung …“ nur bei tatsächlicher Genehmigung;
-- „In Zusammenarbeit mit …“ nur nach expliziter Zustimmung.
+Darf mehr Inhalte laden, aber weiterhin:
 
-Für `karladam.de` ist eine wechselseitige funktionale Verlinkung besonders sinnvoll:
-
-`karladam.de → Hier lernen Sie rudern → adams-erben.de`
-
-`adams-erben.de → Karl Adam vertiefen → karladam.de`
+- Bilder lazy laden außer Hero/above-the-fold;
+- korrekte Größenangaben;
+- WebP/AVIF soweit sinnvoll;
+- kein unnötiges Layout Shifting.
 
 ---
 
-## 16. Implementierungsreihenfolge
+## 34. Mobile First
 
-### Phase A — lokal, ohne Rechteabhängigkeiten
+Primäres Abnahmeszenario für `/`:
 
-1. Hero-Motto ändern.
-2. RRC-Karte um Website-Link und Bild-/Logo-Slots erweitern.
-3. Stimmen-Komponente mit sechs klar markierten Platzhaltern.
-4. Adams-Labor-Komponente mit sachlich vorsichtigen Draft-Texten.
-5. Ruderführungs-Abschnitt mit offiziellem Stadtlink/Kontakt.
-6. Vertiefungs-/Historienabschnitt mit Buch-, DRV- und `karladam.de`-Slot.
-7. Förderungsabschnitt mit Stiftung und Förderkategorien.
-8. Vereinssuche/Kontaktfunktion vollständig erhalten.
-9. lokalen Full-Stack-Kontakttest dokumentieren und smoke-testen.
+**iPhone / Safari**
 
-### Phase B — nach Partner-/Rechtefreigaben
+### Testfall
 
-1. RRC-Logo auswählen und integrieren.
-2. heutiges RRC-Foto integrieren.
-3. historisches Dirk-Andresen-Foto integrieren.
-4. echte sechs Ruderer interviewen und Platzhalter ersetzen.
-5. Guido Klossek nach Rücksprache namentlich/mit Zitat integrieren.
-6. Stiftungsvorsitz/Funktion verifizieren und autorisiertes Zitat einbauen.
-7. `karladam.de`-Ziel verifizieren und Gegenseitigkeitslink abstimmen.
-8. Ausstellung aktualisieren.
+1. Nutzer hat gerade den Film gesehen oder Scan/Link geöffnet.
+2. Seite lädt.
+3. Innerhalb von 10 Sekunden versteht er Thema und Nutzen.
+4. Innerhalb von 30–60 Sekunden kann er Ort/PLZ eingeben.
+5. Er sieht passende Vereine.
+6. Er kann Kontakt aufnehmen oder die Vereinswebsite öffnen.
 
-### Phase C — redaktionelle Qualität
+### Muss erhalten bleiben
 
-1. historische Aussagen einzeln belegen;
-2. NS-Abschnitt gegen Primär-/Fachquellen prüfen;
-3. „Adams Labor“ auf Erfindungs-/Prioritätsbehauptungen prüfen;
-4. Bildrechte-/Credits-Audit;
-5. Accessibility-/Mobile-/Performance-Audit;
-6. finaler Kontakt-Routing-Smoke-Test.
+- fixed Header;
+- kein horizontaler Root-Scroll;
+- sichtbarer CTA;
+- Hamburger-Menü;
+- ausreichende Touch-Ziele;
+- Fokuszustände;
+- `prefers-reduced-motion`;
+- lokaler horizontaler Scroll nur dort, wo bewusst notwendig.
 
 ---
 
-## 17. Acceptance Criteria
+# TEIL D — SEO, SHARING UND ANALYTIK
 
-Der Branch ist lokal abnahmefähig, wenn:
+## 35. SEO-Trennung
 
-- [ ] Hero verwendet exakt das neue Leitmotiv.
-- [ ] RRC hat drei Aktionen: Kontakt, RRC-Website, DRV-Profil.
-- [ ] RRC besitzt Slots für heutiges Bild, historisches Bild und Logo mit Rechte-Metadaten.
-- [ ] sechs generationenübergreifende Stimmen-Platzhalter sind sichtbar und eindeutig als Platzhalter gekennzeichnet.
-- [ ] die sechs Interviewfragen sind redaktionell hinterlegt.
-- [ ] „Adams Labor“ zeigt mindestens vier belastbare Vorher→Adam→Heute-Ketten.
-- [ ] Ratzeburger Ruderführung ist mit offizieller Quelle und Kontakt eingebaut.
-- [ ] Biografie ist direkt verlinkt und als unbezahlter Hinweis gekennzeichnet.
-- [ ] Ausstellung und zukünftiges `karladam.de` sind als Vertiefungsziele vorgesehen.
-- [ ] ein eigenständiger, ausgewogener Abschnitt zur NS-Vergangenheit/Aufarbeitung ist vorhanden.
-- [ ] DRV-Quellen und ergänzende journalistische Kontroverse sind sauber getrennt.
-- [ ] Karl-Adam-Stiftung und weitere Förderwege werden dargestellt.
-- [ ] Funktion/Vorsitz Frank König bleibt bis Verifikation unveröffentlicht bzw. als TODO markiert.
-- [ ] Kontaktvermittlung arbeitet lokal full-stack und nutzt das bestehende sichere serverseitige Routing.
-- [ ] keine Empfänger-E-Mail gelangt in öffentliche Artefakte.
-- [ ] keine realen Vereinsmails werden durch lokale Tests versandt.
-- [ ] keine neuen geschützten Assets werden ohne Freigabe ausgeliefert.
-- [ ] kein Preview-/Production-Deploy erfolgt ohne explizite Freigabe.
+Die Zwei-Seiten-Struktur soll unterschiedliche Suchintentionen bedienen.
+
+### `/` — Suchintention
+
+Primär:
+
+- Adams Acht;
+- Karl Adam Film;
+- Rudern ausprobieren;
+- Ruderverein finden;
+- Rudern lernen;
+- Karl Adam Rudern.
+
+Empfohlener Title:
+
+**Adams Erben – Vom Kinosaal ins Boot | Rudern ausprobieren**
+
+Description sinngemäß:
+
+**„Adams Acht“ gesehen? Entdecke, wie Karl Adams Erbe im Rudern weiterlebt, und finde einen Ruderverein in deiner Nähe.**
+
+### `/rudern/` — Suchintention
+
+Primär:
+
+- Karl Adam Training;
+- Deutschlandachter;
+- Ruderakademie Ratzeburg;
+- Ratzeburger Ruderregatta;
+- Rudern verstehen;
+- Achter Rudern;
+- Rudertechnik;
+- Wanderrudern;
+- Karl Adam Geschichte.
+
+Empfohlener Title:
+
+**Rudern & Adams Erbe – Training, Achter, Ratzeburg und Geschichte**
+
+Beide Seiten erhalten eigene Canonicals.
 
 ---
 
-## 18. Offene Entscheidungen / Partner-Inputs
+## 36. Social Sharing
 
-1. Welches RRC-Logo: Clubfahne oder Vintage-Logo mit Stadtwappen?
-2. Welches heutige RRC-Foto?
-3. Welches historische Foto kann Dirk Andresen freigeben?
-4. Welche sechs Personen decken 16–84 Jahre sinnvoll ab?
-5. Darf Guido Klossek als Ansprechpartner/Zitatgeber erscheinen?
-6. Wer ist aktuell formal Vorsitzender der Karl-Adam-Stiftung und wie lautet die gewünschte Funktionsbezeichnung?
-7. Welches autorisierte Stiftungszitat wird verwendet?
-8. Welche endgültige URL/Struktur erhält `karladam.de`?
-9. Welche Ausstellungseite soll dauerhaft verlinkt werden?
-10. Soll die kritische historische Vertiefung nur verlinken oder eine kurze eigene redaktionelle Zusammenfassung enthalten?
+Beide Seiten benötigen:
 
-## 19. Leitplanke für die Umsetzung
+- `og:title`;
+- `og:description`;
+- `og:url`;
+- `og:image`;
+- `twitter:card=summary_large_image`.
 
-Die redaktionellen Module dürfen die Hauptaufgabe nie verdrängen. Auf jeder längeren inhaltlichen Strecke soll ein natürlicher Weg zurück zur Vereinsfindung bestehen.
+### Unterschiedliche Bilder
 
-**Erfolgskriterium des gesamten Konzepts:** Ein Besucher kommt wegen des Films oder Karl Adam auf die Seite, versteht mehr über Ort, Innovation, Menschen und Ambivalenzen — und kann anschließend tatsächlich einen Ruderverein finden und sicher kontaktieren.
+`/`:
+
+- emotionales starkes Boot-/Ratzeburg-Motiv;
+- Film-zu-Bootshaus-Charakter.
+
+`/rudern/`:
+
+- eher redaktionelles Rudersport-/Karl-Adam-Motiv.
+
+Keine Filmstills ohne Rechtefreigabe.
+
+---
+
+## 37. Structured Data
+
+Mindestens prüfen/implementieren:
+
+### `/`
+
+- `WebSite`;
+- ggf. `Organization` bzw. Initiative nur mit sachlich korrekten Angaben;
+- `SearchAction` nur wenn semantisch und technisch passend.
+
+### `/rudern/`
+
+- `WebPage`;
+- ggf. `Article`/`CollectionPage` für klar redaktionelle Struktur;
+- `Person` für Karl Adam nur mit sauberer externer Referenzierung und ohne Überbehauptung.
+
+Keine künstlich aufgeblähten Schema-Daten.
+
+---
+
+## 38. Messkonzept
+
+Falls datenschutzkonforme Analytics eingesetzt werden, mindestens unterscheiden:
+
+### `/`
+
+- Quick-Finder gestartet;
+- Vereinsergebnis angezeigt;
+- Kontakt-CTA geklickt;
+- Vereinswebsite geöffnet;
+- `/rudern/` aufgerufen.
+
+### `/rudern/`
+
+- Einstieg aus `/`;
+- Kapitelanker;
+- Rückkehr zur Vereinssuche;
+- externe Quellenklicks.
+
+Keine unnötige personenbezogene Tracking-Logik.
+
+---
+
+# TEIL E — CONTENT- UND LAUNCH-GATES
+
+## 39. Platzhalter
+
+Vor Production müssen sichtbare Entwicklungsplatzhalter verschwinden oder bewusst entfernt werden.
+
+Aktuell besonders relevant:
+
+- Ratzeburg damals/heute;
+- Stimmen;
+- Ruderakademie-Bild;
+- Stiftung-Zitat;
+- Storyboard-Grafiken im Rudern-Verstehen-Bereich.
+
+### Regel
+
+**Ein fehlendes reales Asset ist besser als ein sichtbarer Entwicklungsplatzhalter im Launch-Stand.**
+
+---
+
+## 40. Bild- und Rechte-Gates
+
+Keine Auslieferung ohne geklärte Rechte bei:
+
+- historischen Bildern;
+- Logos;
+- Filmstills;
+- Buchcovern;
+- Portraits;
+- Partnerassets.
+
+Für Bilder soweit sinnvoll dokumentieren:
+
+- Quelle;
+- Rechteinhaber;
+- Freigabe;
+- Credit;
+- Alt-Text;
+- Datum/Stand.
+
+---
+
+## 41. Fachliche Qualität
+
+Vor Launch prüfen:
+
+- Achtergeometrie;
+- Crew-/Cox-Anordnung;
+- Riemen/Skull-Terminologie;
+- Trainingsaussagen;
+- historische Prioritätsaussagen;
+- Höhentraining;
+- Ruderakademie-Daten;
+- Regatta-Daten;
+- Weltbestzeit;
+- Altersklassen / Masters;
+- historische Einordnung.
+
+---
+
+## 42. Externe Links
+
+### Auf `/`
+
+Sparsam einsetzen.
+
+Vor erster Conversion nur:
+
+- Trailer;
+- offizielle Filmseite;
+- falls notwendig RRC-Link.
+
+Keine Linkdichte, die Besucher früh aus dem Funnel zieht.
+
+### Auf `/rudern/`
+
+World Rowing, DRV, Schubschlag, Biografie, Ausstellung, Stadtführung und weitere Quellen können ausführlich eingebunden werden.
+
+---
+
+# TEIL F — IMPLEMENTIERUNG
+
+## 43. Phase A — Zwei-Seiten-Grundstruktur
+
+1. `/rudern/` als zweite Seite erzeugen.
+2. bestehende Langinhalte aus der Startseite technisch dorthin verschieben.
+3. gemeinsame Header-/Footer-/Kontakt-/Suchkomponenten herauslösen bzw. wiederverwenden.
+4. Navigation je Seite anpassen.
+5. interne Links und Anker definieren.
+6. Build-Validierung auf beide Seiten erweitern.
+
+### Ergebnis Phase A
+
+- beide URLs bauen erfolgreich;
+- keine Inhalte verloren;
+- Startseite deutlich kürzer;
+- Vertiefungsseite enthält den bisherigen fachlichen Kern.
+
+---
+
+## 44. Phase B — Landingpage-Funnel
+
+1. Hero sprachlich auf Einsteiger ausrichten.
+2. Film-Brücke kompakt halten.
+3. Quick Finder implementieren.
+4. bestehende Nearest-Logik wiederverwenden.
+5. Ratzeburg auf kurze Landingpage-Version reduzieren.
+6. Adams Labor auf 3–5 Prinzipien verdichten.
+7. Stimmen nach vorn holen.
+8. Breiten-/Lebenssport-Teaser ergänzen.
+9. zweiten CTA einbauen.
+10. Vertiefungs-Teaser zu `/rudern/` integrieren.
+
+---
+
+## 45. Phase C — Vertiefungsseite redaktionell ordnen
+
+1. Intro für `/rudern/` erstellen.
+2. Adams Labor sauber strukturieren.
+3. Regatta integrieren.
+4. Ruderakademie integrieren.
+5. Rudern verstehen integrieren.
+6. World Rowing/DRV/Schubschlag ordnen.
+7. historische Einordnung platzieren.
+8. Biografie/Ausstellung/Stadtführung/Förderung platzieren.
+9. Rückwege zur Vereinssuche ergänzen.
+
+---
+
+## 46. Phase D — Launch-Reife
+
+1. sichtbare Platzhalter entfernen/ersetzen;
+2. echte Stimmen integrieren;
+3. Bildrechte prüfen;
+4. fachliche Prüfung;
+5. iPhone-/Safari-Test;
+6. Desktop-/Tablet-Test;
+7. Accessibility-Audit;
+8. Performance-Audit;
+9. SEO-Metadaten pro Seite;
+10. Social Images;
+11. Structured Data;
+12. Routing-/Kontakt-Smoke-Test;
+13. Linkcheck;
+14. Production-Build prüfen.
+
+---
+
+# TEIL G — ACCEPTANCE CRITERIA
+
+## 47. Startseite `/`
+
+- [ ] `/` ist klar als Kinobesucher-/Einsteiger-Landingpage erkennbar.
+- [ ] Hero enthält das Leitmotiv.
+- [ ] Film-Brücke folgt direkt nach Hero.
+- [ ] Quick Finder erscheint vor langen historischen/fachlichen Inhalten.
+- [ ] Quick Finder benötigt primär nur Ort oder PLZ.
+- [ ] Standardradius wird intern gesetzt und nicht als Pflichtentscheidung gezeigt.
+- [ ] Ergebnis priorisiert Rudervereine statt Verbandsstrukturen.
+- [ ] CTA-Sprache nutzt „Rudern ausprobieren“ / „Probetraining anfragen“.
+- [ ] Ratzeburg ist kompakt präsent.
+- [ ] Adams Ideen werden auf 3–5 schnell erfassbare Prinzipien verdichtet.
+- [ ] echte Stimmen sind vorhanden oder die Sektion ist nicht als Platzhalter sichtbar.
+- [ ] Rudern als Breiten-/Lebenssport wird sichtbar.
+- [ ] zweiter Conversion-CTA ist vorhanden.
+- [ ] `/rudern/` wird sichtbar und verständlich als Vertiefung angeboten.
+- [ ] externe Linkdichte vor erster Conversion ist gering.
+- [ ] Startseite lädt keine unnötigen schweren Detailassets der Fachseite.
+
+## 48. Vertiefungsseite `/rudern/`
+
+- [ ] `/rudern/` wird erfolgreich gebaut und direkt aufrufbar ausgeliefert.
+- [ ] Adams Labor ist vollständig vorhanden.
+- [ ] Regatta ist vollständig vorhanden.
+- [ ] Ruderakademie ist vollständig vorhanden.
+- [ ] Rudern verstehen ist vollständig vorhanden.
+- [ ] Deutschlandachter/Weltbestzeit ist enthalten.
+- [ ] Rennrudern und Wanderrudern sind enthalten.
+- [ ] World Rowing ist sinnvoll integriert.
+- [ ] DRV ist sinnvoll integriert.
+- [ ] Schubschlag ist redaktionell integriert.
+- [ ] historische Verantwortung ist enthalten.
+- [ ] Biografie/Ausstellung/karladam.de sind als Vertiefung vorgesehen bzw. integriert.
+- [ ] Stadtführung ist enthalten.
+- [ ] Förderung/Ehrenamt ist enthalten.
+- [ ] Rückweg zu „Rudern ausprobieren“ ist klar sichtbar.
+
+## 49. Gemeinsame Technik
+
+- [ ] Header/Footer werden nicht unnötig doppelt gepflegt.
+- [ ] Kontakt-Dialog funktioniert auf allen vorgesehenen Einstiegen.
+- [ ] Direct-only-Routing bleibt unverändert sicher.
+- [ ] keine Empfänger-E-Mail erscheint öffentlich.
+- [ ] Nearest-Suche verwendet keine externe Geocoding-API.
+- [ ] Mobile Header bleibt fixed.
+- [ ] Hamburger funktioniert.
+- [ ] „Rudern ausprobieren“ bleibt mobil erreichbar.
+- [ ] kein horizontaler Root-Scroll.
+- [ ] Tastaturbedienung funktioniert.
+- [ ] Fokuszustände bleiben sichtbar.
+- [ ] `prefers-reduced-motion` wird respektiert.
+
+## 50. SEO / Launch
+
+- [ ] `/` und `/rudern/` haben unterschiedliche Titles.
+- [ ] beide Seiten haben eigene Descriptions.
+- [ ] beide Seiten haben eigene Canonicals.
+- [ ] `og:image` vorhanden.
+- [ ] `twitter:card=summary_large_image` vorhanden.
+- [ ] passende Structured Data geprüft/implementiert.
+- [ ] keine sichtbaren Produktionsplatzhalter.
+- [ ] keine ungeklärten geschützten Assets.
+- [ ] externe Links geprüft.
+- [ ] Filmstart ist korrekt mit 17. September 2026 angegeben.
+
+---
+
+## 51. Nicht-Ziele
+
+Diese Änderung soll ausdrücklich nicht:
+
+- die sichere Vereinssuche neu erfinden;
+- einen kompletten Technologie-/Framework-Wechsel auslösen;
+- die Fachinhalte löschen;
+- eine neue dritte Content-Plattform aufbauen;
+- eine offizielle Filmseite imitieren;
+- eine offizielle DRV-Seite imitieren;
+- `karladam.de` oder die Biografie ersetzen;
+- historische Kontroversen aus Marketinggründen ausblenden;
+- die Seite mit Tracking überfrachten.
+
+---
+
+## 52. Leitplanke für zukünftige Inhalte
+
+Neue Inhalte müssen vor Einbau einer von zwei Seiten zugeordnet werden.
+
+### Gehört auf `/`, wenn …
+
+- es einem Ruder-Neuling hilft;
+- es die Brücke Film → Rudern stärkt;
+- es eine Einstiegshürde abbaut;
+- es zur Vereinssuche führt;
+- es in wenigen Sekunden verständlich ist.
+
+### Gehört auf `/rudern/`, wenn …
+
+- es Fachwissen voraussetzt oder vertieft;
+- es historische Details behandelt;
+- es Quellen-/Kontextarbeit braucht;
+- es Institutionen, Training, Technik oder Ruderkultur ausführlich erklärt;
+- es primär für bereits Interessierte Mehrwert bringt.
+
+### Faustregel
+
+> **Wenn ein Inhalt den Weg zum ersten Probetraining verlängert, gehört er wahrscheinlich nicht auf die Startseite.**
+
+---
+
+## 53. Endzustand
+
+### `/` — 5-Minuten-Erlebnis
+
+Film → Karl Adam → Ratzeburg → Rudern heute → echte Menschen → Verein finden → Rudern ausprobieren.
+
+### `/rudern/` — 30–45-Minuten-Erlebnis
+
+Training → Technik → Achter → Regatta → Ruderakademie → Wanderrudern → Menschen → Geschichte → Quellen → Förderung → zurück ins Bootshaus.
+
+### Gesamterfolg
+
+`Adams Erben` soll gleichzeitig zwei Dinge hervorragend leisten:
+
+1. **Menschen nach dem Film tatsächlich ins Rudern bringen.**
+2. **Karl Adams Erbe und den Rudersport mit ungewöhnlicher redaktioneller Tiefe erklären.**
+
+Die Zwei-Seiten-Architektur ist die verbindliche Grundlage, um beide Ziele zu erreichen, ohne dass eines das andere verwässert.
