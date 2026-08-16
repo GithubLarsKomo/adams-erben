@@ -1,15 +1,7 @@
 name: Club Logo Pilot
 
 on:
-  push:
-    branches: [feat/club-logo-enrichment]
-    paths:
-      - '.github/workflows/logo-pilot.yml'
-      - 'scripts/sync-club-logos.mjs'
-      - 'scripts/lib/logo-discovery.mjs'
-      - 'scripts/lib/logo-manifest.mjs'
-      - 'scripts/sync-drv.mjs'
-      - 'src/data/club-logos.json'
+  workflow_dispatch:
 
 permissions:
   contents: read
