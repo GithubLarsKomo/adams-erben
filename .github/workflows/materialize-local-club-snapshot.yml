@@ -105,3 +105,5 @@ jobs:
           git add scripts/build.mjs scripts/build-local.mjs src/data/clubs.snapshot.json
           git commit -m "use full sanitized club snapshot for local builds"
           git push origin HEAD:feat/karl-adam-local-cooperation
+
+# Registered workflow; this change triggers the one-time materialization run.
