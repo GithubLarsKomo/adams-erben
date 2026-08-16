@@ -47,7 +47,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: club-logo-pilot-100-v3
+          name: club-logo-pilot-100-v3-final
           if-no-files-found: warn
           retention-days: 7
           path: |
