@@ -85,3 +85,5 @@ jobs:
           fi
           git commit -m "integrate V5 club logos into Vereinssuche"
           git push origin HEAD:feat/club-logo-enrichment
+
+# Registered workflow; this update intentionally triggers the one-time integration run.
