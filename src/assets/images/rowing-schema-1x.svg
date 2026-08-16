@@ -3,42 +3,23 @@
 <desc id="desc">Direkte Draufsicht eines Renn-Einers mit einer Person und je einem Skull auf Backbord und Steuerbord.</desc>
 <defs>
   <style>
-    .hull{stroke:#0B2336;stroke-width:4;stroke-linejoin:round}
-    .tech{stroke:#0B2336;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;fill:none}
-    .shaft{stroke:#123A57;stroke-width:6;stroke-linecap:round}
-    .seat{fill:#123A57;stroke:#0B2336;stroke-width:3}
-    .foot{stroke:#0B2336;stroke-width:5;stroke-linecap:round}
-    .rower{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
-    .head{fill:#A9DCEB;stroke:#0B2336;stroke-width:3}
-    .arm{stroke:#0B2336;stroke-width:8;stroke-linecap:round}
-    .hand{fill:#A6342B;stroke:#0B2336;stroke-width:2}
-    .oarlock{fill:#92D6EA;stroke:#0B2336;stroke-width:3}
-    .blade{fill:#A6342B;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
+    .hull{stroke:#0B2336;stroke-width:4;stroke-linejoin:round}.tech{stroke:#0B2336;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;fill:none}.shaft{stroke:#123A57;stroke-width:6;stroke-linecap:round}.seat{fill:#123A57;stroke:#0B2336;stroke-width:3}.foot{stroke:#0B2336;stroke-width:5;stroke-linecap:round}.rower{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}.head{fill:#A9DCEB;stroke:#0B2336;stroke-width:3}.arm{stroke:#0B2336;stroke-width:8;stroke-linecap:round}.hand{fill:#A6342B;stroke:#0B2336;stroke-width:2}.oarlock{fill:#92D6EA;stroke:#0B2336;stroke-width:3}.blade{fill:#A6342B;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
   </style>
-  <filter id="ae-shadow-filter" x="-20%" y="-30%" width="140%" height="160%">
-    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0B2336" flood-opacity="0.16"/>
-  </filter>
+  <filter id="ae-shadow-filter" x="-20%" y="-30%" width="140%" height="160%"><feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0B2336" flood-opacity="0.16"/></filter>
   <symbol id="ae-seat" viewBox="-18 -12 36 24"><rect x="-18" y="-12" width="36" height="24" rx="6" class="seat"/></symbol>
   <symbol id="ae-oarlock" viewBox="-10 -10 20 20"><circle r="8" class="oarlock"/><circle r="2.6" fill="#0B2336"/></symbol>
   <symbol id="ae-head" viewBox="-13 -13 26 26"><circle r="12" class="head"/></symbol>
   <symbol id="ae-torso" viewBox="-25 -18 50 36"><rect x="-24" y="-17" width="48" height="34" rx="15" class="rower"/></symbol>
 </defs>
 <g id="boat-1x">
-  <path d="M 220 280 L 249 274.24 L 278 270.53 L 307 267.37 L 336 264.54 L 365 261.97 L 394 259.61 L 423 257.44 L 452 255.44 L 481 253.61 L 510 251.94 L 539 250.43 L 568 249.08 L 597 247.9 L 626 246.89 L 655 246.07 L 684 245.42 L 713 244.95 L 742 244.67 L 771 244.57 L 800 244.67 L 829 244.95 L 858 245.42 L 887 246.07 L 916 246.89 L 945 247.9 L 974 249.08 L 1003 250.43 L 1032 251.94 L 1061 253.61 L 1090 255.44 L 1119 257.44 L 1148 259.61 L 1177 261.97 L 1206 264.54 L 1235 267.37 L 1264 270.53 L 1293 274.24 L 1322 280 L 1322 280 L 1293 285.76 L 1264 289.47 L 1235 292.63 L 1206 295.46 L 1177 298.03 L 1148 300.39 L 1119 302.56 L 1090 304.56 L 1061 306.39 L 1032 308.06 L 1003 309.57 L 974 310.92 L 945 312.1 L 916 313.11 L 887 313.93 L 858 314.58 L 829 315.05 L 800 315.33 L 771 315.43 L 742 315.33 L 713 315.05 L 684 314.58 L 655 313.93 L 626 313.11 L 597 312.1 L 568 310.92 L 539 309.57 L 510 308.06 L 481 306.39 L 452 304.56 L 423 302.56 L 394 300.39 L 365 298.03 L 336 295.46 L 307 292.63 L 278 289.47 L 249 285.76 L 220 280 Z" fill="#F7F5EF" class="hull" filter="url(#ae-shadow-filter)"/>
-  <path d="M 650 280 C 700 252 900 252 950 280 C 900 308 700 308 650 280 Z" fill="#92D6EA" opacity=".24"/>
+  <path d="M220 280 C300 245 600 244 800 244 C1000 244 1300 250 1380 280 C1300 310 1000 316 800 316 C600 316 300 315 220 280 Z" fill="#F7F5EF" class="hull" filter="url(#ae-shadow-filter)"/>
+  <path d="M650 280 C700 252 900 252 950 280 C900 308 700 308 650 280 Z" fill="#92D6EA" opacity=".24"/>
   <g id="seat-1"><use href="#ae-seat" x="782" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-1"><line x1="745" y1="258" x2="745" y2="302" class="foot"/></g>
   <g id="rigger-port-1" class="tech"><line x1="775" y1="262" x2="800" y2="214"/><line x1="825" y1="262" x2="800" y2="214"/></g>
   <g id="rigger-starboard-1" class="tech"><line x1="775" y1="298" x2="800" y2="346"/><line x1="825" y1="298" x2="800" y2="346"/></g>
-  <g id="scull-port-1"><line x1="845" y1="300" x2="642.38" y2="-87.28" class="shaft"/><polygon points="647.45,-89.93 622.52,-164.24 599.48,-152.19 637.31,-84.63" class="blade"/><use href="#ae-oarlock" x="790" y="204" width="20" height="20"/></g>
-  <g id="scull-starboard-1"><line x1="845" y1="260" x2="642.38" y2="647.28" class="shaft"/><polygon points="637.31,644.63 599.48,712.19 622.52,724.24 647.45,649.93" class="blade"/><use href="#ae-oarlock" x="790" y="336" width="20" height="20"/></g>
-  <g id="rower-1" filter="url(#ae-shadow-filter)">
-    <use href="#ae-torso" x="775" y="262" width="50" height="36"/>
-    <use href="#ae-head" x="817" y="267" width="26" height="26"/>
-    <line x1="807" y1="270" x2="845" y2="260" class="arm"/>
-    <line x1="807" y1="290" x2="845" y2="300" class="arm"/>
-    <circle cx="845" cy="260" r="6" class="hand"/>
-    <circle cx="845" cy="300" r="6" class="hand"/>
-  </g>
+  <g id="scull-port-1"><line x1="845" y1="300" x2="732.77" y2="85.53" class="shaft"/><polygon points="737.84,82.87 712.77,19.25 689.73,31.3 727.71,88.18" class="blade"/><use href="#ae-oarlock" x="790" y="204" width="20" height="20"/></g>
+  <g id="scull-starboard-1"><line x1="845" y1="260" x2="732.77" y2="474.47" class="shaft"/><polygon points="727.71,471.82 689.73,528.7 712.77,540.75 737.84,477.13" class="blade"/><use href="#ae-oarlock" x="790" y="336" width="20" height="20"/></g>
+  <g id="rower-1" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="775" y="262" width="50" height="36"/><use href="#ae-head" x="817" y="267" width="26" height="26"/><line x1="807" y1="270" x2="845" y2="260" class="arm"/><line x1="807" y1="290" x2="845" y2="300" class="arm"/><circle cx="845" cy="260" r="6" class="hand"/><circle cx="845" cy="300" r="6" class="hand"/></g>
 </g>
 </svg>
