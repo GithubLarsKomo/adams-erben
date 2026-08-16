@@ -19,6 +19,7 @@ const legalFiles = [
 ];
 
 function fail(message) {
+  console.error(`::error file=scripts/risk-protection.mjs::${message}`);
   throw new Error(`[risk-protection] ${message}`);
 }
 
@@ -53,7 +54,10 @@ for (const attr of runtimeAttributes) {
     if (/^https?:\/\//i.test(value)) externalRuntimeAssets.push(`${element.tagName}[${attr}=${value}]`);
   });
 }
-$('link[href],script[src],source[src],track[src]').each((_, element) => {
+
+// Only link relations that cause the browser to fetch a resource are runtime assets.
+// Canonical/alternate metadata may and should use absolute public URLs without creating a request.
+$('link[rel="stylesheet"][href],link[rel="preload"][href],link[rel="modulepreload"][href],link[rel="icon"][href],link[rel="apple-touch-icon"][href],script[src],source[src],track[src]').each((_, element) => {
   const attr = element.tagName === 'link' ? 'href' : 'src';
   const value = String($(element).attr(attr) || '').trim();
   if (/^https?:\/\//i.test(value)) externalRuntimeAssets.push(`${element.tagName}[${attr}=${value}]`);
