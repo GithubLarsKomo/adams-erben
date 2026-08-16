@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment]
   pull_request:
 
 permissions:
@@ -33,8 +33,15 @@ jobs:
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
           node --check scripts/validate-drv-output.test.mjs
+          node --check scripts/sync-club-logos.mjs
+          node --check scripts/apply-club-logo-manifest.mjs
+          node --check scripts/lib/logo-discovery.mjs
+          node --check scripts/lib/logo-manifest.mjs
           node --check src/assets/app.js
           node --check src/assets/nearest.js
+
+      - name: Club logo enrichment tests
+        run: npm run test:logos
 
       - name: DRV output validator tests
         run: npm run test:drv-output
