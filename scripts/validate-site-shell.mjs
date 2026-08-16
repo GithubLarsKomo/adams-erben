@@ -15,6 +15,7 @@ const targets = [
   { file: path.join('rudern', 'index.html'), path: '/rudern/', variant: 'rowing' }
 ];
 
+const sourceDetailTargets = pages.filter((page) => page.path !== '/');
 const failures = [];
 
 function expect(condition, message) {
@@ -55,6 +56,19 @@ for (const target of targets) {
   }
 }
 
+for (const page of sourceDetailTargets) {
+  const sourceHtml = await readFile(path.join(root, 'src', page.file), 'utf8');
+  const $ = cheerio.load(sourceHtml);
+  const label = `src:${page.path}`;
+
+  expect($('.site-header').length === 0, `${label}: SEO source must not contain .site-header`);
+  expect($('.site-footer').length === 0, `${label}: SEO source must not contain .site-footer`);
+  expect($('.detail-footer').length === 0, `${label}: SEO source must not contain .detail-footer`);
+  expect($('.skip-link').length === 0, `${label}: SEO source must not contain shell-owned .skip-link`);
+  expect($('main#inhalt').length === 1, `${label}: SEO source must retain exactly one main#inhalt`);
+  expect($('.detail-hero').length === 1, `${label}: SEO source must retain its content .detail-hero`);
+}
+
 const cssOwnership = [
   ['src/assets/detail-page.css', ['.site-header', '.brand', '.menu-toggle', '.site-footer', '.detail-footer']],
   ['src/assets/story-flow.css', ['.site-header', '.brand', '.menu-toggle', '.header-actions', '.header-find-club']],
@@ -76,5 +90,5 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`[site-shell] validated ${targets.length} pages, in-page targets and CSS ownership`);
+  console.log(`[site-shell] validated ${targets.length} output pages, ${sourceDetailTargets.length} shell-free SEO sources, in-page targets and CSS ownership`);
 }
