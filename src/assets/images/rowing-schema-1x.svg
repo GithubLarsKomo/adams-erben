@@ -9,10 +9,15 @@
     .shaft{stroke:#123A57;stroke-width:6;stroke-linecap:round}
     .seat{fill:#123A57;stroke:#0B2336;stroke-width:3}
     .foot{stroke:#0B2336;stroke-width:5;stroke-linecap:round}
-    .rower{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
-    .head{fill:#A9DCEB;stroke:#0B2336;stroke-width:3}
-    .arm{stroke:#0B2336;stroke-width:8;stroke-linecap:round}
-    .hand{fill:#A6342B;stroke:#0B2336;stroke-width:2}
+    .rower-body{fill:#F7F5EF;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
+    .rower-shirt{fill:#92D6EA;stroke:#0B2336;stroke-width:2.5;stroke-linejoin:round}
+    .rower-head{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
+    .rower-hair{fill:#123A57}
+    .rower-neck{fill:#F7F5EF;stroke:#0B2336;stroke-width:2}
+    .arm-upper{stroke:#0B2336;stroke-width:10;stroke-linecap:round;fill:none}
+    .arm-lower{stroke:#123A57;stroke-width:8;stroke-linecap:round;fill:none}
+    .elbow{fill:#92D6EA;stroke:#0B2336;stroke-width:2}
+    .hand{fill:#F7F5EF;stroke:#0B2336;stroke-width:2}
     .oarlock{fill:#92D6EA;stroke:#0B2336;stroke-width:3}
     .blade{fill:#A6342B;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
   </style>
@@ -21,8 +26,15 @@
   </filter>
   <symbol id="ae-seat" viewBox="-18 -12 36 24"><rect x="-18" y="-12" width="36" height="24" rx="6" class="seat"/></symbol>
   <symbol id="ae-oarlock" viewBox="-10 -10 20 20"><circle r="8" class="oarlock"/><circle r="2.6" fill="#0B2336"/></symbol>
-  <symbol id="ae-head" viewBox="-13 -13 26 26"><circle r="12" class="head"/></symbol>
-  <symbol id="ae-torso" viewBox="-25 -18 50 36"><rect x="-24" y="-17" width="48" height="34" rx="15" class="rower"/></symbol>
+  <symbol id="ae-head" viewBox="-16 -16 32 32">
+    <circle cx="0" cy="0" r="12" class="rower-head"/>
+    <path d="M -11 -2 C -10 -10 -5 -13 0 -13 C 6 -13 10 -9 11 -2 C 6 -6 -6 -6 -11 -2 Z" class="rower-hair"/>
+    <rect x="-3" y="10" width="6" height="5" rx="2" class="rower-neck"/>
+  </symbol>
+  <symbol id="ae-torso" viewBox="-28 -22 56 44">
+    <path d="M -20 -14 C -15 -18 -8 -20 0 -20 C 8 -20 15 -18 20 -14 C 24 -9 25 -2 23 8 C 19 16 11 20 0 20 C -11 20 -19 16 -23 8 C -25 -2 -24 -9 -20 -14 Z" class="rower-body"/>
+    <path d="M -17 -10 C -10 -14 -4 -15 0 -15 C 4 -15 10 -14 17 -10 L 13 6 C 9 10 5 11 0 11 C -5 11 -9 10 -13 6 Z" class="rower-shirt"/>
+  </symbol>
 </defs>
 <g id="boat-1x">
   <path d="M 620 280 L 649 274.24 L 678 270.53 L 707 267.37 L 736 264.54 L 765 261.97 L 794 259.61 L 823 257.44 L 852 255.44 L 881 253.62 L 910 251.95 L 939 250.44 L 968 249.09 L 997 247.9 L 1026 246.87 L 1055 245.99 L 1084 245.28 L 1113 244.72 L 1142 244.32 L 1171 244.08 L 1200 244 L 1229 244.08 L 1258 244.32 L 1287 244.72 L 1316 245.28 L 1345 245.99 L 1374 246.87 L 1403 247.9 L 1432 249.09 L 1461 250.44 L 1490 251.95 L 1519 253.62 L 1548 255.44 L 1577 257.44 L 1606 259.61 L 1635 261.97 L 1664 264.54 L 1693 267.37 L 1722 270.53 L 1751 274.24 L 1780 280 L 1780 280 L 1751 285.76 L 1722 289.47 L 1693 292.63 L 1664 295.46 L 1635 298.03 L 1606 300.39 L 1577 302.56 L 1548 304.56 L 1519 306.38 L 1490 308.05 L 1461 309.56 L 1432 310.91 L 1403 312.1 L 1374 313.13 L 1345 314.01 L 1316 314.72 L 1287 315.28 L 1258 315.68 L 1229 315.92 L 1200 316 L 1171 315.92 L 1142 315.68 L 1113 315.28 L 1084 314.72 L 1055 314.01 L 1026 313.13 L 997 312.1 L 968 310.91 L 939 309.56 L 910 308.05 L 881 306.38 L 852 304.56 L 823 302.56 L 794 300.39 L 765 298.03 L 736 295.46 L 707 292.63 L 678 289.47 L 649 285.76 L 620 280 Z" fill="#F7F5EF" class="hull" filter="url(#ae-shadow-filter)"/>
@@ -31,15 +43,27 @@
   <g id="foot-stretcher-1"><line x1="1145" y1="258" x2="1145" y2="302" class="foot"/></g>
   <g id="rigger-port-1" class="tech"><line x1="1175" y1="262" x2="1200" y2="214"/><line x1="1225" y1="262" x2="1200" y2="214"/></g>
   <g id="rigger-starboard-1" class="tech"><line x1="1175" y1="298" x2="1200" y2="346"/><line x1="1225" y1="298" x2="1200" y2="346"/></g>
-  <g id="scull-port-1"><line x1="1245" y1="300" x2="1137.41" y2="94.39" class="shaft"/><polygon points="1142.48,91.73 1117.4,28.11 1094.37,40.16 1132.34,97.04" class="blade"/><use href="#ae-oarlock" x="1190" y="204" width="20" height="20"/></g>
-  <g id="scull-starboard-1"><line x1="1245" y1="260" x2="1137.41" y2="465.61" class="shaft"/><polygon points="1132.34,462.96 1094.37,519.84 1117.4,531.89 1142.48,468.27" class="blade"/><use href="#ae-oarlock" x="1190" y="336" width="20" height="20"/></g>
+  <g id="scull-port-1">
+    <line x1="1245" y1="300" x2="1137.41" y2="94.39" class="shaft"/>
+    <polygon points="1142.48,91.73 1117.4,28.11 1094.37,40.16 1132.34,97.04" class="blade"/>
+    <use href="#ae-oarlock" x="1190" y="204" width="20" height="20"/>
+  </g>
+  <g id="scull-starboard-1">
+    <line x1="1245" y1="260" x2="1137.41" y2="465.61" class="shaft"/>
+    <polygon points="1132.34,462.96 1094.37,519.84 1117.4,531.89 1142.48,468.27" class="blade"/>
+    <use href="#ae-oarlock" x="1190" y="336" width="20" height="20"/>
+  </g>
   <g id="rower-1" filter="url(#ae-shadow-filter)">
-    <use href="#ae-torso" x="1175" y="262" width="50" height="36"/>
-    <use href="#ae-head" x="1217" y="267" width="26" height="26"/>
-    <line x1="1207" y1="270" x2="1245" y2="260" class="arm"/>
-    <line x1="1207" y1="290" x2="1245" y2="300" class="arm"/>
-    <circle cx="1245" cy="260" r="6" class="hand"/>
-    <circle cx="1245" cy="300" r="6" class="hand"/>
+    <use href="#ae-torso" x="1172" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1215" y="264" width="32" height="32"/>
+    <line x1="1207" y1="270" x2="1225.87" y2="261.42" class="arm-upper"/>
+    <line x1="1225.87" y1="261.42" x2="1245" y2="260" class="arm-lower"/>
+    <circle cx="1225.87" cy="261.42" r="4.4" class="elbow"/>
+    <ellipse cx="1245" cy="260" rx="6.3" ry="4.8" class="hand"/>
+    <line x1="1207" y1="290" x2="1225.87" y2="298.58" class="arm-upper"/>
+    <line x1="1225.87" y1="298.58" x2="1245" y2="300" class="arm-lower"/>
+    <circle cx="1225.87" cy="298.58" r="4.4" class="elbow"/>
+    <ellipse cx="1245" cy="300" rx="6.3" ry="4.8" class="hand"/>
   </g>
 </g>
 </svg>
