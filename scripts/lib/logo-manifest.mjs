@@ -37,9 +37,7 @@ export function applyLogoManifest(organizations, manifest) {
     return {
       ...organization,
       logo: entry.asset,
-      logoStatus: 'present',
-      logoSourceUrl: entry.sourceUrl || '',
-      logoSourcePage: entry.sourcePage || organization.website || ''
+      logoStatus: 'present'
     };
   });
 }
