@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment, risk-protection, feat/seo-discoverability, image-production]
   pull_request:
 
 permissions:
@@ -29,19 +29,39 @@ jobs:
           node --check scripts/build.mjs
           node --check scripts/build-local.mjs
           node --check scripts/split-audiences.mjs
+          node --check scripts/postbuild-seo.mjs
+          node --check scripts/seo-pages.mjs
+          node --check scripts/validate-seo-output.mjs
+          node --check scripts/postbuild-legal-links.mjs
+          node --check scripts/risk-preflight.mjs
+          node --check scripts/risk-protection.mjs
+          node --check scripts/privacy-static.test.mjs
+          node --check scripts/contact-personal-safety.test.mjs
+          node --check scripts/generate-rowing-schemata.mjs
+          node --check scripts/generate-rowing-schemata.test.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
           node --check scripts/validate-drv-output.test.mjs
           node --check scripts/sync-club-logos.mjs
           node --check scripts/apply-club-logo-manifest.mjs
+          node --check scripts/apply-logo-v5-precision.mjs
           node --check scripts/lib/logo-discovery.mjs
           node --check scripts/lib/logo-manifest.mjs
           node --check src/assets/app.js
           node --check src/assets/nearest.js
 
+      - name: Static browser privacy guard
+        run: npm run test:privacy-static
+
+      - name: Personal contact safety
+        run: npm run test:risk-contact
+
       - name: Club logo enrichment tests
         run: npm run test:logos
+
+      - name: Rowing schemata tests
+        run: npm run test:rowing-schemata
 
       - name: DRV output validator tests
         run: npm run test:drv-output
@@ -52,7 +72,19 @@ jobs:
       - name: Local nearest-club tests
         run: npm run test:nearest
 
-      - name: Local build with checked-in seed
+      - name: Assert source contains no remote runtime fallbacks
+        shell: bash
+        run: |
+          if grep -R -E -i 'onerror=' src scripts legal; then
+            echo 'Source must not contain runtime fallback handlers.' >&2
+            exit 1
+          fi
+          if grep -R -E -i 'd2cx26qpfwuhvu\.cloudfront\.net|cdn\.podcastcms\.de|rudern\.de/sites/default/files' src scripts legal; then
+            echo 'Source must not contain known third-party runtime asset hosts.' >&2
+            exit 1
+          fi
+
+      - name: Build safe local preview with checked-in seed
         run: npm run build:local
 
       - name: Validate audience pages
@@ -80,6 +112,9 @@ jobs:
           console.log('Audience pages validated.');
           NODE
 
+      - name: Validate SEO output
+        run: npm run validate:seo
+
       - name: Assert browser data contains no email addresses
         shell: bash
         run: |
@@ -87,6 +122,42 @@ jobs:
             echo 'Public browser data must not contain email addresses.' >&2
             exit 1
           fi
+          if find dist -type f -name 'recipients.json' -print -quit | grep -q .; then
+            echo 'Private recipients.json must never be present in dist.' >&2
+            exit 1
+          fi
+
+      - name: Assert no third-party runtime asset hotlinks
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          function walk(dir) {
+            return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+              const full = path.join(dir, entry.name);
+              return entry.isDirectory() ? walk(full) : [full];
+            });
+          }
+          for (const file of walk('dist').filter((file) => file.endsWith('.html'))) {
+            const html = fs.readFileSync(file, 'utf8');
+            if (/(?:src|srcset|poster)\s*=\s*["']https?:\/\//i.test(html)) {
+              console.error('Generated page must not load runtime assets directly from third parties:', file);
+              process.exit(1);
+            }
+            if (/onerror\s*=/i.test(html)) {
+              console.error('Generated page must not contain runtime fallback handlers:', file);
+              process.exit(1);
+            }
+          }
+          NODE
+
+      - name: Assert GeoNames attribution and data sources link
+        shell: bash
+        run: |
+          grep -q 'GeoNames' dist/index.html
+          grep -q 'CC BY 4.0' dist/index.html
+          grep -q '/datenquellen.php' dist/index.html
+          grep -q 'Datenquellen und Lizenzen' legal/datenquellen.php
 
       - name: Validate generated search data
         run: |
@@ -104,3 +175,4 @@ jobs:
           php -l legal/impressum.php
           php -l legal/datenschutz.php
           php -l legal/rechtliche-hinweise.php
+          php -l legal/datenquellen.php

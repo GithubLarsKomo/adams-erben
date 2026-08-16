@@ -4,15 +4,20 @@ COPY package.json ./
 RUN npm install --no-audit --no-fund
 COPY scripts ./scripts
 COPY src ./src
+COPY legal ./legal
 
-# Safe default: do not reuse/crawl the full DRV directory until the preferred
-# data route has been agreed with the DRV (see Issue #1 and NOTICE.md).
+# Safe default: do not crawl or publish a production DRV directory until the
+# data-use route has been documented and explicitly approved.
 ARG PREVIEW_MODE=0
 ARG SKIP_DRV_SYNC=1
 ARG REQUIRE_DRV_SYNC=0
+ARG DRV_SYNC_MODE=disabled
+ARG DRV_DATA_USAGE_APPROVED=0
 ENV PREVIEW_MODE=${PREVIEW_MODE}
 ENV SKIP_DRV_SYNC=${SKIP_DRV_SYNC}
 ENV REQUIRE_DRV_SYNC=${REQUIRE_DRV_SYNC}
+ENV DRV_SYNC_MODE=${DRV_SYNC_MODE}
+ENV DRV_DATA_USAGE_APPROVED=${DRV_DATA_USAGE_APPROVED}
 RUN npm run build
 
 FROM composer:2 AS php-deps
@@ -30,15 +35,19 @@ RUN apt-get update \
     && a2enmod headers
 
 COPY docker/apache-security.conf /etc/apache2/conf-enabled/adams-erben-security.conf
+COPY docker/entrypoint.sh /usr/local/bin/adams-erben-entrypoint
 COPY --from=web-builder /app/dist/ /var/www/html/
 COPY api/ /var/www/html/api/
 COPY legal/ /var/www/html/
 COPY --from=web-builder /app/build-private/recipients.json /opt/adams-erben/recipients.json
 COPY --from=php-deps /app/vendor/ /var/www/vendor/
 
-RUN chown -R www-data:www-data /var/www/html /opt/adams-erben
+RUN chmod +x /usr/local/bin/adams-erben-entrypoint \
+    && chown -R www-data:www-data /var/www/html /opt/adams-erben
 
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD php -r '$body=@file_get_contents("http://127.0.0.1/api/health.php"); exit($body===false ? 1 : 0);'
+
+ENTRYPOINT ["/usr/local/bin/adams-erben-entrypoint"]
