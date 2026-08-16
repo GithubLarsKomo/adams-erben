@@ -1,0 +1,109 @@
+name: Patch Club Logo Presentation
+
+on:
+  push:
+    branches: [feat/karl-adam-local-cooperation]
+    paths:
+      - '.github/workflows/patch-club-logo-presentation.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/karl-adam-local-cooperation
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+
+      - name: Remove logo frame and preserve intrinsic proportions
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const file = 'src/assets/styles.css';
+          let css = fs.readFileSync(file, 'utf8');
+          const before = `.club-logo {
+  width: 78px;
+  height: 78px;
+  margin: 0;
+  padding: .45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(11, 35, 54, .10);
+  border-radius: 14px;
+  background: #e8eef0;
+  overflow: hidden;
+}
+.club-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}`;
+          const after = `.club-logo {
+  width: 78px;
+  height: 78px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0;
+  background: var(--white);
+  box-shadow: none;
+  overflow: visible;
+}
+.club-logo img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}`;
+          if (!css.includes(before)) throw new Error('Expected desktop club-logo CSS block not found');
+          css = css.replace(before, after);
+          const mobileBefore = `.club-logo { width: 64px; height: 64px; border-radius: 12px; padding: .35rem; }`;
+          const mobileAfter = `.club-logo { width: 64px; height: 64px; }`;
+          if (!css.includes(mobileBefore)) throw new Error('Expected mobile club-logo CSS block not found');
+          css = css.replace(mobileBefore, mobileAfter);
+          fs.writeFileSync(file, css);
+          NODE
+
+      - name: Assert borderless proportional logo CSS
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const css = fs.readFileSync('src/assets/styles.css', 'utf8');
+          const figure = css.match(/\.club-logo \{[\s\S]*?\n\}/)?.[0] || '';
+          const image = css.match(/\.club-logo img \{[\s\S]*?\n\}/)?.[0] || '';
+          if (!figure.includes('background: var(--white);')) throw new Error('Club logo background is not white');
+          if (!figure.includes('border: 0;')) throw new Error('Club logo frame border still present');
+          if (!figure.includes('border-radius: 0;')) throw new Error('Club logo frame radius still present');
+          if (!figure.includes('padding: 0;')) throw new Error('Club logo frame padding still present');
+          for (const rule of ['width: auto;', 'height: auto;', 'max-width: 100%;', 'max-height: 100%;']) {
+            if (!image.includes(rule)) throw new Error(`Missing proportional image rule: ${rule}`);
+          }
+          if (image.includes('width: 100%;') || image.includes('height: 100%;')) throw new Error('Logo image is still forced to fill both dimensions');
+          console.log('Borderless white logo slot and intrinsic aspect-ratio scaling verified.');
+          NODE
+
+      - name: Validate local build
+        run: npm run build:local
+
+      - name: Commit presentation fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/assets/styles.css
+          git commit -m "render club logos borderless with original proportions"
+          git push origin HEAD:feat/karl-adam-local-cooperation
