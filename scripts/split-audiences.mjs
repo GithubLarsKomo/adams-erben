@@ -43,7 +43,9 @@ function siteBase($) {
 function renderRowingPage(html) {
   const $ = cheerio.load(html, { decodeEntities: false });
   const base = siteBase($);
-  $('body').addClass('audience-page audience-page-rowing');
+  $('body')
+    .addClass('audience-page audience-page-rowing')
+    .attr('data-shell-variant', 'rowing');
   ensureAudienceStyles($);
 
   $('title').text('Rudern verstehen – Karl Adams Erbe im Sport von heute | Adams Erben');
@@ -65,20 +67,6 @@ function renderRowingPage(html) {
   `);
   hero.find('.independence-note').text('Die vertiefende Redaktion von Adams Erben. Unabhängig von Film, Verbänden und den genannten Institutionen.');
 
-  const nav = $('#primary-navigation');
-  nav.html(`
-    <a href="/">Für Einsteiger</a>
-    <a href="#labor">Adams Labor</a>
-    <a href="#geschichte">Einordnung</a>
-    <a href="#ruderakademie">Ruderakademie</a>
-    <a href="#rudern-verstehen">Rudern verstehen</a>
-    <a href="#stimmen">Stimmen</a>
-    <a class="nav-cta" href="#vereine">Verein finden</a>
-  `);
-
-  $('.header-find-club').attr('href', '#vereine').text('Verein finden');
-  $('.skip-link').attr('href', '#labor').text('Zum Adams Labor springen');
-
   const intro = `
     <section class="audience-intro audience-intro-rowing" aria-labelledby="rowing-intro-title">
       <div>
@@ -96,7 +84,9 @@ function renderRowingPage(html) {
 function renderLandingPage(html) {
   const $ = cheerio.load(html, { decodeEntities: false });
   const base = siteBase($);
-  $('body').addClass('audience-page audience-page-landing');
+  $('body')
+    .addClass('audience-page audience-page-landing')
+    .attr('data-shell-variant', 'landing');
   ensureAudienceStyles($);
 
   $('title').text('Adams Erben – Vom Kinosaal ins Boot');
@@ -122,20 +112,6 @@ function renderLandingPage(html) {
     <a class="button button-primary" href="#quick-finder">Rudern ausprobieren</a>
     <a class="button button-secondary" href="#ratzeburg">Ratzeburg entdecken</a>
   `);
-
-  const nav = $('#primary-navigation');
-  nav.html(`
-    <a href="#film">Adams Acht</a>
-    <a href="#ratzeburg">Ratzeburg</a>
-    <a href="#stimmen">Stimmen</a>
-    <a href="/rudern/">Mehr entdecken</a>
-    <a class="nav-cta" href="#quick-finder">Rudern ausprobieren</a>
-  `);
-  $('.header-find-club')
-    .attr('href', '#quick-finder')
-    .attr('data-compact-label', 'Verein finden')
-    .text('Rudern ausprobieren');
-  $('.skip-link').attr('href', '#quick-finder').text('Direkt Rudern ausprobieren');
 
   const quickFinder = `
     <section class="quick-finder" id="quick-finder" aria-labelledby="quick-finder-title">
@@ -278,6 +254,7 @@ function validateLanding(html) {
   for (const selector of forbidden) {
     if ($(selector).length) throw new Error(`[split-audiences] landing page unexpectedly contains ${selector}`);
   }
+  if ($('body').attr('data-shell-variant') !== 'landing') throw new Error('[split-audiences] landing shell variant missing');
 }
 
 function validateRowing(html) {
@@ -287,6 +264,7 @@ function validateRowing(html) {
     if (!$(selector).length) throw new Error(`[split-audiences] rowing page missing ${selector}`);
   }
   if ($('#film').length) throw new Error('[split-audiences] rowing page still contains film-first section');
+  if ($('body').attr('data-shell-variant') !== 'rowing') throw new Error('[split-audiences] rowing shell variant missing');
 }
 
 const rowingHtml = renderRowingPage(sourceHtml);
@@ -298,4 +276,4 @@ await mkdir(rowingDir, { recursive: true });
 await writeFile(rowingPath, rowingHtml);
 await writeFile(sourcePath, landingHtml);
 
-console.log('[split-audiences] generated / and /rudern/ audience pages');
+console.log('[split-audiences] generated / and /rudern/ audience pages without shell mutation');
