@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment, refactor/shared-site-shell]
   pull_request:
 
 permissions:
@@ -29,6 +29,9 @@ jobs:
           node --check scripts/build.mjs
           node --check scripts/build-local.mjs
           node --check scripts/split-audiences.mjs
+          node --check scripts/apply-site-shell.mjs
+          node --check scripts/validate-site-shell.mjs
+          node --check scripts/lib/site-shell.mjs
           node --check scripts/sync-drv.mjs
           node --check scripts/build-snapshot.mjs
           node --check scripts/validate-drv-output.mjs
@@ -39,6 +42,7 @@ jobs:
           node --check scripts/lib/logo-manifest.mjs
           node --check src/assets/app.js
           node --check src/assets/nearest.js
+          node --check src/assets/site-shell.js
 
       - name: Club logo enrichment tests
         run: npm run test:logos
@@ -54,6 +58,9 @@ jobs:
 
       - name: Local build with checked-in seed
         run: npm run build:local
+
+      - name: Validate shared site shell
+        run: npm run validate:shell
 
       - name: Validate audience pages
         run: |
