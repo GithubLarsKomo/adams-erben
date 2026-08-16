@@ -1,0 +1,37 @@
+name: Full build verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [refactor/shared-site-shell]
+    paths:
+      - .github/workflows/full-build-verification.yml
+
+permissions:
+  contents: read
+
+jobs:
+  full-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Full production build with required DRV sync
+        env:
+          REQUIRE_DRV_SYNC: '1'
+        run: npm run build
+
+      - name: Revalidate shell and SEO output
+        run: |
+          npm run validate:shell
+          npm run validate:seo
