@@ -9,7 +9,7 @@ export async function loadLogoManifest(filePath) {
       organizations: raw.organizations && typeof raw.organizations === 'object' ? raw.organizations : {}
     };
   } catch (error) {
-    if (error?.code === 'ENOENT') return { version: 1, generatedAt: '', organizations: {} };
+    if (error?.code === 'ENOENT') return { version: 2, generatedAt: '', organizations: {} };
     throw error;
   }
 }
@@ -19,7 +19,7 @@ export function logoEntryForOrganization(organization, manifest) {
   const keys = [organization.organizationId, organization.id, organization.drvId].filter(Boolean).map(String);
   for (const key of keys) {
     const entry = entries[key];
-    if (entry?.status === 'present' && entry.asset) return entry;
+    if (entry) return entry;
   }
   return null;
 }
@@ -27,11 +27,13 @@ export function logoEntryForOrganization(organization, manifest) {
 export function applyLogoManifest(organizations, manifest) {
   return organizations.map((organization) => {
     const entry = logoEntryForOrganization(organization, manifest);
-    if (!entry) return {
-      ...organization,
-      logo: '',
-      logoStatus: 'missing'
-    };
+    if (!entry || entry.status !== 'present' || !entry.asset) {
+      return {
+        ...organization,
+        logo: '',
+        logoStatus: entry?.status || 'missing'
+      };
+    }
     return {
       ...organization,
       logo: entry.asset,
