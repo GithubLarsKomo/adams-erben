@@ -6,19 +6,14 @@ COPY scripts ./scripts
 COPY src ./src
 COPY legal ./legal
 
-# Safe default: do not crawl or publish a production DRV directory until the
-# data-use route has been documented and explicitly approved.
+# Deployment images are built exclusively from the checked-in sanitized club
+# snapshot. A live DRV retrieval is an explicit operational action and must
+# never be enabled implicitly by Coolify/Docker build arguments.
 ARG PREVIEW_MODE=0
-ARG SKIP_DRV_SYNC=1
-ARG REQUIRE_DRV_SYNC=0
-ARG DRV_SYNC_MODE=disabled
 ARG DRV_DATA_USAGE_APPROVED=0
 ENV PREVIEW_MODE=${PREVIEW_MODE}
-ENV SKIP_DRV_SYNC=${SKIP_DRV_SYNC}
-ENV REQUIRE_DRV_SYNC=${REQUIRE_DRV_SYNC}
-ENV DRV_SYNC_MODE=${DRV_SYNC_MODE}
 ENV DRV_DATA_USAGE_APPROVED=${DRV_DATA_USAGE_APPROVED}
-RUN npm run build
+RUN npm run build:deployment
 
 FROM composer:2 AS php-deps
 WORKDIR /app
