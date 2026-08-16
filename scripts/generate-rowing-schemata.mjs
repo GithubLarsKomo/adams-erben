@@ -122,8 +122,8 @@ ${commonDefs()}
   <g id="foot-stretcher-1"><line x1="745" y1="258" x2="745" y2="302" class="foot"/></g>
   <g id="rigger-port-1" class="tech"><line x1="775" y1="262" x2="800" y2="214"/><line x1="825" y1="262" x2="800" y2="214"/></g>
   <g id="rigger-starboard-1" class="tech"><line x1="775" y1="298" x2="800" y2="346"/><line x1="825" y1="298" x2="800" y2="346"/></g>
-  ${oarMarkup({ id: "scull-port-1", handle: handlePort, pivot: pivotPort, outboard: 340, bladeLength: 68, bladeWidth: 26 })}
-  ${oarMarkup({ id: "scull-starboard-1", handle: handleStarboard, pivot: pivotStarboard, outboard: 340, bladeLength: 68, bladeWidth: 26 })}
+  ${oarMarkup({ id: "scull-port-1", handle: handlePort, pivot: pivotPort, outboard: 145, bladeLength: 68, bladeWidth: 26 })}
+  ${oarMarkup({ id: "scull-starboard-1", handle: handleStarboard, pivot: pivotStarboard, outboard: 145, bladeLength: 68, bladeWidth: 26 })}
   <g id="rower-1" filter="url(#ae-shadow-filter)">
     <use href="#ae-torso" x="775" y="262" width="50" height="36"/>
     <use href="#ae-head" x="817" y="267" width="26" height="26"/>
@@ -147,7 +147,7 @@ function eightSeatMarkup({ seat, side, x }) {
   return `<g id="seat-${seat}"><use href="#ae-seat" x="${x - 18}" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-${seat}"><line x1="${x - 48}" y1="258" x2="${x - 48}" y2="302" class="foot"/></g>
   <g id="rigger-${sideId}-${seat}" class="tech"><line x1="${x - 26}" y1="${yAttach}" x2="${pivot.x}" y2="${pivot.y}"/><line x1="${x + 26}" y1="${yAttach}" x2="${pivot.x}" y2="${pivot.y}"/></g>
-  ${oarMarkup({ id: `sweep-oar-${sideId}-${seat}`, handle, pivot, outboard: 455, bladeLength: 76, bladeWidth: 30 })}
+  ${oarMarkup({ id: `sweep-oar-${sideId}-${seat}`, handle, pivot, outboard: 130, bladeLength: 76, bladeWidth: 30 })}
   <g id="rower-${seat}">
     <use href="#ae-torso" x="${x - 25}" y="262" width="50" height="36"/>
     <use href="#ae-head" x="${x + 17}" y="267" width="26" height="26"/>
