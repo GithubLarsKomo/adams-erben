@@ -32,7 +32,7 @@ Die neun SEO-Detailseiten wurden selektiv aus `feat/seo-discoverability` überno
 - `src/assets/site-shell.js` – ausschließlich Hamburger-/ARIA-Verhalten
 - `scripts/lib/site-shell.mjs` – Shell-Varianten und Rendering
 - `scripts/apply-site-shell.mjs` – finaler Layout-Schritt für alle erzeugten Seiten
-- `scripts/validate-site-shell.mjs` – strukturelle, Navigations- und CSS-Ownership-Regressionen
+- `scripts/validate-site-shell.mjs` – strukturelle, Source-Hygiene-, Navigations- und CSS-Ownership-Regressionen
 
 ### Zuständigkeiten
 
@@ -62,7 +62,7 @@ SEO besitzt:
 - Sitemap und robots.txt
 - inhaltliche Crosslinks
 
-SEO besitzt ausdrücklich **nicht** Header, Navigation oder Footer.
+SEO besitzt ausdrücklich **nicht** Header, Navigation, Skip-Link oder Footer.
 
 `app.js` bleibt für Vereinssuche und Kontaktlogik zuständig und enthält keine Shell-Navigation.
 
@@ -130,9 +130,20 @@ Der aktuelle Pfad wird bei exakter Übereinstimmung mit `aria-current="page"` ma
 
 ## SEO-Integration
 
-`scripts/postbuild-seo.mjs` ist shell-neutral. Für importierte historische Detaildokumente entfernt es vor dem finalen Shell-Schritt noch vorhandene Legacy-Header/-Footer aus dem Build-Output. Anschließend setzt es ausschließlich SEO-, Produktions-/Preview- und inhaltliche Crosslink-Aspekte.
+`scripts/postbuild-seo.mjs` ist shell-neutral. Es setzt ausschließlich SEO-, Produktions-/Preview- und inhaltliche Crosslink-Aspekte. Die dort verbliebene Entfernung eventueller Legacy-Shell-Fragmente ist nur noch eine defensive Sicherung; die neun SEO-Quelldokumente selbst enthalten keine eigene Shell mehr.
 
 Die zentrale SEO-Konfiguration umfasst zehn Kernseiten. `/rudern/` ist zusätzlich eine bekannte Audience-Seite und wird bei der internen Linkvalidierung als gültiger interner Pfad akzeptiert, ohne die SEO-Kernseitenzahl zu verändern.
+
+## Source-Hygiene der SEO-Seiten
+
+Die neun statischen SEO-Quelldokumente enthalten ausschließlich ihren Seiteninhalt und keine Shell-eigenen Fragmente mehr. In `src/.../index.html` sind für diese Seiten verboten:
+
+- `.site-header`
+- `.site-footer`
+- `.detail-footer`
+- `.skip-link`
+
+Erhalten bleiben müssen genau ein `main#inhalt` sowie der inhaltliche `.detail-hero`. `scripts/validate-site-shell.mjs` prüft diese Regeln direkt gegen die Quelldateien, bevor ein erfolgreicher Build akzeptiert wird.
 
 ## CSS-Ownership
 
@@ -167,6 +178,13 @@ Für jede von der Shell verwaltete Seite gilt nach dem Build:
 - Content-Seiten besitzen `#inhalt` und der Skip-Link zeigt darauf
 - Content-Seiten verlinken den persistenten Vereins-CTA auf `/ruderverein-finden/`
 
+Für die neun SEO-Quellen gilt zusätzlich vor dem Build:
+
+- kein eigener Header oder Footer
+- kein eigener Shell-Skip-Link
+- genau ein `main#inhalt`
+- genau ein `.detail-hero`
+
 ## CI-Gates
 
 CI prüft:
@@ -175,6 +193,7 @@ CI prüft:
 - bestehende Logo-, DRV-, Snapshot- und Nearest-Regressionen
 - lokalen Production-Build mit Seed-Daten
 - Shell-Struktur aller 11 Seiten
+- Shell-Freiheit der neun SEO-Quelldateien
 - CSS-Ownership
 - tote In-Page-Shell-Links
 - SEO-Ausgabe aller zehn Kernseiten
@@ -184,16 +203,11 @@ CI prüft:
 - separaten Preview-Build mit `PREVIEW_MODE=1`, einschließlich Shell- und SEO-Validierung
 - PHP-Syntax
 
-## Noch vorhandene technische Altlast
-
-Die selektiv importierten statischen SEO-Quelldokumente stammen historisch aus dem alten SEO-Branch und enthalten in `src/.../index.html` teilweise noch nicht-kanonische Header-/Footer-Fragmente. Diese Fragmente sind **nicht Teil des finalen Outputs**: `postbuild-seo.mjs` entfernt sie deterministisch, bevor `apply-site-shell.mjs` die einzige kanonische Shell einsetzt.
-
-Eine spätere reine Source-Hygiene kann diese bereits wirkungslosen Fragmente aus den neun Quelldateien entfernen. Sie ist für Laufzeit, Darstellung und Deployment nicht mehr relevant und darf keine eigene Shell-Logik wieder einführen.
-
-## Definition of Done Etappen 1–5
+## Definition of Done Etappen 1–6
 
 - `/` und `/rudern/` verwenden dieselbe kanonische Header-/Footer-Quelle.
 - Die neun SEO-Detailseiten sind in den Integrationsbranch portiert und erhalten im Build ausschließlich die gemeinsame `content`-Shell.
+- Die neun SEO-Quelldateien enthalten physisch keine historischen Header-, Footer- oder Skip-Link-Fragmente mehr.
 - SEO-Postprocessing verändert keine Header-/Footer-Navigation.
 - Legacy-Shell-CSS wurde aus Base-, Story-, Mobile-, Audience- und Detail-CSS entfernt.
 - Auf <= 920 px ist die Navigation nicht horizontal scrollbar, sondern als Hamburger-Menü verfügbar.
