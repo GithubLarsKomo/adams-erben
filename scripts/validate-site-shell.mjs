@@ -43,6 +43,11 @@ for (const target of targets) {
   expect($('.brand .brand-mark[src="/assets/images/adams-erben-mark.png"]').length === 1, `${label}: mobile mark missing`);
   expect($('.brand').text().trim() === '', `${label}: old textual AE brand content survived`);
 
+  $('.site-header .primary-navigation a[href^="#"]').each((_, element) => {
+    const href = $(element).attr('href');
+    expect(Boolean(href && href !== '#' && $(href).length), `${label}: shell navigation contains dead in-page target ${href || '(missing)'}`);
+  });
+
   if (target.variant === 'content') {
     expect($('.skip-link').attr('href') === '#inhalt', `${label}: content skip link must target #inhalt`);
     expect($('#inhalt').length === 1, `${label}: content page missing #inhalt target`);
@@ -53,7 +58,8 @@ for (const target of targets) {
 const cssOwnership = [
   ['src/assets/detail-page.css', ['.site-header', '.brand', '.menu-toggle', '.site-footer', '.detail-footer']],
   ['src/assets/story-flow.css', ['.site-header', '.brand', '.menu-toggle', '.header-actions', '.header-find-club']],
-  ['src/assets/mobile-fixes.css', ['.site-header', '.brand']],
+  ['src/assets/mobile-fixes.css', ['.site-header', '.brand', '.site-footer']],
+  ['src/assets/audience-pages.css', ['.site-header', '.brand', '.menu-toggle', '.header-actions', '.header-find-club', '.site-footer']],
   ['src/assets/styles.css', ['.site-header', '.brand', '.brand-mark', '.site-footer']]
 ];
 
@@ -70,5 +76,5 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`[site-shell] validated ${targets.length} pages and CSS ownership`);
+  console.log(`[site-shell] validated ${targets.length} pages, in-page targets and CSS ownership`);
 }
