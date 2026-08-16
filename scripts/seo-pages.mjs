@@ -13,6 +13,16 @@ export const pages = [
     index: true
   },
   {
+    path: '/rudern/', file: 'rudern/index.html',
+    title: 'Rudern verstehen: Karl Adams Erbe im Sport heute | Adams Erben',
+    description: 'Rudern verstehen und Karl Adams Erbe einordnen: Training, Technik, Mannschaft, Ratzeburg und Ruderkultur – die fachliche Vertiefung von Adams Erben.',
+    ogTitle: 'Rudern verstehen: Karl Adams Erbe im Sport heute',
+    ogDescription: 'Training, Technik, Mannschaft, Ratzeburg und Ruderkultur: die fachliche Vertiefung zu Karl Adams Erbe und zum Rudern von heute.',
+    ogImage: '/assets/images/hero-skiff.webp',
+    ogImageAlt: 'Ruderboot als Motiv zur fachlichen Vertiefung über Karl Adams Erbe',
+    index: true
+  },
+  {
     path: '/karl-adam/', file: 'karl-adam/index.html',
     title: 'Karl Adam: Rudertrainer, Deutschlandachter & Ideen | Adams Erben',
     description: 'Wer war Karl Adam? Seine Rolle in Ratzeburg, beim Deutschlandachter, seine Trainingsideen, Wirkung und die historische Einordnung seiner NS-Biografie.',
