@@ -54,6 +54,31 @@ function addHomepageStructuredData($) {
   $('head').append(`<script id="seo-website-jsonld" type="application/ld+json">${JSON.stringify(data)}</script>`);
 }
 
+function addRowingHubStructuredData($) {
+  if ($('#seo-rowing-hub-jsonld').length) return;
+  const data = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${productionOrigin}/rudern/#webpage`,
+        url: `${productionOrigin}/rudern/`,
+        name: 'Rudern verstehen: Karl Adams Erbe im Sport heute',
+        inLanguage: 'de',
+        isPartOf: { '@id': `${productionOrigin}/#website` }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Adams Erben', item: `${productionOrigin}/` },
+          { '@type': 'ListItem', position: 2, name: 'Rudern & Adams Erbe', item: `${productionOrigin}/rudern/` }
+        ]
+      }
+    ]
+  };
+  $('head').append(`<script id="seo-rowing-hub-jsonld" type="application/ld+json">${JSON.stringify(data)}</script>`);
+}
+
 function appendLinkOnce(container, href, label, className = 'button button-secondary') {
   if (!container?.length || container.find(`a[href="${href}"]`).length) return;
   container.append(`<a class="${className}" href="${href}">${label}</a>`);
@@ -145,11 +170,43 @@ function addHomepageLinks($) {
       </div>`);
   }
 
+  const quickFinder = $('#quick-finder .quick-finder-secondary').first();
+  appendLinkOnce(quickFinder, '/ruderverein-finden/', 'Vereinssuche im Detail', 'text-link');
+
   const aboutSection = $('#ueber').first();
   if (aboutSection.length && !aboutSection.find('a[href="/ueber-adams-erben/"]').length) {
     const target = aboutSection.find('.section-heading').first();
     target.append('<p><a class="button button-secondary" href="/ueber-adams-erben/">Über Adams Erben: Quellen & Redaktion</a></p>');
   }
+}
+
+function addRowingHubLinks($) {
+  const nav = $('#primary-navigation').first();
+  if (nav.length && !nav.find('a[href="/rudern/"]').length) {
+    nav.prepend('<a href="/rudern/" aria-current="page">Rudern & Adams Erbe</a>');
+  } else {
+    nav.find('a[href="/rudern/"]').first().attr('aria-current', 'page');
+  }
+
+  if ($('.seo-rowing-hub-links').length) return;
+  const detailPages = pages.filter((page) => !['/', '/rudern/'].includes(page.path));
+  const links = detailPages
+    .map((page) => `<a class="button button-secondary" href="${page.path}">${page.ogTitle}</a>`)
+    .join('\n');
+  const section = `
+    <section class="seo-rowing-hub-links" aria-labelledby="seo-rowing-hub-links-title">
+      <div class="section-heading">
+        <p class="eyebrow">Thematisch weiter</p>
+        <h2 id="seo-rowing-hub-links-title">Karl Adam, Rudertechnik und der Weg ins Bootshaus vertiefen.</h2>
+        <p>Die redaktionellen Detailseiten bündeln historische Einordnung, Trainingsmethoden, Ratzeburg, Rudertechnik und den praktischen Einstieg ins Rudern.</p>
+      </div>
+      <nav class="film-links" aria-label="Thematische Vertiefungen">
+        ${links}
+      </nav>
+    </section>`;
+  const about = $('#ueber').first();
+  if (about.length) about.before(section);
+  else $('main').append(section);
 }
 
 const historicDetailPaths = new Set([
@@ -239,6 +296,10 @@ for (const page of pages) {
   if (page.path === '/') {
     addHomepageStructuredData($);
     addHomepageLinks($);
+  } else if (page.path === '/rudern/') {
+    addRowingHubStructuredData($);
+    addHomepageLinks($);
+    addRowingHubLinks($);
   } else {
     addHistoricCrossLinks($, page.path);
   }
