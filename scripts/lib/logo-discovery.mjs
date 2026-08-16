@@ -185,7 +185,16 @@ export function scoreEntityConfidence(candidate, organization, pageIdentity) {
 export function classifyLogoCandidate(candidate, organization, pageIdentity, { minScore = 70, minEntity = 0.55 } = {}) {
   const entityConfidence = scoreEntityConfidence(candidate, organization, pageIdentity);
   const score = Number(candidate?.score || 0);
+  const candidateText = `${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`;
+  const tokens = organizationTokens(organization);
+  const assetIdentityEvidence = tokenCoverage(tokens, candidateText) > 0 || acronymMatch(organization?.name || String(organization || ''), candidateText);
+
+  if (NEGATIVE.test(normalizeToken(candidateText))) return { disposition: 'reject', reason: 'negative_logo_context', score, entityConfidence };
+  if (PHOTO_NEGATIVE.test(normalizeToken(candidateText))) return { disposition: 'reject', reason: 'photo_or_banner_context', score, entityConfidence };
   if (score < minScore) return { disposition: 'reject', reason: 'below_logo_score', score, entityConfidence };
+  if (candidate?.kind === 'img' && !assetIdentityEvidence) {
+    return { disposition: entityConfidence >= 0.25 ? 'review' : 'reject', reason: 'asset_identity_missing', score, entityConfidence };
+  }
   if (entityConfidence >= minEntity) return { disposition: 'accept', reason: 'logo_and_entity_match', score, entityConfidence };
   if (entityConfidence >= 0.25 || candidate?.kind === 'jsonld' || candidate?.kind === 'meta') {
     return { disposition: 'review', reason: 'entity_match_uncertain', score, entityConfidence };
