@@ -1,0 +1,87 @@
+name: Integrate Club Logos UI
+
+on:
+  push:
+    branches: [feat/club-logo-enrichment]
+    paths:
+      - '.github/workflows/integrate-club-logos-ui.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/club-logo-enrichment
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Download final V5 logo artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: club-logo-pilot-500-v5-final
+          run-id: 31947537015
+          github-token: ${{ github.token }}
+          path: .club-logo-artifact
+
+      - name: Import approved manifest and local assets
+        run: |
+          test -f .club-logo-artifact/src/data/club-logos.json
+          test -d .club-logo-artifact/src/assets/images/clubs
+          rm -rf src/assets/images/clubs
+          mkdir -p src/assets/images/clubs
+          cp -a .club-logo-artifact/src/assets/images/clubs/. src/assets/images/clubs/
+          cp .club-logo-artifact/src/data/club-logos.json src/data/club-logos.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const manifest = JSON.parse(fs.readFileSync('src/data/club-logos.json', 'utf8'));
+          const entries = Object.values(manifest.organizations || {});
+          const present = entries.filter((entry) => entry.status === 'present');
+          if (present.length !== 217) throw new Error(`Expected 217 V5 present logos, got ${present.length}`);
+          for (const entry of present) {
+            if (!String(entry.asset || '').startsWith('/assets/images/clubs/')) throw new Error(`Non-local logo path for ${entry.name}`);
+            const local = `src${entry.asset}`;
+            if (!fs.existsSync(local)) throw new Error(`Missing imported asset ${local}`);
+          }
+          console.log(`[logos] verified ${present.length} approved local assets`);
+          NODE
+
+      - name: Integrate logos into search cards
+        run: node scripts/integrate-club-logo-search-ui.mjs
+
+      - name: Build and verify browser output
+        run: |
+          npm run build:local
+          node - <<'NODE'
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('dist/data/clubs.json', 'utf8'));
+          const withLogo = (data.organizations || []).filter((org) => org.logoStatus === 'present');
+          if (withLogo.length !== 217) throw new Error(`Expected 217 browser logos, got ${withLogo.length}`);
+          if (withLogo.some((org) => !String(org.logo || '').startsWith('/assets/images/clubs/'))) throw new Error('Browser output contains non-local logo URL');
+          if (!fs.readFileSync('dist/assets/app.js', 'utf8').includes('safeLocalLogoUrl')) throw new Error('Logo UI helper missing from built app');
+          console.log(`[logos] browser output verified: ${withLogo.length} local logos`);
+          NODE
+
+      - name: Commit approved logo assets and UI
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/club-logos.json src/assets/images/clubs src/assets/app.js src/assets/styles.css
+          if git diff --cached --quiet; then
+            echo "No integration changes to commit."
+            exit 0
+          fi
+          git commit -m "integrate V5 club logos into Vereinssuche"
+          git push origin HEAD:feat/club-logo-enrichment
