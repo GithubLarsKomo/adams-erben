@@ -45,39 +45,6 @@ button { cursor: pointer; }
 }
 .skip-link:focus { transform: none; }
 
-.site-header {
-  width: min(calc(100% - 2rem), var(--content));
-  margin: 0 auto;
-  min-height: 92px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: .9rem;
-  color: var(--navy);
-  text-decoration: none;
-}
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--navy);
-  color: var(--white);
-  font-weight: 800;
-  letter-spacing: -.03em;
-}
-.brand strong, .brand small { display: block; }
-.brand strong { font-size: 1.08rem; }
-.brand small { color: var(--muted); font-size: .78rem; }
-.site-header nav, .site-footer nav { display: flex; gap: 1.2rem; flex-wrap: wrap; }
-.site-header nav a, .site-footer nav a { text-decoration: none; font-weight: 650; }
-
 main > section {
   width: min(calc(100% - 2rem), var(--content));
   margin: 0 auto;
@@ -304,27 +271,12 @@ main > section {
 .honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
 .form-status { min-height: 1.4em; color: var(--muted); margin: 0; }
 
-.site-footer {
-  width: min(calc(100% - 2rem), var(--content));
-  margin: 6rem auto 0;
-  padding: 2rem 0 3rem;
-  border-top: 1px solid var(--line);
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  color: var(--muted);
-}
-.site-footer strong { color: var(--ink); }
-.site-footer p { margin: .3rem 0 0; max-width: 600px; }
-
 .legal-page { width: min(calc(100% - 2rem), 820px); margin: 0 auto; padding: 4rem 0 7rem; }
 .legal-page h1 { font-family: Georgia, serif; font-size: clamp(2.3rem, 5vw, 4rem); line-height: 1; }
 .legal-page h2 { margin-top: 2.4rem; }
 .legal-page .missing-config { background: #fff1d6; border: 1px solid #e3bb69; padding: 1rem; border-radius: 12px; }
 
 @media (max-width: 920px) {
-  .site-header { align-items: flex-start; padding: 1rem 0; }
-  .site-header nav { display: none; }
   .hero { grid-template-columns: 1fr; min-height: auto; }
   .hero-art { max-width: 520px; margin: 0 auto; }
   .search-panel { grid-template-columns: 1fr 1fr; }
@@ -338,11 +290,10 @@ main > section {
 }
 
 @media (max-width: 640px) {
-  main > section, .site-header, .site-footer { width: min(calc(100% - 1rem), var(--content)); }
-  .brand small { display: none; }
+  main > section { width: min(calc(100% - 1rem), var(--content)); }
   .hero { padding: 2rem 1.25rem; border-radius: 22px; }
   .hero-art svg { min-width: 0; }
-  .featured-card, .directory-heading, .site-footer { display: block; }
+  .featured-card, .directory-heading { display: block; }
   .featured-actions { margin-top: 1rem; }
   .search-panel { position: static; grid-template-columns: 1fr; }
   .search-field { grid-column: auto; }
@@ -352,14 +303,12 @@ main > section {
   .club-grid, .principles { grid-template-columns: 1fr; }
   .film { border-radius: 20px; }
   .club-card { min-height: 220px; }
-  .site-footer nav { margin-top: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
 }
-
 
 /* Club logo cards — local V5-approved assets only */
 .club-card-header {
