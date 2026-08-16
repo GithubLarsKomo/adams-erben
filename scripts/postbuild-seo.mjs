@@ -64,7 +64,6 @@ function removeEditorialPlaceholdersFromProduction($) {
 
   $('.preview-banner, .preview-contact-note').remove();
   $('#stimmen').remove();
-  $('.site-header nav a[href="#stimmen"], .site-header nav a[href="/#stimmen"]').remove();
 
   $('[class*="placeholder"]').each((_, element) => {
     const node = $(element);
@@ -106,6 +105,10 @@ function enforceLocalRuntimeAssets($) {
   });
 }
 
+function stripLegacyDetailShell($) {
+  $('.site-header, .site-footer, .detail-footer, .skip-link').remove();
+}
+
 function addHomepageLinks($) {
   appendLinkOnce($('.hero .hero-actions').first(), '/karl-adam/', 'Karl Adam entdecken');
 
@@ -145,59 +148,21 @@ function addHomepageLinks($) {
       </div>`);
   }
 
+  const compactGateway = $('.professional-link').first();
+  if (compactGateway.length && !compactGateway.find('.seo-core-links').length) {
+    compactGateway.append(`
+      <nav class="seo-core-links" aria-label="Weitere Inhalte">
+        <a href="/karl-adam-trainingsmethoden/">Trainingsmethoden</a>
+        <a href="/rudern-verstehen/">Rudern verstehen</a>
+        <a href="/rudern-lernen/">Rudern lernen</a>
+        <a href="/ruderverein-finden/">Ruderverein finden</a>
+      </nav>`);
+  }
+
   const aboutSection = $('#ueber').first();
   if (aboutSection.length && !aboutSection.find('a[href="/ueber-adams-erben/"]').length) {
     const target = aboutSection.find('.section-heading').first();
     target.append('<p><a class="button button-secondary" href="/ueber-adams-erben/">Über Adams Erben: Quellen & Redaktion</a></p>');
-  }
-}
-
-const historicDetailPaths = new Set([
-  '/karl-adam/',
-  '/adams-acht/',
-  '/deutschlandachter-1960/',
-  '/ratzeburg/',
-  '/karl-adam-trainingsmethoden/'
-]);
-
-function addHistoricCrossLinks($, currentPath) {
-  if (!historicDetailPaths.has(currentPath)) return;
-
-  const nav = $('.site-header nav[aria-label="Hauptnavigation"]').first();
-  const links = [
-    ['/karl-adam/', 'Karl Adam'],
-    ['/adams-acht/', 'Adams Acht'],
-    ['/deutschlandachter-1960/', 'Achter 1960'],
-    ['/ratzeburg/', 'Ratzeburg'],
-    ['/karl-adam-trainingsmethoden/', 'Trainingsmethoden']
-  ];
-
-  for (const [href, label] of links) {
-    if (nav.find(`a[href="${href}"]`).length) continue;
-    const clubLink = nav.find('a[href="/ruderverein-finden/"], a[href="/#vereine"], a[href="#vereine"]').first();
-    const link = `<a href="${href}"${href === currentPath ? ' aria-current="page"' : ''}>${label}</a>`;
-    if (clubLink.length) clubLink.before(link);
-    else nav.append(link);
-  }
-
-  if (currentPath === '/karl-adam/') {
-    const nextLinks = $('.next-card .next-links').first();
-    const additions = [
-      ['/deutschlandachter-1960/', 'Deutschlandachter 1960', 'button button-primary'],
-      ['/adams-acht/', 'Adams Acht', 'button button-secondary'],
-      ['/ratzeburg/', 'Ratzeburg', 'button button-secondary'],
-      ['/karl-adam-trainingsmethoden/', 'Trainingsmethoden', 'button button-secondary']
-    ];
-    for (const [href, label, className] of additions) {
-      appendLinkOnce(nextLinks, href, label, className);
-    }
-  }
-}
-
-function addSharedTrustLink($) {
-  const footerNav = $('.detail-footer nav, .site-footer nav').last();
-  if (footerNav.length && !footerNav.find('a[href="/ueber-adams-erben/"]').length) {
-    footerNav.append('<a href="/ueber-adams-erben/">Über Adams Erben</a>');
   }
 }
 
@@ -213,6 +178,8 @@ for (const page of pages) {
   const $ = cheerio.load(html, { decodeEntities: false });
   removeEditorialPlaceholdersFromProduction($);
   enforceLocalRuntimeAssets($);
+
+  if (page.path !== '/') stripLegacyDetailShell($);
 
   $('title').text(page.title);
   setMeta($, 'meta[name="description"]', { name: 'description', content: page.description });
@@ -236,13 +203,8 @@ for (const page of pages) {
   if (h1Count !== 1) throw new Error(`[seo] ${page.path} must have exactly one h1, found ${h1Count}`);
   if (!$('html').attr('lang')) throw new Error(`[seo] ${page.path} is missing html[lang]`);
 
-  if (page.path === '/') {
-    addHomepageStructuredData($);
-    addHomepageLinks($);
-  } else {
-    addHistoricCrossLinks($, page.path);
-  }
-  addSharedTrustLink($);
+  if (page.path === '/') addHomepageStructuredData($);
+  if (page.path === '/') addHomepageLinks($);
 
   await writeFile(filePath, $.html());
 }
