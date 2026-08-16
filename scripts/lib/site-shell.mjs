@@ -70,6 +70,15 @@ function renderHeader(template, config, currentPath) {
   return $.html();
 }
 
+function removeDeadInPageNavigation($) {
+  $('.site-header .primary-navigation a[href^="#"]').each((_, element) => {
+    const link = $(element);
+    const href = link.attr('href');
+    if (!href || href === '#') return;
+    if (!$(href).length) link.remove();
+  });
+}
+
 export function applySiteShell($, { variant, headerTemplate, footerTemplate, currentPath = '' }) {
   const config = variants[variant];
   if (!config) throw new Error(`[site-shell] unknown variant: ${variant}`);
@@ -88,6 +97,7 @@ export function applySiteShell($, { variant, headerTemplate, footerTemplate, cur
   const previewBanner = $('#preview-banner').first();
   if (previewBanner.length) previewBanner.after(headerHtml);
   else skipLink.after(headerHtml);
+  removeDeadInPageNavigation($);
 
   $('.site-footer, .detail-footer').remove();
   $('body').append(footerTemplate);
