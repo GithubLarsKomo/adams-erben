@@ -66,6 +66,24 @@ function safeExternalUrl(value = '') {
   }
 }
 
+function safeLocalLogoUrl(org) {
+  if (org?.logoStatus !== 'present' || !org?.logo) return '';
+  try {
+    const url = new URL(org.logo, window.location.origin);
+    if (url.origin !== window.location.origin) return '';
+    if (!url.pathname.startsWith('/assets/images/clubs/')) return '';
+    return `${url.pathname}${url.search}`;
+  } catch {
+    return '';
+  }
+}
+
+function clubLogoMarkup(org) {
+  const logoUrl = safeLocalLogoUrl(org);
+  if (!logoUrl) return '';
+  return `<figure class="club-logo"><img src="${escaped(logoUrl)}" alt="${escaped(`Logo von ${org.name}`)}" loading="lazy" decoding="async"></figure>`;
+}
+
 function organizationStates(org) {
   const values = Array.isArray(org.states) && org.states.length ? org.states : [org.state];
   return [...new Set(values.filter(Boolean))];
@@ -130,12 +148,18 @@ function clubCard(org) {
     contactHint = '<p class="club-route club-route-neutral">Für diesen Eintrag liegen derzeit keine direkten Kontaktdaten vor.</p>';
   }
 
+  const logo = clubLogoMarkup(org);
   return `
     <article class="club-card ${org.featured ? 'club-card-featured' : ''}">
-      <div class="club-card-topline"><span class="club-type">${escaped(labelForType(org.type))}</span>${badge}</div>
-      <h3>${escaped(org.name)}</h3>
-      <p class="club-location">${escaped(meta || 'Standort nicht hinterlegt')}</p>
-      ${distance}
+      <div class="club-card-header${logo ? '' : ' club-card-header-no-logo'}">
+        ${logo}
+        <div class="club-card-heading">
+          <div class="club-card-topline"><span class="club-type">${escaped(labelForType(org.type))}</span>${badge}</div>
+          <h3>${escaped(org.name)}</h3>
+          <p class="club-location">${escaped(meta || 'Standort nicht hinterlegt')}</p>
+          ${distance}
+        </div>
+      </div>
       ${contactHint}
       <div class="club-card-actions">${actions}</div>
     </article>`;

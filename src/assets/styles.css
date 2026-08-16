@@ -359,3 +359,42 @@ main > section {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
 }
+
+
+/* Club logo cards — local V5-approved assets only */
+.club-card-header {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.club-card-header-no-logo { grid-template-columns: minmax(0, 1fr); }
+.club-logo {
+  width: 78px;
+  height: 78px;
+  margin: 0;
+  padding: .45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(11, 35, 54, .10);
+  border-radius: 14px;
+  background: #e8eef0;
+  overflow: hidden;
+}
+.club-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+.club-card-heading { min-width: 0; }
+.club-card-heading .club-card-topline { min-height: 1.2rem; }
+.club-card-heading h3 { margin-top: .55rem; }
+
+@media (max-width: 680px) {
+  .club-card-header { grid-template-columns: 64px minmax(0, 1fr); gap: .8rem; }
+  .club-card-header-no-logo { grid-template-columns: minmax(0, 1fr); }
+  .club-logo { width: 64px; height: 64px; border-radius: 12px; padding: .35rem; }
+}
