@@ -73,16 +73,18 @@ const regattaDecision = classifyLogoCandidate(regattaLogo, aegir, aegirIdentity)
 assert.equal(regattaDecision.disposition, 'reject');
 assert.equal(regattaDecision.reason, 'event_or_regatta_context');
 
-// V3 regression 2: sponsor logo on the correct club page needs direct club identity evidence.
+// V3 regression 2: same-site sponsor assets must not inherit club identity from the hostname.
 const bessel = { name: 'Bessel-Ruder-Club e.V.', city: 'Minden' };
 const besselIdentity = { text: 'Bessel-Ruder-Club e.V. | BRC Minden' };
 const bankLogo = {
-  url: 'https://bessel-ruder-club.de/media/Logo_VVB_Minden_blau.svg', kind: 'img', score: 125,
-  label: 'Volksbank Minden', directContext: 'logo bank', context: 'content partner-row', directlyReferenced: true
+  url: 'https://www.besselrc.de/wp-content/uploads/2023/01/Logo_VVB_Minden_blau.svg', kind: 'img', score: 75,
+  label: '', directContext: 'attachment-full widget_sp_image-image-link',
+  context: 'attachment-full widget_sp_image-image-link widget_sp_image-3 widget clearfix widget_sp_image flex_column',
+  directlyReferenced: true
 };
 const bankDecision = classifyLogoCandidate(bankLogo, bessel, besselIdentity);
 assert.notEqual(bankDecision.disposition, 'accept');
-assert.ok(['negative_logo_context', 'direct_asset_identity_missing'].includes(bankDecision.reason));
+assert.equal(bankDecision.reason, 'direct_asset_identity_missing');
 
 // V3 regression 3: explicit flag/logo identity beats a cropped background/header photo at equal score.
 const crefeld = { name: 'Crefelder Ruder-Club 1883 e.V.', city: 'Krefeld' };
