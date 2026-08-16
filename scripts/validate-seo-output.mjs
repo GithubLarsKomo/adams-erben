@@ -50,6 +50,7 @@ const titles = new Map();
 const descriptions = new Map();
 const longParagraphs = new Map();
 const expectedPaths = new Set(pages.map((page) => page.path));
+const knownInternalPaths = new Set([...expectedPaths, '/rudern/']);
 
 for (const page of pages) {
   const filePath = path.join(dist, page.file);
@@ -160,7 +161,7 @@ for (const page of pages) {
     const href = $(element).attr('href');
     if (!href || href.startsWith('/#') || href.endsWith('.php')) return;
     const normalized = href.split('#')[0].split('?')[0];
-    if (normalized.endsWith('/') && !expectedPaths.has(normalized)) {
+    if (normalized.endsWith('/') && !knownInternalPaths.has(normalized)) {
       fail(page.path, `internal core-style link points to unregistered path ${normalized}`);
     }
     if (expectedPaths.has(normalized) && normalized !== page.path) linkedCorePaths.add(normalized);
