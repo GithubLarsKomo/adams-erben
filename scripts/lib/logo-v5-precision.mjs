@@ -91,7 +91,7 @@ function embeddedShortAlias(organization, text = '') {
   const tokens = words(text);
   const aliases = organizationAliases(organization).filter((alias) => /^[a-z0-9]+$/.test(alias) && alias.length >= 2 && alias.length <= 4);
   if (aliases.some((alias) => tokens.includes(alias))) return false;
-  return aliases.some((alias) => tokens.some((token) => token.length > alias.length && token.includes(alias)));
+  return aliases.some((alias) => tokens.some((token) => token.length > alias.length && token.length <= 6 && token.includes(alias)));
 }
 
 function hasForeignIdentity(candidate, organization, selectedUrl = '') {
