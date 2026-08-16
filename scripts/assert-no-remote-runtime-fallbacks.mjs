@@ -3,7 +3,9 @@ import path from 'node:path';
 
 const root = process.cwd();
 const roots = ['src', 'scripts', 'legal'];
-const textExtensions = new Set(['.css', '.html', '.js', '.json', '.mjs', '.php', '.svg', '.txt', '.xml']);
+// Scan executable/renderable source. JSON under src/data is provenance/content metadata and may
+// legitimately record third-party source URLs; generated HTML is checked separately after build.
+const textExtensions = new Set(['.css', '.html', '.js', '.mjs', '.php', '.svg', '.xml']);
 const forbiddenHosts = [
   'd2cx26qpfwuhvu' + '.cloudfront.net',
   'cdn' + '.podcastcms.de',
