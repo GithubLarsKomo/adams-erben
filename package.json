@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/risk-preflight.mjs && node scripts/build.mjs && node scripts/apply-club-logo-manifest.mjs && node scripts/remove-local-snapshot.mjs && node scripts/split-audiences.mjs && node scripts/postbuild-seo.mjs && node scripts/postbuild-legal-links.mjs && node scripts/validate-seo-output.mjs && node scripts/risk-protection.mjs",
+    "build:deployment": "node scripts/build-deployment-snapshot.mjs",
     "build:local": "node scripts/build-local.mjs",
     "risk:check": "node scripts/risk-protection.mjs",
     "risk:preflight": "node scripts/risk-preflight.mjs",
