@@ -27,55 +27,37 @@ jobs:
           const fs = require('fs');
           const file = 'src/assets/styles.css';
           let css = fs.readFileSync(file, 'utf8');
-          const before = `.club-logo {
-  width: 78px;
-  height: 78px;
-  margin: 0;
-  padding: .45rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(11, 35, 54, .10);
-  border-radius: 14px;
-  background: #e8eef0;
-  overflow: hidden;
-}
-.club-logo img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  object-position: center;
-}`;
-          const after = `.club-logo {
-  width: 78px;
-  height: 78px;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 0;
-  background: var(--white);
-  box-shadow: none;
-  overflow: visible;
-}
-.club-logo img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  object-position: center;
-}`;
-          if (!css.includes(before)) throw new Error('Expected desktop club-logo CSS block not found');
-          css = css.replace(before, after);
-          const mobileBefore = `.club-logo { width: 64px; height: 64px; border-radius: 12px; padding: .35rem; }`;
-          const mobileAfter = `.club-logo { width: 64px; height: 64px; }`;
-          if (!css.includes(mobileBefore)) throw new Error('Expected mobile club-logo CSS block not found');
-          css = css.replace(mobileBefore, mobileAfter);
+          const desktop = [
+            '.club-logo {',
+            '  width: 78px;',
+            '  height: 78px;',
+            '  margin: 0;',
+            '  padding: 0;',
+            '  display: flex;',
+            '  align-items: center;',
+            '  justify-content: center;',
+            '  border: 0;',
+            '  border-radius: 0;',
+            '  background: var(--white);',
+            '  box-shadow: none;',
+            '  overflow: visible;',
+            '}',
+            '.club-logo img {',
+            '  display: block;',
+            '  width: auto;',
+            '  height: auto;',
+            '  max-width: 100%;',
+            '  max-height: 100%;',
+            '  object-fit: contain;',
+            '  object-position: center;',
+            '}'
+          ].join('\n');
+          const desktopPattern = /\.club-logo \{\n[\s\S]*?\n\}\n\.club-logo img \{\n[\s\S]*?\n\}/;
+          if (!desktopPattern.test(css)) throw new Error('Expected desktop club-logo CSS block not found');
+          css = css.replace(desktopPattern, desktop);
+          const mobilePattern = /\.club-logo \{ width: 64px; height: 64px; border-radius: 12px; padding: \.35rem; \}/;
+          if (!mobilePattern.test(css)) throw new Error('Expected mobile club-logo CSS block not found');
+          css = css.replace(mobilePattern, '.club-logo { width: 64px; height: 64px; }');
           fs.writeFileSync(file, css);
           NODE
 
@@ -86,14 +68,15 @@ jobs:
           const css = fs.readFileSync('src/assets/styles.css', 'utf8');
           const figure = css.match(/\.club-logo \{[\s\S]*?\n\}/)?.[0] || '';
           const image = css.match(/\.club-logo img \{[\s\S]*?\n\}/)?.[0] || '';
-          if (!figure.includes('background: var(--white);')) throw new Error('Club logo background is not white');
-          if (!figure.includes('border: 0;')) throw new Error('Club logo frame border still present');
-          if (!figure.includes('border-radius: 0;')) throw new Error('Club logo frame radius still present');
-          if (!figure.includes('padding: 0;')) throw new Error('Club logo frame padding still present');
-          for (const rule of ['width: auto;', 'height: auto;', 'max-width: 100%;', 'max-height: 100%;']) {
-            if (!image.includes(rule)) throw new Error(`Missing proportional image rule: ${rule}`);
+          for (const rule of ['padding: 0;', 'border: 0;', 'border-radius: 0;', 'background: var(--white);']) {
+            if (!figure.includes(rule)) throw new Error('Missing frame rule: ' + rule);
           }
-          if (image.includes('width: 100%;') || image.includes('height: 100%;')) throw new Error('Logo image is still forced to fill both dimensions');
+          for (const rule of ['width: auto;', 'height: auto;', 'max-width: 100%;', 'max-height: 100%;']) {
+            if (!image.includes(rule)) throw new Error('Missing proportional image rule: ' + rule);
+          }
+          if (/^\s*width:\s*100%;/m.test(image) || /^\s*height:\s*100%;/m.test(image)) {
+            throw new Error('Logo image is still forced to fill both dimensions');
+          }
           console.log('Borderless white logo slot and intrinsic aspect-ratio scaling verified.');
           NODE
 
