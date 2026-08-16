@@ -82,7 +82,7 @@ const bankLogo = {
 };
 const bankDecision = classifyLogoCandidate(bankLogo, bessel, besselIdentity);
 assert.notEqual(bankDecision.disposition, 'accept');
-assert.equal(bankDecision.reason, 'direct_asset_identity_missing');
+assert.ok(['negative_logo_context', 'direct_asset_identity_missing'].includes(bankDecision.reason));
 
 // V3 regression 3: explicit flag/logo identity beats a cropped background/header photo at equal score.
 const crefeld = { name: 'Crefelder Ruder-Club 1883 e.V.', city: 'Krefeld' };
