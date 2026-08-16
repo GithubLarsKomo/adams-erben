@@ -46,6 +46,11 @@ function normalizeParagraph(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+function isAudienceSiblingPair(first, second) {
+  return new Set([first, second]).size === 2
+    && [first, second].every((value) => value === '/' || value === '/rudern/');
+}
+
 const titles = new Map();
 const descriptions = new Map();
 const longParagraphs = new Map();
@@ -107,9 +112,9 @@ for (const page of pages) {
   if (page.path === '/') {
     if (!types.has('WebSite')) fail(page.path, 'homepage JSON-LD must contain WebSite');
   } else {
-    if (!types.has('BreadcrumbList')) fail(page.path, 'detail page JSON-LD must contain BreadcrumbList');
-    if (!types.has('WebPage') && !types.has('AboutPage')) fail(page.path, 'detail page JSON-LD must contain WebPage or AboutPage');
-    if (!$('[aria-current="page"]').length) fail(page.path, 'detail page should expose aria-current="page"');
+    if (!types.has('BreadcrumbList')) fail(page.path, 'detail/hub page JSON-LD must contain BreadcrumbList');
+    if (!types.has('WebPage') && !types.has('AboutPage')) fail(page.path, 'detail/hub page JSON-LD must contain WebPage or AboutPage');
+    if (!$('[aria-current="page"]').length) fail(page.path, 'detail/hub page should expose aria-current="page"');
   }
 
   const skipLink = $('.skip-link[href^="#"]').first();
@@ -167,8 +172,14 @@ for (const page of pages) {
   });
 
   if (page.path === '/') {
+    for (const requiredPath of ['/rudern/', '/karl-adam/', '/ruderverein-finden/']) {
+      if (!linkedCorePaths.has(requiredPath)) fail(page.path, `audience homepage does not link to required path ${requiredPath}`);
+    }
+  } else if (page.path === '/rudern/') {
     for (const expectedPath of expectedPaths) {
-      if (expectedPath !== '/' && !linkedCorePaths.has(expectedPath)) fail(page.path, `homepage does not link to core page ${expectedPath}`);
+      if (!['/', '/rudern/'].includes(expectedPath) && !linkedCorePaths.has(expectedPath)) {
+        fail(page.path, `rowing hub does not link to core page ${expectedPath}`);
+      }
     }
   } else if (linkedCorePaths.size < 2) {
     fail(page.path, `detail page links to only ${linkedCorePaths.size} other core page(s); expected at least 2`);
@@ -197,9 +208,9 @@ for (const page of pages) {
     const paragraph = normalizeParagraph($(element).text());
     if (paragraph.length < 180) return;
     const previous = longParagraphs.get(paragraph);
-    if (previous && previous !== page.path) {
+    if (previous && previous !== page.path && !isAudienceSiblingPair(previous, page.path)) {
       fail(page.path, `long paragraph is duplicated verbatim from ${previous}`);
-    } else {
+    } else if (!previous) {
       longParagraphs.set(paragraph, page.path);
     }
   });
@@ -237,7 +248,7 @@ if (robots) {
   }
 }
 
-if (pages.length !== 10) failures.push(`central SEO configuration: expected 10 core pages, found ${pages.length}`);
+if (pages.length !== 11) failures.push(`central SEO configuration: expected 11 core pages including /rudern/, found ${pages.length}`);
 
 if (failures.length) {
   console.error(`[seo-validate] failed (${previewMode ? 'preview' : 'production'})`);
