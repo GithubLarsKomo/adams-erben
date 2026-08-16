@@ -103,10 +103,15 @@ function commonDefs() {
     .shaft{stroke:#123A57;stroke-width:6;stroke-linecap:round}
     .seat{fill:#123A57;stroke:#0B2336;stroke-width:3}
     .foot{stroke:#0B2336;stroke-width:5;stroke-linecap:round}
-    .rower{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
-    .head{fill:#A9DCEB;stroke:#0B2336;stroke-width:3}
-    .arm{stroke:#0B2336;stroke-width:8;stroke-linecap:round}
-    .hand{fill:#A6342B;stroke:#0B2336;stroke-width:2}
+    .rower-body{fill:#F7F5EF;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
+    .rower-shirt{fill:#92D6EA;stroke:#0B2336;stroke-width:2.5;stroke-linejoin:round}
+    .rower-head{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
+    .rower-hair{fill:#123A57}
+    .rower-neck{fill:#F7F5EF;stroke:#0B2336;stroke-width:2}
+    .arm-upper{stroke:#0B2336;stroke-width:10;stroke-linecap:round;fill:none}
+    .arm-lower{stroke:#123A57;stroke-width:8;stroke-linecap:round;fill:none}
+    .elbow{fill:#92D6EA;stroke:#0B2336;stroke-width:2}
+    .hand{fill:#F7F5EF;stroke:#0B2336;stroke-width:2}
     .oarlock{fill:#92D6EA;stroke:#0B2336;stroke-width:3}
     .blade{fill:#A6342B;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
   </style>
@@ -115,8 +120,15 @@ function commonDefs() {
   </filter>
   <symbol id="ae-seat" viewBox="-18 -12 36 24"><rect x="-18" y="-12" width="36" height="24" rx="6" class="seat"/></symbol>
   <symbol id="ae-oarlock" viewBox="-10 -10 20 20"><circle r="8" class="oarlock"/><circle r="2.6" fill="#0B2336"/></symbol>
-  <symbol id="ae-head" viewBox="-13 -13 26 26"><circle r="12" class="head"/></symbol>
-  <symbol id="ae-torso" viewBox="-25 -18 50 36"><rect x="-24" y="-17" width="48" height="34" rx="15" class="rower"/></symbol>
+  <symbol id="ae-head" viewBox="-16 -16 32 32">
+    <circle cx="0" cy="0" r="12" class="rower-head"/>
+    <path d="M -11 -2 C -10 -10 -5 -13 0 -13 C 6 -13 10 -9 11 -2 C 6 -6 -6 -6 -11 -2 Z" class="rower-hair"/>
+    <rect x="-3" y="10" width="6" height="5" rx="2" class="rower-neck"/>
+  </symbol>
+  <symbol id="ae-torso" viewBox="-28 -22 56 44">
+    <path d="M -20 -14 C -15 -18 -8 -20 0 -20 C 8 -20 15 -18 20 -14 C 24 -9 25 -2 23 8 C 19 16 11 20 0 20 C -11 20 -19 16 -23 8 C -25 -2 -24 -9 -20 -14 Z" class="rower-body"/>
+    <path d="M -17 -10 C -10 -14 -4 -15 0 -15 C 4 -15 10 -14 17 -10 L 13 6 C 9 10 5 11 0 11 C -5 11 -9 10 -13 6 Z" class="rower-shirt"/>
+  </symbol>
 </defs>`;
 }
 
@@ -126,6 +138,37 @@ function oarMarkup({ id, shaftStart, pivot, outboard, bladeLength, bladeWidth })
     <line x1="${fmt(shaftStart.x)}" y1="${fmt(shaftStart.y)}" x2="${fmt(root.x)}" y2="${fmt(root.y)}" class="shaft"/>
     <polygon points="${bladePoints(pivot, root, bladeLength, bladeWidth)}" class="blade"/>
     <use href="#ae-oarlock" x="${fmt(pivot.x - 10)}" y="${fmt(pivot.y - 10)}" width="20" height="20"/>
+  </g>`;
+}
+
+function armElbow(shoulder, hand, bend) {
+  const dx = hand.x - shoulder.x;
+  const dy = hand.y - shoulder.y;
+  const d = Math.hypot(dx, dy) || 1;
+  const px = -dy / d;
+  const py = dx / d;
+  return {
+    x: shoulder.x + dx * 0.52 + px * bend,
+    y: shoulder.y + dy * 0.52 + py * bend,
+  };
+}
+
+function armMarkup(shoulder, hand, bend, handRx = 6, handRy = 4.6) {
+  const elbow = armElbow(shoulder, hand, bend);
+  return `<line x1="${fmt(shoulder.x)}" y1="${fmt(shoulder.y)}" x2="${fmt(elbow.x)}" y2="${fmt(elbow.y)}" class="arm-upper"/>
+    <line x1="${fmt(elbow.x)}" y1="${fmt(elbow.y)}" x2="${fmt(hand.x)}" y2="${fmt(hand.y)}" class="arm-lower"/>
+    <circle cx="${fmt(elbow.x)}" cy="${fmt(elbow.y)}" r="4.4" class="elbow"/>
+    <ellipse cx="${fmt(hand.x)}" cy="${fmt(hand.y)}" rx="${handRx}" ry="${handRy}" class="hand"/>`;
+}
+
+function singleRowerMarkup(handleStarboard, handlePort) {
+  const shoulderUpper = { x: 1207, y: 270 };
+  const shoulderLower = { x: 1207, y: 290 };
+  return `<g id="rower-1" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="1172" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1215" y="264" width="32" height="32"/>
+    ${armMarkup(shoulderUpper, handleStarboard, -3.5, 6.3, 4.8)}
+    ${armMarkup(shoulderLower, handlePort, 3.5, 6.3, 4.8)}
   </g>`;
 }
 
@@ -151,14 +194,7 @@ ${commonDefs()}
   <g id="rigger-starboard-1" class="tech"><line x1="1175" y1="298" x2="1200" y2="346"/><line x1="1225" y1="298" x2="1200" y2="346"/></g>
   ${oarMarkup({ id: "scull-port-1", shaftStart: handlePort, pivot: pivotPort, outboard: 135, bladeLength: 68, bladeWidth: 26 })}
   ${oarMarkup({ id: "scull-starboard-1", shaftStart: handleStarboard, pivot: pivotStarboard, outboard: 135, bladeLength: 68, bladeWidth: 26 })}
-  <g id="rower-1" filter="url(#ae-shadow-filter)">
-    <use href="#ae-torso" x="1175" y="262" width="50" height="36"/>
-    <use href="#ae-head" x="1217" y="267" width="26" height="26"/>
-    <line x1="1207" y1="270" x2="1245" y2="260" class="arm"/>
-    <line x1="1207" y1="290" x2="1245" y2="300" class="arm"/>
-    <circle cx="1245" cy="260" r="6" class="hand"/>
-    <circle cx="1245" cy="300" r="6" class="hand"/>
-  </g>
+  ${singleRowerMarkup(handleStarboard, handlePort)}
 </g>
 </svg>`;
 }
@@ -178,6 +214,17 @@ export function eightSeatGeometry({ side, x }) {
   };
 }
 
+function sweepRowerMarkup({ seat, x, port, handA, handB }) {
+  const shoulderA = { x: x + 8, y: port ? 271 : 289 };
+  const shoulderB = { x: x + 8, y: port ? 289 : 271 };
+  return `<g id="rower-${seat}" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="${x - 28}" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="${x + 15}" y="264" width="32" height="32"/>
+    ${armMarkup(shoulderA, handA, port ? -3.5 : 3.5, 5.8, 4.4)}
+    ${armMarkup(shoulderB, handB, port ? 3.5 : -3.5, 5.8, 4.4)}
+  </g>`;
+}
+
 function eightSeatMarkup({ seat, side, x }) {
   const geometry = eightSeatGeometry({ side, x });
   const { port, pivot, shaftStart, handA, handB, yAttach, sideId } = geometry;
@@ -185,14 +232,7 @@ function eightSeatMarkup({ seat, side, x }) {
   <g id="foot-stretcher-${seat}"><line x1="${x - 48}" y1="258" x2="${x - 48}" y2="302" class="foot"/></g>
   <g id="rigger-${sideId}-${seat}" class="tech"><line x1="${x - 26}" y1="${yAttach}" x2="${fmt(pivot.x)}" y2="${fmt(pivot.y)}"/><line x1="${x + 26}" y1="${yAttach}" x2="${fmt(pivot.x)}" y2="${fmt(pivot.y)}"/></g>
   ${oarMarkup({ id: `sweep-oar-${sideId}-${seat}`, shaftStart, pivot, outboard: 180, bladeLength: 76, bladeWidth: 30 })}
-  <g id="rower-${seat}" filter="url(#ae-shadow-filter)">
-    <use href="#ae-torso" x="${x - 25}" y="262" width="50" height="36"/>
-    <use href="#ae-head" x="${x + 17}" y="267" width="26" height="26"/>
-    <line x1="${x + 8}" y1="${port ? 271 : 289}" x2="${fmt(handA.x)}" y2="${fmt(handA.y)}" class="arm"/>
-    <line x1="${x + 8}" y1="${port ? 289 : 271}" x2="${fmt(handB.x)}" y2="${fmt(handB.y)}" class="arm"/>
-    <circle cx="${fmt(handA.x)}" cy="${fmt(handA.y)}" r="5.5" class="hand"/>
-    <circle cx="${fmt(handB.x)}" cy="${fmt(handB.y)}" r="5.5" class="hand"/>
-  </g>`;
+  ${sweepRowerMarkup({ seat, x, port, handA, handB })}`;
 }
 
 export function buildEightSvg() {
@@ -210,8 +250,8 @@ ${commonDefs()}
   <g id="crew-and-riggers">
   ${seats}
     <g id="cox" filter="url(#ae-shadow-filter)">
-      <use href="#ae-torso" x="1945" y="264" width="44" height="32"/>
-      <use href="#ae-head" x="1982" y="267" width="26" height="26"/>
+      <use href="#ae-torso" x="1941" y="260" width="50" height="38"/>
+      <use href="#ae-head" x="1980" y="264" width="32" height="32"/>
     </g>
   </g>
 </g>
