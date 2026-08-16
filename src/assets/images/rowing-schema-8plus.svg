@@ -9,10 +9,15 @@
     .shaft{stroke:#123A57;stroke-width:6;stroke-linecap:round}
     .seat{fill:#123A57;stroke:#0B2336;stroke-width:3}
     .foot{stroke:#0B2336;stroke-width:5;stroke-linecap:round}
-    .rower{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
-    .head{fill:#A9DCEB;stroke:#0B2336;stroke-width:3}
-    .arm{stroke:#0B2336;stroke-width:8;stroke-linecap:round}
-    .hand{fill:#A6342B;stroke:#0B2336;stroke-width:2}
+    .rower-body{fill:#F7F5EF;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
+    .rower-shirt{fill:#92D6EA;stroke:#0B2336;stroke-width:2.5;stroke-linejoin:round}
+    .rower-head{fill:#F7F5EF;stroke:#0B2336;stroke-width:3}
+    .rower-hair{fill:#123A57}
+    .rower-neck{fill:#F7F5EF;stroke:#0B2336;stroke-width:2}
+    .arm-upper{stroke:#0B2336;stroke-width:10;stroke-linecap:round;fill:none}
+    .arm-lower{stroke:#123A57;stroke-width:8;stroke-linecap:round;fill:none}
+    .elbow{fill:#92D6EA;stroke:#0B2336;stroke-width:2}
+    .hand{fill:#F7F5EF;stroke:#0B2336;stroke-width:2}
     .oarlock{fill:#92D6EA;stroke:#0B2336;stroke-width:3}
     .blade{fill:#A6342B;stroke:#0B2336;stroke-width:3;stroke-linejoin:round}
   </style>
@@ -21,8 +26,15 @@
   </filter>
   <symbol id="ae-seat" viewBox="-18 -12 36 24"><rect x="-18" y="-12" width="36" height="24" rx="6" class="seat"/></symbol>
   <symbol id="ae-oarlock" viewBox="-10 -10 20 20"><circle r="8" class="oarlock"/><circle r="2.6" fill="#0B2336"/></symbol>
-  <symbol id="ae-head" viewBox="-13 -13 26 26"><circle r="12" class="head"/></symbol>
-  <symbol id="ae-torso" viewBox="-25 -18 50 36"><rect x="-24" y="-17" width="48" height="34" rx="15" class="rower"/></symbol>
+  <symbol id="ae-head" viewBox="-16 -16 32 32">
+    <circle cx="0" cy="0" r="12" class="rower-head"/>
+    <path d="M -11 -2 C -10 -10 -5 -13 0 -13 C 6 -13 10 -9 11 -2 C 6 -6 -6 -6 -11 -2 Z" class="rower-hair"/>
+    <rect x="-3" y="10" width="6" height="5" rx="2" class="rower-neck"/>
+  </symbol>
+  <symbol id="ae-torso" viewBox="-28 -22 56 44">
+    <path d="M -20 -14 C -15 -18 -8 -20 0 -20 C 8 -20 15 -18 20 -14 C 24 -9 25 -2 23 8 C 19 16 11 20 0 20 C -11 20 -19 16 -23 8 C -25 -2 -24 -9 -20 -14 Z" class="rower-body"/>
+    <path d="M -17 -10 C -10 -14 -4 -15 0 -15 C 4 -15 10 -14 17 -10 L 13 6 C 9 10 5 11 0 11 C -5 11 -9 10 -13 6 Z" class="rower-shirt"/>
+  </symbol>
 </defs>
 <g id="boat-8plus">
   <path d="M 210 280 L 259.5 272.96 L 309 268.43 L 358.5 264.56 L 408 261.11 L 457.5 257.97 L 507 255.08 L 556.5 252.43 L 606 249.99 L 655.5 247.75 L 705 245.72 L 754.5 243.88 L 804 242.23 L 853.5 240.77 L 903 239.51 L 952.5 238.44 L 1002 237.56 L 1051.5 236.88 L 1101 236.39 L 1150.5 236.1 L 1200 236 L 1249.5 236.1 L 1299 236.39 L 1348.5 236.88 L 1398 237.56 L 1447.5 238.44 L 1497 239.51 L 1546.5 240.77 L 1596 242.23 L 1645.5 243.88 L 1695 245.72 L 1744.5 247.75 L 1794 249.99 L 1843.5 252.43 L 1893 255.08 L 1942.5 257.97 L 1992 261.11 L 2041.5 264.56 L 2091 268.43 L 2140.5 272.96 L 2190 280 L 2190 280 L 2140.5 287.04 L 2091 291.57 L 2041.5 295.44 L 1992 298.89 L 1942.5 302.03 L 1893 304.92 L 1843.5 307.57 L 1794 310.01 L 1744.5 312.25 L 1695 314.28 L 1645.5 316.12 L 1596 317.77 L 1546.5 319.23 L 1497 320.49 L 1447.5 321.56 L 1398 322.44 L 1348.5 323.12 L 1299 323.61 L 1249.5 323.9 L 1200 324 L 1150.5 323.9 L 1101 323.61 L 1051.5 323.12 L 1002 322.44 L 952.5 321.56 L 903 320.49 L 853.5 319.23 L 804 317.77 L 754.5 316.12 L 705 314.28 L 655.5 312.25 L 606 310.01 L 556.5 307.57 L 507 304.92 L 457.5 302.03 L 408 298.89 L 358.5 295.44 L 309 291.57 L 259.5 287.04 L 210 280 Z" fill="#92D6EA" class="hull" filter="url(#ae-shadow-filter)"/>
@@ -31,44 +43,167 @@
   <g id="seat-1"><use href="#ae-seat" x="482" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-1"><line x1="452" y1="258" x2="452" y2="302" class="foot"/></g>
   <g id="rigger-port-1" class="tech"><line x1="474" y1="258" x2="465" y2="215"/><line x1="526" y1="258" x2="465" y2="215"/></g>
-  <g id="sweep-oar-port-1"><line x1="556.65" y1="312.38" x2="341.63" y2="83.92" class="shaft"/><polygon points="346.44,79.4 300.47,18.3 278.62,38.86 336.83,88.45" class="blade"/><use href="#ae-oarlock" x="455" y="205" width="20" height="20"/></g>
-  <g id="rower-1" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="475" y="262" width="50" height="36"/><use href="#ae-head" x="517" y="267" width="26" height="26"/><line x1="508" y1="271" x2="548.77" y2="304.01" class="arm"/><line x1="508" y1="289" x2="541.23" y2="295.99" class="arm"/><circle cx="548.77" cy="304.01" r="5.5" class="hand"/><circle cx="541.23" cy="295.99" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-port-1">
+    <line x1="556.65" y1="312.38" x2="341.63" y2="83.92" class="shaft"/>
+    <polygon points="346.44,79.4 300.47,18.3 278.62,38.86 336.83,88.45" class="blade"/>
+    <use href="#ae-oarlock" x="455" y="205" width="20" height="20"/>
+  </g>
+  <g id="rower-1" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="472" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="515" y="264" width="32" height="32"/>
+    <line x1="508" y1="271" x2="531.4" y2="285.44" class="arm-upper"/>
+    <line x1="531.4" y1="285.44" x2="548.77" y2="304.01" class="arm-lower"/>
+    <circle cx="531.4" cy="285.44" r="4.4" class="elbow"/>
+    <ellipse cx="548.77" cy="304.01" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="508" y1="289" x2="524.56" y2="296.06" class="arm-upper"/>
+    <line x1="524.56" y1="296.06" x2="541.23" y2="295.99" class="arm-lower"/>
+    <circle cx="524.56" cy="296.06" r="4.4" class="elbow"/>
+    <ellipse cx="541.23" cy="295.99" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-2"><use href="#ae-seat" x="662" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-2"><line x1="632" y1="258" x2="632" y2="302" class="foot"/></g>
   <g id="rigger-starboard-2" class="tech"><line x1="654" y1="302" x2="645" y2="345"/><line x1="706" y1="302" x2="645" y2="345"/></g>
-  <g id="sweep-oar-starboard-2"><line x1="736.65" y1="247.62" x2="521.63" y2="476.08" class="shaft"/><polygon points="516.83,471.55 458.62,521.14 480.47,541.7 526.44,480.6" class="blade"/><use href="#ae-oarlock" x="635" y="335" width="20" height="20"/></g>
-  <g id="rower-2" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="655" y="262" width="50" height="36"/><use href="#ae-head" x="697" y="267" width="26" height="26"/><line x1="688" y1="289" x2="728.77" y2="255.99" class="arm"/><line x1="688" y1="271" x2="721.23" y2="264.01" class="arm"/><circle cx="728.77" cy="255.99" r="5.5" class="hand"/><circle cx="721.23" cy="264.01" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-starboard-2">
+    <line x1="736.65" y1="247.62" x2="521.63" y2="476.08" class="shaft"/>
+    <polygon points="516.83,471.55 458.62,521.14 480.47,541.7 526.44,480.6" class="blade"/>
+    <use href="#ae-oarlock" x="635" y="335" width="20" height="20"/>
+  </g>
+  <g id="rower-2" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="652" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="695" y="264" width="32" height="32"/>
+    <line x1="688" y1="289" x2="711.4" y2="274.56" class="arm-upper"/>
+    <line x1="711.4" y1="274.56" x2="728.77" y2="255.99" class="arm-lower"/>
+    <circle cx="711.4" cy="274.56" r="4.4" class="elbow"/>
+    <ellipse cx="728.77" cy="255.99" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="688" y1="271" x2="704.56" y2="263.94" class="arm-upper"/>
+    <line x1="704.56" y1="263.94" x2="721.23" y2="264.01" class="arm-lower"/>
+    <circle cx="704.56" cy="263.94" r="4.4" class="elbow"/>
+    <ellipse cx="721.23" cy="264.01" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-3"><use href="#ae-seat" x="842" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-3"><line x1="812" y1="258" x2="812" y2="302" class="foot"/></g>
   <g id="rigger-port-3" class="tech"><line x1="834" y1="258" x2="825" y2="215"/><line x1="886" y1="258" x2="825" y2="215"/></g>
-  <g id="sweep-oar-port-3"><line x1="916.65" y1="312.38" x2="701.63" y2="83.92" class="shaft"/><polygon points="706.44,79.4 660.47,18.3 638.62,38.86 696.83,88.45" class="blade"/><use href="#ae-oarlock" x="815" y="205" width="20" height="20"/></g>
-  <g id="rower-3" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="835" y="262" width="50" height="36"/><use href="#ae-head" x="877" y="267" width="26" height="26"/><line x1="868" y1="271" x2="908.77" y2="304.01" class="arm"/><line x1="868" y1="289" x2="901.23" y2="295.99" class="arm"/><circle cx="908.77" cy="304.01" r="5.5" class="hand"/><circle cx="901.23" cy="295.99" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-port-3">
+    <line x1="916.65" y1="312.38" x2="701.63" y2="83.92" class="shaft"/>
+    <polygon points="706.44,79.4 660.47,18.3 638.62,38.86 696.83,88.45" class="blade"/>
+    <use href="#ae-oarlock" x="815" y="205" width="20" height="20"/>
+  </g>
+  <g id="rower-3" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="832" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="875" y="264" width="32" height="32"/>
+    <line x1="868" y1="271" x2="891.4" y2="285.44" class="arm-upper"/>
+    <line x1="891.4" y1="285.44" x2="908.77" y2="304.01" class="arm-lower"/>
+    <circle cx="891.4" cy="285.44" r="4.4" class="elbow"/>
+    <ellipse cx="908.77" cy="304.01" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="868" y1="289" x2="884.56" y2="296.06" class="arm-upper"/>
+    <line x1="884.56" y1="296.06" x2="901.23" y2="295.99" class="arm-lower"/>
+    <circle cx="884.56" cy="296.06" r="4.4" class="elbow"/>
+    <ellipse cx="901.23" cy="295.99" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-4"><use href="#ae-seat" x="1022" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-4"><line x1="992" y1="258" x2="992" y2="302" class="foot"/></g>
   <g id="rigger-starboard-4" class="tech"><line x1="1014" y1="302" x2="1005" y2="345"/><line x1="1066" y1="302" x2="1005" y2="345"/></g>
-  <g id="sweep-oar-starboard-4"><line x1="1096.65" y1="247.62" x2="881.63" y2="476.08" class="shaft"/><polygon points="876.83,471.55 818.62,521.14 840.47,541.7 886.44,480.6" class="blade"/><use href="#ae-oarlock" x="995" y="335" width="20" height="20"/></g>
-  <g id="rower-4" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="1015" y="262" width="50" height="36"/><use href="#ae-head" x="1057" y="267" width="26" height="26"/><line x1="1048" y1="289" x2="1088.77" y2="255.99" class="arm"/><line x1="1048" y1="271" x2="1081.23" y2="264.01" class="arm"/><circle cx="1088.77" cy="255.99" r="5.5" class="hand"/><circle cx="1081.23" cy="264.01" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-starboard-4">
+    <line x1="1096.65" y1="247.62" x2="881.63" y2="476.08" class="shaft"/>
+    <polygon points="876.83,471.55 818.62,521.14 840.47,541.7 886.44,480.6" class="blade"/>
+    <use href="#ae-oarlock" x="995" y="335" width="20" height="20"/>
+  </g>
+  <g id="rower-4" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="1012" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1055" y="264" width="32" height="32"/>
+    <line x1="1048" y1="289" x2="1071.4" y2="274.56" class="arm-upper"/>
+    <line x1="1071.4" y1="274.56" x2="1088.77" y2="255.99" class="arm-lower"/>
+    <circle cx="1071.4" cy="274.56" r="4.4" class="elbow"/>
+    <ellipse cx="1088.77" cy="255.99" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="1048" y1="271" x2="1064.56" y2="263.94" class="arm-upper"/>
+    <line x1="1064.56" y1="263.94" x2="1081.23" y2="264.01" class="arm-lower"/>
+    <circle cx="1064.56" cy="263.94" r="4.4" class="elbow"/>
+    <ellipse cx="1081.23" cy="264.01" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-5"><use href="#ae-seat" x="1202" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-5"><line x1="1172" y1="258" x2="1172" y2="302" class="foot"/></g>
   <g id="rigger-port-5" class="tech"><line x1="1194" y1="258" x2="1185" y2="215"/><line x1="1246" y1="258" x2="1185" y2="215"/></g>
-  <g id="sweep-oar-port-5"><line x1="1276.65" y1="312.38" x2="1061.63" y2="83.92" class="shaft"/><polygon points="1066.44,79.4 1020.47,18.3 998.62,38.86 1056.83,88.45" class="blade"/><use href="#ae-oarlock" x="1175" y="205" width="20" height="20"/></g>
-  <g id="rower-5" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="1195" y="262" width="50" height="36"/><use href="#ae-head" x="1237" y="267" width="26" height="26"/><line x1="1228" y1="271" x2="1268.77" y2="304.01" class="arm"/><line x1="1228" y1="289" x2="1261.23" y2="295.99" class="arm"/><circle cx="1268.77" cy="304.01" r="5.5" class="hand"/><circle cx="1261.23" cy="295.99" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-port-5">
+    <line x1="1276.65" y1="312.38" x2="1061.63" y2="83.92" class="shaft"/>
+    <polygon points="1066.44,79.4 1020.47,18.3 998.62,38.86 1056.83,88.45" class="blade"/>
+    <use href="#ae-oarlock" x="1175" y="205" width="20" height="20"/>
+  </g>
+  <g id="rower-5" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="1192" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1235" y="264" width="32" height="32"/>
+    <line x1="1228" y1="271" x2="1251.4" y2="285.44" class="arm-upper"/>
+    <line x1="1251.4" y1="285.44" x2="1268.77" y2="304.01" class="arm-lower"/>
+    <circle cx="1251.4" cy="285.44" r="4.4" class="elbow"/>
+    <ellipse cx="1268.77" cy="304.01" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="1228" y1="289" x2="1244.56" y2="296.06" class="arm-upper"/>
+    <line x1="1244.56" y1="296.06" x2="1261.23" y2="295.99" class="arm-lower"/>
+    <circle cx="1244.56" cy="296.06" r="4.4" class="elbow"/>
+    <ellipse cx="1261.23" cy="295.99" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-6"><use href="#ae-seat" x="1382" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-6"><line x1="1352" y1="258" x2="1352" y2="302" class="foot"/></g>
   <g id="rigger-starboard-6" class="tech"><line x1="1374" y1="302" x2="1365" y2="345"/><line x1="1426" y1="302" x2="1365" y2="345"/></g>
-  <g id="sweep-oar-starboard-6"><line x1="1456.65" y1="247.62" x2="1241.63" y2="476.08" class="shaft"/><polygon points="1236.83,471.55 1178.62,521.14 1200.47,541.7 1246.44,480.6" class="blade"/><use href="#ae-oarlock" x="1355" y="335" width="20" height="20"/></g>
-  <g id="rower-6" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="1375" y="262" width="50" height="36"/><use href="#ae-head" x="1417" y="267" width="26" height="26"/><line x1="1408" y1="289" x2="1448.77" y2="255.99" class="arm"/><line x1="1408" y1="271" x2="1441.23" y2="264.01" class="arm"/><circle cx="1448.77" cy="255.99" r="5.5" class="hand"/><circle cx="1441.23" cy="264.01" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-starboard-6">
+    <line x1="1456.65" y1="247.62" x2="1241.63" y2="476.08" class="shaft"/>
+    <polygon points="1236.83,471.55 1178.62,521.14 1200.47,541.7 1246.44,480.6" class="blade"/>
+    <use href="#ae-oarlock" x="1355" y="335" width="20" height="20"/>
+  </g>
+  <g id="rower-6" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="1372" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1415" y="264" width="32" height="32"/>
+    <line x1="1408" y1="289" x2="1431.4" y2="274.56" class="arm-upper"/>
+    <line x1="1431.4" y1="274.56" x2="1448.77" y2="255.99" class="arm-lower"/>
+    <circle cx="1431.4" cy="274.56" r="4.4" class="elbow"/>
+    <ellipse cx="1448.77" cy="255.99" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="1408" y1="271" x2="1424.56" y2="263.94" class="arm-upper"/>
+    <line x1="1424.56" y1="263.94" x2="1441.23" y2="264.01" class="arm-lower"/>
+    <circle cx="1424.56" cy="263.94" r="4.4" class="elbow"/>
+    <ellipse cx="1441.23" cy="264.01" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-7"><use href="#ae-seat" x="1562" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-7"><line x1="1532" y1="258" x2="1532" y2="302" class="foot"/></g>
   <g id="rigger-port-7" class="tech"><line x1="1554" y1="258" x2="1545" y2="215"/><line x1="1606" y1="258" x2="1545" y2="215"/></g>
-  <g id="sweep-oar-port-7"><line x1="1636.65" y1="312.38" x2="1421.63" y2="83.92" class="shaft"/><polygon points="1426.44,79.4 1380.47,18.3 1358.62,38.86 1416.83,88.45" class="blade"/><use href="#ae-oarlock" x="1535" y="205" width="20" height="20"/></g>
-  <g id="rower-7" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="1555" y="262" width="50" height="36"/><use href="#ae-head" x="1597" y="267" width="26" height="26"/><line x1="1588" y1="271" x2="1628.77" y2="304.01" class="arm"/><line x1="1588" y1="289" x2="1621.23" y2="295.99" class="arm"/><circle cx="1628.77" cy="304.01" r="5.5" class="hand"/><circle cx="1621.23" cy="295.99" r="5.5" class="hand"/></g>
+  <g id="sweep-oar-port-7">
+    <line x1="1636.65" y1="312.38" x2="1421.63" y2="83.92" class="shaft"/>
+    <polygon points="1426.44,79.4 1380.47,18.3 1358.62,38.86 1416.83,88.45" class="blade"/>
+    <use href="#ae-oarlock" x="1535" y="205" width="20" height="20"/>
+  </g>
+  <g id="rower-7" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="1552" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1595" y="264" width="32" height="32"/>
+    <line x1="1588" y1="271" x2="1611.4" y2="285.44" class="arm-upper"/>
+    <line x1="1611.4" y1="285.44" x2="1628.77" y2="304.01" class="arm-lower"/>
+    <circle cx="1611.4" cy="285.44" r="4.4" class="elbow"/>
+    <ellipse cx="1628.77" cy="304.01" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="1588" y1="289" x2="1604.56" y2="296.06" class="arm-upper"/>
+    <line x1="1604.56" y1="296.06" x2="1621.23" y2="295.99" class="arm-lower"/>
+    <circle cx="1604.56" cy="296.06" r="4.4" class="elbow"/>
+    <ellipse cx="1621.23" cy="295.99" rx="5.8" ry="4.4" class="hand"/>
+  </g>
   <g id="seat-8"><use href="#ae-seat" x="1742" y="268" width="36" height="24"/></g>
   <g id="foot-stretcher-8"><line x1="1712" y1="258" x2="1712" y2="302" class="foot"/></g>
   <g id="rigger-starboard-8" class="tech"><line x1="1734" y1="302" x2="1725" y2="345"/><line x1="1786" y1="302" x2="1725" y2="345"/></g>
-  <g id="sweep-oar-starboard-8"><line x1="1816.65" y1="247.62" x2="1601.63" y2="476.08" class="shaft"/><polygon points="1596.83,471.55 1538.62,521.14 1560.47,541.7 1606.44,480.6" class="blade"/><use href="#ae-oarlock" x="1715" y="335" width="20" height="20"/></g>
-  <g id="rower-8" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="1735" y="262" width="50" height="36"/><use href="#ae-head" x="1777" y="267" width="26" height="26"/><line x1="1768" y1="289" x2="1808.77" y2="255.99" class="arm"/><line x1="1768" y1="271" x2="1801.23" y2="264.01" class="arm"/><circle cx="1808.77" cy="255.99" r="5.5" class="hand"/><circle cx="1801.23" cy="264.01" r="5.5" class="hand"/></g>
-    <g id="cox" filter="url(#ae-shadow-filter)"><use href="#ae-torso" x="1945" y="264" width="44" height="32"/><use href="#ae-head" x="1982" y="267" width="26" height="26"/></g>
+  <g id="sweep-oar-starboard-8">
+    <line x1="1816.65" y1="247.62" x2="1601.63" y2="476.08" class="shaft"/>
+    <polygon points="1596.83,471.55 1538.62,521.14 1560.47,541.7 1606.44,480.6" class="blade"/>
+    <use href="#ae-oarlock" x="1715" y="335" width="20" height="20"/>
+  </g>
+  <g id="rower-8" filter="url(#ae-shadow-filter)">
+    <use href="#ae-torso" x="1732" y="258" width="56" height="44"/>
+    <use href="#ae-head" x="1775" y="264" width="32" height="32"/>
+    <line x1="1768" y1="289" x2="1791.4" y2="274.56" class="arm-upper"/>
+    <line x1="1791.4" y1="274.56" x2="1808.77" y2="255.99" class="arm-lower"/>
+    <circle cx="1791.4" cy="274.56" r="4.4" class="elbow"/>
+    <ellipse cx="1808.77" cy="255.99" rx="5.8" ry="4.4" class="hand"/>
+    <line x1="1768" y1="271" x2="1784.56" y2="263.94" class="arm-upper"/>
+    <line x1="1784.56" y1="263.94" x2="1801.23" y2="264.01" class="arm-lower"/>
+    <circle cx="1784.56" cy="263.94" r="4.4" class="elbow"/>
+    <ellipse cx="1801.23" cy="264.01" rx="5.8" ry="4.4" class="hand"/>
+  </g>
+    <g id="cox" filter="url(#ae-shadow-filter)">
+      <use href="#ae-torso" x="1941" y="260" width="50" height="38"/>
+      <use href="#ae-head" x="1980" y="264" width="32" height="32"/>
+    </g>
   </g>
 </g>
 </svg>
