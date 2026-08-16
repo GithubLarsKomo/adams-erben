@@ -1,13 +1,16 @@
 import * as cheerio from 'cheerio';
 
-const POSITIVE = /(?:^|[\s_\-])(logo|brand|branding|wappen|signet|vereinslogo|clublogo|site-logo|custom-logo)(?:$|[\s_\-])/i;
+const POSITIVE = /(?:^|[\s_\-])(logo|brand|branding|wappen|flagge|signet|vereinslogo|clublogo|site-logo|custom-logo)(?:$|[\s_\-])/i;
 const NEGATIVE = /(sponsor|partner|advert|cookie|social|facebook|instagram|youtube|payment|badge|seal|footer-logo)/i;
-const PHOTO_NEGATIVE = /(hero|slider|slide|banner|header[-_ ]?(?:image|photo|bild)|titelbild|theme[-_ ]?image|gallery|galerie|background|bg[-_])/i;
+const EVENT_NEGATIVE = /(regatta|achterregatta|ruderregatta|cup|pokal|meisterschaft|championship|event|veranstaltung|ausschreibung|meldeergebnis|rennergebnis|race|rennen|sprint)/i;
+const PHOTO_NEGATIVE = /(hero|slider|slide|banner|header[-_ ]?(?:image|photo|bild)|titelbild|theme[-_ ]?image|gallery|galerie|background|hintergrund|bg[-_])/i;
+const IDENTITY_POSITIVE = /(vereinslogo|clublogo|site[-_ ]?logo|custom[-_ ]?logo|wappen|flagge|signet|brand(?:ing)?)/i;
 const CMS_ASSET_HOST = /(^|\.)(?:image\.jimcdn\.com|static\.wixstatic\.com|images\.squarespace-cdn\.com|files\.wordpress\.com)$/i;
 const GENERIC_NAME_TOKENS = new Set([
   'e', 'v', 'ev', 'der', 'die', 'das', 'und', 'von', 'zu', 'am', 'an', 'im', 'in',
-  'ruderclub', 'ruderverein', 'rudergesellschaft', 'ruderriege', 'ruder', 'club', 'verein', 'gesellschaft',
-  'landesruderverband', 'ruderverband', 'verband', 'akademische', 'akademischer'
+  'ruderclub', 'ruderverein', 'rudergesellschaft', 'rudergemeinschaft', 'ruderriege', 'ruderklub',
+  'ruder', 'club', 'verein', 'gesellschaft', 'landesruderverband', 'ruderverband', 'verband',
+  'akademische', 'akademischer', 'akademischen', 'akademisches'
 ]);
 
 function clean(value = '') {
@@ -48,8 +51,9 @@ function canonicalNameWords(name = '') {
 function abbreviationForWord(word) {
   const map = {
     akademische: 'a', akademischer: 'a', akademischen: 'a', akademisches: 'a',
-    ruderclub: 'rc', ruderverein: 'rv', rudergesellschaft: 'rg', rudergemeinschaft: 'rg', ruderriege: 'rr',
-    ruderklub: 'rk', ruderverbindung: 'rv', turnverbindung: 'tv', landesruderverband: 'lrv', ruderverband: 'rv'
+    ruderclub: 'rc', ruderverein: 'rv', rudergesellschaft: 'rg', rudergemeinschaft: 'rg',
+    ruderriege: 'rr', ruderklub: 'rk', ruderverbindung: 'rv', turnverbindung: 'tv',
+    landesruderverband: 'lrv', ruderverband: 'rv'
   };
   if (map[word]) return map[word];
   if (/^(?:e|v|ev|der|die|das|und|von|zu|am|an|im|in)$/.test(word)) return '';
@@ -88,8 +92,7 @@ function aliasMatch(organization, text) {
 function exactNameMatch(organization, text) {
   const name = typeof organization === 'string' ? organization : organization?.name || '';
   const core = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
-  if (core.length < 5) return false;
-  return normalizeToken(text).includes(core);
+  return core.length >= 5 && normalizeToken(text).includes(core);
 }
 
 function parseDimension(value) {
@@ -101,6 +104,14 @@ function srcsetUrl(value = '') {
   const candidates = String(value).split(',').map((item) => item.trim()).filter(Boolean)
     .map((item) => item.split(/\s+/)[0]).filter(Boolean);
   return candidates.at(-1) || '';
+}
+
+function firstUsableSource(...values) {
+  for (const value of values) {
+    const candidate = clean(value);
+    if (candidate && !/^(?:data|blob|javascript):/i.test(candidate)) return candidate;
+  }
+  return '';
 }
 
 export function resolveCandidateUrl(raw, pageUrl, baseHref = '') {
@@ -139,26 +150,68 @@ export function isTrustedReferencedAsset(candidate, pageUrl) {
   }
 }
 
+function ownElementContext($, element) {
+  const current = $(element);
+  return clean([
+    current.attr('id'), current.attr('class'), current.attr('alt'), current.attr('title'), current.attr('aria-label')
+  ].filter(Boolean).join(' '));
+}
+
 function elementContext($, element) {
   const parts = [];
   let current = $(element);
   for (let depth = 0; depth < 4 && current.length; depth += 1) {
-    const attrs = [current.attr('id'), current.attr('class'), current.attr('alt'), current.attr('title'), current.attr('aria-label')].filter(Boolean);
-    parts.push(...attrs);
+    parts.push(...[
+      current.attr('id'), current.attr('class'), current.attr('alt'), current.attr('title'), current.attr('aria-label')
+    ].filter(Boolean));
     current = current.parent();
   }
   return clean(parts.join(' '));
 }
 
+function candidateDirectText(candidate) {
+  return clean(`${candidate?.label || ''} ${candidate?.directContext || ''} ${candidate?.url || ''}`);
+}
+
+function candidateFullText(candidate) {
+  return clean(`${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`);
+}
+
+function hasDirectOrganizationEvidence(candidate, organization) {
+  const text = candidateDirectText(candidate);
+  const tokens = organizationTokens(organization);
+  return tokenCoverage(tokens, text) > 0 || aliasMatch(organization, text) || exactNameMatch(organization, text);
+}
+
+export function candidatePreferenceScore(candidate, organization = '') {
+  const direct = normalizeToken(candidateDirectText(candidate));
+  const full = normalizeToken(candidateFullText(candidate));
+  let priority = 0;
+  if (candidate.kind === 'jsonld') priority += 140;
+  else if (candidate.kind === 'meta') priority += 120;
+  if (IDENTITY_POSITIVE.test(direct)) priority += 90;
+  if (hasDirectOrganizationEvidence(candidate, organization)) priority += 80;
+  if (candidate.inHeader) priority += 20;
+  if (EVENT_NEGATIVE.test(full)) priority -= 180;
+  if (NEGATIVE.test(full)) priority -= 160;
+  if (PHOTO_NEGATIVE.test(full)) priority -= 140;
+  const width = parseDimension(candidate.width);
+  const height = parseDimension(candidate.height);
+  const largest = Math.max(width, height);
+  const smallest = Math.min(width || largest, height || largest);
+  if (largest >= 600 && smallest > 0 && largest / smallest >= 4) priority -= 70;
+  if (/\bcropped\b/.test(normalizeToken(candidate.url || '')) && !IDENTITY_POSITIVE.test(direct)) priority -= 35;
+  return priority;
+}
+
 export function scoreLogoCandidate(candidate, organization = '') {
   const urlText = normalizeToken(candidate.url || '');
-  const label = clean([candidate.label, candidate.context].filter(Boolean).join(' '));
-  const labelNorm = normalizeToken(label);
+  const labelNorm = normalizeToken(clean([candidate.label, candidate.context].filter(Boolean).join(' ')));
   let score = Number(candidate.baseScore || 0);
 
   if (POSITIVE.test(` ${labelNorm.replace(/ /g, '-')} `)) score += 70;
-  if (/(logo|wappen|signet|brand)/i.test(urlText)) score += 50;
-  if (/(logo|wappen|signet|brand)/i.test(labelNorm)) score += 35;
+  if (/(logo|wappen|flagge|signet|brand)/i.test(urlText)) score += 50;
+  if (/(logo|wappen|flagge|signet|brand)/i.test(labelNorm)) score += 35;
   if (candidate.inHeader) score += 20;
   if (candidate.kind === 'jsonld') score += 40;
   if (candidate.kind === 'meta') score += 30;
@@ -179,9 +232,17 @@ export function scoreLogoCandidate(candidate, organization = '') {
   else if (largest > 0 && largest < 40) score -= 40;
   if (largest >= 600 && smallest > 0 && largest / smallest >= 4) score -= 45;
 
-  if (PHOTO_NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 80;
-  if (NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 100;
+  if (EVENT_NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 140;
+  if (PHOTO_NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 100;
+  if (NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 120;
   return score;
+}
+
+function jsonLdObjects(value) {
+  if (Array.isArray(value)) return value.flatMap(jsonLdObjects);
+  if (!value || typeof value !== 'object') return [];
+  const nested = Array.isArray(value['@graph']) ? value['@graph'].flatMap(jsonLdObjects) : [];
+  return [value, ...nested];
 }
 
 export function extractPageIdentity(html) {
@@ -198,27 +259,33 @@ export function extractPageIdentity(html) {
         const types = Array.isArray(item['@type']) ? item['@type'] : [item['@type']];
         if (types.some((type) => /Organization|SportsOrganization|LocalBusiness/i.test(String(type || '')))) add(item.name);
       }
-    } catch { /* ignore invalid JSON-LD */ }
+    } catch { /* invalid JSON-LD is non-fatal */ }
   });
   return { names, text: names.join(' | ') };
 }
 
 export function scoreEntityConfidence(candidate, organization, pageIdentity) {
   const tokens = organizationTokens(organization);
-  const candidateText = `${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`;
+  const candidateText = candidateFullText(candidate);
+  const directText = candidateDirectText(candidate);
   const pageText = pageIdentity?.text || '';
   const pageCoverage = tokenCoverage(tokens, pageText);
   const assetCoverage = tokenCoverage(tokens, candidateText);
+  const directCoverage = tokenCoverage(tokens, directText);
   const pageAlias = aliasMatch(organization, pageText);
   const assetAlias = aliasMatch(organization, candidateText);
+  const directAlias = aliasMatch(organization, directText);
   const pageExact = exactNameMatch(organization, pageText);
   const assetExact = exactNameMatch(organization, candidateText);
+  const directExact = exactNameMatch(organization, directText);
 
-  if (assetExact || ((candidate?.kind === 'jsonld' || candidate?.kind === 'meta') && pageExact)) return 1;
-  let confidence = Math.min(1, pageCoverage * 0.55 + assetCoverage * 0.35);
-  if (pageAlias) confidence += 0.15;
-  if (assetAlias) confidence += 0.35;
-  if (pageExact) confidence += 0.25;
+  if (directExact || ((candidate?.kind === 'jsonld' || candidate?.kind === 'meta') && pageExact)) return 1;
+  let confidence = Math.min(1, pageCoverage * 0.45 + assetCoverage * 0.2 + directCoverage * 0.25);
+  if (pageAlias) confidence += 0.1;
+  if (assetAlias) confidence += 0.15;
+  if (directAlias) confidence += 0.3;
+  if (pageExact) confidence += 0.2;
+  if (assetExact) confidence += 0.15;
   if ((candidate?.kind === 'jsonld' || candidate?.kind === 'meta') && pageCoverage >= 0.5) confidence += 0.15;
   return Math.min(1, Number(confidence.toFixed(3)));
 }
@@ -226,18 +293,18 @@ export function scoreEntityConfidence(candidate, organization, pageIdentity) {
 export function classifyLogoCandidate(candidate, organization, pageIdentity, { minScore = 70, minEntity = 0.55 } = {}) {
   const entityConfidence = scoreEntityConfidence(candidate, organization, pageIdentity);
   const score = Number(candidate?.score || 0);
-  const candidateText = `${candidate?.label || ''} ${candidate?.context || ''} ${candidate?.url || ''}`;
-  const tokens = organizationTokens(organization);
-  const assetIdentityEvidence = tokenCoverage(tokens, candidateText) > 0 || aliasMatch(organization, candidateText) || exactNameMatch(organization, candidateText);
+  const fullText = normalizeToken(candidateFullText(candidate));
+  const directIdentityEvidence = hasDirectOrganizationEvidence(candidate, organization);
 
-  if (NEGATIVE.test(normalizeToken(candidateText))) return { disposition: 'reject', reason: 'negative_logo_context', score, entityConfidence };
-  if (PHOTO_NEGATIVE.test(normalizeToken(candidateText))) return { disposition: 'reject', reason: 'photo_or_banner_context', score, entityConfidence };
+  if (EVENT_NEGATIVE.test(fullText)) return { disposition: 'reject', reason: 'event_or_regatta_context', score, entityConfidence };
+  if (NEGATIVE.test(fullText)) return { disposition: 'reject', reason: 'negative_logo_context', score, entityConfidence };
+  if (PHOTO_NEGATIVE.test(fullText)) return { disposition: 'reject', reason: 'photo_or_banner_context', score, entityConfidence };
   if (score < minScore) {
     if (score >= 40 && entityConfidence >= 0.8) return { disposition: 'review', reason: 'high_entity_low_logo_score', score, entityConfidence };
     return { disposition: 'reject', reason: 'below_logo_score', score, entityConfidence };
   }
-  if (candidate?.kind === 'img' && !assetIdentityEvidence) {
-    return { disposition: entityConfidence >= 0.25 ? 'review' : 'reject', reason: 'asset_identity_missing', score, entityConfidence };
+  if (candidate?.kind === 'img' && !directIdentityEvidence) {
+    return { disposition: entityConfidence >= 0.25 ? 'review' : 'reject', reason: 'direct_asset_identity_missing', score, entityConfidence };
   }
   if (entityConfidence >= minEntity) return { disposition: 'accept', reason: 'logo_and_entity_match', score, entityConfidence };
   if (entityConfidence >= 0.25 || candidate?.kind === 'jsonld' || candidate?.kind === 'meta') {
@@ -251,14 +318,8 @@ function pushCandidate(target, raw, details, pageUrl, baseHref, organization) {
   if (!url) return;
   const candidate = { directlyReferenced: true, ...details, url };
   candidate.score = scoreLogoCandidate(candidate, organization);
+  candidate.preference = candidatePreferenceScore(candidate, organization);
   target.push(candidate);
-}
-
-function jsonLdObjects(value) {
-  if (Array.isArray(value)) return value.flatMap(jsonLdObjects);
-  if (!value || typeof value !== 'object') return [];
-  const nested = Array.isArray(value['@graph']) ? value['@graph'].flatMap(jsonLdObjects) : [];
-  return [value, ...nested];
 }
 
 export function extractLogoCandidates(html, pageUrl, organization = '', { includeIcons = false } = {}) {
@@ -275,25 +336,31 @@ export function extractLogoCandidates(html, pageUrl, organization = '', { includ
         const types = Array.isArray(item['@type']) ? item['@type'] : [item['@type']];
         if (!types.some((type) => /Organization|SportsOrganization|LocalBusiness/i.test(String(type || '')))) continue;
         const logo = typeof item.logo === 'string' ? item.logo : item.logo?.url || item.logo?.contentUrl;
-        pushCandidate(candidates, logo, { kind: 'jsonld', baseScore: 90, label: clean(`${item.name || ''} organization logo`) }, pageUrl, baseHref, organization);
+        pushCandidate(candidates, logo, {
+          kind: 'jsonld', baseScore: 90,
+          label: clean(`${item.name || ''} organization logo`), directContext: clean(item.name || '')
+        }, pageUrl, baseHref, organization);
       }
-    } catch { /* ignore invalid JSON-LD */ }
+    } catch { /* invalid JSON-LD is non-fatal */ }
   });
 
   $('meta[itemprop="logo"], meta[property="og:logo"], meta[name="logo"]').each((_, element) => {
+    const label = $(element).attr('property') || $(element).attr('itemprop') || $(element).attr('name') || 'logo';
     pushCandidate(candidates, $(element).attr('content'), {
-      kind: 'meta', baseScore: 80,
-      label: $(element).attr('property') || $(element).attr('itemprop') || $(element).attr('name') || 'logo'
+      kind: 'meta', baseScore: 80, label, directContext: label
     }, pageUrl, baseHref, organization);
   });
 
   $('img').each((_, element) => {
     const current = $(element);
-    const raw = current.attr('src') || current.attr('data-src') || current.attr('data-lazy-src') || srcsetUrl(current.attr('srcset'));
+    const raw = firstUsableSource(
+      current.attr('src'), current.attr('data-src'), current.attr('data-lazy-src'), srcsetUrl(current.attr('srcset'))
+    );
     if (!raw) return;
     pushCandidate(candidates, raw, {
       kind: 'img', baseScore: 0,
       label: clean([current.attr('alt'), current.attr('title'), current.attr('aria-label')].filter(Boolean).join(' ')),
+      directContext: ownElementContext($, element),
       context: elementContext($, element),
       inHeader: current.closest('header, nav, [role="banner"]').length > 0,
       width: current.attr('width'), height: current.attr('height')
@@ -302,16 +369,23 @@ export function extractLogoCandidates(html, pageUrl, organization = '', { includ
 
   if (includeIcons) {
     $('link[rel~="apple-touch-icon"], link[rel~="icon"]').each((_, element) => {
-      pushCandidate(candidates, $(element).attr('href'), { kind: 'icon', baseScore: 15, label: $(element).attr('rel') || 'icon' }, pageUrl, baseHref, organization);
+      const label = $(element).attr('rel') || 'icon';
+      pushCandidate(candidates, $(element).attr('href'), {
+        kind: 'icon', baseScore: 15, label, directContext: label
+      }, pageUrl, baseHref, organization);
     });
   }
 
   const deduped = new Map();
   for (const candidate of candidates) {
     const previous = deduped.get(candidate.url);
-    if (!previous || candidate.score > previous.score) deduped.set(candidate.url, candidate);
+    if (!previous || candidate.score > previous.score || (candidate.score === previous.score && candidate.preference > previous.preference)) {
+      deduped.set(candidate.url, candidate);
+    }
   }
-  return [...deduped.values()].sort((a, b) => b.score - a.score || a.url.localeCompare(b.url));
+  return [...deduped.values()].sort((a, b) =>
+    b.score - a.score || b.preference - a.preference || a.url.localeCompare(b.url)
+  );
 }
 
 export function sanitizeSvg(svgText) {
@@ -325,11 +399,16 @@ export function sanitizeSvg(svgText) {
       if (/^style$/i.test(name) && /url\(\s*["']?(?:https?:)?\/\//i.test(String(value || ''))) $(element).removeAttr(name);
     }
   });
-  $('style').each((_, element) => { if (/url\(\s*["']?(?:https?:)?\/\//i.test($(element).text())) $(element).remove(); });
+  $('style').each((_, element) => {
+    if (/url\(\s*["']?(?:https?:)?\/\//i.test($(element).text())) $(element).remove();
+  });
   return $.xml();
 }
 
 export function extensionForContentType(contentType = '') {
   const type = String(contentType).split(';')[0].trim().toLowerCase();
-  return { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/webp': '.webp', 'image/gif': '.gif', 'image/svg+xml': '.svg', 'image/avif': '.avif' }[type] || '';
+  return {
+    'image/png': '.png', 'image/jpeg': '.jpg', 'image/webp': '.webp', 'image/gif': '.gif',
+    'image/svg+xml': '.svg', 'image/avif': '.avif'
+  }[type] || '';
 }
