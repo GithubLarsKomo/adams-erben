@@ -4,13 +4,17 @@ const POSITIVE = /(?:^|[\s_\-])(logo|brand|branding|wappen|flagge|signet|vereins
 const NEGATIVE = /(sponsor|partner|advert|cookie|social|facebook|instagram|youtube|payment|badge|seal|footer-logo)/i;
 const EVENT_NEGATIVE = /(regatta|achterregatta|ruderregatta|cup|pokal|meisterschaft|championship|event|veranstaltung|ausschreibung|meldeergebnis|rennergebnis|race|rennen|sprint)/i;
 const PHOTO_NEGATIVE = /(hero|slider|slide|banner|header[-_ ]?(?:image|photo|bild)|titelbild|theme[-_ ]?image|gallery|galerie|background|hintergrund|bg[-_])/i;
+const PHOTO_HARD_NEGATIVE = /(hero|slider|slide|banner|header[-_ ]?(?:image|photo|bild)|titelbild|theme[-_ ]?image|gallery|galerie|bg[-_])/i;
+const COSMETIC_BACKGROUND = /(background|hintergrund)/i;
 const IDENTITY_POSITIVE = /(vereinslogo|clublogo|site[-_ ]?logo|custom[-_ ]?logo|wappen|flagge|signet|brand(?:ing)?)/i;
+const DIRECT_LOGO_POSITIVE = /\b(?:logo|vereinslogo|clublogo|site logo|custom logo|wappen|flagge|signet|brand|branding)\b/i;
+const STRONG_SITE_IDENTITY = /\b(?:custom logo|site logo|header logo(?: img)?|brand logo|navbar brand|logo image|logo link|seitenlogo|mk desktop logo|mk responsive logo|mk resposnive logo)\b/i;
 const CMS_ASSET_HOST = /(^|\.)(?:image\.jimcdn\.com|static\.wixstatic\.com|images\.squarespace-cdn\.com|files\.wordpress\.com)$/i;
 const GENERIC_NAME_TOKENS = new Set([
   'e', 'v', 'ev', 'der', 'die', 'das', 'und', 'von', 'zu', 'am', 'an', 'im', 'in',
   'ruderclub', 'ruderverein', 'rudergesellschaft', 'rudergemeinschaft', 'ruderriege', 'ruderklub',
-  'ruder', 'club', 'verein', 'gesellschaft', 'landesruderverband', 'ruderverband', 'verband',
-  'akademische', 'akademischer', 'akademischen', 'akademisches'
+  'ruder', 'rudern', 'club', 'verein', 'gesellschaft', 'landesruderverband', 'ruderverband', 'verband',
+  'akademische', 'akademischer', 'akademischen', 'akademisches', 'abt', 'abteilung'
 ]);
 
 function clean(value = '') {
@@ -27,8 +31,13 @@ export function normalizeToken(value = '') {
     .trim();
 }
 
+function isYearToken(token) {
+  return /^(?:18|19|20)\d{2}$/.test(token);
+}
+
 function meaningfulTokens(value = '') {
-  return normalizeToken(value).split(' ').filter((token) => token.length >= 3 && !GENERIC_NAME_TOKENS.has(token));
+  return normalizeToken(value).split(' ')
+    .filter((token) => token.length >= 3 && !isYearToken(token) && !GENERIC_NAME_TOKENS.has(token));
 }
 
 function organizationTokens(organization) {
@@ -45,7 +54,7 @@ function canonicalNameWords(name = '') {
     .replace(/\bruder\s+gemeinschaft\b/g, 'rudergemeinschaft')
     .replace(/\bruder\s+riege\b/g, 'ruderriege')
     .split(' ')
-    .filter(Boolean);
+    .filter((word) => word && !isYearToken(word));
 }
 
 function abbreviationForWord(word) {
@@ -53,10 +62,11 @@ function abbreviationForWord(word) {
     akademische: 'a', akademischer: 'a', akademischen: 'a', akademisches: 'a',
     ruderclub: 'rc', ruderverein: 'rv', rudergesellschaft: 'rg', rudergemeinschaft: 'rg',
     ruderriege: 'rr', ruderklub: 'rk', ruderverbindung: 'rv', turnverbindung: 'tv',
-    landesruderverband: 'lrv', ruderverband: 'rv'
+    landesruderverband: 'lrv', ruderverband: 'rv', eisenbahnsportverein: 'esv',
+    sportverein: 'sv', turnverein: 'tv', wassersportverein: 'wsv'
   };
   if (map[word]) return map[word];
-  if (/^(?:e|v|ev|der|die|das|und|von|zu|am|an|im|in)$/.test(word)) return '';
+  if (/^(?:e|v|ev|der|die|das|und|von|zu|am|an|im|in|abt|abteilung|rudern)$/.test(word)) return '';
   return word[0] || '';
 }
 
@@ -68,7 +78,12 @@ export function organizationAliases(organization) {
   const withoutCity = words.filter((word) => !cityWords.has(word));
   const build = (items) => items.map(abbreviationForWord).join('');
   const aliases = new Set([build(withoutCity), build(words)]);
-  const normalizedName = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
+  if (words.includes('eisenbahnsportverein')) aliases.add('esv');
+  const normalizedName = normalizeToken(name)
+    .replace(/\b(?:e v|ev)\b/g, '')
+    .replace(/\b(?:18|19|20)\d{2}\b/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (normalizedName) aliases.add(normalizedName.replace(/\s+/g, ''));
   return [...aliases].filter((value) => value.length >= 2 && value.length <= 80);
 }
@@ -91,7 +106,11 @@ function aliasMatch(organization, text) {
 
 function exactNameMatch(organization, text) {
   const name = typeof organization === 'string' ? organization : organization?.name || '';
-  const core = normalizeToken(name).replace(/\b(?:e v|ev)\b/g, '').replace(/\s+/g, ' ').trim();
+  const core = normalizeToken(name)
+    .replace(/\b(?:e v|ev)\b/g, '')
+    .replace(/\b(?:18|19|20)\d{2}\b/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
   return core.length >= 5 && normalizeToken(text).includes(core);
 }
 
@@ -192,6 +211,27 @@ function hasDirectOrganizationEvidence(candidate, organization) {
   return tokenCoverage(tokens, text) > 0 || aliasMatch(organization, text) || exactNameMatch(organization, text);
 }
 
+function hasStrongSiteIdentity(candidate) {
+  return STRONG_SITE_IDENTITY.test(normalizeToken(candidateFullText(candidate)));
+}
+
+function pageHasOrganizationEvidence(organization, pageIdentity) {
+  const pageText = pageIdentity?.text || '';
+  const tokens = organizationTokens(organization);
+  return tokenCoverage(tokens, pageText) >= 0.5 || aliasMatch(organization, pageText) || exactNameMatch(organization, pageText);
+}
+
+function hasDisqualifyingPhotoContext(candidate) {
+  const fullRaw = candidateFullText(candidate);
+  if (!PHOTO_NEGATIVE.test(fullRaw)) return false;
+  if (PHOTO_HARD_NEGATIVE.test(fullRaw)) return true;
+  if (COSMETIC_BACKGROUND.test(fullRaw)) {
+    const direct = normalizeToken(candidateDirectText(candidate));
+    return !DIRECT_LOGO_POSITIVE.test(direct);
+  }
+  return true;
+}
+
 export function candidatePreferenceScore(candidate, organization = '') {
   const direct = normalizeToken(candidateDirectText(candidate));
   const full = normalizeToken(candidateFullText(candidate));
@@ -199,11 +239,12 @@ export function candidatePreferenceScore(candidate, organization = '') {
   if (candidate.kind === 'jsonld') priority += 140;
   else if (candidate.kind === 'meta') priority += 120;
   if (IDENTITY_POSITIVE.test(direct)) priority += 90;
+  if (hasStrongSiteIdentity(candidate)) priority += 70;
   if (hasDirectOrganizationEvidence(candidate, organization)) priority += 80;
   if (candidate.inHeader) priority += 20;
   if (EVENT_NEGATIVE.test(full)) priority -= 180;
   if (NEGATIVE.test(full)) priority -= 160;
-  if (PHOTO_NEGATIVE.test(full)) priority -= 140;
+  if (hasDisqualifyingPhotoContext(candidate)) priority -= 140;
   const width = parseDimension(candidate.width);
   const height = parseDimension(candidate.height);
   const largest = Math.max(width, height);
@@ -242,7 +283,7 @@ export function scoreLogoCandidate(candidate, organization = '') {
   if (largest >= 600 && smallest > 0 && largest / smallest >= 4) score -= 45;
 
   if (EVENT_NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 140;
-  if (PHOTO_NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 100;
+  if (hasDisqualifyingPhotoContext(candidate)) score -= 100;
   if (NEGATIVE.test(`${labelNorm} ${urlText}`)) score -= 120;
   return score;
 }
@@ -304,18 +345,22 @@ export function classifyLogoCandidate(candidate, organization, pageIdentity, { m
   const score = Number(candidate?.score || 0);
   const fullText = normalizeToken(candidateFullText(candidate));
   const directIdentityEvidence = hasDirectOrganizationEvidence(candidate, organization);
+  const strictSiteIdentity = candidate?.kind === 'img' && hasStrongSiteIdentity(candidate)
+    && pageHasOrganizationEvidence(organization, pageIdentity) && entityConfidence >= 0.25;
 
   if (EVENT_NEGATIVE.test(fullText)) return { disposition: 'reject', reason: 'event_or_regatta_context', score, entityConfidence };
   if (NEGATIVE.test(fullText)) return { disposition: 'reject', reason: 'negative_logo_context', score, entityConfidence };
-  if (PHOTO_NEGATIVE.test(fullText)) return { disposition: 'reject', reason: 'photo_or_banner_context', score, entityConfidence };
+  if (hasDisqualifyingPhotoContext(candidate)) return { disposition: 'reject', reason: 'photo_or_banner_context', score, entityConfidence };
   if (score < minScore) {
     if (score >= 40 && entityConfidence >= 0.8) return { disposition: 'review', reason: 'high_entity_low_logo_score', score, entityConfidence };
     return { disposition: 'reject', reason: 'below_logo_score', score, entityConfidence };
   }
   if (candidate?.kind === 'img' && !directIdentityEvidence) {
+    if (strictSiteIdentity) return { disposition: 'accept', reason: 'strict_site_identity', score, entityConfidence };
     return { disposition: entityConfidence >= 0.25 ? 'review' : 'reject', reason: 'direct_asset_identity_missing', score, entityConfidence };
   }
   if (entityConfidence >= minEntity) return { disposition: 'accept', reason: 'logo_and_entity_match', score, entityConfidence };
+  if (strictSiteIdentity) return { disposition: 'accept', reason: 'strict_site_identity', score, entityConfidence };
   if (entityConfidence >= 0.25 || candidate?.kind === 'jsonld' || candidate?.kind === 'meta') {
     return { disposition: 'review', reason: 'entity_match_uncertain', score, entityConfidence };
   }
