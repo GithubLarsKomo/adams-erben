@@ -1,5 +1,5 @@
 #vorbild-rivale{scroll-margin-top:calc(var(--site-shell-header-height,76px) + 18px)}
-.east-west-story{padding-top:clamp(2.5rem,6vw,5rem);padding-bottom:clamp(2.5rem,6vw,5rem)}
+.east-west-story{padding-top:clamp(2.5rem,6vw,5rem);padding-bottom:0}
 .east-west-heading{max-width:960px}
 .source-legend{display:flex;flex-wrap:wrap;gap:.55rem;margin:1.25rem 0 2rem}
 .evidence-badge{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:.32rem .58rem;border-radius:999px;font-size:.66rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.1}
