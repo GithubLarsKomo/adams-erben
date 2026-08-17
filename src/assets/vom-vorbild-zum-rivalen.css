@@ -7,63 +7,74 @@
 .evidence-context{background:#eef3f7;color:#28495f;border:1px solid #c9d6df}
 .evidence-memory{background:#fff4df;color:#704b16;border:1px solid #ecd3a5}
 
-/* Full-width story cards use the same visual language as the existing Adam-Labor cards. */
 .east-west-chapter{width:100%;margin:1rem 0;padding:clamp(1.5rem,4vw,3rem);border:1px solid rgba(11,35,54,.10);border-radius:28px;background:var(--white);box-shadow:0 12px 30px rgba(11,35,54,.045)}
 .east-west-year{display:inline-flex;align-items:center;min-height:30px;margin:0 0 .45rem;padding:.32rem .68rem;border-radius:999px;background:#f1d8d4;color:var(--accent-dark);font-size:.72rem;font-weight:900;letter-spacing:.08em;line-height:1;text-transform:uppercase}
 .east-west-copy{max-width:none}
 .east-west-copy h3{max-width:980px;margin:.48rem 0 .85rem;font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.8rem,3.4vw,2.75rem);line-height:1.06;color:var(--navy)}
 .east-west-copy>p{max-width:980px;color:var(--muted);line-height:1.68}
+.east-west-copy>p strong{color:var(--navy)}
 
-/* Compact source lines keep evidence close to the corresponding claim without competing with the story. */
 .east-west-source-row{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .7rem;margin:1.15rem 0 0!important;padding-top:.85rem;border-top:1px solid rgba(11,35,54,.10);font-size:.78rem;line-height:1.45;color:var(--muted)!important}
 .east-west-source-row strong{color:var(--navy);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
 .east-west-source-row a{color:var(--navy-2);font-weight:750;text-decoration:none}
 .east-west-source-row a:hover{text-decoration:underline;color:var(--accent-dark)}
 .east-west-source-row-center{justify-content:center;max-width:900px;margin:1rem auto 0!important}
 
-/* 1948–1955: warm historical prologue. */
 .east-west-prologue{background:var(--foam);border-color:#e2ded3}
+.east-west-reference{background:#f6fafc;border-color:#dbe6eb}
+.east-west-koerner{background:#f3f7f9;border-color:#d3e0e6}
+.east-west-observation{background:var(--white);border-color:#d8e2e7}
+.east-west-memory-story{background:#fffaf0;border-color:#ead6ae;box-shadow:none}
 
-/* 1962–1963: restrained analytical card. */
-.east-west-chapter:nth-of-type(2){background:#f6fafc;border-color:#dbe6eb}
+.east-west-quote{max-width:920px;margin:1.1rem 0;padding:1rem 1.2rem;border-left:4px solid var(--navy-2);background:rgba(255,255,255,.68);font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.15rem,2.2vw,1.5rem);line-height:1.45;color:var(--navy)}
+.east-west-quote-strong{font-size:clamp(1.25rem,2.5vw,1.7rem);font-weight:700}
 
-/* 1963/64: methodological turn – dark feature card. */
+.memory-callout{max-width:980px;margin-top:1.2rem;padding:1rem 1.1rem;border-left:4px solid #d5a14a;background:#fffaf0;border-radius:0 14px 14px 0}
+.memory-callout p{margin:.55rem 0 0;color:#5d4a2d;line-height:1.6}
+.memory-callout-compact{margin-bottom:1rem}
+
+.archive-fact{max-width:980px;margin:1.1rem 0;padding:.9rem 1rem;border:1px solid #cfdce2;border-radius:14px;background:#f7fafb;display:grid;gap:.2rem}
+.archive-fact strong{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--navy)}
+.archive-fact span{font-size:.88rem;line-height:1.45;color:var(--muted)}
+
+.evidence-check{max-width:980px;margin:1.15rem 0;padding:1rem 1.1rem;border:1px solid #e1c998;border-radius:16px;background:#fffdf7}
+.evidence-check>strong{display:block;margin-bottom:.35rem;font-family:Georgia,"Times New Roman",serif;font-size:1.2rem;color:var(--navy)}
+.evidence-check p{margin:0;color:#5d4a2d;line-height:1.62}
+
+.kremtz-turn{max-width:980px;margin:1.25rem 0;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:.8rem;align-items:stretch}
+.kremtz-turn>div:not(.kremtz-turn-arrow){padding:1rem 1.05rem;border:1px solid #c7d9e1;border-radius:16px;background:#f8fbfc;display:grid;gap:.3rem}
+.kremtz-turn strong{font-family:Georgia,"Times New Roman",serif;font-size:1.5rem;color:var(--navy)}
+.kremtz-turn span{color:var(--muted);line-height:1.55}
+.kremtz-turn-arrow{display:grid;place-items:center;font-size:1.7rem;font-weight:800;color:var(--accent-dark)}
+
+.east-west-bled{background:var(--water);border-color:#c9dce3}
+
 .east-west-schubschlag{background:var(--navy);color:var(--white);border-color:transparent;box-shadow:0 16px 35px rgba(11,35,54,.11)}
 .east-west-schubschlag .east-west-year{background:var(--accent);color:var(--white)}
 .east-west-schubschlag .east-west-copy h3{color:var(--white)}
 .east-west-schubschlag .east-west-copy>p{color:#dbe9ef}
-.east-west-schubschlag>.east-west-copy>.evidence-badge{background:rgba(232,243,234,.96)}
+.east-west-schubschlag .east-west-copy>p strong{color:#fff}
+.east-west-schubschlag>.east-west-copy>.evidence-badge{background:rgba(238,243,247,.96);color:#28495f}
 .east-west-podcast{margin-top:1.35rem;background:#102c40;border-color:rgba(255,255,255,.14);box-shadow:none}
-/* source-links.css is loaded globally and may override heading colors; keep this card title unambiguously white. */
 .east-west-schubschlag .east-west-podcast .source-link-card-copy h3{color:#fff!important}
 .east-west-schubschlag .east-west-source-row{border-top-color:rgba(255,255,255,.16);color:#bcd0da!important}
 .east-west-schubschlag .east-west-source-row strong{color:#fff}
 .east-west-schubschlag .east-west-source-row a{color:#a9dceb}
 .east-west-schubschlag .east-west-source-row a:hover{color:#fff}
 
-/* 1965: observation card leaves room for the separately marked oral-history inset. */
-.east-west-observation{background:var(--white);border-color:#d8e2e7}
-.memory-callout{max-width:980px;margin-top:1.2rem;padding:1rem 1.1rem;border-left:4px solid #d5a14a;background:#fffaf0;border-radius:0 14px 14px 0}
-.memory-callout p{margin:.55rem 0 0;color:#5d4a2d}
+.east-west-mexico{background:radial-gradient(circle at 84% 24%,rgba(126,204,229,.16),transparent 24%),var(--navy);color:var(--white);border-color:transparent;box-shadow:0 16px 35px rgba(11,35,54,.11)}
+.east-west-mexico .east-west-year{background:var(--accent);color:var(--white)}
+.east-west-mexico .east-west-copy h3{color:var(--white)}
+.east-west-mexico .east-west-copy>p{color:#dbe9ef}
+.east-west-mexico .east-west-copy>p strong{color:#fff}
+.east-west-mexico>.east-west-copy>.evidence-badge{background:rgba(232,243,234,.96)}
+.east-west-mexico .source-note{color:#bdd3dc}
+.east-west-mexico .east-west-source-row{border-top-color:rgba(255,255,255,.16);color:#bcd0da!important}
+.east-west-mexico .east-west-source-row strong{color:#fff}
+.east-west-mexico .east-west-source-row a{color:#a9dceb}
+.east-west-mexico .east-west-source-row a:hover{color:#fff}
 
-/* 1966: cool, light results card before the dark Olympic culmination. */
-.east-west-result:nth-of-type(5){background:var(--water);border-color:#c9dce3}
-
-/* 1968: Olympic culmination, visually tied to the existing Mexico altitude card. */
-.east-west-result:nth-of-type(6){background:radial-gradient(circle at 84% 24%,rgba(126,204,229,.16),transparent 24%),var(--navy);color:var(--white);border-color:transparent;box-shadow:0 16px 35px rgba(11,35,54,.11)}
-.east-west-result:nth-of-type(6) .east-west-year{background:var(--accent);color:var(--white)}
-.east-west-result:nth-of-type(6) .east-west-copy h3{color:var(--white)}
-.east-west-result:nth-of-type(6) .east-west-copy>p{color:#dbe9ef}
-.east-west-result:nth-of-type(6)>.east-west-copy>.evidence-badge{background:rgba(232,243,234,.96)}
-.east-west-result:nth-of-type(6) .source-note{color:#bdd3dc}
-.east-west-result:nth-of-type(6) .east-west-source-row{border-top-color:rgba(255,255,255,.16);color:#bcd0da!important}
-.east-west-result:nth-of-type(6) .east-west-source-row strong{color:#fff}
-.east-west-result:nth-of-type(6) .east-west-source-row a{color:#a9dceb}
-.east-west-result:nth-of-type(6) .east-west-source-row a:hover{color:#fff}
-
-/* 1970: quiet conclusion with a clear editorial accent. */
-.east-west-epilogue{background:var(--foam);border-color:#e2ded3;box-shadow:none}
-.east-west-epilogue{border-top:4px solid var(--accent)}
+.east-west-epilogue{background:var(--foam);border-color:#e2ded3;box-shadow:none;border-top:4px solid var(--accent)}
 
 .border-history-map{margin:1rem 0 1.35rem}
 .border-map-placeholder{min-height:260px;display:grid;place-content:center;gap:.6rem;padding:clamp(1.5rem,4vw,3rem);border:1px dashed rgba(11,35,54,.28);border-radius:22px;background:linear-gradient(135deg,#edf4f2,#f7fafb);text-align:center}
@@ -87,4 +98,7 @@
   .source-legend{margin-bottom:1.2rem}
   .east-west-source-row{display:grid;gap:.38rem;padding-top:.75rem}
   .east-west-source-row-center{justify-items:center;text-align:center}
+  .kremtz-turn{grid-template-columns:1fr;gap:.55rem}
+  .kremtz-turn-arrow{transform:rotate(90deg);min-height:28px}
+  .east-west-quote{padding:.9rem 1rem}
 }
