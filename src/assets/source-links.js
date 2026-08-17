@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const kicker = worldRowing.querySelector('.source-link-card-kicker');
     const copyText = worldRowing.querySelector('.source-link-card-copy > p:last-child');
     if (kicker) kicker.textContent = 'Heute · Internationaler Rudersport';
-    if (copyText) copyText.textContent = 'Was zu Adams Zeit auf internationalen Regatten weiterentwickelt wurde, wird heute unter dem Dach von World Rowing weltweit organisiert und fortgeführt.';
+    if (copyText) copyText.textContent = 'Karl Adams Erfolge gehören zur Geschichte des internationalen Rudersports. Wie sich dieser Sport heute weltweit präsentiert, zeigt World Rowing als internationaler Ruderverband.';
   }
 
   const drv = moveBefore('#vereine .source-link-card-drv', '#ruderakademie .academy-network');
