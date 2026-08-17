@@ -14,6 +14,13 @@
 .east-west-copy h3{max-width:980px;margin:.48rem 0 .85rem;font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.8rem,3.4vw,2.75rem);line-height:1.06;color:var(--navy)}
 .east-west-copy>p{max-width:980px;color:var(--muted);line-height:1.68}
 
+/* Compact source lines keep evidence close to the corresponding claim without competing with the story. */
+.east-west-source-row{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .7rem;margin:1.15rem 0 0!important;padding-top:.85rem;border-top:1px solid rgba(11,35,54,.10);font-size:.78rem;line-height:1.45;color:var(--muted)!important}
+.east-west-source-row strong{color:var(--navy);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.east-west-source-row a{color:var(--navy-2);font-weight:750;text-decoration:none}
+.east-west-source-row a:hover{text-decoration:underline;color:var(--accent-dark)}
+.east-west-source-row-center{justify-content:center;max-width:900px;margin:1rem auto 0!important}
+
 /* 1948–1955: warm historical prologue. */
 .east-west-prologue{background:var(--foam);border-color:#e2ded3}
 
@@ -27,7 +34,12 @@
 .east-west-schubschlag .east-west-copy>p{color:#dbe9ef}
 .east-west-schubschlag>.east-west-copy>.evidence-badge{background:rgba(232,243,234,.96)}
 .east-west-podcast{margin-top:1.35rem;background:#102c40;border-color:rgba(255,255,255,.14);box-shadow:none}
-.east-west-podcast h3{color:var(--white)}
+/* source-links.css is loaded globally and may override heading colors; keep this card title unambiguously white. */
+.east-west-schubschlag .east-west-podcast .source-link-card-copy h3{color:#fff!important}
+.east-west-schubschlag .east-west-source-row{border-top-color:rgba(255,255,255,.16);color:#bcd0da!important}
+.east-west-schubschlag .east-west-source-row strong{color:#fff}
+.east-west-schubschlag .east-west-source-row a{color:#a9dceb}
+.east-west-schubschlag .east-west-source-row a:hover{color:#fff}
 
 /* 1965: observation card leaves room for the separately marked oral-history inset. */
 .east-west-observation{background:var(--white);border-color:#d8e2e7}
@@ -44,6 +56,10 @@
 .east-west-result:nth-of-type(6) .east-west-copy>p{color:#dbe9ef}
 .east-west-result:nth-of-type(6)>.east-west-copy>.evidence-badge{background:rgba(232,243,234,.96)}
 .east-west-result:nth-of-type(6) .source-note{color:#bdd3dc}
+.east-west-result:nth-of-type(6) .east-west-source-row{border-top-color:rgba(255,255,255,.16);color:#bcd0da!important}
+.east-west-result:nth-of-type(6) .east-west-source-row strong{color:#fff}
+.east-west-result:nth-of-type(6) .east-west-source-row a{color:#a9dceb}
+.east-west-result:nth-of-type(6) .east-west-source-row a:hover{color:#fff}
 
 /* 1970: quiet conclusion with a clear editorial accent. */
 .east-west-epilogue{background:var(--foam);border-color:#e2ded3;box-shadow:none}
@@ -69,4 +85,6 @@
   .east-west-copy h3{font-size:clamp(1.55rem,8vw,2.1rem)}
   .border-map-placeholder{min-height:220px}
   .source-legend{margin-bottom:1.2rem}
+  .east-west-source-row{display:grid;gap:.38rem;padding-top:.75rem}
+  .east-west-source-row-center{justify-items:center;text-align:center}
 }
