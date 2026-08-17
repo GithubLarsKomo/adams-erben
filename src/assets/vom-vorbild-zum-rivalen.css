@@ -22,6 +22,7 @@
 .result-panel strong{font-family:Georgia,"Times New Roman",serif;font-size:1.45rem}.result-panel span{color:#dcebf0;line-height:1.5}
 .result-panel-mexico{background:#173c52}
 .east-west-podcast{margin-top:1.2rem}
+.east-west-podcast h3{color:var(--white)}
 .east-west-editorial-note{margin-top:1.75rem;padding:1.2rem 1.3rem;border:1px solid rgba(11,35,54,.12);border-radius:18px;background:var(--foam)}
 .east-west-editorial-note p{margin:.65rem 0 0;color:var(--muted);line-height:1.6}
 .east-west-editorial-note strong{color:var(--navy)}
