@@ -19,6 +19,36 @@ if ($('#vorbild-rivale').length) throw new Error('[east-west] story already pres
 
 $('#geschichte').before(partialHtml);
 
+const mapPlaceholder = $('.border-map-placeholder').first();
+if (!mapPlaceholder.length) throw new Error('[east-west] historical map placeholder missing before map integration');
+mapPlaceholder.replaceWith(`
+  <figure class="border-map-figure" aria-labelledby="border-map-title" aria-describedby="border-map-description">
+    <div class="border-map-heading">
+      <h3 id="border-map-title">Ein Ruderrevier an der Grenze</h3>
+      <p id="border-map-description">Adams Ratzeburger Ruderraum reichte vom frühen Schulrudern am Großen Ratzeburger See bis zum späteren Hochleistungszentrum am Küchensee. Die Karte trennt belegte Geografie, zwei schematische Fahrräume am West- und Ostufer und den politischen Grenzraum bewusst voneinander.</p>
+    </div>
+    <div class="border-map-frame">
+      <img src="/assets/images/ratzeburg-border-rowing-history.svg" alt="Schematische historische Karte von Ratzeburg mit Großem Ratzeburger See, Küchensee, historischem LG-Schulbootshaus am heutigen Karl-Adam-Weg, RRC, Rothenhusen, Wakenitz, Fahrräumen an West- und Ostufer sowie innerdeutschem Grenzraum nördlich des Bereichs Kalkhütte." loading="lazy" decoding="async">
+    </div>
+    <figcaption class="border-map-caption">Die gestrichelten Linien zeigen nur schematische Fahrräume entlang beider Ufer, keine rekonstruierten GPS-Routen. Ein konkreter DDR-Beobachtungspunkt wird nicht kartiert, weil er nicht belegt ist.</figcaption>
+    <div class="border-map-insights" aria-label="Einordnung der Karte">
+      <article>
+        <h4>Das Revier</h4>
+        <p>Karl Adams Ruderwelt begann am Großen Ratzeburger See. Die Ruderriege der Lauenburgischen Gelehrtenschule nutzte ihn für Fahrten Richtung Rothenhusen; ab 1955 verlagerte sich der Schwerpunkt des Renn- und Hochleistungstrainings an den Küchensee.</p>
+      </article>
+      <article>
+        <h4>Die Grenze</h4>
+        <p>Der politisch markierte Grenzraum setzt am Ostufer erst nördlich des Bereichs Kalkhütte ein; Buchholz dient gegenüber als Orientierung. Der historische Verlauf wird nur so präzise gezeigt, wie es die Quellenlage trägt.</p>
+      </article>
+      <article>
+        <h4>Warum das wichtig ist</h4>
+        <p>Ratzeburg war kein fernes westdeutsches Leistungszentrum. Ein Teil des realen Ruderreviers lag unmittelbar an der Systemgrenze. Diese räumliche Nähe macht die später dokumentierten Beobachtungsfahrten verständlich – ohne einen Beobachtungsort zu erfinden.</p>
+      </article>
+    </div>
+    <p class="border-map-sources"><strong>Quellen zur Karte:</strong> <a href="https://www.grenzhus.de/publikationen/" target="_blank" rel="noopener noreferrer">Grenzhus Schlagsdorf · Grenzgeschichte Ratzeburger See ↗</a><span aria-hidden="true">·</span><a href="https://www.rrc-online.de/2018/geschichte-und-erfolge/laudatio-zum-85-geburtstag-von-dr-alfred-block/" target="_blank" rel="noopener noreferrer">RRC · frühes Ruderrevier und Schulbootshaus ↗</a></p>
+    <p class="border-map-transition"><strong>Die Grenze trennte zwei Sportsysteme.</strong> Ratzeburgs Erfolge machten den Ort jedoch zum Referenzpunkt auf beiden Seiten. Anfang der 1960er Jahre stellte sich im DDR-Rudern deshalb eine sehr konkrete Frage: <em>Wie macht Adam das?</em></p>
+  </figure>`);
+
 if (!$('link[href="/assets/vom-vorbild-zum-rivalen.css"]').length) {
   $('head').append('<link rel="stylesheet" href="/assets/vom-vorbild-zum-rivalen.css">');
 }
@@ -44,7 +74,11 @@ const required = [
   ['.evidence-documented', 'documented evidence badge'],
   ['.evidence-context', 'historical context badge'],
   ['.evidence-memory', 'later-memory badge'],
-  ['.border-map-placeholder', 'historical map placeholder'],
+  ['.border-map-figure', 'historical map figure'],
+  ['.border-map-frame img[src="/assets/images/ratzeburg-border-rowing-history.svg"]', 'historical map SVG'],
+  ['.border-map-insights > article', 'historical map insight cards'],
+  ['.border-map-sources', 'historical map sources'],
+  ['.border-map-transition', 'historical map story transition'],
   ['.archive-fact', '1965 archive reference'],
   ['.evidence-check', 'Schilf evidence check'],
   ['.kremtz-turn', 'Kremtz 1965 to 1966 turning point'],
@@ -58,6 +92,8 @@ const required = [
 for (const [selector, label] of required) {
   if (!$(selector).length) throw new Error(`[east-west] required ${label} missing`);
 }
+if ($('.border-map-placeholder').length) throw new Error('[east-west] historical map placeholder survived integration');
+if ($('.border-map-insights > article').length !== 3) throw new Error('[east-west] historical map must contain exactly three insight cards');
 
 const text = $.text();
 const requiredText = [
@@ -65,7 +101,10 @@ const requiredText = [
   'BStU, MfS, ZAIG 1081, Bl. 8–16',
   'Peter Kremtz wird mit Roland Göhler Weltmeister im Zweier ohne',
   'DDR-Achter: Rang 7',
-  'Die DDR hat die Bundesrepublik um Längen geschlagen'
+  'Die DDR hat die Bundesrepublik um Längen geschlagen',
+  'West- und Ostufer',
+  'nördlich des Bereichs Kalkhütte',
+  'Wie macht Adam das?'
 ];
 for (const claim of requiredText) {
   if (!text.includes(claim)) throw new Error(`[east-west] required sourced claim missing: ${claim}`);
@@ -83,4 +122,4 @@ for (const overclaim of forbidden) {
 }
 
 await writeFile(rowingPath, $.html());
-console.log('[east-west] integrated #vorbild-rivale into /rudern/ only');
+console.log('[east-west] integrated #vorbild-rivale with historical border map into /rudern/ only');
