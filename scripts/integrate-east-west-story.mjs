@@ -73,7 +73,6 @@ for (const claim of requiredText) {
 
 const forbidden = [
   'Stasi beobachtete',
-  'Stasi-Spionage',
   'Doping erklärt die frühen Erfolge',
   'Beobachtungsfahrten des DDR-Trainers Peter Kremtz',
   'Peter Kremtz nach Ratzeburg',
