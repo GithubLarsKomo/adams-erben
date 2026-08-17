@@ -49,8 +49,8 @@ mapPlaceholder.replaceWith(`
     <p class="border-map-transition"><strong>Die Grenze trennte zwei Sportsysteme.</strong> Ratzeburgs Erfolge machten den Ort jedoch zum Referenzpunkt auf beiden Seiten. Anfang der 1960er Jahre stellte sich im DDR-Rudern deshalb eine sehr konkrete Frage: <em>Wie macht Adam das?</em></p>
   </figure>`);
 
-if (!$('link[href="/assets/vom-vorbild-zum-rivalen.css"]').length) {
-  $('head').append('<link rel="stylesheet" href="/assets/vom-vorbild-zum-rivalen.css">');
+for (const href of ['/assets/vom-vorbild-zum-rivalen.css', '/assets/border-history-map.css']) {
+  if (!$(`link[href="${href}"]`).length) $('head').append(`<link rel="stylesheet" href="${href}">`);
 }
 
 const nav = $('#primary-navigation');
@@ -87,6 +87,7 @@ const required = [
   ['.east-west-podcast img[src="/assets/images/schubschlag.webp"]', 'local Schubschlag asset'],
   ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link'],
   ['link[href="/assets/vom-vorbild-zum-rivalen.css"]', 'feature stylesheet'],
+  ['link[href="/assets/border-history-map.css"]', 'historical map stylesheet'],
   ['#primary-navigation a[href="#vorbild-rivale"]', 'Ost & West navigation']
 ];
 for (const [selector, label] of required) {
