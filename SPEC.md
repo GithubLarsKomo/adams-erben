@@ -542,26 +542,52 @@ Bundesrepublik → DDR-Training
 
 # TEIL B — KARTENANFORDERUNGEN
 
-## 18. Ziel der Karte
+## 18. Ziel und dramaturgische Funktion der Karte
 
-Die Karte soll historische Argumentation leisten. Sie muss gleichzeitig zeigen:
+Die Karte ist kein dekoratives Kartenmotiv, sondern ein **Beweis- und Übergangsmodul**. Sie soll in wenigen Sekunden verständlich machen:
 
 1. wo Adams Ratzeburger Arbeit begann;
-2. wie Großer Ratzeburger See und Küchensee zusammenhängen;
-3. wohin frühe Trainingsfahrten führten;
-4. wie nah die innerdeutsche Grenze tatsächlich lag.
+2. dass der Große Ratzeburger See ein reales frühes Ruderrevier war;
+3. wie Großer Ratzeburger See und Küchensee räumlich zusammenhängen;
+4. wohin dokumentierte frühe Fahrten führten;
+5. wie unmittelbar dieses Ruderrevier an der innerdeutschen Grenze lag;
+6. warum Ratzeburg für DDR-Rudersportler kein abstrakt fernes westdeutsches Leistungszentrum war.
 
 ### Arbeitstitel
 
 **Ein Ruderrevier an der Grenze**
 
+### Verbindlicher Vorspann
+
+> **Adams Ratzeburger Ruderraum reichte vom frühen Schulrudern am Großen Ratzeburger See bis zum späteren Hochleistungszentrum am Küchensee. Wenige Kilometer weiter begann die DDR. Die Karte trennt belegte Geografie, historisch dokumentierte Fahrtrichtungen und politische Grenze bewusst voneinander.**
+
+### Dramaturgisches Ergebnis
+
+Der Besucher soll nach dem Kartenmodul nicht denken „hier wurde spioniert“, sondern:
+
+> **Zwei Sportsysteme lagen räumlich unmittelbar nebeneinander. Als Ratzeburg sportlich zum Maßstab wurde, bekam diese Nähe zusätzliche Bedeutung.**
+
 ---
 
-## 19. Pflichtobjekte der Karte
+## 19. Kartenausschnitt und Pflichtobjekte
+
+### Kartenausschnitt
+
+Der Ausschnitt muss Ratzeburg als erzählerisches Zentrum behandeln und gleichzeitig den nördlichen Zusammenhang bis Rothenhusen/Wakenitz zeigen. Schlagsdorf ist **Quellenort, nicht Kartenmittelpunkt**.
+
+Empfohlene räumliche Hierarchie:
+
+- Ratzeburg im unteren bis mittleren Drittel;
+- Großer Ratzeburger See als dominante Nord-Süd-Achse;
+- Küchensee südlich bzw. südwestlich klar erkennbar;
+- Rothenhusen und Übergang zur Wakenitz im nördlichen Bereich;
+- historische Grenze am östlichen/nordöstlichen Rand entsprechend belastbarer Kartengrundlage.
+
+### Pflichtobjekte
 
 - Inselstadt Ratzeburg;
 - ehemalige Lauenburgische Gelehrtenschule / heutiges Rathaus;
-- historisches Schulbootshaus;
+- historisches LG-Schulbootshaus hinter der ehemaligen Schule;
 - Großer Ratzeburger See;
 - Küchensee;
 - Ratzeburger Ruderclub;
@@ -571,34 +597,98 @@ Die Karte soll historische Argumentation leisten. Sie muss gleichzeitig zeigen:
 - DDR;
 - historisch belastbarer Grenzverlauf für den dargestellten Zeitraum.
 
-Optional:
+### Optionale Orientierungspunkte
 
-- Ruderakademie als heutiger Orientierungspunkt;
-- Dom nur, wenn er Orientierung verbessert.
+- Ruderakademie Ratzeburg — nur als **heutiger Orientierungspunkt**, visuell sekundär;
+- Ratzeburger Dom — nur, wenn er die räumliche Orientierung verbessert;
+- Lübeck nicht zwingend im Kartenausschnitt; bei Bedarf nur als Richtungspfeil `weiter Richtung Lübeck`.
+
+Heutige Orientierungspunkte müssen optisch von historischen Orten unterscheidbar sein.
 
 ---
 
-## 20. Trainingsroute
+## 20. Informationsschichten und visuelle Semantik
 
-Eine schematische historische Trainingsrichtung darf dargestellt werden:
+Die Karte benötigt vier klar unterscheidbare Ebenen. Keine Ebene darf allein durch Farbe codiert sein.
+
+### Ebene A — Geografie
+
+- Wasserflächen;
+- Inselstadt / Uferlinien;
+- Großer Ratzeburger See;
+- Küchensee;
+- Wakenitz.
+
+Darstellung ruhig, flächig und visuell dominant. Wasser in sehr hellem, zurückhaltendem Blau; Land neutral/off-white.
+
+### Ebene B — historisch belegte Ruderorte
+
+- LG / heutiges Rathaus;
+- historisches Schulbootshaus;
+- RRC am Küchensee;
+- Rothenhusen als dokumentiertes Ziel früher Fahrten.
+
+Diese Orte erhalten eindeutige Marker plus Textlabel. Keine Karten-App-Pins; bevorzugt kleine Kreise, Punkte oder redaktionelle Marker.
+
+### Ebene C — politische Geografie
+
+- BRD;
+- DDR;
+- innerdeutsche Grenze.
+
+Grenze als eigene Linienart, z. B. dunkle Strich-Punkt- oder Doppellinie. Sie darf nicht mit der schematischen Ruderroute verwechselt werden.
+
+### Ebene D — schematische frühe Fahrtrichtung
+
+Eine zurückhaltende gestrichelte Linie bzw. Richtungslinie darf die dokumentierte Nutzung des Reviers veranschaulichen:
 
 **Schulbootshaus → Großer Ratzeburger See → Rothenhusen**
 
-### Guardrail
+Sie ist ausdrücklich **keine rekonstruierte GPS-Route**.
 
-Nicht als exakte historische GPS-Route ausgeben.
+### Verbindliche Legende
 
-Darstellung z. B. als gestrichelte Linie mit Label:
+Mindestens:
 
-`frühe Trainingsfahrten Richtung Rothenhusen`
+- `● historischer Ruderort`;
+- `○ heutiger Orientierungspunkt`;
+- `– – – schematische frühe Fahrtrichtung`;
+- `— · — innerdeutsche Grenze`;
+- bei kartografisch belegter Unsicherheit optional: `schraffiert / aufgehellt = historisch strittiger Grenzabschnitt`.
 
-optional:
-
-`teilweise weiter Richtung Lübeck`
+Die letzte Legendenposition darf nur verwendet werden, wenn die zugrunde liegende historische Karte eine solche Differenzierung tatsächlich trägt.
 
 ---
 
-## 21. Grenzverlauf
+## 21. Schematische Trainings- und Fahrtrichtung
+
+Eine schematische historische Fahrtrichtung darf dargestellt werden:
+
+**Schulbootshaus → Großer Ratzeburger See → Rothenhusen**
+
+### Verbindliches Kartenlabel
+
+`frühe Fahrten Richtung Rothenhusen`
+
+Optional am nördlichen Kartenrand:
+
+`teilweise weiter Richtung Lübeck`
+
+### Guardrails
+
+- nicht als exakte historische Route oder GPS-Track ausgeben;
+- keine einzelnen Trainingseinheiten rekonstruieren;
+- nicht behaupten, jede Fahrt sei Hochleistungstraining gewesen;
+- Linie nicht bis zu einem erfundenen Beobachtungspunkt verlängern;
+- keine Boots- oder Beobachterposition erfinden.
+
+### Visuelle Abgrenzung
+
+Die Fahrtrichtung muss deutlich leichter und weniger dominant als die Staatsgrenze erscheinen. Grenze = politische Trennung; gestrichelte Ruderlinie = redaktionelle Schematisierung eines belegten Bewegungsraums.
+
+---
+
+## 22. Grenzverlauf
 
 Der Grenzverlauf muss aus einer belastbaren historischen Quelle abgeleitet werden.
 
@@ -606,19 +696,28 @@ Der Grenzverlauf muss aus einer belastbaren historischen Quelle abgeleitet werde
 
 - keine frei gezeichnete Grenzlinie;
 - keine Behauptung, der gesamte Ostuferbereich sei DDR-Gebiet gewesen;
-- berücksichtigen, dass der Verlauf am Ostufer lange unklar war und 1973 nochmals vermessen wurde.
+- berücksichtigen, dass der Verlauf am Ostufer lange unklar war und 1973 nochmals vermessen wurde;
+- bei quellenseitig nicht auflösbarer Genauigkeit lieber generalisieren als Scheingenauigkeit erzeugen.
 
-Mögliches Kartenlabel:
+### Kartenlabel
 
 **INNERDEUTSCHE GRENZE**
 
-Zusatz:
+### Erläuterung
 
 > **Der genaue Verlauf am Ostufer war selbst zwischen beiden deutschen Staaten lange nicht abschließend geklärt.**
 
+### Quellenbezug
+
+Primäre sichtbare Referenz für die Grenzgeschichte:
+
+`Grenzhus Schlagsdorf · Grenzgeschichte Ratzeburger See ↗`
+
+Die kartografische Umsetzung darf nur so präzise sein wie die verwendete historische Grundlage.
+
 ---
 
-## 22. Keine erfundenen Beobachtungspunkte
+## 23. Keine erfundenen Beobachtungspunkte
 
 Die Karte darf **keinen Pin oder Marker** zeigen mit Aussagen wie:
 
@@ -635,9 +734,11 @@ Die spätere Hofmann-Erinnerung `Schilf am Ostufer` darf **nicht kartografisch l
 
 ---
 
-## 23. Kartenstil
+## 24. Kartenstil, Layout und Responsive-Verhalten
 
-### Gewünscht
+### Stil
+
+Gewünscht:
 
 - dokumentarisch;
 - ruhig;
@@ -645,45 +746,181 @@ Die spätere Hofmann-Erinnerung `Schilf am Ostufer` darf **nicht kartografisch l
 - hochwertig;
 - Wasser visuell dominant;
 - Grenze klar erkennbar, aber nicht dramatisiert;
-- historische Anmutung ohne künstliche Alterung.
+- historische Anmutung ohne künstliche Alterung;
+- visuell passend zu den übrigen redaktionellen Modulen von Adams Erben.
 
-### Nicht gewünscht
+Nicht gewünscht:
 
+- Google-/Apple-Maps-Anmutung;
 - Agententhriller-Optik;
 - rote Alarm-/Militärästhetik;
 - Grenztürme oder Stacheldraht als dekoratives Motiv ohne Ortsbeleg;
 - Comicstil;
-- übermäßige Papieralterung.
+- übermäßige Papieralterung;
+- Stecknadel- oder POI-Icon-Sammlung wie in einer Tourismuskarte.
 
 ### Asset
 
 `src/assets/images/ratzeburg-border-rowing-history.svg`
 
-Optional zusätzlich WebP.
+Optional zusätzlich WebP nur als Fallback/Preview; semantische Textalternative bleibt Pflicht.
+
+### Desktop ≥ 1024 px
+
+Reihenfolge:
+
+1. zentrierter Titel;
+2. Vorspann mit max. ca. 760–820 px Textbreite;
+3. Karten-Breakout bis ca. 1180 px Inhaltsbreite;
+4. Legende unmittelbar unter oder innerhalb eines ruhigen Kartenrandbereichs;
+5. drei redaktionelle Kacheln in einer Reihe;
+6. kompakter Quellenblock;
+7. dramaturgische Überleitung zur Hauptgeschichte.
+
+Die Karte soll ca. 560–680 px visuelle Höhe erhalten. Alle Hauptlabels müssen ohne Interaktion verständlich sein.
+
+### Tablet 768–1023 px
+
+- Karte volle Content-Breite;
+- Labels reduzieren, aber nicht zentrale Orte entfernen;
+- drei Kacheln als 2+1- oder einspaltige Anordnung, je nach verfügbarer Breite;
+- Legende darf umbrechen.
+
+### Mobile < 768 px
+
+Nicht nur die Desktop-SVG proportional verkleinern.
+
+Verbindlich:
+
+- eigener mobiler `viewBox` bzw. separate Label-Anordnung;
+- hochformatiger oder deutlich höherer Kartenausschnitt, damit Nord-Süd-Geografie lesbar bleibt;
+- Mindestinhalte bei ca. 360 px: `Ratzeburg`, `LG-Schulbootshaus`, `Großer Ratzeburger See`, `Küchensee`, `RRC`, `Rothenhusen`, `Wakenitz`, `BRD`, `DDR`, `Grenze`;
+- drei Inhaltskacheln untereinander;
+- Quellenblock darf umbrechen;
+- kein horizontales Scrollen als Voraussetzung zum Verstehen;
+- keine Information ausschließlich per Hover.
+
+### Interaktion
+
+Die Karte muss statisch vollständig verständlich sein. Optionale Fokus-/Tooltip-Interaktionen dürfen nur Zusatzinformationen liefern.
 
 ---
 
-## 24. Responsive Kartenanforderungen
+## 24.1 Verbindliche Kartenlabels und optionale Tooltips
 
-### Desktop
+### Historisches LG-Schulbootshaus
 
-- Karte als breiter redaktioneller Breakout möglich;
-- alle Hauptlabels gleichzeitig lesbar;
-- Legende außerhalb dichter Bereiche.
+**Label:** `erstes LG-Schulbootshaus`  
+**Zusatz/Tooltip:** `Ausgangspunkt der Ruderriege der Lauenburgischen Gelehrtenschule; historischer Bestand hinter der ehemaligen Schule, dem heutigen Rathaus.`
 
-### Mobile
+### Ehemalige LG / heutiges Rathaus
 
-Bei ca. 360 px Breite mindestens lesbar:
+**Label:** `LG / heute Rathaus`  
+**Zusatz/Tooltip:** `Hier unterrichtete Karl Adam; die frühe Ruderarbeit entstand im Umfeld der Schule.`
 
-- Ratzeburg;
-- Schulbootshaus;
-- Großer Ratzeburger See;
-- Küchensee;
-- Rothenhusen;
-- DDR / BRD;
-- Grenze.
+### Ratzeburger Ruderclub / Küchensee
 
-Bei Bedarf eigene mobile Beschriftungsvariante statt bloßer Skalierung.
+**Label:** `RRC · ab 1955`  
+**Zusatz/Tooltip:** `Mit dem eigenen Bootshaus am Küchensee verlagerte sich der Schwerpunkt des Renn- und Hochleistungstrainings hierher.`
+
+### Rothenhusen
+
+**Label:** `Rothenhusen`  
+**Zusatz/Tooltip:** `Dokumentiertes Ziel früher Fahrten der Ratzeburger Schulruderriege auf dem Großen Ratzeburger See.`
+
+### Wakenitz
+
+**Label:** `Wakenitz`  
+**Zusatz/Tooltip:** `Nördliche Verbindung des Ruderraums in Richtung Lübeck.`
+
+### Innerdeutsche Grenze
+
+**Label:** `INNERDEUTSCHE GRENZE`  
+**Zusatz/Tooltip:** `Historischer Grenzverlauf; am Ostufer lange nicht in allen Details abschließend geklärt.`
+
+### Heutige Ruderakademie, falls gezeigt
+
+**Label:** `Ruderakademie · heute`  
+Visuell eindeutig sekundär und nicht mit den historischen 1948–1955-Orten gleichsetzen.
+
+---
+
+## 24.2 Drei redaktionelle Kacheln unter der Karte
+
+Die derzeit freie Fläche unter der Karte wird nicht mit weiterem allgemeinen Fließtext gefüllt, sondern mit drei kurzen Kacheln. Sie erklären die Aussage der Karte in maximal ca. 45–60 Wörtern pro Kachel.
+
+### DAS REVIER
+
+> **Karl Adams Ruderwelt begann am Großen Ratzeburger See. Die Ruderriege der Lauenburgischen Gelehrtenschule nutzte ihn für Fahrten Richtung Rothenhusen; ab 1955 verlagerte sich der Schwerpunkt des Renn- und Hochleistungstrainings an den Küchensee.**
+
+### DIE GRENZE
+
+> **Nördlich und östlich des Ratzeburger Ruderraums verlief die innerdeutsche Grenze. Ihr genauer Verlauf am Ostufer war lange nicht abschließend geklärt. Die Karte zeigt deshalb nur historisch belastbare Geografie und vermeidet Scheingenauigkeit.**
+
+### WARUM DAS WICHTIG IST
+
+> **Ratzeburg war kein fernes westdeutsches Leistungszentrum. Ein Teil des realen Ruderreviers lag unmittelbar an der Systemgrenze. Diese räumliche Nähe macht die später dokumentierten Beobachtungsfahrten verständlich – ohne einen konkreten Beobachtungsort zu behaupten.**
+
+### Layout
+
+- Desktop: drei gleichwertige Karten/Kacheln nebeneinander;
+- Mobile: untereinander;
+- keine Icons erforderlich;
+- Überschrift klein, deutlich und konsistent mit anderen Story-Kacheln;
+- keine zusätzliche Quellenzeile in jeder Kachel; Quellen werden zentral direkt darunter geführt.
+
+---
+
+## 24.3 Quellenblock des Kartenmoduls
+
+Der aktuell übergroße `QUELLE:`-Block darf **nicht** als zweite visuelle Überschrift konkurrieren.
+
+### Verbindliche Gestaltung
+
+Kleine, ruhige Quellenzeile bzw. maximal zwei Zeilen unter den drei Kacheln:
+
+**Quellen zur Karte:** `Grenzhus Schlagsdorf · Grenzgeschichte Ratzeburger See ↗` · `RRC-/LG-Chronik · frühes Ruderrevier und Bootshaus ↗`
+
+### Regeln
+
+- `QUELLE:` nicht in Display-/Headline-Typografie;
+- Schriftgröße und Gewicht wie redaktionelle Metadaten bzw. Quellenhinweise;
+- externe Links mit verständlichem Linktext und External-Link-Indikator;
+- Grenzhus belegt Grenzgeschichte, nicht automatisch Adams Trainingsfahrten;
+- RRC-/LG-Chronik belegt frühes Revier/Bootshaus, nicht den politischen Grenzverlauf;
+- falls nur ein konkreter Grenzhus-Link technisch verfügbar ist, darf die zweite Quelle zunächst als nicht verlinkter Quellenhinweis stehen, bis die belastbare Ziel-URL hinterlegt ist.
+
+---
+
+## 24.4 Überleitung aus der Karte in „Vom Vorbild zum Rivalen“
+
+Das Kartenmodul endet mit einem kurzen narrativen Haken, nicht mit der Quellenzeile.
+
+### Verbindlicher Übergangstext
+
+> **Die Grenze trennte zwei Sportsysteme. Ratzeburgs Erfolge machten den Ort jedoch zum Referenzpunkt auf beiden Seiten. Anfang der 1960er Jahre stellte sich im DDR-Rudern deshalb eine sehr konkrete Frage: Wie macht Adam das?**
+
+Danach folgt unmittelbar Abschnitt 1962/1963 der Hauptgeschichte.
+
+Die 1965 belegten Beobachtungsfahrten dürfen an dieser Stelle noch nicht vorweg als Erklärung oder Spionagehandlung ausgedeutet werden.
+
+---
+
+## 24.5 Barrierefreiheit und technische Anforderungen der Karte
+
+- SVG mit sinnvollem `title` und `desc`;
+- vollständige Textalternative direkt im DOM, nicht nur im `alt` eines Rasterbildes;
+- historische Orte und Grenze müssen auch ohne Farbe unterscheidbar sein;
+- optionale Tooltips per Tastatur/Fokus erreichbar;
+- kein Informationsverlust ohne JavaScript;
+- keine externe Kartenbibliothek, kein Tracking und kein Third-Party-Tile-Service;
+- bei `prefers-reduced-motion` keine animierte Route oder bewegte Grenzlinie;
+- auf Mobile keine verdeckten Labels durch Tooltip-Zwang;
+- Linkziele im Quellenblock mit klaren Accessible Names.
+
+### Textalternative — Mindestinhalt
+
+> **Die Karte zeigt Ratzeburg mit dem historischen LG-Schulbootshaus am Großen Ratzeburger See, den späteren RRC-Standort am Küchensee, Rothenhusen und die Wakenitz im Norden sowie den historisch belegbaren Verlauf der innerdeutschen Grenze. Eine gestrichelte Linie markiert nur schematisch frühe Fahrten Richtung Rothenhusen und stellt keine rekonstruierte Route dar. Ein konkreter DDR-Beobachtungspunkt wird nicht gezeigt, weil er nicht belegt ist.**
 
 ---
 
@@ -912,6 +1149,8 @@ Die Sektion soll wie eine dokumentarische Geschichte funktionieren, nicht wie ei
 
 - alternierende Text-/Bild-Komposition;
 - Karte als breiter Breakout;
+- im Kartenmodul unter der Karte drei Kacheln `Das Revier`, `Die Grenze`, `Warum das wichtig ist`;
+- Kartenquelle als kleine Metazeile, nicht als Display-Überschrift;
 - 1963 und 1965 als visuell hervorgehobene Quellenmomente;
 - Schilf-Modul direkt an 1965 koppeln, nicht als losgelöste Agentengeschichte;
 - Kremtz 1965→1966 als kompakte Vorher/Nachher-Transition;
@@ -927,7 +1166,8 @@ Chronologie muss jederzeit eindeutig bleiben.
 
 - konsequent einspaltig;
 - keine horizontale Timeline;
-- Karte in voller Content-Breite;
+- Karte in voller Content-Breite mit eigenem mobilen `viewBox`/Label-Layout;
+- die drei Kartenkacheln untereinander;
 - Quote-Cards nicht breiter als Viewport;
 - Kremtz-Transition vertikal `1965 ↓ 1966`;
 - Ergebnisgrafiken untereinander stapeln;
@@ -936,7 +1176,7 @@ Chronologie muss jederzeit eindeutig bleiben.
 
 ---
 
-## 33. Quellenbadges
+## 33. Quellenbadges und Quellen-Microcopy
 
 Badge-System:
 
@@ -949,6 +1189,8 @@ Optionaler Link:
 **Quelle ansehen**
 
 Quellen nicht ausschließlich am Seitenende verstecken.
+
+Für Karten- und Kontextmodule gilt zusätzlich: Quellenlinks werden als **kleine redaktionelle Metadaten** gesetzt. Ein großes, typografisch dominantes `QUELLE:` ist zu vermeiden, wenn es mit der eigentlichen Story-Überschrift konkurriert.
 
 ---
 
@@ -1250,6 +1492,7 @@ JavaScript darf nur ergänzen:
 ## 50. Karte
 
 - [ ] historische Karte erstellt;
+- [ ] Ratzeburg ist Kartenmittelpunkt, Schlagsdorf nur Quellenort;
 - [ ] ehemaliges LG / heutiges Rathaus enthalten;
 - [ ] historisches Bootshaus enthalten;
 - [ ] Großer Ratzeburger See enthalten;
@@ -1260,11 +1503,20 @@ JavaScript darf nur ergänzen:
 - [ ] BRD und DDR beschriftet;
 - [ ] Grenzverlauf aus belastbarer historischer Grundlage übernommen;
 - [ ] keine frei erfundene Grenzlinie;
-- [ ] schematische Trainingsrichtung klar als solche erkennbar;
+- [ ] schematische Fahrtrichtung klar als solche erkennbar und von der Grenzlinie unterscheidbar;
+- [ ] keine exakte GPS-Route suggeriert;
 - [ ] kein erfundener Beobachtungs-/Schilf-Pin;
 - [ ] Hofmanns `Ostufer` nicht als exakter Punkt kartiert;
-- [ ] Karte auf Desktop und Mobile lesbar;
-- [ ] Textalternative für Karte vorhanden.
+- [ ] verbindliche Legende mit historischen Orten, heutigen Orientierungspunkten, Fahrtrichtung und Grenze vorhanden;
+- [ ] Label-/Tooltip-Texte für LG-Bootshaus, LG/Rathaus, RRC, Rothenhusen, Wakenitz und Grenze umgesetzt;
+- [ ] drei Kartenkacheln `Das Revier`, `Die Grenze`, `Warum das wichtig ist` mit freigegebenem Text umgesetzt;
+- [ ] Quellenblock typografisch zurückgenommen und nicht als große `QUELLE:`-Headline gestaltet;
+- [ ] Grenzhus und RRC-/LG-Kontext quellenlogisch getrennt;
+- [ ] dramaturgische Überleitung `Wie macht Adam das?` vorhanden;
+- [ ] Desktop-Breakout lesbar;
+- [ ] mobile Karte nutzt eigenes Label-/ViewBox-Konzept statt bloßer Skalierung;
+- [ ] Textalternative für Karte vorhanden;
+- [ ] keine externe Kartenbibliothek oder Third-Party-Tiles eingebunden.
 
 ## 51. Quellen
 
@@ -1273,6 +1525,8 @@ JavaScript darf nur ergänzen:
 - [ ] direkte Zitate einzeln nachprüfbar;
 - [ ] redaktionelle Zusammenfassungen nicht als Originalzitate gestaltet;
 - [ ] Quellenhinweise direkt an relevanten Aussagen sichtbar;
+- [ ] Kartenquelle Grenzhus nur für Grenzgeschichte verwendet;
+- [ ] RRC-/LG-Quelle für frühes Revier und Bootshaus getrennt ausgewiesen;
 - [ ] MfS-Fundkontext nicht mit MfS-Beteiligung verwechselt;
 - [ ] Kremtz 1965 als Primärbeleg und Hofmann als spätere Konkretisierung klar getrennt;
 - [ ] Körners Funktion nicht als Beleg persönlicher Ratzeburg-Reisen verwendet;
@@ -1285,6 +1539,9 @@ JavaScript darf nur ergänzen:
 - [ ] vertikaler Story-Flow statt horizontaler Timeline;
 - [ ] mobile Darstellung einspaltig;
 - [ ] Karte mobil lesbar;
+- [ ] Kartenkacheln Desktop dreispaltig und Mobile gestapelt;
+- [ ] Quellen-Microcopy konkurriert nicht visuell mit der Kartenüberschrift;
+- [ ] Karten-Tooltips sind nur Zusatzinformation und nicht zum Verständnis erforderlich;
 - [ ] Primärquelle 1965 visuell hervorgehoben;
 - [ ] Schilf-Modul direkt an den 1965-Beleg gekoppelt;
 - [ ] Kremtz 1965→1966 als eigenständige Transition sichtbar;
