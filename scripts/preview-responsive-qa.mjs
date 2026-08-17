@@ -5,9 +5,8 @@ import { chromium } from 'playwright';
 const baseUrl = process.env.BASE_URL || 'https://preview.adams-erben.de';
 const widths = [390, 430, 768, 1024];
 const routes = [
-  { path: '/', variant: 'landing', cta: '#quick-finder', inPageNav: true },
-  { path: '/rudern/', variant: 'rowing', cta: '#vereine', inPageNav: true },
-  { path: '/deutschlandachter-1960/', variant: 'content', cta: '/ruderverein-finden/', inPageNav: false }
+  { path: '/', variant: 'landing', cta: '#quick-finder' },
+  { path: '/rudern/', variant: 'rowing', cta: '#vereine' }
 ];
 
 const outDir = path.resolve('qa-artifacts');
@@ -144,25 +143,20 @@ try {
             const style = getComputedStyle(el);
             const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.2;
             return {
-              text: el.textContent.replace(/\s+/g, ' ').trim(),
               left: rect.left,
               right: rect.right,
               height: rect.height,
               scrollWidth: el.scrollWidth,
               clientWidth: el.clientWidth,
               lines: Math.max(1, Math.round(rect.height / lineHeight)),
-              overflowWrap: style.overflowWrap,
-              hyphens: style.hyphens
+              overflowWrap: style.overflowWrap
             };
           });
           const h1Fits = h1Metrics.left >= -1 && h1Metrics.right <= width + 1 && h1Metrics.scrollWidth <= h1Metrics.clientWidth + 1;
           record(route.path, width, 'H1 wraps without clipping', h1Fits, `lines≈${h1Metrics.lines}, right=${h1Metrics.right.toFixed(1)}, scroll/client=${h1Metrics.scrollWidth}/${h1Metrics.clientWidth}, overflowWrap=${h1Metrics.overflowWrap}`);
-          if (route.path === '/deutschlandachter-1960/') {
-            record(route.path, width, 'Deutschlandachter H1 present', /Deutschlandachter/.test(h1Metrics.text), h1Metrics.text);
-          }
         }
 
-        if (route.inPageNav && (await nav.count()) === 1) {
+        if ((await nav.count()) === 1) {
           const anchors = await page.locator('#primary-navigation a[href^="#"]').evaluateAll((els) => els.map((el) => el.getAttribute('href')));
           const targetCheck = await page.evaluate((hrefs) => hrefs.map((href) => ({ href, exists: Boolean(href && document.querySelector(href)) })), anchors);
           record(route.path, width, 'all shell in-page targets exist', targetCheck.length > 0 && targetCheck.every((item) => item.exists), JSON.stringify(targetCheck));
@@ -184,21 +178,6 @@ try {
             }, firstHref);
             record(route.path, width, 'in-page navigation click works', Boolean(navResult && navResult.hash === firstHref && navResult.targetTop >= navResult.headerBottom - 3), navResult ? `hash=${navResult.hash}, targetTop=${navResult.targetTop.toFixed(1)}, headerBottom=${navResult.headerBottom.toFixed(1)}` : 'missing target/header');
           }
-        } else if (!route.inPageNav) {
-          await page.evaluate(() => window.scrollTo(0, 0));
-          const skip = page.locator('.skip-link[href="#inhalt"]').first();
-          const skipExists = (await skip.count()) === 1;
-          if (skipExists) {
-            await skip.evaluate((el) => el.click());
-            await page.waitForTimeout(120);
-          }
-          const skipResult = await page.evaluate(() => {
-            const target = document.querySelector('#inhalt');
-            const siteHeader = document.querySelector('.site-header');
-            if (!target || !siteHeader) return null;
-            return { hash: location.hash, targetTop: target.getBoundingClientRect().top, headerBottom: siteHeader.getBoundingClientRect().bottom };
-          });
-          record(route.path, width, 'content skip/in-page navigation works', Boolean(skipResult && skipResult.hash === '#inhalt' && skipResult.targetTop >= skipResult.headerBottom - 3), skipResult ? `hash=${skipResult.hash}, targetTop=${skipResult.targetTop.toFixed(1)}, headerBottom=${skipResult.headerBottom.toFixed(1)}` : `skipExists=${skipExists}`);
         }
 
         await page.evaluate(() => window.scrollTo(0, 0));

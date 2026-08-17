@@ -1,7 +1,7 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
-import { pages, productionOrigin, previewOrigin } from './seo-pages.mjs';
+import { pages, productionOrigin, previewOrigin, retiredDetailPages } from './seo-pages.mjs';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
@@ -46,11 +46,19 @@ function normalizeParagraph(value) {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+async function exists(filePath) {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const titles = new Map();
 const descriptions = new Map();
-const longParagraphs = new Map();
 const expectedPaths = new Set(pages.map((page) => page.path));
-const knownInternalPaths = new Set([...expectedPaths, '/rudern/']);
+const retiredPaths = new Set(retiredDetailPages.map((page) => page.path));
 
 for (const page of pages) {
   const filePath = path.join(dist, page.file);
@@ -105,13 +113,7 @@ for (const page of pages) {
   else descriptions.set(description, page.path);
 
   const types = jsonLdTypes($, page.path);
-  if (page.path === '/') {
-    if (!types.has('WebSite')) fail(page.path, 'homepage JSON-LD must contain WebSite');
-  } else {
-    if (!types.has('BreadcrumbList')) fail(page.path, 'detail page JSON-LD must contain BreadcrumbList');
-    if (!types.has('WebPage') && !types.has('AboutPage')) fail(page.path, 'detail page JSON-LD must contain WebPage or AboutPage');
-    if (!$('[aria-current="page"]').length) fail(page.path, 'detail page should expose aria-current="page"');
-  }
+  if (page.path === '/' && !types.has('WebSite')) fail(page.path, 'homepage JSON-LD must contain WebSite');
 
   const skipLink = $('.skip-link[href^="#"]').first();
   if (!skipLink.length) {
@@ -156,24 +158,23 @@ for (const page of pages) {
     }
   });
 
-  const linkedCorePaths = new Set();
+  const linkedProductPaths = new Set();
   $('a[href^="/"]').each((_, element) => {
     const href = $(element).attr('href');
     if (!href || href.startsWith('/#') || href.endsWith('.php')) return;
     const normalized = href.split('#')[0].split('?')[0];
-    if (normalized.endsWith('/') && !knownInternalPaths.has(normalized)) {
-      fail(page.path, `internal core-style link points to unregistered path ${normalized}`);
+    if (retiredPaths.has(normalized)) {
+      fail(page.path, `retired SEO route is still linked: ${normalized}`);
+      return;
     }
-    if (expectedPaths.has(normalized) && normalized !== page.path) linkedCorePaths.add(normalized);
+    if (normalized.endsWith('/') && !expectedPaths.has(normalized)) {
+      fail(page.path, `internal product-style link points to unregistered path ${normalized}`);
+    }
+    if (expectedPaths.has(normalized) && normalized !== page.path) linkedProductPaths.add(normalized);
   });
 
-  if (page.path === '/') {
-    for (const expectedPath of expectedPaths) {
-      if (expectedPath !== '/' && !linkedCorePaths.has(expectedPath)) fail(page.path, `homepage does not link to core page ${expectedPath}`);
-    }
-  } else if (linkedCorePaths.size < 2) {
-    fail(page.path, `detail page links to only ${linkedCorePaths.size} other core page(s); expected at least 2`);
-  }
+  if (page.path === '/' && !linkedProductPaths.has('/rudern/')) fail(page.path, 'landing page must link to /rudern/');
+  if (page.path === '/rudern/' && !linkedProductPaths.has('/')) fail(page.path, 'rowing page must link back to /');
 
   if (!previewMode) {
     const bodyClone = $('body').clone();
@@ -193,17 +194,6 @@ for (const page of pages) {
       if (pattern.test(visibleText)) fail(page.path, `production output contains editorial placeholder text matching ${pattern}`);
     }
   }
-
-  $('p').each((_, element) => {
-    const paragraph = normalizeParagraph($(element).text());
-    if (paragraph.length < 180) return;
-    const previous = longParagraphs.get(paragraph);
-    if (previous && previous !== page.path) {
-      fail(page.path, `long paragraph is duplicated verbatim from ${previous}`);
-    } else {
-      longParagraphs.set(paragraph, page.path);
-    }
-  });
 }
 
 let sitemap;
@@ -218,10 +208,20 @@ if (sitemap) {
     const loc = `<loc>${productionOrigin}${page.path}</loc>`;
     if (!sitemap.includes(loc)) failures.push(`sitemap.xml: missing ${page.path}`);
   }
+  for (const retired of retiredDetailPages) {
+    if (sitemap.includes(`${productionOrigin}${retired.path}`)) failures.push(`sitemap.xml: retired route still present ${retired.path}`);
+  }
   const locCount = (sitemap.match(/<loc>/g) || []).length;
   const indexedCount = pages.filter((page) => page.index).length;
   if (locCount !== indexedCount) failures.push(`sitemap.xml: expected ${indexedCount} URLs, found ${locCount}`);
 }
+
+for (const retired of retiredDetailPages) {
+  if (await exists(path.join(root, 'src', retired.file))) failures.push(`source retirement: ${retired.file} must not exist`);
+  if (await exists(path.join(dist, retired.file))) failures.push(`output retirement: ${retired.file} must not exist`);
+}
+if (await exists(path.join(root, 'src', 'assets', 'detail-page.css'))) failures.push('source retirement: assets/detail-page.css must not exist');
+if (await exists(path.join(dist, 'assets', 'detail-page.css'))) failures.push('output retirement: assets/detail-page.css must not exist');
 
 let robots;
 try {
@@ -238,7 +238,7 @@ if (robots) {
   }
 }
 
-if (pages.length !== 10) failures.push(`central SEO configuration: expected 10 core pages, found ${pages.length}`);
+if (pages.length !== 2) failures.push(`central SEO configuration: expected 2 product pages, found ${pages.length}`);
 
 if (failures.length) {
   console.error(`[seo-validate] failed (${previewMode ? 'preview' : 'production'})`);
@@ -246,4 +246,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`[seo-validate] ${pages.length} core pages validated (${previewMode ? 'preview' : 'production'})`);
+console.log(`[seo-validate] ${pages.length} product pages validated; ${retiredDetailPages.length} retired detail routes absent (${previewMode ? 'preview' : 'production'})`);

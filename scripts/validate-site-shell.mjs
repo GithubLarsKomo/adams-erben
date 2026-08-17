@@ -1,32 +1,28 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
-import { pages } from './seo-pages.mjs';
+import { pages, retiredDetailPages } from './seo-pages.mjs';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
-
-const targets = [
-  ...pages.map((page) => ({
-    file: page.file,
-    path: page.path,
-    variant: page.path === '/' ? 'landing' : 'content'
-  })),
-  { file: path.join('rudern', 'index.html'), path: '/rudern/', variant: 'rowing' }
-];
-
-const sourceDetailTargets = pages.filter((page) => page.path !== '/');
 const failures = [];
+const retiredPaths = new Set(retiredDetailPages.map((page) => page.path));
+const variantExpectations = {
+  landing: { skip: '#quick-finder', cta: '#quick-finder' },
+  rowing: { skip: '#labor', cta: '#vereine' }
+};
 
 function expect(condition, message) {
   if (!condition) failures.push(message);
 }
 
-for (const target of targets) {
-  const html = await readFile(path.join(dist, target.file), 'utf8');
+for (const page of pages) {
+  const html = await readFile(path.join(dist, page.file), 'utf8');
   const $ = cheerio.load(html);
-  const label = target.path;
+  const label = page.path;
+  const expected = variantExpectations[page.shellVariant];
 
+  expect(Boolean(expected), `${label}: unknown shell variant ${page.shellVariant}`);
   expect($('.site-header').length === 1, `${label}: expected exactly one .site-header`);
   expect($('.site-header[data-site-shell="header"]').length === 1, `${label}: shared header marker missing`);
   expect($('#primary-navigation').length === 1, `${label}: expected exactly one #primary-navigation`);
@@ -38,39 +34,31 @@ for (const target of targets) {
   expect($('link[href="/assets/site-shell.css"]').length === 1, `${label}: site-shell.css missing or duplicated`);
   expect($('script[src="/assets/site-shell.js"]').length === 1, `${label}: site-shell.js missing or duplicated`);
   expect($('script[src="/assets/story-nav.js"]').length === 0, `${label}: legacy story-nav.js must not survive shell application`);
-  expect($('body').attr('data-shell-variant') === target.variant, `${label}: wrong data-shell-variant`);
-  expect($('body').attr('data-shell-path') === target.path, `${label}: wrong data-shell-path`);
+  expect($('body').attr('data-shell-variant') === page.shellVariant, `${label}: wrong data-shell-variant`);
+  expect($('body').attr('data-shell-path') === page.path, `${label}: wrong data-shell-path`);
   expect($('.brand .brand-lockup[src="/assets/images/adams-erben-logo.png"]').length === 1, `${label}: desktop logo missing`);
   expect($('.brand .brand-mark[src="/assets/images/adams-erben-mark.png"]').length === 1, `${label}: mobile mark missing`);
   expect($('.brand').text().trim() === '', `${label}: old textual AE brand content survived`);
+
+  if (expected) {
+    expect($('.skip-link').attr('href') === expected.skip, `${label}: skip link must target ${expected.skip}`);
+    expect($(expected.skip).length === 1, `${label}: skip target ${expected.skip} missing`);
+    expect($('.header-find-club').attr('href') === expected.cta, `${label}: persistent CTA must target ${expected.cta}`);
+  }
 
   $('.site-header .primary-navigation a[href^="#"]').each((_, element) => {
     const href = $(element).attr('href');
     expect(Boolean(href && href !== '#' && $(href).length), `${label}: shell navigation contains dead in-page target ${href || '(missing)'}`);
   });
 
-  if (target.variant === 'content') {
-    expect($('.skip-link').attr('href') === '#inhalt', `${label}: content skip link must target #inhalt`);
-    expect($('#inhalt').length === 1, `${label}: content page missing #inhalt target`);
-    expect($('.header-find-club').attr('href') === '/ruderverein-finden/', `${label}: content CTA must use standalone club finder`);
-  }
-}
-
-for (const page of sourceDetailTargets) {
-  const sourceHtml = await readFile(path.join(root, 'src', page.file), 'utf8');
-  const $ = cheerio.load(sourceHtml);
-  const label = `src:${page.path}`;
-
-  expect($('.site-header').length === 0, `${label}: SEO source must not contain .site-header`);
-  expect($('.site-footer').length === 0, `${label}: SEO source must not contain .site-footer`);
-  expect($('.detail-footer').length === 0, `${label}: SEO source must not contain .detail-footer`);
-  expect($('.skip-link').length === 0, `${label}: SEO source must not contain shell-owned .skip-link`);
-  expect($('main#inhalt').length === 1, `${label}: SEO source must retain exactly one main#inhalt`);
-  expect($('.detail-hero').length === 1, `${label}: SEO source must retain its content .detail-hero`);
+  $('a[href^="/"]').each((_, element) => {
+    const href = $(element).attr('href') || '';
+    const normalized = href.split('#')[0].split('?')[0];
+    expect(!retiredPaths.has(normalized), `${label}: retired SEO route is still linked: ${normalized}`);
+  });
 }
 
 const cssOwnership = [
-  ['src/assets/detail-page.css', ['.site-header', '.brand', '.menu-toggle', '.site-footer', '.detail-footer']],
   ['src/assets/story-flow.css', ['.site-header', '.brand', '.menu-toggle', '.header-actions', '.header-find-club']],
   ['src/assets/mobile-fixes.css', ['.site-header', '.brand', '.site-footer']],
   ['src/assets/audience-pages.css', ['.site-header', '.brand', '.menu-toggle', '.header-actions', '.header-find-club', '.site-footer']],
@@ -90,5 +78,5 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`[site-shell] validated ${targets.length} output pages, ${sourceDetailTargets.length} shell-free SEO sources, in-page targets and CSS ownership`);
+  console.log(`[site-shell] validated ${pages.length} product pages, in-page targets, retired-route isolation and CSS ownership`);
 }

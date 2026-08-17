@@ -29,20 +29,6 @@ const variants = {
     ],
     ctaHref: '#vereine',
     ctaLabel: 'Verein finden'
-  },
-  content: {
-    skipHref: '#inhalt',
-    skipLabel: 'Zum Inhalt springen',
-    nav: [
-      ['/adams-acht/', 'Adams Acht'],
-      ['/karl-adam/', 'Karl Adam'],
-      ['/ratzeburg/', 'Ratzeburg'],
-      ['/rudern/', 'Rudern'],
-      ['/ueber-adams-erben/', 'Über'],
-      ['/ruderverein-finden/', 'Verein finden', 'nav-cta']
-    ],
-    ctaHref: '/ruderverein-finden/',
-    ctaLabel: 'Verein finden'
   }
 };
 

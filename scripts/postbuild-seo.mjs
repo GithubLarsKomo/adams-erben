@@ -31,7 +31,7 @@ function setCanonical($, href) {
 }
 
 function addHomepageStructuredData($) {
-  if ($('#seo-website-jsonld').length) return;
+  $('#seo-website-jsonld').remove();
   const data = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -52,11 +52,6 @@ function addHomepageStructuredData($) {
     ]
   };
   $('head').append(`<script id="seo-website-jsonld" type="application/ld+json">${JSON.stringify(data)}</script>`);
-}
-
-function appendLinkOnce(container, href, label, className = 'button button-secondary') {
-  if (!container?.length || container.find(`a[href="${href}"]`).length) return;
-  container.append(`<a class="${className}" href="${href}">${label}</a>`);
 }
 
 function removeEditorialPlaceholdersFromProduction($) {
@@ -105,81 +100,18 @@ function enforceLocalRuntimeAssets($) {
   });
 }
 
-function stripLegacyDetailShell($) {
-  $('.site-header, .site-footer, .detail-footer, .skip-link').remove();
-}
-
-function addHomepageLinks($) {
-  appendLinkOnce($('.hero .hero-actions').first(), '/karl-adam/', 'Karl Adam entdecken');
-
-  const filmSection = $('#film').first();
-  if (filmSection.length && !filmSection.find('.seo-film-detail-links').length) {
-    const links = `
-      <div class="film-links seo-film-detail-links">
-        <a class="button button-secondary" href="/adams-acht/">Historischer Hintergrund zu Adams Acht</a>
-        <a class="button button-secondary" href="/deutschlandachter-1960/">Deutschlandachter 1960</a>
-      </div>`;
-    const existingLinks = filmSection.find('.film-links').last();
-    if (existingLinks.length) existingLinks.after(links);
-    else filmSection.append(links);
-  }
-
-  const ratzeburgActions = $('#ratzeburg .featured-actions').first();
-  appendLinkOnce(ratzeburgActions, '/ratzeburg/', 'Ratzeburg als Ruderstadt');
-
-  const laborHeading = $('#labor .lab-heading').first();
-  if (laborHeading.length && !$('#labor .seo-training-detail-links').length) {
-    laborHeading.append(`
-      <div class="film-links seo-training-detail-links">
-        <a class="button button-secondary" href="/karl-adam-trainingsmethoden/">Karl Adams Trainingsmethoden vertiefen</a>
-      </div>`);
-  }
-
-  const rowingSection = $('#rudern-verstehen').first();
-  if (rowingSection.length && !rowingSection.find('.seo-rowing-funnel-links').length) {
-    const target = rowingSection.find('.rowing-outro').first().length
-      ? rowingSection.find('.rowing-outro').first()
-      : rowingSection.find('.section-heading').first();
-    target.append(`
-      <div class="film-links seo-rowing-funnel-links">
-        <a class="button button-secondary" href="/rudern-verstehen/">Rudern verstehen</a>
-        <a class="button button-secondary" href="/rudern-lernen/">Rudern lernen</a>
-        <a class="button button-primary" href="/ruderverein-finden/">Ruderverein finden</a>
-      </div>`);
-  }
-
-  const compactGateway = $('.professional-link').first();
-  if (compactGateway.length && !compactGateway.find('.seo-core-links').length) {
-    compactGateway.append(`
-      <nav class="seo-core-links" aria-label="Weitere Inhalte">
-        <a href="/karl-adam-trainingsmethoden/">Trainingsmethoden</a>
-        <a href="/rudern-verstehen/">Rudern verstehen</a>
-        <a href="/rudern-lernen/">Rudern lernen</a>
-        <a href="/ruderverein-finden/">Ruderverein finden</a>
-      </nav>`);
-  }
-
-  const aboutSection = $('#ueber').first();
-  if (aboutSection.length && !aboutSection.find('a[href="/ueber-adams-erben/"]').length) {
-    const target = aboutSection.find('.section-heading').first();
-    target.append('<p><a class="button button-secondary" href="/ueber-adams-erben/">Über Adams Erben: Quellen & Redaktion</a></p>');
-  }
-}
-
 for (const page of pages) {
   const filePath = path.join(dist, page.file);
   let html;
   try {
     html = await readFile(filePath, 'utf8');
   } catch {
-    throw new Error(`[seo] configured page missing after build: ${page.file}`);
+    throw new Error(`[seo] configured product page missing after build: ${page.file}`);
   }
 
   const $ = cheerio.load(html, { decodeEntities: false });
   removeEditorialPlaceholdersFromProduction($);
   enforceLocalRuntimeAssets($);
-
-  if (page.path !== '/') stripLegacyDetailShell($);
 
   $('title').text(page.title);
   setMeta($, 'meta[name="description"]', { name: 'description', content: page.description });
@@ -204,7 +136,6 @@ for (const page of pages) {
   if (!$('html').attr('lang')) throw new Error(`[seo] ${page.path} is missing html[lang]`);
 
   if (page.path === '/') addHomepageStructuredData($);
-  if (page.path === '/') addHomepageLinks($);
 
   await writeFile(filePath, $.html());
 }
@@ -226,4 +157,4 @@ await writeFile(
     : `User-agent: *\nAllow: /\n\nSitemap: ${productionOrigin}/sitemap.xml\n`
 );
 
-console.log(`[seo] finalized ${pages.length} pages (${previewMode ? 'preview' : 'production'})`);
+console.log(`[seo] finalized ${pages.length} product pages (${previewMode ? 'preview' : 'production'})`);

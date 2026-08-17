@@ -2,14 +2,19 @@
 
 ## Ziel
 
-Header, Branding, Navigation, Mobile-Menü, persistenter Vereins-CTA und Footer werden aus genau einer Build-Komponente erzeugt. Der finale Build-Output darf diese Elemente nicht mehr seitenweise implementieren oder durch SEO-/Audience-Postprocessing verändern.
+Adams Erben hat zwei klar getrennte, nutzerorientierte Inhaltsoberflächen: die kurze Einstiegsseite `/` und die vertiefende Ruderseite `/rudern/`. Header, Branding, Navigation, Mobile-Menü, persistenter Vereins-CTA und Footer werden für beide aus genau einer Build-Komponente erzeugt.
 
-## Aktueller Scope
+SEO unterstützt diese beiden Produktseiten technisch. Es erzeugt keine zusätzlichen, inhaltlich redundanten Landing- oder Detailseiten.
 
-Die gemeinsame Shell gilt für alle aktuell erzeugten öffentlichen HTML-Seiten:
+## Öffentlicher Scope
 
-- `/`
-- `/rudern/`
+Die gemeinsame Shell und die zentrale SEO-Konfiguration gelten für genau:
+
+- `/` – Einstieg für Kinobesucher und Interessierte
+- `/rudern/` – redaktionelle und fachliche Vertiefung
+
+Die zuvor aus `feat/seo-discoverability` übernommenen neun SEO-Detailseiten wurden aus Produktgründen wieder entfernt:
+
 - `/karl-adam/`
 - `/adams-acht/`
 - `/deutschlandachter-1960/`
@@ -20,7 +25,7 @@ Die gemeinsame Shell gilt für alle aktuell erzeugten öffentlichen HTML-Seiten:
 - `/ruderverein-finden/`
 - `/ueber-adams-erben/`
 
-Die neun SEO-Detailseiten wurden selektiv aus `feat/seo-discoverability` übernommen. Es erfolgte ausdrücklich kein pauschaler Merge des divergierten SEO-Branches.
+Diese Routen dürfen weder als Source-Dateien noch im Build-Output, in der Sitemap oder als interne Links wieder auftauchen, solange keine neue Produktentscheidung ihre Wiedereinführung vorsieht.
 
 ## Architektur
 
@@ -31,38 +36,16 @@ Die neun SEO-Detailseiten wurden selektiv aus `feat/seo-discoverability` überno
 - `src/assets/site-shell.css` – alleinige CSS-Zuständigkeit für Header, Brand, Navigation, Hamburger, persistenten CTA und Footer
 - `src/assets/site-shell.js` – ausschließlich Hamburger-/ARIA-Verhalten
 - `scripts/lib/site-shell.mjs` – Shell-Varianten und Rendering
-- `scripts/apply-site-shell.mjs` – finaler Layout-Schritt für alle erzeugten Seiten
-- `scripts/validate-site-shell.mjs` – strukturelle, Source-Hygiene-, Navigations- und CSS-Ownership-Regressionen
+- `scripts/apply-site-shell.mjs` – finaler Layout-Schritt für beide Produktseiten
+- `scripts/validate-site-shell.mjs` – strukturelle, Navigations- und CSS-Ownership-Regressionen
 
 ### Zuständigkeiten
 
-Die Site-Shell besitzt:
+Die Site-Shell besitzt Logo, Header, primäre Navigation, mobilen persistenten CTA, Hamburger-Menü, Skip-Link, Footer und responsive Header-Geometrie.
 
-- Adams-Erben-Logo und Mobile-Marke
-- Header und primäre Navigation
-- mobilen persistenten CTA
-- Hamburger-Menü
-- Skip-Link-Ziel
-- Footer
-- responsive Header-Höhe und Sticky-/Fixed-Verhalten
+Die Produktseiten besitzen `<main>`, Hero, Sektionen, Bilder, redaktionelle Inhalte, Vereinssuche und interne Anker.
 
-Die jeweilige Seite besitzt:
-
-- `<main>` und dessen Inhalte
-- Hero, Sektionen, Bilder, Tabellen und sonstige Inhaltskomponenten
-- audience-spezifische Texte und interne Anker
-- Breadcrumbs und Detailkarten
-
-SEO besitzt:
-
-- `<title>` und Description
-- Canonical URL
-- Open Graph / Twitter-Metadaten
-- JSON-LD
-- Sitemap und robots.txt
-- inhaltliche Crosslinks
-
-SEO besitzt ausdrücklich **nicht** Header, Navigation, Skip-Link oder Footer.
+SEO besitzt ausschließlich technische Auffindbarkeit: Title/Description, Canonical URL, Open Graph/Twitter, JSON-LD, Sitemap, robots.txt und technische Linkvalidierung. SEO besitzt keine eigenständigen Inhaltsseiten und verändert keine Header-/Footer-Navigation.
 
 `app.js` bleibt für Vereinssuche und Kontaktlogik zuständig und enthält keine Shell-Navigation.
 
@@ -76,7 +59,7 @@ SEO besitzt ausdrücklich **nicht** Header, Navigation, Skip-Link oder Footer.
 6. `scripts/validate-site-shell.mjs`
 7. `scripts/validate-seo-output.mjs`
 
-Die Shell wird bewusst **nach** Audience-Split und SEO-Postprocessing angewendet. Danach darf kein Build-Schritt Header oder Footer verändern.
+Der Audience-Split erzeugt aus dem redaktionellen Quellbestand die beiden Produktseiten. SEO finalisiert anschließend ausschließlich Metadaten und Crawling-Artefakte. Die Shell wird danach als letzter struktureller Schritt angewendet.
 
 ## Shell-Varianten
 
@@ -89,10 +72,10 @@ Navigation:
 - Adams Acht
 - Ratzeburg
 - Stimmen, sofern die Sektion im jeweiligen Build vorhanden ist
-- Mehr entdecken
-- Desktop-CTA: Rudern ausprobieren
+- Mehr entdecken → `/rudern/`
+- Rudern ausprobieren
 
-Mobiler persistenter CTA: `Rudern ausprobieren`, kompakt `Verein finden`.
+Skip-Link und CTA zielen auf `#quick-finder`.
 
 ### rowing
 
@@ -100,119 +83,79 @@ Für `/rudern/`.
 
 Navigation:
 
-- Für Einsteiger
+- Für Einsteiger → `/`
 - Adams Labor
 - Einordnung
 - Ruderakademie
 - Rudern verstehen
-- Stimmen, sofern die Sektion im jeweiligen Build vorhanden ist
-- Desktop-CTA: Verein finden
-
-Mobiler persistenter CTA: `Verein finden`.
-
-### content
-
-Für alle SEO-Detailseiten.
-
-Navigation:
-
-- Adams Acht
-- Karl Adam
-- Ratzeburg
-- Rudern
-- Über
+- Stimmen, sofern vorhanden
 - Verein finden
 
-Skip-Link: `#inhalt`.
-Persistenter CTA: `/ruderverein-finden/`.
+Skip-Link: `#labor`. Persistenter CTA: `#vereine`.
 
-Der aktuelle Pfad wird bei exakter Übereinstimmung mit `aria-current="page"` markiert.
+Eine `content`-Shell für SEO-Detailseiten existiert nicht mehr.
 
-## SEO-Integration
+## SEO-Prinzip
 
-`scripts/postbuild-seo.mjs` ist shell-neutral. Es setzt ausschließlich SEO-, Produktions-/Preview- und inhaltliche Crosslink-Aspekte. Die dort verbliebene Entfernung eventueller Legacy-Shell-Fragmente ist nur noch eine defensive Sicherung; die neun SEO-Quelldokumente selbst enthalten keine eigene Shell mehr.
+`scripts/seo-pages.mjs` enthält nur die zwei echten Produktseiten. Beide dürfen indexiert und in `sitemap.xml` geführt werden.
 
-Die zentrale SEO-Konfiguration umfasst zehn Kernseiten. `/rudern/` ist zusätzlich eine bekannte Audience-Seite und wird bei der internen Linkvalidierung als gültiger interner Pfad akzeptiert, ohne die SEO-Kernseitenzahl zu verändern.
+`scripts/postbuild-seo.mjs` darf keine zusätzlichen Gateway-Links oder SEO-Content-Blöcke in die Seiten injizieren. Die vorherigen künstlichen Verweise auf Detailrouten sind entfernt.
 
-## Source-Hygiene der SEO-Seiten
-
-Die neun statischen SEO-Quelldokumente enthalten ausschließlich ihren Seiteninhalt und keine Shell-eigenen Fragmente mehr. In `src/.../index.html` sind für diese Seiten verboten:
-
-- `.site-header`
-- `.site-footer`
-- `.detail-footer`
-- `.skip-link`
-
-Erhalten bleiben müssen genau ein `main#inhalt` sowie der inhaltliche `.detail-hero`. `scripts/validate-site-shell.mjs` prüft diese Regeln direkt gegen die Quelldateien, bevor ein erfolgreicher Build akzeptiert wird.
+Die neun zurückgezogenen Detailrouten stehen zentral in `retiredDetailPages`. `scripts/validate-seo-output.mjs` blockiert einen Build, wenn eine davon wieder als Source, Output, Sitemap-Eintrag oder interner Link erscheint.
 
 ## CSS-Ownership
 
-Folgende Dateien dürfen keine Shell-Selektoren mehr besitzen:
+Folgende Dateien dürfen keine Shell-Selektoren besitzen:
 
 - `src/assets/styles.css`
 - `src/assets/mobile-fixes.css`
 - `src/assets/story-flow.css`
 - `src/assets/audience-pages.css`
-- `src/assets/detail-page.css`
 
 Header, Brand, Navigation, Hamburger, persistenter CTA und Footer liegen ausschließlich in `src/assets/site-shell.css`.
 
-`detail-page.css` enthält nur Detailseitenkomponenten. Für lange deutsche Überschriften wie „Deutschlandachter“ gelten explizite `hyphens`-/`overflow-wrap`-Regeln und ein mobiler H1-Scale.
+Das frühere `src/assets/detail-page.css` ist zusammen mit den Detailseiten entfernt.
 
 ## Invarianten
 
-Für jede von der Shell verwaltete Seite gilt nach dem Build:
+Für `/` und `/rudern/` gilt nach jedem Build:
 
 - genau ein `.site-header`
 - genau ein `#primary-navigation`
 - genau eine `.menu-toggle`
 - genau eine `.header-find-club`
 - genau ein `.site-footer`
-- keine `.detail-footer`
-- `/assets/site-shell.css` ist genau einmal geladen
-- `/assets/site-shell.js` ist genau einmal geladen
-- `/assets/story-nav.js` ist nicht mehr geladen
-- das Branding enthält keinen alten `AE`-Textknoten
-- Logo und Mobile-Marke stammen aus `/assets/images/adams-erben-logo.png` und `/assets/images/adams-erben-mark.png`
-- In-Page-Links der Shell zeigen nur auf tatsächlich vorhandene Ziele
-- Content-Seiten besitzen `#inhalt` und der Skip-Link zeigt darauf
-- Content-Seiten verlinken den persistenten Vereins-CTA auf `/ruderverein-finden/`
+- `/assets/site-shell.css` genau einmal
+- `/assets/site-shell.js` genau einmal
+- kein `/assets/story-nav.js`
+- kein alter textueller `AE`-Brand
+- Desktop-Logo und Mobile-Marke aus den freigegebenen lokalen Assets
+- keine toten In-Page-Links
+- keine Links zu zurückgezogenen SEO-Routen
+- passende Skip-Link- und CTA-Ziele je Audience
 
-Für die neun SEO-Quellen gilt zusätzlich vor dem Build:
+Für die zurückgezogenen SEO-Seiten gilt:
 
-- kein eigener Header oder Footer
-- kein eigener Shell-Skip-Link
-- genau ein `main#inhalt`
-- genau ein `.detail-hero`
+- keine entsprechende `src/<route>/index.html`
+- keine entsprechende `dist/<route>/index.html`
+- kein Eintrag in `sitemap.xml`
+- kein interner Link von `/` oder `/rudern/`
+- kein `detail-page.css`
 
 ## CI-Gates
 
-CI prüft:
+CI prüft weiterhin Production- und Preview-Build, Shell-Struktur, SEO-Metadaten, Sitemap/robots.txt, Audience-Split, Logo-/DRV-/Snapshot-/Nearest-Regressionen, Datenschutz der Browserdaten und PHP-Syntax.
 
-- JavaScript-Syntax der Build-, Shell- und SEO-Skripte
-- bestehende Logo-, DRV-, Snapshot- und Nearest-Regressionen
-- lokalen Production-Build mit Seed-Daten
-- Shell-Struktur aller 11 Seiten
-- Shell-Freiheit der neun SEO-Quelldateien
-- CSS-Ownership
-- tote In-Page-Shell-Links
-- SEO-Ausgabe aller zehn Kernseiten
-- Audience-Split
-- E-Mail-Freiheit der öffentlichen Browserdaten
-- Routing-Metadaten
-- separaten Preview-Build mit `PREVIEW_MODE=1`, einschließlich Shell- und SEO-Validierung
-- PHP-Syntax
+Zusätzlich ist die Entfernung der neun Detailrouten jetzt eine explizite Negativregression.
 
-## Definition of Done Etappen 1–6
+## Definition of Done
 
-- `/` und `/rudern/` verwenden dieselbe kanonische Header-/Footer-Quelle.
-- Die neun SEO-Detailseiten sind in den Integrationsbranch portiert und erhalten im Build ausschließlich die gemeinsame `content`-Shell.
-- Die neun SEO-Quelldateien enthalten physisch keine historischen Header-, Footer- oder Skip-Link-Fragmente mehr.
-- SEO-Postprocessing verändert keine Header-/Footer-Navigation.
-- Legacy-Shell-CSS wurde aus Base-, Story-, Mobile-, Audience- und Detail-CSS entfernt.
-- Auf <= 920 px ist die Navigation nicht horizontal scrollbar, sondern als Hamburger-Menü verfügbar.
-- Logo, Außenbreite und Header-Verhalten sind über alle Seiten konsistent.
-- Der passende CTA bleibt mobil sichtbar.
-- `npm run build` und `npm run build:local` führen Shell- und SEO-Gates aus.
-- Production und Preview werden in CI separat gebaut und validiert.
-- Die bestehende Vereinssuche bleibt funktional unverändert.
+- `/` und `/rudern/` sind die einzigen redaktionellen HTML-Produktseiten.
+- Beide verwenden dieselbe kanonische Site-Shell.
+- Die neun redundanten SEO-Detailquellen sind physisch gelöscht.
+- Die Detailseiten werden nicht mehr gebaut oder indexiert.
+- Die Sitemap enthält genau `/` und `/rudern/`.
+- Es existieren keine künstlich injizierten SEO-Gateway-Links zu den zurückgezogenen Routen.
+- Die `content`-Shell und `detail-page.css` sind entfernt.
+- `npm run build` und `npm run build:local` validieren die Zwei-Seiten-Architektur und die Negativregression.
+- Die bestehende Vereinssuche und der Audience-Split bleiben funktional erhalten.
