@@ -5,15 +5,15 @@
 **Status:** Umsetzungsgrundlage  
 **Stand:** 2026-08-17  
 **Kernzeitraum:** 1948–1970  
-**Optionaler Epilog:** 1972  
+**Optionaler Epilog:** 1972
 
 ---
 
 ## 1. Ziel und Kernthese
 
-Das Feature erweitert die Karl-Adam-Erzählung um eine gesamtdeutsche Perspektive. Es soll zeigen, wie Karl Adams Ratzeburger Trainingsarbeit in der DDR wahrgenommen, beobachtet und zunächst als Referenz genutzt wurde; wie Theo Körner daraus mit anderen Schwerpunkten eine eigenständige DDR-Ruderschule entwickelte; wie beide Systeme in den 1960er Jahren parallel Weltspitze erreichten; und wie sich die Blickrichtung schließlich umkehrte.
+Das Feature erweitert die Karl-Adam-Erzählung um eine gesamtdeutsche Perspektive. Es zeigt, wie Karl Adams Ratzeburger Trainingsarbeit in der DDR wahrgenommen, beobachtet und zunächst als Referenz genutzt wurde; wie sich unter Theo Körner daraus eine eigenständige DDR-Ruderschule entwickelte; wie aus einem methodischen Rückstand binnen weniger Jahre sportliche Konkurrenz auf Augenhöhe wurde; und wie sich die Blickrichtung schließlich umkehrte.
 
-Die Sektion ist **kein DDR-Exkurs** und keine nationale Siegergeschichte. Sie erzählt einen gegenseitigen Innovations- und Lernprozess im geteilten Deutschland.
+Die Sektion ist **kein DDR-Exkurs**, keine nationale Siegergeschichte und kein Agententhriller. Sie erzählt einen Innovations-, Lern- und Konkurrenzprozess im geteilten Deutschland.
 
 ### Kernthese
 
@@ -25,11 +25,13 @@ Besucher sollen nach der Sektion verstehen:
 
 - Karl Adams Wirkung reichte über seine eigenen Mannschaften hinaus;
 - DDR-Ruderer und Funktionäre sahen Anfang der 1960er Jahre einen methodischen Rückstand;
-- Beobachtungsfahrten nach Ratzeburg sind zeitgenössisch dokumentiert;
-- Theo Körners System war keine bloße Kopie Adams;
+- wiederholte Beobachtungsfahrten von DDR-Rudersportfunktionären nach Ratzeburg sind **zeitgenössisch dokumentiert**;
+- die spätere Erzählung von Beobachtern im Schilf besitzt damit einen belegten historischen Kern, aber keinen zeitgenössischen Beleg für Ort, Personen oder konkrete Trainingsserie;
+- Theo Körner war ab 1962 eine zentrale sportlich-technische Leitfigur des DRSV und entwickelte die DDR-Trainingspraxis in eine eigene Richtung weiter;
+- Peter Kremtz bildet einen idealen dramaturgischen Wendepunkt: **1965 beklagt er den Rückstand und die verspätete Übernahme westdeutscher Methoden; 1966 wird er Weltmeister**;
 - Bled 1966 markiert den Übergang vom Vorbild zum Rivalen;
 - Mexiko 1968 zeigt zwei gleichzeitig erfolgreiche deutsche Ruderschulen;
-- Karl Adam selbst erkannte 1970 den veränderten Kräftevergleich an;
+- Karl Adam selbst erkennt 1970 den veränderten Kräftevergleich an;
 - der Begriff **Schubschlag** verbindet Körners Ruderschule mit dem heutigen gleichnamigen Podcast.
 
 ---
@@ -43,10 +45,16 @@ Besucher sollen nach der Sektion verstehen:
 - Großer Ratzeburger See als reales frühes Trainingsrevier;
 - Trainingsfahrten Richtung Rothenhusen und teilweise Lübeck;
 - RRC-Gründung 1953 und Verlagerung des Hochleistungszentrums an den Küchensee ab 1955;
+- historische Grenzlage des Ratzeburger Ruderreviers;
 - DDR-Primärquelle 1963 mit ausdrücklicher Adam-Nennung;
+- Theo Körners Funktion als sportlich-technische Leitfigur ab 1962;
 - Hans Ecksteins spätere Einordnung der Körner-Umstellung 1963/64;
-- zeitgenössischer Kremtz-Beleg 1965 für häufige Beobachtungsfahrten nach Ratzeburg;
-- Schilf-Anekdote ausschließlich als spätere Erinnerung;
+- zeitgenössischer Kremtz-Beleg vom 5. Mai 1965 für häufige Beobachtungsfahrten nach Ratzeburg;
+- exakter Fundkontext **BStU, MfS, ZAIG 1081, Bl. 8–16, Einzelinformation 415/65**;
+- Quellenhinweis, dass es sich um eine interne MfS-Information handelt, **nicht** um den Beleg einer MfS-Beobachtungsoperation in Ratzeburg;
+- Kremtz 1965 → Weltmeister 1966 als personifizierter Wendepunkt;
+- Schilf-Anekdote ausschließlich als spätere Erinnerung Wilfried Hofmanns;
+- expliziter Guardrail: **nicht behaupten, Theo Körner selbst habe im Schilf gelegen**;
 - Theo Körners Ausdauerorientierung, Schubschlag, Wissenschafts- und Talentsystem;
 - Bled 1966;
 - bestätigte Verbindung zum Podcast `Schubschlag`;
@@ -54,7 +62,8 @@ Besucher sollen nach der Sektion verstehen:
 - Karl Adams ZEIT-Beitrag 1970;
 - optionaler Epilog 1972;
 - historische Grenzkarte;
-- sichtbare Quellenlogik.
+- sichtbare Quellenlogik;
+- offene Archivrecherche zu den namentlich bislang unbekannten DDR-Beobachtern.
 
 ### Nicht Teil dieses Features
 
@@ -63,7 +72,8 @@ Besucher sollen nach der Sektion verstehen:
 - umfassende Biografie Theo Körners;
 - vollständige Regatta- oder Olympiachronik;
 - erfundene Rekonstruktion eines konkreten Beobachtungsortes im Schilf;
-- ungeprüfte Stasi-/MfS-Spionagebehauptungen.
+- ungeprüfte Stasi-/MfS-Spionagebehauptungen;
+- Behauptung, Körner, Hofmann oder eine andere namentlich bekannte Person sei ohne Primärbeleg selbst Teilnehmer einer Beobachtungsfahrt gewesen.
 
 ---
 
@@ -109,7 +119,7 @@ Die Grenzgeschichte wird nicht künstlich an Adams Biografie angefügt. Das spä
 
 ### Guardrail
 
-Nicht behaupten, jede dieser Fahrten sei leistungsorientiertes Hochleistungstraining gewesen. Die Quelle belegt die Fahrten und Nutzung des Reviers, nicht jede einzelne Trainingsintention.
+Nicht behaupten, jede dieser Fahrten sei leistungsorientiertes Hochleistungstraining gewesen. Die Quelle belegt Fahrten und Nutzung des Reviers, nicht jede einzelne Trainingsintention.
 
 ---
 
@@ -117,9 +127,7 @@ Nicht behaupten, jede dieser Fahrten sei leistungsorientiertes Hochleistungstrai
 
 ### 1953
 
-Gründung des Ratzeburger Ruderclubs.
-
-Der junge Club besitzt zunächst kein eigenes Bootshaus und nutzt weiterhin Schulboote und Infrastruktur der Ruderriege.
+Gründung des Ratzeburger Ruderclubs. Der junge Club besitzt zunächst kein eigenes Bootshaus und nutzt weiterhin Schulboote und Infrastruktur der Ruderriege.
 
 ### 1955
 
@@ -134,21 +142,17 @@ Das eigene RRC-Bootshaus am Küchensee wird zum neuen Zentrum des Renn- und Hoch
 - „Adam trainierte nur auf dem Küchensee.“
 - „Adams Training fand hauptsächlich auf dem Großen Ratzeburger See statt.“
 
-Beide Verkürzungen sind zu grob.
-
 ---
 
 ## 6. Übergang — Ein Ruderrevier an der Grenze
-
-An diesem Punkt wird erstmals die geografische Besonderheit sichtbar gemacht.
 
 Der Große Ratzeburger See war nicht nur Trainingsgewässer, sondern lag unmittelbar an der deutsch-deutschen Systemgrenze. Der genaue Grenzverlauf am Ostufer war selbst zwischen beiden Staaten lange nicht abschließend geklärt und wurde 1973 nochmals vermessen.
 
 ### Ziel der Passage
 
-Der Besucher soll verstehen:
-
 > **Ratzeburg war kein fernes westdeutsches Leistungszentrum. Ein Teil seines realen Ruderreviers lag unmittelbar an der Grenze zur DDR.**
+
+Diese räumliche Nähe erklärt nicht automatisch die späteren Beobachtungsfahrten, macht ihre praktische Durchführbarkeit aber verständlich.
 
 ---
 
@@ -158,11 +162,17 @@ Der Besucher soll verstehen:
 
 **Ratzeburg gibt den Takt vor**
 
-Die erste Männer-Weltmeisterschaft 1962 und die vorausgehenden gesamtdeutschen Ausscheidungen zeigen ein klares Leistungsgefälle zugunsten westdeutscher Boote. Achim Hill bildet die wichtige DDR-Ausnahme.
+Die erste Männer-Weltmeisterschaft 1962 und die vorausgehenden gesamtdeutschen Ausscheidungen zeigen ein deutliches Leistungsgefälle zugunsten westdeutscher Boote. Achim Hill bildet eine wichtige DDR-Ausnahme.
 
-### Aussage
+Adam steht innerhalb dieser westdeutschen Erfolgslage als besonders sichtbarer Trainer, Innovator und Vertreter wissenschaftlich-experimenteller Trainingsarbeit.
 
-Nicht Adam allein für sämtliche westdeutschen Erfolge verantwortlich machen. Vielmehr steht Adam innerhalb der westdeutschen Erfolgslage als besonders sichtbarer Trainer, Innovator und Vertreter wissenschaftlich-experimenteller Trainingsarbeit.
+### Theo Körner ab 1962
+
+Theo Körner wird 1962 sportlich-technisch zu einer zentralen Leitfigur des DDR-Ruderns. Seine Rolle gehört **vor** die spätere Umstellung 1963/64, damit deutlich wird: Der Aufbau einer eigenen DDR-Ruderschule beginnt institutionell bereits in der Phase, in der Ratzeburg als Maßstab wahrgenommen wird.
+
+### Guardrail
+
+Aus Körners Funktion darf nicht abgeleitet werden, dass er persönlich an Beobachtungsfahrten nach Ratzeburg teilnahm. Dafür liegt bislang kein Beleg vor.
 
 ### Übergang
 
@@ -196,7 +206,7 @@ Karl Adam wird ausdrücklich genannt.
 
 ### Redaktionelle Interpretation
 
-Die Quelle soll nicht auf „Intervalltraining“ reduziert werden. Sie zeigt Interesse an einer gesamten Trainingskultur:
+Die Quelle nicht auf „Intervalltraining“ reduzieren. Sie zeigt Interesse an einer gesamten Trainingskultur:
 
 **beobachten → messen → individualisieren → überprüfen → verändern**
 
@@ -212,7 +222,7 @@ Die Quelle soll nicht auf „Intervalltraining“ reduziert werden. Sie zeigt In
 
 **Lernen reicht nicht**
 
-Hans Eckstein erinnerte sich in einem späteren Interview:
+Hans Eckstein erinnerte sich später:
 
 > „Der entscheidende Impuls zur Umstellung ging 1963/64 von Herrn Dr. Körner aus.“
 
@@ -222,7 +232,7 @@ Hans Eckstein erinnerte sich in einem späteren Interview:
 
 ### Inhaltlich erklären
 
-Theo Körners sich entwickelndes System umfasst insbesondere:
+Körners sich entwickelndes System umfasst insbesondere:
 
 - höheren Trainingsumfang;
 - stärkere Ausdauerorientierung;
@@ -237,7 +247,7 @@ Theo Körners sich entwickelndes System umfasst insbesondere:
 
 ### Guardrail
 
-Adam und Körner nicht als simple Gegensätze `Intervall vs. Ausdauer` darstellen. Beide Systeme waren komplexer. Die Begriffe dienen nur der Schwerpunktsetzung.
+Adam und Körner nicht als simple Gegensätze `Intervall vs. Ausdauer` darstellen. Beide Systeme waren komplexer; die Begriffe beschreiben Schwerpunkte.
 
 ---
 
@@ -247,50 +257,70 @@ Adam und Körner nicht als simple Gegensätze `Intervall vs. Ausdauer` darstelle
 
 **Die DDR kommt nach Ratzeburg**
 
-Peter Kremtz vom SC Einheit Dresden wird in einer zeitgenössischen Information vom 5. Mai 1965 mit der Aussage dokumentiert, DDR-Rudersportfunktionäre würden:
+Am **5. Mai 1965** wird in einer internen MfS-Information die Kritik des DDR-Spitzenruderers **Peter Kremtz vom SC Einheit Dresden** dokumentiert.
+
+Fundstelle:
+
+**BStU, MfS, ZAIG 1081, Bl. 8–16, Einzelinformation Nr. 415/65.**
+
+Kremtz äußert, DDR-Rudersportfunktionäre würden:
 
 > **„oft nach Ratzeburg zur Beobachtung fahren“**
 
-Kremtz kritisiert zugleich, westdeutsche Methoden würden häufig erst übernommen, wenn diese bereits weiterentwickelt worden seien.
+Er kritisiert zugleich, westdeutsche Trainingsmethoden würden häufig erst übernommen, wenn die Westdeutschen bereits wieder einen Entwicklungsschritt weiter seien.
 
 ### Quellenbadge
 
 `DOKUMENTIERT · DDR-QUELLE 1965`
 
+### Quellenkritischer Hinweis
+
+Die Aussage ist besonders wertvoll, weil sie **zeitgenössisch und intern** überliefert ist. Der MfS-Fundkontext belegt jedoch **nicht**, dass das MfS die Ratzeburger Trainingsbeobachtung organisierte oder selbst durchführte.
+
 ### Muss deutlich werden
 
-- es handelte sich nicht um einen einzelnen Besuch;
+- es handelte sich laut Kremtz nicht um einen einzelnen Besuch;
 - Ziel war ausdrücklich Ratzeburg;
-- der Zweck war Beobachtung;
-- die Aussage stammt von einem DDR-Leistungssportler und ist zeitgenössisch dokumentiert.
+- Zweck war ausdrücklich Beobachtung;
+- Kremtz beschreibt einen wahrgenommenen methodischen Rückstand;
+- die Grundhandlung „DDR-Rudersportfunktionäre beobachten Ratzeburg“ ist damit als zeitgenössischer DDR-interner Primärbeleg abgesichert.
 
 ### Nicht ableiten
 
 - die Beobachter seien MfS-Mitarbeiter gewesen;
-- es habe sich um geheime Agentenoperationen gehandelt;
-- ein konkreter Beobachtungspunkt sei dadurch belegt.
+- es habe sich um eine geheime Agentenoperation gehandelt;
+- ein konkreter Beobachtungspunkt sei belegt;
+- Theo Körner sei selbst einer der Beobachter gewesen.
+
+### Dramaturgischer Haken
+
+Peter Kremtz ist nicht nur Quelle, sondern Protagonist des Wendepunkts:
+
+> **Mai 1965: Kremtz beklagt den Rückstand. 1966: Kremtz wird Weltmeister im Zweier ohne.**
+
+Diese Verbindung muss im Story-Flow sichtbar werden und darf nicht erst in einer Fußnote stehen.
 
 ---
 
-## 11. Die Schilf-Anekdote
+## 11. Die Schilf-Geschichte — belegter Kern, unbelegtes Detail
 
-### Überschrift
+### Arbeitstitel
 
 **Und dann ist da noch die Geschichte vom Schilf.**
 
-Wilfried Hofmann erinnerte sich 2024, DDR-Beobachter hätten bei Adam am Ostufer im Schilf gelegen und Trainingsserien verfolgt, darunter sechs 500-m-Stücke mit kurzen Pausen.
+Wilfried Hofmann, später Präsident des DRSV, erinnerte sich Jahrzehnte später, DDR-Beobachter hätten bei Adam am Ostufer im Schilf gelegen und Trainingsserien verfolgt, darunter sechs 500-m-Stücke mit kurzen Pausen.
 
 ### Quellenbadge
 
 `SPÄTERE ERINNERUNG · WILFRIED HOFMANN`
 
-### Direkt daneben / darunter verpflichtend
+### Verpflichtender Faktencheck direkt im Modul
 
-> **Dokumentiert ist, dass DDR-Rudersportfunktionäre wiederholt zur Beobachtung nach Ratzeburg kamen. Ob sie tatsächlich im Schilf lagen und genau dieses Training stoppten, lässt sich bislang nicht unabhängig belegen.**
+> **Zeitgenössisch dokumentiert ist, dass DDR-Rudersportfunktionäre wiederholt zur Beobachtung nach Ratzeburg kamen. Die spätere Erinnerung konkretisiert diese Beobachtungen mit dem Schilf am Ostufer und einer bestimmten Trainingsserie. Für Ort, beteiligte Personen und die konkrete 6×500-m-Beobachtung fehlt bislang eine unabhängige zeitgenössische Bestätigung.**
 
-### Funktion
+### Redaktionelle Einordnung
 
-Die Anekdote darf emotional funktionieren, muss aber visuell und sprachlich klar unterhalb eines zeitgenössischen Belegs eingeordnet werden.
+Die Schilf-Geschichte ist damit **nicht mehr als bloße unverbundene Legende** zu behandeln. Ihr historischer Kern — wiederholte DDR-Beobachtung in Ratzeburg — ist durch Kremtz 1965 belegt. Die konkrete Szenerie bleibt Oral History.
 
 ### Verbotene Zuspitzungen
 
@@ -299,28 +329,33 @@ Nicht verwenden:
 - „Stasi-Agenten spionierten Adam aus.“
 - „DDR-Spione lagen im Schilf.“
 - „Das MfS stahl Adams Trainingsgeheimnisse.“
+- „Theo Körner lag im Schilf.“
 - „Die DDR kopierte Adams geheimes Programm.“
 - „Vom DDR-Ufer wurde Adams Küchensee-Training beobachtet.“
+- einen erfundenen Kartenpin für das Schilf-Versteck.
 
 ---
 
-## 12. Theo Körners „Schubschlag“
+## 12. Adam → Körner → Schubschlag
 
 ### Arbeitstitel
 
-**Ein Wort bleibt**
+**Vom Lernen zur eigenen Handschrift**
 
-Der charakteristische lange, kraftvolle Durchzug in Körners Ruderschule wird als `Schubschlag` erklärt.
+Die dramaturgische Transition soll explizit werden:
 
-### Inhaltliche Funktion
+1. Adam wird zum Referenzpunkt für wissenschaftlich kontrolliertes Training;
+2. DDR-Funktionäre beobachten Ratzeburg und versuchen, westdeutsche Methoden zu verstehen;
+3. Körner entwickelt daraus **keine Kopie**, sondern setzt eigene Schwerpunkte;
+4. der `Schubschlag` wird zu einem sichtbaren technischen Ausdruck dieser eigenständigen Ruderschule.
 
-Der Begriff dient als Brücke zwischen Trainingsgeschichte und heutiger Ruderkultur.
+### Schubschlag erklären
+
+Der charakteristische lange, kraftvolle Durchzug in Körners Ruderschule wird als `Schubschlag` erklärt. Die technische Erklärung muss auch für Nicht-Ruderer verständlich sein und darf nicht suggerieren, ein einzelnes Schlagmerkmal erkläre die DDR-Erfolge.
 
 ### Podcast-Verbindung
 
 Die Namensherkunft des Podcasts **Schubschlag** von Carsten Brzeski und Matthias Zander aus diesem historischen Begriff ist bestätigt.
-
-Die bisherige Einschränkung einer nur redaktionell hergestellten Wortgleichheit entfällt.
 
 ### Podcast-Modul
 
@@ -329,7 +364,7 @@ Die bisherige Einschränkung einer nur redaktionell hergestellten Wortgleichheit
 
 Kurztext sinngemäß:
 
-> Theo Körners „Schubschlag“ wurde zum Sinnbild einer neuen Ruderschule. Jahrzehnte später lebt der Begriff im gleichnamigen Podcast von Carsten Brzeski und Matthias Zander weiter – mit Geschichten aus dem Rudersport, aus Ost und West.
+> Theo Körners „Schubschlag“ wurde zum Sinnbild einer eigenständigen Ruderschule. Jahrzehnte später lebt der Begriff im gleichnamigen Podcast von Carsten Brzeski und Matthias Zander weiter – mit Geschichten aus dem Rudersport, aus Ost und West.
 
 CTA:
 
@@ -351,19 +386,33 @@ Das `Neue Deutschland` hebt hervor:
 
 > **„Westdeutschland nur im Achter erfolgreich“**
 
-Genau dieser Achter ist jedoch Karl Adams Mannschaft und wird Weltmeister.
+Genau dieser Achter ist Karl Adams Mannschaft und wird Weltmeister.
+
+### Kremtz als personifizierter Wandel
+
+Peter Kremtz, der im Mai 1965 noch den methodischen Rückstand und die verspätete Übernahme westdeutscher Trainingsmethoden beklagte, wird 1966 zusammen mit Roland Göhler Weltmeister im Zweier ohne.
+
+### Verpflichtende Mikrodramaturgie
+
+**1965**  
+`„oft nach Ratzeburg zur Beobachtung“`  
+Kremtz: DDR läuft methodisch hinterher.
+
+↓
+
+**1966**  
+`Weltmeister`  
+Kremtz steht selbst für den sportlichen Durchbruch.
 
 ### Redaktionelle Zusammenfassung
 
-> **1966 gewinnt die DDR den Systemvergleich. Adam gewinnt noch einmal den Achter.**
+> **1966 wird aus dem früheren methodischen Rückstand echte Konkurrenz. Adam gewinnt den Achter – die DDR wird erfolgreichste Nation.**
 
-Diese Formulierung ist redaktionell und darf nicht als historisches Zitat erscheinen.
+Nicht verwenden: „Die DDR gewinnt den Systemvergleich“ als scheinbar objektive historische Feststellung. Wenn der Begriff verwendet wird, nur klar als redaktionelle Zuspitzung.
 
 ### Bedeutung
 
-Bled ist keine abgeschlossene Wachablösung.
-
-Es ist der Moment, in dem aus dem früheren Vorbild ein Rivale auf Augenhöhe geworden ist.
+Bled ist keine abgeschlossene Wachablösung. Es ist der Moment, in dem aus dem früheren Vorbild ein Rivale auf Augenhöhe geworden ist.
 
 ---
 
@@ -373,7 +422,7 @@ Es ist der Moment, in dem aus dem früheren Vorbild ein Rivale auf Augenhöhe ge
 
 **Beide Systeme gewinnen**
 
-Mexiko 1968 verhindert eine zu einfache lineare Erzählung `1966 DDR übernimmt, Adam ist vorbei`.
+Mexiko 1968 verhindert die zu einfache lineare Erzählung `1966 DDR übernimmt, Adam ist vorbei`.
 
 ### Bundesrepublik / Karl Adam
 
@@ -388,13 +437,14 @@ Mexiko 1968 verhindert eine zu einfache lineare Erzählung `1966 DDR übernimmt,
 
 ### Kerninterpretation
 
-> **1968 waren beide Systeme gleichzeitig Weltspitze – aber nicht in denselben Bootsklassen.**
+> **1968 waren beide Ruderschulen gleichzeitig Weltspitze – aber nicht in denselben Bootsklassen.**
 
 ### Dramaturgische Funktion
 
-- 1966: Rivalität entsteht;
-- 1968: Rivalität erreicht olympische Reife;
-- 1970: das Gesamtkräfteverhältnis kippt deutlich.
+- 1965: Rückstand und Beobachtung;
+- 1966: Rivalität wird sportlich sichtbar;
+- 1968: beide deutschen Systeme gewinnen olympisches Gold;
+- 1970: das Gesamtkräfteverhältnis kippt deutlich zugunsten der DDR.
 
 ### Visuelles Ergebnisband
 
@@ -476,16 +526,17 @@ Bundesrepublik → DDR-Training
 
 ### HAUPTHANDLUNG
 
-5. **1962 — der westdeutsche Maßstab**
+5. **1962 — der westdeutsche Maßstab / Körner übernimmt sportlich-technische Verantwortung**
 6. **1963 — „Wie macht Adam das?“**
 7. **1963/64 — Körner beginnt den eigenen Weg**
-8. **1965 — „oft nach Ratzeburg zur Beobachtung“**
-9. **Schilf-Anekdote als Oral History**
-10. **1966 — Bled: Vom Vorbild zum Rivalen**
-11. **Schubschlag — historische Technik und heutiger Podcast**
-12. **1968 — Mexiko: zwei Wege zur Weltspitze**
-13. **1970 — Adam erkennt den DDR-Vorsprung an**
-14. **optional 1972 — der Westen schaut zurück**
+8. **1965 — „oft nach Ratzeburg zur Beobachtung“ — zeitgenössischer Kremtz-Beleg**
+9. **Schilf-Geschichte — belegter Kern, Oral-History-Detail**
+10. **Adam → Körner → Schubschlag**
+11. **1966 — Kremtz: vom Kritiker des Rückstands zum Weltmeister / Bled: Vom Vorbild zum Rivalen**
+12. **Schubschlag — historische Technik und heutiger Podcast**
+13. **1968 — Mexiko: zwei Wege zur Weltspitze**
+14. **1970 — Adam erkennt den DDR-Vorsprung an**
+15. **optional 1972 — der Westen schaut zurück**
 
 ---
 
@@ -493,9 +544,7 @@ Bundesrepublik → DDR-Training
 
 ## 18. Ziel der Karte
 
-Die Karte soll nicht dekorieren, sondern historische Argumentation leisten.
-
-Sie muss gleichzeitig zeigen:
+Die Karte soll historische Argumentation leisten. Sie muss gleichzeitig zeigen:
 
 1. wo Adams Ratzeburger Arbeit begann;
 2. wie Großer Ratzeburger See und Küchensee zusammenhängen;
@@ -510,24 +559,22 @@ Sie muss gleichzeitig zeigen:
 
 ## 19. Pflichtobjekte der Karte
 
-Die Karte muss mindestens enthalten:
-
 - Inselstadt Ratzeburg;
 - ehemalige Lauenburgische Gelehrtenschule / heutiges Rathaus;
 - historisches Schulbootshaus;
-- Großen Ratzeburger See;
+- Großer Ratzeburger See;
 - Küchensee;
 - Ratzeburger Ruderclub;
 - Rothenhusen;
 - Wakenitz;
 - Bundesrepublik Deutschland;
 - DDR;
-- historisch belastbaren Grenzverlauf für den dargestellten Zeitraum.
+- historisch belastbarer Grenzverlauf für den dargestellten Zeitraum.
 
 Optional:
 
 - Ruderakademie als heutiger Orientierungspunkt;
-- Dom nur, wenn er Orientierung verbessert und die Karte nicht überlädt.
+- Dom nur, wenn er Orientierung verbessert.
 
 ---
 
@@ -541,11 +588,13 @@ Eine schematische historische Trainingsrichtung darf dargestellt werden:
 
 Nicht als exakte historische GPS-Route ausgeben.
 
-Darstellung z. B. als:
+Darstellung z. B. als gestrichelte Linie mit Label:
 
-- feine gestrichelte Linie;
-- Label `frühe Trainingsfahrten Richtung Rothenhusen`;
-- ggf. Zusatz `teilweise weiter Richtung Lübeck`.
+`frühe Trainingsfahrten Richtung Rothenhusen`
+
+optional:
+
+`teilweise weiter Richtung Lübeck`
 
 ---
 
@@ -559,7 +608,7 @@ Der Grenzverlauf muss aus einer belastbaren historischen Quelle abgeleitet werde
 - keine Behauptung, der gesamte Ostuferbereich sei DDR-Gebiet gewesen;
 - berücksichtigen, dass der Verlauf am Ostufer lange unklar war und 1973 nochmals vermessen wurde.
 
-### Mögliches Kartenlabel
+Mögliches Kartenlabel:
 
 **INNERDEUTSCHE GRENZE**
 
@@ -578,11 +627,11 @@ Die Karte darf **keinen Pin oder Marker** zeigen mit Aussagen wie:
 - `Schilf-Versteck`;
 - `Beobachtungspunkt 1965`.
 
-Dafür fehlt ein belastbarer Ortsbeleg.
-
-Zulässig ist eine flächige oder textliche Annotation:
+Zulässig ist nur eine flächige oder textliche Annotation:
 
 > **1965 sind wiederholte Beobachtungsfahrten von DDR-Rudersportfunktionären nach Ratzeburg dokumentiert. Der genaue Beobachtungsort ist unbekannt.**
+
+Die spätere Hofmann-Erinnerung `Schilf am Ostufer` darf **nicht kartografisch lokalisiert** werden.
 
 ---
 
@@ -604,15 +653,13 @@ Zulässig ist eine flächige oder textliche Annotation:
 - rote Alarm-/Militärästhetik;
 - Grenztürme oder Stacheldraht als dekoratives Motiv ohne Ortsbeleg;
 - Comicstil;
-- übermäßige Textur oder Papieralterung.
+- übermäßige Papieralterung.
 
 ### Asset
 
-Bevorzugt editierbare SVG:
-
 `src/assets/images/ratzeburg-border-rowing-history.svg`
 
-Optional zusätzlich WebP für optimierte Auslieferung.
+Optional zusätzlich WebP.
 
 ---
 
@@ -620,13 +667,13 @@ Optional zusätzlich WebP für optimierte Auslieferung.
 
 ### Desktop
 
-- Karte kann breiter redaktioneller Breakout sein;
+- Karte als breiter redaktioneller Breakout möglich;
 - alle Hauptlabels gleichzeitig lesbar;
 - Legende außerhalb dichter Bereiche.
 
 ### Mobile
 
-Bei ca. 360 px Breite müssen mindestens lesbar bleiben:
+Bei ca. 360 px Breite mindestens lesbar:
 
 - Ratzeburg;
 - Schulbootshaus;
@@ -636,7 +683,7 @@ Bei ca. 360 px Breite müssen mindestens lesbar bleiben:
 - DDR / BRD;
 - Grenze.
 
-Bei Bedarf mobile Variante mit reduzierter Beschriftung statt bloßer Skalierung.
+Bei Bedarf eigene mobile Beschriftungsvariante statt bloßer Skalierung.
 
 ---
 
@@ -644,9 +691,12 @@ Bei Bedarf mobile Variante mit reduzierter Beschriftung statt bloßer Skalierung
 
 ## 25. Grundprinzip
 
-Die Sektion muss sichtbar zwischen **zeitgenössischem Beleg**, **historischer Einordnung** und **späterer Erinnerung** unterscheiden.
+Die Sektion muss sichtbar zwischen **zeitgenössischem Beleg**, **direkter späterer Erinnerung** und **historischer Einordnung** unterscheiden.
 
-Anekdoten dürfen erzählt werden, solange ihr Quellenstatus unmittelbar erkennbar bleibt.
+Besonders wichtig ist die zweistufige Beleglogik der Schilf-Geschichte:
+
+1. **Aussagekern belegt:** wiederholte DDR-Beobachtungsfahrten nach Ratzeburg — Kremtz 1965.
+2. **Szenerie retrospektiv:** Schilf am Ostufer, konkrete Trainingsserie — Hofmann Jahrzehnte später.
 
 ---
 
@@ -668,7 +718,21 @@ Beispiele:
 - Wettkampfergebnisse 1966/1968;
 - Karl Adams ZEIT-Beitrag 1970.
 
-### B — HISTORISCHER KONTEXT
+### B — DIREKTE SPÄTERE ERINNERUNG
+
+Retrospektive Aussage eines beteiligten Funktionärs, Trainers oder Zeitzeugen. Hoher narrativer Wert, aber kein Ersatz für eine zeitgenössische Quelle.
+
+Badge:
+
+`SPÄTERE ERINNERUNG`
+
+Beispiele:
+
+- Hans Eckstein zur Umstellung 1963/64;
+- Wilfried Hofmann zur Schilf-Geschichte;
+- Hofmann zum westdeutschen Beobachten 1972.
+
+### C — HISTORISCHER KONTEXT
 
 Institutionelle, archivalische oder wissenschaftliche Sekundärquelle.
 
@@ -685,31 +749,19 @@ Beispiele:
 - DRV;
 - sporthistorische Arbeiten.
 
-### C — SPÄTERE ERINNERUNG
-
-Retrospektive Zeitzeugenaussage.
-
-Badge:
-
-`SPÄTERE ERINNERUNG`
-
-Beispiele:
-
-- Hans Eckstein zur Umstellung 1963/64;
-- Wilfried Hofmann zur Schilf-Geschichte;
-- Hofmann zum westdeutschen Beobachten 1972.
-
 ---
 
-## 27. Zitierregeln
+## 27. Zitier- und Inferenzregeln
 
 - direkte Zitate nur mit konkret benannter Quelle;
 - Originalwortlaut nicht modernisieren;
 - Auslassungen mit `[…]` kennzeichnen;
 - redaktionelle Zusammenfassungen niemals wie Originalzitate gestalten;
 - MfS-Akten als Fund-/Überlieferungskontext benennen, ohne daraus automatisch eine MfS-Beteiligung am geschilderten Vorgang abzuleiten;
-- bei retrospektiven Aussagen immer Jahr bzw. zeitlichen Abstand kenntlich machen;
-- jede Schilf-Aussage muss mit dem Hinweis auf fehlende unabhängige Bestätigung gekoppelt bleiben.
+- bei retrospektiven Aussagen Jahr bzw. zeitlichen Abstand kenntlich machen;
+- jede Schilf-Aussage muss mit dem Hinweis auf fehlende unabhängige Bestätigung der Details gekoppelt bleiben;
+- Körners Funktion ab 1962 darf als Kontext für die fachliche Verarbeitung westdeutscher Methoden verwendet werden, **nicht** als Beleg seiner persönlichen Teilnahme an Beobachtungsreisen;
+- Kremtz’ Weltmeistertitel 1966 darf dramaturgisch mit seiner Kritik 1965 verbunden werden; nicht behaupten, sein Erfolg sei kausal allein Folge der Ratzeburg-Beobachtung gewesen.
 
 ---
 
@@ -721,14 +773,17 @@ Beispiele:
 | frühe Fahrten Richtung Rothenhusen/Lübeck | RRC-Chronik | Kontext | B+ |
 | RRC nutzt zunächst Schulbootshaus | RRC-Chronik | Kontext | B+ |
 | eigenes RRC-Bootshaus ab 1955 am Küchensee | RRC-Chronik | Kontext | B+ |
-| historisches Schulbootshaus besteht heute | lokale / Eigentümerquellen | Kontext | B+ |
-| Grenzlage am Ratzeburger See | Grenzhus | Kontext | A/B |
+| Grenzlage am Ratzeburger See | Grenzhus / historische Kartengrundlagen | Kontext | A/B |
 | DDR-Ruderer wollen Adams Vorgehen verstehen | DDR-Bericht 12.09.1963 | Dokumentiert | A |
 | Kritik an schematischem DDR-Training | DDR-Bericht 1963 | Dokumentiert | A |
-| Körners entscheidender Umstellungsimpuls 1963/64 | Hans Eckstein, Interview 2005 | Erinnerung | B |
-| DDR-Funktionäre fahren „oft nach Ratzeburg“ | Peter Kremtz / Bericht 05.05.1965 | Dokumentiert | A |
-| Beobachter liegen im Schilf am Ostufer | Wilfried Hofmann 2024 | Erinnerung | C |
-| 6 × 500 m wurden beobachtet | Wilfried Hofmann 2024 | Erinnerung | C |
+| Körner ab 1962 in zentraler sportlich-technischer Funktion | institutionelle / World-Rowing-Überlieferung | Kontext | B+ |
+| Körners entscheidender Umstellungsimpuls 1963/64 | Hans Eckstein, späteres Interview | Erinnerung | B |
+| DDR-Funktionäre fahren „oft nach Ratzeburg“ | Peter Kremtz / MfS-Information 05.05.1965, ZAIG 1081 | Dokumentiert | A |
+| westdeutsche Methoden würden verspätet übernommen | Peter Kremtz / MfS-Information 05.05.1965 | Dokumentiert | A |
+| Beobachter liegen im Schilf am Ostufer | Wilfried Hofmann, spätere Erinnerung | Erinnerung | C+ |
+| 6 × 500 m wurden beobachtet | Wilfried Hofmann, spätere Erinnerung | Erinnerung | C |
+| Körner selbst lag im Schilf | **kein Beleg** | unzulässig | — |
+| Kremtz wird 1966 Weltmeister im Zweier ohne | Ergebnisquellen | Dokumentiert | A |
 | DDR erfolgreichste Nation Bled 1966 | Ergebnisquellen / ND | Dokumentiert | A |
 | Adams Achter Weltmeister 1966 | Ergebnisquellen | Dokumentiert | A |
 | Schubschlag als Körner-Begriff | World Rowing / Rudersporthistorie | Kontext | B+ |
@@ -737,33 +792,80 @@ Beispiele:
 | DDR gewinnt 1968 zwei Rudergoldmedaillen | Olympiaresultate | Dokumentiert | A |
 | DDR-Achter 1968 Rang 7 | Olympiaresultate | Dokumentiert | A |
 | Adam konstatiert DDR-Vorsprung 1970 | Karl Adam / DIE ZEIT | Dokumentiert | A+ |
-| Westen beobachtet DDR-Training 1972 | Hofmann 2024 | Erinnerung | C |
+| Westen beobachtet DDR-Training 1972 | Hofmann, spätere Erinnerung | Erinnerung | C |
 
 ---
 
-## 29. Offene Recherche
+## 29. Offene Recherche — priorisierte Archivstrategie
 
-### 29.1 Deutsches Sportecho 1959–1966
+Die offene Recherche ist **Enhancement, kein Blocker** für die Umsetzung. Sie soll jedoch so dokumentiert sein, dass spätere Funde ohne Neuaufbau der Story integrierbar sind.
 
-Ziel: weitere öffentliche zeitgenössische DDR-Rezeption Adams ergänzen.
+### 29.1 A+++ — Anschlussrecherche zur MfS-Information 415/65
 
-Prioritäre Zeiträume:
+Ausgangspunkt:
 
-- 1959 — internationaler Durchbruch;
-- 1960 — Rom;
-- 1962 — Luzern und deutsch-deutsche Qualifikation;
-- 1963 — EM / Trainingsdiskussion;
-- 1964 — Olympiaqualifikation / Tokio;
-- 1965 — Ratzeburg / Trainingswende;
-- 1966 — Bled.
+**BStU, MfS, ZAIG 1081, Bl. 8–16, Einzelinformation Nr. 415/65 vom 05.05.1965.**
+
+Ziel:
+
+- weitere Vorgänge zu Peter Kremtz;
+- Hinweise auf DRSV-Reisen in die Bundesrepublik;
+- Namen der von Kremtz erwähnten `Rudersportfunktionäre`;
+- mögliche Reise-, Beobachtungs- oder Auswertungsberichte.
 
 Suchbegriffe:
 
-`Karl Adam`, `Adam`, `Ratzeburg`, `Ratzeburger Achter`, `Intervalltraining`, `Intervallmethode`, `Dauermethode`, `Rudertechnik`, `Trainingsmethodik`, `Theo Körner`, `Achter`, `Schubschlag`.
+`Ratzeburg`, `Ruder`, `Rudersportfunktionäre`, `Karl Adam`, `Adam`, `Trainingsmethoden`, `Peter Kremtz`, `SC Einheit Dresden`, `DRSV`, `Theo Körner`, `Westdeutschland`, `Reisekader`, `Hospitation`, `Beobachtung`.
 
-**Status:** Enhancement, kein Blocker.
+### 29.2 A+++ — Bundesarchiv / DRSV / DY 12
 
-### 29.2 Zweiter Schilf-Beleg
+Priorität auf Akten 1959–1966 zu:
+
+- Reisegenehmigungen Bundesrepublik;
+- Delegationsreisen;
+- Trainerreisen;
+- Hospitationen;
+- Reiseberichte;
+- Trainings- und Wettkampfbeobachtungen;
+- Ratzeburg;
+- Karl Adam;
+- Intervalltraining / Trainingsmethodik;
+- Theo Körner;
+- Alfred Bruno Neumann;
+- gesamtdeutsche Ausscheidungen;
+- WM Luzern 1962;
+- Bled 1966.
+
+Ziel: **namentliche Identifikation der nach Ratzeburg fahrenden Funktionäre** und möglichst ein zeitgenössischer Reise-/Beobachtungsbericht.
+
+### 29.3 A++ — `Der deutsche Rudersport` / `Skull und Riemen`
+
+Prioritäre Jahrgänge:
+
+- 1959–1961 `Skull und Riemen`;
+- 1962–1966 `Der deutsche Rudersport`;
+- ergänzend 1967–1968 für die Konsolidierung der eigenen DDR-Ruderschule.
+
+Suchbegriffe:
+
+`Adam`, `Ratzeburg`, `Ratzeburger`, `Westdeutschland`, `Trainingsmethodik`, `Intervall`, `Dauermethode`, `Körner`, `Schubschlag`, `Kremtz`, `Bled`, `Luzern`, `Achter`.
+
+### 29.4 A+ — Deutsches Sportecho 1959–1968
+
+Prioritäre Ereignisfenster:
+
+- 1959 — internationaler Durchbruch Ratzeburgs;
+- 1960 — Rom;
+- 1962 — Luzern und deutsch-deutsche Qualifikation;
+- 1963 — Trainingsdiskussion;
+- 1964 — Tokio / Ausscheidungen;
+- 1965 — Ratzeburg / Trainingswende;
+- 1966 — Bled;
+- 1968 — Mexiko.
+
+Ziel: öffentliche DDR-Sprache gegenüber Adam, Ratzeburg und der sich wandelnden Konkurrenzlage.
+
+### 29.5 Zweiter unabhängiger Schilf-Beleg
 
 Weiter suchen in:
 
@@ -779,8 +881,6 @@ Weiter suchen in:
 
 Ziel: unabhängige Bestätigung mindestens eines Elements `Ostufer`, `Schilf`, `6 × 500 m`, konkreter Beobachtung Adams.
 
-**Status:** Enhancement, kein Blocker, solange die Geschichte sichtbar als spätere Erinnerung gekennzeichnet bleibt.
-
 ---
 
 # TEIL D — UX UND VISUELLE UMSETZUNG
@@ -795,9 +895,14 @@ Die Sektion soll wie eine dokumentarische Geschichte funktionieren, nicht wie ei
 
 - Text;
 - historische Karte;
-- Quote-Card;
-- Ergebnisband;
+- Primärquellen-Card 1963;
+- Primärquellen-Card Kremtz 1965;
+- Oral-History-/Faktencheck-Modul Schilf;
+- **Kremtz-Wendepunkt 1965 → 1966**;
+- Ergebnisband Bled;
 - Schubschlag-Podcast-Modul;
+- Ergebnisband Mexiko;
+- Adam-Zitat 1970;
 - Quellenhinweise;
 - aktuelle Ortsaufnahme des Bootshauses.
 
@@ -805,18 +910,16 @@ Die Sektion soll wie eine dokumentarische Geschichte funktionieren, nicht wie ei
 
 ## 31. Desktop-UX
 
-Empfohlen:
-
 - alternierende Text-/Bild-Komposition;
 - Karte als breiter Breakout;
 - 1963 und 1965 als visuell hervorgehobene Quellenmomente;
-- Bled 1966 und Mexiko 1968 als kompakte Ergebnisgrafiken;
+- Schilf-Modul direkt an 1965 koppeln, nicht als losgelöste Agentengeschichte;
+- Kremtz 1965→1966 als kompakte Vorher/Nachher-Transition;
+- Bled 1966 und Mexiko 1968 als Ergebnisgrafiken;
 - `Schubschlag` als bewusster Gegenwartsbruch;
-- 1970 als ruhiger Abschluss mit Adam-Zitat statt weiterer Medaillenoptik.
+- 1970 als ruhiger Abschluss mit Adam-Zitat.
 
-### Lesefluss
-
-Die Nutzerführung soll zeitlich klar bleiben. Keine parallelen Spalten, die chronologische Reihenfolge unklar machen.
+Chronologie muss jederzeit eindeutig bleiben.
 
 ---
 
@@ -826,22 +929,20 @@ Die Nutzerführung soll zeitlich klar bleiben. Keine parallelen Spalten, die chr
 - keine horizontale Timeline;
 - Karte in voller Content-Breite;
 - Quote-Cards nicht breiter als Viewport;
+- Kremtz-Transition vertikal `1965 ↓ 1966`;
 - Ergebnisgrafiken untereinander stapeln;
-- Quellenbadges immer vor oder direkt an der zugehörigen Aussage;
-- Links und CTA mindestens touch-freundlich;
+- Quellenbadges immer vor oder direkt an der Aussage;
 - keine wichtigen Inhalte ausschließlich per Hover.
 
 ---
 
 ## 33. Quellenbadges
 
-Badge-System visuell dezent, aber eindeutig:
+Badge-System:
 
 - `DOKUMENTIERT`
-- `HISTORISCHER KONTEXT`
 - `SPÄTERE ERINNERUNG`
-
-Die Badges dürfen nicht wie Bewertungsschulnoten wirken, sondern wie transparente Quellenhinweise.
+- `HISTORISCHER KONTEXT`
 
 Optionaler Link:
 
@@ -855,55 +956,81 @@ Quellen nicht ausschließlich am Seitenende verstecken.
 
 Gestaltung bewusst anders als harte Primärquelle.
 
-Empfohlen:
+### Aufbau
 
-- zurückhaltender Hintergrund;
-- kleine Überschrift `Überlieferte Geschichte` oder Badge `SPÄTERE ERINNERUNG`;
-- Hofmann-Anekdote;
-- unmittelbar darunter Faktencheck-Hinweis.
+1. Badge `SPÄTERE ERINNERUNG`;
+2. Hofmann-Anekdote;
+3. unmittelbar anschließender Faktencheck;
+4. kleiner Rückverweis auf Kremtz 1965: `Wiederholte Beobachtungsfahrten sind dokumentiert.`
 
-Keine Illustration von Spionen oder versteckten Männern im Gebüsch, solange kein konkreter visueller Beleg vorliegt.
+Keine Illustration von Spionen oder versteckten Männern im Gebüsch. Wenn atmosphärisches Schilf verwendet wird, nur als abstrakter Landschaftsausschnitt ohne Personen und ohne behaupteten historischen Ort.
 
 ---
 
-## 35. Modul „Schubschlag“
+## 35. Modul „Kremtz 1965 → 1966“
+
+Dieses Modul ist neu verpflichtend.
+
+### Inhalt
+
+**5. Mai 1965**  
+Kremtz beklagt methodischen Rückstand und verspätete Übernahme westdeutscher Methoden.
+
+↓
+
+**1966, Bled**  
+Kremtz / Göhler werden Weltmeister im Zweier ohne.
+
+### Kernaussage
+
+> **Der Wandel vom Lernenden zum Rivalen lässt sich an einer Person erzählen.**
+
+### Guardrail
+
+Kein kausaler Kurzschluss `Ratzeburg beobachtet → deshalb Weltmeister`.
+
+---
+
+## 36. Modul „Schubschlag“
 
 Bestehendes Podcast-Logo verwenden.
 
 Inhalt:
 
 - kurze technische Erklärung des historischen Begriffs;
+- klare Adam→Körner-Transition;
 - Übergang in die Gegenwart;
 - bestätigte Namensherkunft;
 - CTA zum Podcast.
 
-Das Modul soll nicht wie Werbung wirken, sondern wie eine heutige Fortsetzung des historischen Begriffs.
+Das Modul soll nicht wie Werbung wirken.
 
 ---
 
-## 36. Ergebnisband Bled 1966
-
-Empfohlene Struktur:
+## 37. Ergebnisband Bled 1966
 
 **DDR**  
 3 × Gold  
 2 × Bronze  
 `erfolgreichste Nation`
 
-gegenüber / daneben:
+gegenüber:
 
 **KARL ADAMS ACHTER**  
 🥇 Weltmeister
 
-Kernaussage darunter:
+zusätzlich sichtbar:
+
+**PETER KREMTZ / ROLAND GÖHLER**  
+🥇 Zweier ohne
+
+Kernaussage:
 
 > **Aus dem Vorbild war ein Rivale geworden.**
 
 ---
 
-## 37. Ergebnisband Mexiko 1968
-
-Empfohlene Struktur:
+## 38. Ergebnisband Mexiko 1968
 
 **KARL ADAM / BRD**  
 🥇 Achter
@@ -914,19 +1041,17 @@ Empfohlene Struktur:
 🥈 Vierer mit  
 `DDR-Achter: Rang 7`
 
-Kernaussage darunter:
+Kernaussage:
 
 > **Zwei deutsche Ruderschulen waren gleichzeitig Weltspitze.**
 
 ---
 
-## 38. Abschluss 1970
+## 39. Abschluss 1970
 
-Der Abschluss soll bewusst von Ergebnisgrafik zu Originalstimme wechseln.
+Der Abschluss wechselt bewusst von Ergebnisgrafik zu Originalstimme.
 
 Adam-ZEIT-Beitrag als starkes Zitat-/Textmodul.
-
-Keine künstliche dramatische Schlussgrafik notwendig.
 
 ### Letzte Leitzeile
 
@@ -936,41 +1061,41 @@ Keine künstliche dramatische Schlussgrafik notwendig.
 
 # TEIL E — ASSETS UND BILDBEDARF
 
-## 39. Pflichtassets
+## 40. Pflichtassets
 
-### 39.1 Historisches LG-Bootshaus — aktuelle Aufnahme
+### 40.1 Historisches LG-Bootshaus — aktuelle Aufnahme
 
-Benötigt werden möglichst:
+Benötigt möglichst:
 
 1. eigenständige Ansicht des Bootshauses;
 2. räumlicher Zusammenhang mit ehemaliger Schule / heutigem Rathaus;
 3. Blickbezug zum Wasser.
 
-Bildfunktion: historischer Schlüsselort, nicht bloße Illustration.
-
-### 39.2 Historische Karte
-
-Dateivorschlag:
+### 40.2 Historische Karte
 
 `src/assets/images/ratzeburg-border-rowing-history.svg`
 
-### 39.3 Karl Adam
+### 40.3 Karl Adam
 
 Nur vorhandenes bzw. rechtlich geklärtes Material.
 
-### 39.4 Theo Körner
+### 40.4 Theo Körner
 
 Nur mit geklärter Nutzung; ansonsten text-/grafikbasierte Darstellung.
 
-### 39.5 Schubschlag-Podcast
+### 40.5 Schubschlag-Podcast
 
 Bereits vorhandenes freigegebenes Logo verwenden.
+
+### 40.6 Kremtz
+
+Kein neues Bild zwingend erforderlich. Der 1965→1966-Wendepunkt muss auch rein typografisch funktionieren.
 
 ---
 
 # TEIL F — REDAKTIONELLE UND HISTORISCHE GUARDRAILS
 
-## 40. Grundhaltung
+## 41. Grundhaltung
 
 Gewünscht:
 
@@ -993,7 +1118,7 @@ Nicht gewünscht:
 
 ---
 
-## 41. Adam / Körner
+## 42. Adam / Körner
 
 Nicht erzählen:
 
@@ -1003,9 +1128,22 @@ Sondern:
 
 > Adam verändert Trainingsdenken → DDR beobachtet und lernt → Körner entwickelt ein eigenständiges System → beide Schulen konkurrieren → Wissen fließt später zurück.
 
+Körner darf weder zum bloßen Kopisten Adams noch zum unbelegten Ratzeburg-Späher gemacht werden.
+
 ---
 
-## 42. DDR-Doping
+## 43. MfS / Schilf
+
+Verbindliche Trennung:
+
+- **MfS-Akte:** Überlieferungsort der Kremtz-Aussage;
+- **Kremtz-Aussage:** zeitgenössischer Beleg wiederholter Beobachtungsfahrten;
+- **Hofmann-Erinnerung:** spätere Konkretisierung mit Schilf und Trainingsserie;
+- **nicht belegt:** MfS-Operation, Agentenstatus, konkrete Teilnehmer, konkreter Beobachtungspunkt, Körners persönliche Teilnahme.
+
+---
+
+## 44. DDR-Doping
 
 Das Kernmodul endet bewusst 1970 bzw. optional 1972.
 
@@ -1013,11 +1151,9 @@ Wenn die Geschichte später in die 1970er und 1980er Jahre fortgeführt wird, mu
 
 Für Bled 1966 und frühe Körner-Erfolge darf dieses spätere System jedoch **nicht ohne konkreten Beleg rückwirkend als alleinige Erklärung** verwendet werden.
 
-Trainingsinnovation und späteres staatlich organisiertes Doping sind historisch getrennt zu behandeln.
-
 ---
 
-## 43. Geografische Guardrails
+## 45. Geografische Guardrails
 
 - Großer Ratzeburger See ausdrücklich als frühes Adam-Trainingsrevier behandeln;
 - Küchensee ab 1955 als zentralen Hochleistungsstandort darstellen;
@@ -1028,32 +1164,19 @@ Trainingsinnovation und späteres staatlich organisiertes Doping sind historisch
 
 ---
 
-## 44. Quellen-Guardrails
-
-- MfS-Akte ≠ automatisch MfS-Operation;
-- `Rudersportfunktionäre` nicht zu `Agenten` umdeuten;
-- Hofmanns Schilf-Anekdote niemals ohne Kennzeichnung als spätere Erinnerung;
-- Ecksteins 1963/64-Datierung ebenfalls als retrospektive Aussage kennzeichnen;
-- direkte Zitate nur mit überprüfbarer Fundstelle;
-- redaktionelle Zusammenfassungen klar als solche gestalten.
-
----
-
 # TEIL G — IMPLEMENTIERUNGSLEITLINIEN
 
-## 45. Einbindung in die bestehende Seitenarchitektur
+## 46. Einbindung in die bestehende Seitenarchitektur
 
 Das Feature gehört auf die redaktionelle Vertiefungsseite `/rudern/`, nicht als Vollfassung auf die Einsteiger-Landingpage `/`.
 
 Auf `/` kann ein kurzer Teaser auf die gesamtdeutsche Geschichte verweisen.
 
-### Empfohlener Anker
+Empfohlener Anker:
 
 `/rudern/#vom-vorbild-zum-rivalen`
 
-### Semantische Struktur
-
-Empfohlen:
+Empfohlene Semantik:
 
 ```html
 <section id="vom-vorbild-zum-rivalen" class="story-section story-section--german-rivalry">
@@ -1061,26 +1184,22 @@ Empfohlen:
 </section>
 ```
 
-Innerhalb chronologische `article`-/`section`-Blöcke verwenden, aber keine unnötige DOM-Verschachtelung.
-
 ---
 
-## 46. Progressive Enhancement
+## 47. Progressive Enhancement
 
 Die gesamte Geschichte muss ohne JavaScript lesbar bleiben.
 
 JavaScript darf nur ergänzen:
 
 - Kartenfokus;
-- sanfte Timeline-/Scroll-Highlights;
+- sanfte Scroll-Highlights;
 - optionale Quellenexpansion;
 - kleine Interaktionen.
 
-Keine Inhalte ausschließlich dynamisch nachladen, wenn sie für das historische Verständnis erforderlich sind.
-
 ---
 
-## 47. Barrierefreiheit
+## 48. Barrierefreiheit
 
 - semantische Überschriftenhierarchie;
 - Kartenalternative als Text;
@@ -1095,23 +1214,30 @@ Keine Inhalte ausschließlich dynamisch nachladen, wenn sie für das historische
 
 # TEIL H — DEFINITION OF DONE
 
-## 48. Inhalt
+## 49. Inhalt
 
 - [ ] historische LG-Ruderriege und Adam 1948 integriert;
 - [ ] altes LG-Bootshaus als Schlüsselort integriert;
 - [ ] Großer Ratzeburger See ausdrücklich als frühes Trainingsrevier dargestellt;
 - [ ] Fahrten Richtung Rothenhusen korrekt eingeordnet;
 - [ ] Übergang zum RRC und Küchensee 1953/55 korrekt dargestellt;
-- [ ] beide Seen in ihrer jeweiligen historischen Funktion sauber beschrieben;
+- [ ] historische Grenzlage korrekt erklärt;
 - [ ] Adam 1963 mit zeitgenössischer DDR-Quelle ausdrücklich genannt;
 - [ ] Kritik an schematischem DDR-Training verständlich zusammengefasst;
+- [ ] Körners zentrale sportlich-technische Rolle ab 1962 eingeordnet;
 - [ ] Hans Eckstein zur Körner-Wende 1963/64 aufgenommen und als spätere Erinnerung gekennzeichnet;
 - [ ] Körners eigenständige Trainingsentwicklung verständlich erklärt;
 - [ ] Kremtz 1965 als zeitgenössischer Beleg der Beobachtungsfahrten eingebunden;
+- [ ] exakte Fundstelle `BStU, MfS, ZAIG 1081, Bl. 8–16 / 415/65` dokumentiert;
 - [ ] „oft nach Ratzeburg zur Beobachtung“ korrekt zitiert;
-- [ ] Schilf-Anekdote enthalten, aber sichtbar als spätere Erinnerung gekennzeichnet;
-- [ ] fehlende unabhängige Bestätigung der Schilfdetails ausdrücklich genannt;
+- [ ] Kremtz’ Kritik an verspäteter Methodenübernahme eingeordnet;
+- [ ] Kremtz 1965→1966 als sichtbarer dramaturgischer Wendepunkt umgesetzt;
+- [ ] Kremtz/Göhler als Weltmeister 1966 korrekt dargestellt;
+- [ ] Schilf-Geschichte enthalten, aber sichtbar als spätere Erinnerung gekennzeichnet;
+- [ ] belegter Kern und unbelegte Schilfdetails direkt nebeneinander erklärt;
 - [ ] keine unbelegte Stasi-/MfS-Spionagezuordnung;
+- [ ] nirgends behauptet, Theo Körner habe selbst im Schilf gelegen oder an Beobachtungsfahrten teilgenommen;
+- [ ] Adam→Körner→Schubschlag-Transition explizit umgesetzt;
 - [ ] Schubschlag technisch/historisch verständlich erklärt;
 - [ ] bestätigte Brücke zum Podcast `Schubschlag` umgesetzt;
 - [ ] Bled 1966 als Wendepunkt dargestellt;
@@ -1121,7 +1247,7 @@ Keine Inhalte ausschließlich dynamisch nachladen, wenn sie für das historische
 - [ ] Adam/ZEIT 1970 als Hauptschluss eingebaut;
 - [ ] optionaler 1972-Epilog nur als spätere Erinnerung gekennzeichnet.
 
-## 49. Karte
+## 50. Karte
 
 - [ ] historische Karte erstellt;
 - [ ] ehemaliges LG / heutiges Rathaus enthalten;
@@ -1136,34 +1262,40 @@ Keine Inhalte ausschließlich dynamisch nachladen, wenn sie für das historische
 - [ ] keine frei erfundene Grenzlinie;
 - [ ] schematische Trainingsrichtung klar als solche erkennbar;
 - [ ] kein erfundener Beobachtungs-/Schilf-Pin;
+- [ ] Hofmanns `Ostufer` nicht als exakter Punkt kartiert;
 - [ ] Karte auf Desktop und Mobile lesbar;
 - [ ] Textalternative für Karte vorhanden.
 
-## 50. Quellen
+## 51. Quellen
 
 - [ ] alle harten Aussagen mit Quelle belegbar;
-- [ ] Quellenklassen `DOKUMENTIERT`, `HISTORISCHER KONTEXT`, `SPÄTERE ERINNERUNG` umgesetzt;
+- [ ] Quellenklassen `DOKUMENTIERT`, `SPÄTERE ERINNERUNG`, `HISTORISCHER KONTEXT` umgesetzt;
 - [ ] direkte Zitate einzeln nachprüfbar;
 - [ ] redaktionelle Zusammenfassungen nicht als Originalzitate gestaltet;
 - [ ] Quellenhinweise direkt an relevanten Aussagen sichtbar;
 - [ ] MfS-Fundkontext nicht mit MfS-Beteiligung verwechselt;
-- [ ] Sportecho-Recherche als Enhancement dokumentiert;
-- [ ] zweiter Schilf-Beleg als offene Recherche dokumentiert.
+- [ ] Kremtz 1965 als Primärbeleg und Hofmann als spätere Konkretisierung klar getrennt;
+- [ ] Körners Funktion nicht als Beleg persönlicher Ratzeburg-Reisen verwendet;
+- [ ] Sportecho-, DRSV- und Bundesarchiv-Recherche als Enhancement dokumentiert;
+- [ ] Suche nach den namentlich unbekannten Beobachtern dokumentiert;
+- [ ] zweiter unabhängiger Schilf-Beleg als offene Recherche dokumentiert.
 
-## 51. UX
+## 52. UX
 
 - [ ] vertikaler Story-Flow statt horizontaler Timeline;
 - [ ] mobile Darstellung einspaltig;
 - [ ] Karte mobil lesbar;
+- [ ] Primärquelle 1965 visuell hervorgehoben;
+- [ ] Schilf-Modul direkt an den 1965-Beleg gekoppelt;
+- [ ] Kremtz 1965→1966 als eigenständige Transition sichtbar;
 - [ ] Bled- und Mexiko-Ergebnisbänder responsive;
-- [ ] Schilf-Modul visuell von Primärquellen getrennt;
 - [ ] Podcast-Modul in Storyfluss integriert;
 - [ ] Quellenbadges zugänglich und nicht nur farbcodiert;
 - [ ] keine wichtigen Inhalte ausschließlich per Hover;
 - [ ] vollständige Geschichte ohne JavaScript lesbar;
 - [ ] `prefers-reduced-motion` berücksichtigt.
 
-## 52. Assets und Rechte
+## 53. Assets und Rechte
 
 - [ ] Bootshaus-Aufnahme vorhanden bzw. Platzhalter klar gekennzeichnet;
 - [ ] Kartenasset eigenständig erstellt und rechtlich unproblematisch;
@@ -1172,17 +1304,18 @@ Keine Inhalte ausschließlich dynamisch nachladen, wenn sie für das historische
 - [ ] vorhandenes freigegebenes Schubschlag-Logo verwendet;
 - [ ] keine ungeklärten Presse-/Archivbilder eingebunden.
 
-## 53. Redaktionelle Qualität
+## 54. Redaktionelle Qualität
 
 - [ ] keine BRD-/DDR-Triumphalgeschichte;
 - [ ] kein Agententhriller-Framing;
 - [ ] Adam nicht als alleiniger Ursprung sämtlicher westdeutscher Erfolge dargestellt;
 - [ ] Körner nicht als bloßer Adam-Kopist dargestellt;
+- [ ] Kremtz’ Weltmeistertitel nicht monokausal aus den Ratzeburg-Beobachtungen erklärt;
 - [ ] DDR-Erfolge nicht pauschal mit späterem Staatsdoping erklärt;
 - [ ] technische Begriffe für Nicht-Ruderer verständlich;
 - [ ] Schlussbotschaft ergibt sich aus der Geschichte und nicht aus künstlicher Dramatisierung.
 
-## 54. Technische Qualität
+## 55. Technische Qualität
 
 - [ ] vorhandene Shared-Shell-/Responsive-Struktur des `refactor`-Branches respektiert;
 - [ ] keine Regression in Header, Navigation oder `Verein finden`;
@@ -1194,7 +1327,7 @@ Keine Inhalte ausschließlich dynamisch nachladen, wenn sie für das historische
 
 ---
 
-# 55. Finale Leitdramaturgie
+# 56. Finale Leitdramaturgie
 
 ### 1948–1955
 ## Ein Ruderrevier entsteht
@@ -1203,10 +1336,10 @@ Adam, Schulruderriege, altes Bootshaus, Großer Ratzeburger See, Rothenhusen, RR
 
 ↓
 
-### 1963
+### 1962–1963
 ## Wie macht Adam das?
 
-DDR-Ruderer suchen nach den Gründen des westdeutschen Vorsprungs.
+Ratzeburg ist Maßstab. DDR-Ruderer suchen nach den Gründen des westdeutschen Vorsprungs; Körner steht bereits in sportlich-technischer Verantwortung.
 
 ↓
 
@@ -1217,17 +1350,24 @@ Aus Beobachtung und Kritik entsteht eine eigenständige Ruderschule.
 
 ↓
 
-### 1965
+### 5. Mai 1965
 ## Die DDR kommt nach Ratzeburg
 
-Zeitgenössisch dokumentierte Beobachtungsfahrten.
+Peter Kremtz dokumentiert: Funktionäre fahren **„oft nach Ratzeburg zur Beobachtung“**.
 
 ↓
 
 ### Überlieferung
 ## Die Männer im Schilf
 
-Starke Anekdote, transparent als spätere Erinnerung gekennzeichnet.
+Der Kern der Beobachtung ist belegt; Schilf, Ostufer und 6×500 m bleiben spätere Erinnerung.
+
+↓
+
+### 1965 → 1966
+## Ein Jahr, eine Person, ein Wendepunkt
+
+Kremtz beklagt den Rückstand — und wird im folgenden Jahr Weltmeister.
 
 ↓
 
@@ -1239,9 +1379,9 @@ DDR erfolgreichste Nation – Adams Achter bleibt Weltmeister.
 ↓
 
 ### Schubschlag
-## Ein Begriff überlebt seine Zeit
+## Aus der Kopie wird eine eigene Handschrift
 
-Theo Körners Rudertechnik → heutiger Podcast von Brzeski und Zander.
+Adam als Referenz → Körners eigenständige Trainingsschule → heutiger Podcast von Brzeski und Zander.
 
 ↓
 
@@ -1259,7 +1399,7 @@ Adam selbst erkennt den DDR-Vorsprung an.
 
 ---
 
-# 56. Schlussbotschaft
+# 57. Schlussbotschaft
 
 > **Karl Adam veränderte nicht nur seine eigenen Mannschaften. Seine Arbeit zwang auch die Konkurrenz, anders über Rudern nachzudenken. In der DDR entstand daraus eine eigene Schule – stark genug, ihrerseits den Westen zum Lernen zu zwingen.**
 
