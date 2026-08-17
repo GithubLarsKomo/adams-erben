@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/build.mjs && node scripts/apply-club-logo-manifest.mjs && node scripts/split-audiences.mjs && node scripts/postbuild-seo.mjs && node scripts/apply-site-shell.mjs && node scripts/validate-site-shell.mjs && node scripts/validate-seo-output.mjs",
+    "build": "node scripts/build.mjs && node scripts/apply-club-logo-manifest.mjs && node scripts/split-audiences.mjs && node scripts/integrate-east-west-story.mjs && node scripts/postbuild-seo.mjs && node scripts/apply-site-shell.mjs && node scripts/validate-site-shell.mjs && node scripts/validate-seo-output.mjs",
     "build:local": "node scripts/build-local.mjs",
     "validate:shell": "node scripts/validate-site-shell.mjs",
     "validate:seo": "node scripts/validate-seo-output.mjs",
