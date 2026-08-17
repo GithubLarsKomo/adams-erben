@@ -46,6 +46,12 @@ for (const page of pages) {
     expect($('.header-find-club').attr('href') === expected.cta, `${label}: persistent CTA must target ${expected.cta}`);
   }
 
+  if (page.shellVariant === 'rowing') {
+    expect($('#vorbild-rivale').length === 1, `${label}: east-west story #vorbild-rivale missing after complete build`);
+    expect($('#primary-navigation a[href="#vorbild-rivale"]').length === 1, `${label}: Ost & West navigation link missing after complete build`);
+    expect($('link[href="/assets/vom-vorbild-zum-rivalen.css"]').length === 1, `${label}: east-west stylesheet missing after complete build`);
+  }
+
   $('.site-header .primary-navigation a[href^="#"]').each((_, element) => {
     const href = $(element).attr('href');
     expect(Boolean(href && href !== '#' && $(href).length), `${label}: shell navigation contains dead in-page target ${href || '(missing)'}`);

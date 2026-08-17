@@ -21,6 +21,7 @@ const variants = {
     nav: [
       ['/', 'Für Einsteiger'],
       ['#labor', 'Adams Labor'],
+      ['#vorbild-rivale', 'Ost & West'],
       ['#geschichte', 'Einordnung'],
       ['#ruderakademie', 'Ruderakademie'],
       ['#rudern-verstehen', 'Rudern verstehen'],
