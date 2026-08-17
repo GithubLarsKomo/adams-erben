@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="map-title map-desc">
+  <title id="map-title">Ein Ruderrevier an der Grenze</title>
+  <desc id="map-desc">Schematische historische Karte von Ratzeburg mit Großem Ratzeburger See, Küchensee, frühem LG-Schulbootshaus am heutigen Karl-Adam-Weg, RRC ab 1955, Rothenhusen, Wakenitz, zwei frühen Fahrkorridoren an West- und Ostufer sowie dem historisch markierten Grenzraum, der am Ostufer erst nördlich des Bereichs Kalkhütte einsetzt. Die Fahrkorridore sind keine rekonstruierten GPS-Routen.</desc>
+
+  <defs>
+    <style>
+      .land{fill:#f4f2ea;stroke:#d8ddd8;stroke-width:2}
+      .water{fill:#c9e7ee;stroke:#8cbecb;stroke-width:2}
+      .minor-water{fill:none;stroke:#9fcbd5;stroke-width:4;stroke-linecap:round}
+      .island{fill:#f4f2ea;stroke:#d8ddd8;stroke-width:2}
+      .city{fill:#e7e3d8;stroke:#c8c2b5;stroke-width:1.5}
+      .road{fill:none;stroke:#c3c8c7;stroke-width:4;stroke-linecap:round}
+      .shore-route{fill:none;stroke:#4f7f86;stroke-width:5;stroke-linecap:round;stroke-dasharray:12 11;opacity:.64}
+      .border{fill:none;stroke:#1f3b4b;stroke-width:5;stroke-linecap:round;stroke-dasharray:18 8 3 8}
+      .border-zone{fill:#dfe8de;opacity:.7;stroke:none}
+      .marker{fill:#0f5968;stroke:#fff;stroke-width:3}
+      .marker-now{fill:#fff;stroke:#0f5968;stroke-width:3}
+      .label{font-family:Arial,Helvetica,sans-serif;fill:#173847;font-size:22px}
+      .label-small{font-family:Arial,Helvetica,sans-serif;fill:#45616c;font-size:17px}
+      .label-water{font-family:Georgia,'Times New Roman',serif;fill:#2d6878;font-size:28px;font-style:italic;letter-spacing:.3px}
+      .label-country{font-family:Arial,Helvetica,sans-serif;fill:#294956;font-size:28px;font-weight:700;letter-spacing:2px}
+      .label-border{font-family:Arial,Helvetica,sans-serif;fill:#173847;font-size:18px;font-weight:700;letter-spacing:1.5px}
+      .legend{font-family:Arial,Helvetica,sans-serif;fill:#45616c;font-size:16px}
+      .legend-title{font-family:Arial,Helvetica,sans-serif;fill:#173847;font-size:17px;font-weight:700}
+      .note{font-family:Arial,Helvetica,sans-serif;fill:#5e737a;font-size:15px}
+    </style>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#173847" flood-opacity=".12"/>
+    </filter>
+  </defs>
+
+  <!-- neutral land background -->
+  <rect width="1200" height="900" fill="#eef2ee"/>
+
+  <!-- western and eastern land masses, schematic but geography-led -->
+  <path class="land" d="M0 0H420C390 70 372 145 366 230C360 315 373 403 357 482C341 562 316 647 314 726C312 800 329 853 354 900H0Z"/>
+  <path class="land" d="M790 0H1200V900H737C759 835 779 775 791 703C807 611 802 520 818 431C834 341 856 270 847 190C838 113 809 55 790 0Z"/>
+
+  <!-- Großer Ratzeburger See -->
+  <path class="water" d="M420 0C389 85 383 168 388 244C394 336 380 423 367 504C354 585 338 666 349 742C359 811 386 857 413 900H737C760 836 777 773 789 702C805 610 802 523 815 432C828 343 851 266 841 190C832 111 807 51 786 0Z"/>
+
+  <!-- southern Ratzeburg island / Domsee relation -->
+  <path class="island" d="M516 711C560 684 628 684 676 708C714 728 727 768 707 802C682 843 614 860 561 845C513 831 484 794 492 756C497 736 503 722 516 711Z"/>
+  <path class="water" d="M430 781C462 758 490 752 516 758C541 764 555 784 553 807C551 834 526 857 487 873L431 886C415 852 414 811 430 781Z" opacity=".9"/>
+
+  <!-- Küchensee -->
+  <path class="water" d="M345 761C306 779 278 812 276 850C274 869 278 885 284 900H437C428 872 411 845 393 823C377 802 360 781 345 761Z"/>
+
+  <!-- Wakenitz continuation -->
+  <path class="minor-water" d="M625 5C643 40 653 75 652 111C651 138 644 162 633 184"/>
+
+  <!-- simplified roads / settlement context -->
+  <path class="road" d="M132 117C166 212 176 335 184 448C192 574 207 688 247 799"/>
+  <path class="road" d="M492 808C555 826 623 826 707 805"/>
+  <path class="road" d="M524 738C570 727 628 729 675 744"/>
+
+  <!-- border zone begins only north of Kalkhütte / opposite Buchholz -->
+  <path class="border-zone" d="M817 0H1200V515C1130 491 1070 477 1005 469C940 462 888 465 823 476C815 392 830 323 840 255C849 190 842 117 817 0Z"/>
+  <path class="border" d="M842 0C860 78 863 151 852 219C843 279 828 340 825 408C823 446 828 473 840 504C875 520 914 528 958 530C1004 532 1048 521 1082 503C1110 487 1133 466 1150 441"/>
+
+  <!-- schematic early rowing corridors on both shores -->
+  <path class="shore-route" d="M486 746C445 704 416 652 405 596C394 540 399 479 407 419C415 355 417 291 416 232C415 170 421 114 439 63"/>
+  <path class="shore-route" d="M677 747C722 696 754 641 767 577C779 515 775 452 782 392C790 325 807 269 805 212C803 157 791 108 771 63"/>
+
+  <!-- route annotations -->
+  <text class="label-small" x="285" y="490" transform="rotate(-82 285 490)">schematischer Fahrraum Westufer</text>
+  <text class="label-small" x="890" y="475" transform="rotate(80 890 475)">schematischer Fahrraum Ostufer</text>
+
+  <!-- Ratzeburg settlement context -->
+  <path class="city" d="M512 721L564 699L633 703L690 729L707 773L677 815L612 840L548 828L501 789Z"/>
+  <text class="label" x="553" y="785" font-weight="700">Ratzeburg</text>
+
+  <!-- named points -->
+  <circle class="marker" cx="507" cy="714" r="10"/>
+  <line x1="507" y1="714" x2="388" y2="685" stroke="#0f5968" stroke-width="2"/>
+  <text class="label" x="167" y="676">historisches LG-Schulbootshaus</text>
+  <text class="label-small" x="167" y="701">heutiger Karl-Adam-Weg · zwischen Barlachblick und Café Köbke</text>
+
+  <circle class="marker" cx="587" cy="790" r="9"/>
+  <line x1="587" y1="790" x2="685" y2="860" stroke="#0f5968" stroke-width="2"/>
+  <text class="label" x="694" y="864">LG / heute Rathaus</text>
+
+  <circle class="marker" cx="346" cy="836" r="10"/>
+  <line x1="346" y1="836" x2="200" y2="847" stroke="#0f5968" stroke-width="2"/>
+  <text class="label" x="55" y="842">RRC · ab 1955</text>
+  <text class="label-small" x="55" y="866">Küchensee</text>
+
+  <circle class="marker" cx="647" cy="96" r="10"/>
+  <line x1="647" y1="96" x2="544" y2="126" stroke="#0f5968" stroke-width="2"/>
+  <text class="label" x="410" y="126">Rothenhusen</text>
+
+  <circle class="marker" cx="330" cy="538" r="9"/>
+  <line x1="330" y1="538" x2="236" y2="557" stroke="#0f5968" stroke-width="2"/>
+  <text class="label" x="133" y="562">Buchholz</text>
+
+  <!-- Kalkhütte reference is geographic guidance, not a primary historical POI -->
+  <circle class="marker-now" cx="834" cy="515" r="8"/>
+  <line x1="834" y1="515" x2="936" y2="554" stroke="#0f5968" stroke-width="2"/>
+  <text class="label-small" x="944" y="558">Bereich Kalkhütte</text>
+  <text class="note" x="944" y="578">Orientierung für Beginn des Grenzraums</text>
+
+  <!-- water labels -->
+  <text class="label-water" x="545" y="410" transform="rotate(82 545 410)">Großer Ratzeburger See</text>
+  <text class="label-water" x="281" y="875" transform="rotate(-28 281 875)">Küchensee</text>
+  <text class="label-water" x="667" y="65" transform="rotate(82 667 65)">Wakenitz</text>
+
+  <!-- political labels -->
+  <text class="label-country" x="89" y="300">BRD</text>
+  <text class="label-country" x="991" y="245">DDR</text>
+  <text class="label-border" x="909" y="384" transform="rotate(73 909 384)">INNERDEUTSCHE GRENZE</text>
+  <text class="note" x="887" y="603">Grenz-/Niemandslandbereich beginnt am Ostufer erst</text>
+  <text class="note" x="887" y="624">etwas nördlich von Kalkhütte, etwa gegenüber Buchholz.</text>
+
+  <!-- northern direction -->
+  <g transform="translate(1100 64)">
+    <path d="M0 38L14 0L28 38Z" fill="#173847"/>
+    <text class="label-small" x="8" y="59">N</text>
+  </g>
+
+  <!-- legend -->
+  <g transform="translate(58 58)" filter="url(#soft)">
+    <rect width="360" height="158" rx="14" fill="#fff" fill-opacity=".92" stroke="#d2d9d7"/>
+    <text class="legend-title" x="20" y="31">LEGENDE</text>
+    <circle class="marker" cx="29" cy="58" r="7"/>
+    <text class="legend" x="48" y="64">historischer Ruderort</text>
+    <path class="shore-route" d="M20 90H75"/>
+    <text class="legend" x="89" y="96">schematischer Fahrraum</text>
+    <path class="border" d="M20 121H75"/>
+    <text class="legend" x="89" y="127">innerdeutsche Grenze</text>
+    <text class="note" x="20" y="148">Fahrkorridore sind keine rekonstruierten GPS-Routen.</text>
+  </g>
+</svg>
