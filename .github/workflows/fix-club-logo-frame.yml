@@ -1,0 +1,45 @@
+name: Fix Club Logo Frame
+
+on:
+  push:
+    branches: [feat/club-logo-enrichment]
+    paths:
+      - '.github/workflows/fix-club-logo-frame.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/club-logo-enrichment
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Remove gray logo frame and preserve proportions
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const file = 'src/assets/styles.css';
+          let css = fs.readFileSync(file, 'utf8');
+          css = css.replace(/\.club-logo \{\n  width: 78px;\n  height: 78px;\n  margin: 0;\n  padding: \.45rem;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border: 1px solid rgba\(11, 35, 54, \.10\);\n  border-radius: 14px;\n  background: #e8eef0;\n  overflow: hidden;\n\}/, `.club-logo {\n  width: 78px;\n  height: 78px;\n  margin: 0;\n  padding: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  border: 0;\n  border-radius: 0;\n  background: var(--white);\n  box-shadow: none;\n  overflow: visible;\n}`);
+          css = css.replace(/\.club-logo img \{\n  width: 100%;\n  height: 100%;\n  display: block;\n  object-fit: contain;\n  object-position: center;\n\}/, `.club-logo img {\n  display: block;\n  width: auto;\n  height: auto;\n  max-width: 100%;\n  max-height: 100%;\n  object-fit: contain;\n  object-position: center;\n}`);
+          css = css.replace('.club-logo { width: 64px; height: 64px; border-radius: 12px; padding: .35rem; }', '.club-logo { width: 64px; height: 64px; }');
+          if (css.includes('background: #e8eef0') || css.includes('padding: .45rem')) throw new Error('Old logo frame CSS still present');
+          if (!css.includes('width: auto;') || !css.includes('max-height: 100%;')) throw new Error('Proportional logo CSS missing');
+          fs.writeFileSync(file, css);
+          NODE
+      - name: Validate local build
+        run: |
+          npm install --no-audit --no-fund
+          npm run build:local
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/assets/styles.css
+          git commit -m "render club logos borderless with original proportions"
+          git push origin HEAD:feat/club-logo-enrichment
