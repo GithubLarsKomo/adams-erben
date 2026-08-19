@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment, refactor/shared-site-shell]
+    branches: [main, feat/mvp-wayfinder, feat/karl-adam-local-cooperation, feat/direct-club-contact-nearest, feat/landingpage-kinobesucher, feat/club-logo-enrichment, feat/vom-vorbild-zum-rivalen, refactor/shared-site-shell]
   pull_request:
 
 permissions:
@@ -32,6 +32,8 @@ jobs:
           node --check scripts/postbuild-seo.mjs
           node --check scripts/seo-pages.mjs
           node --check scripts/apply-site-shell.mjs
+          node --check scripts/integrate-east-west-story.mjs
+          node --check scripts/integrate-east-west-map.mjs
           node --check scripts/validate-site-shell.mjs
           node --check scripts/validate-seo-output.mjs
           node --check scripts/lib/site-shell.mjs
@@ -44,6 +46,7 @@ jobs:
           node --check scripts/lib/logo-discovery.mjs
           node --check scripts/lib/logo-manifest.mjs
           node --check src/assets/app.js
+          node --check src/assets/east-west-map.js
           node --check src/assets/nearest.js
           node --check src/assets/site-shell.js
 
@@ -82,7 +85,16 @@ jobs:
             [rowing.includes('id="labor"'), 'rowing page includes Adams Labor'],
             [rowing.includes('id="rudern-verstehen"'), 'rowing page includes rowing explainer'],
             [!rowing.includes('id="film"'), 'rowing page excludes film-first section'],
-            [rowing.includes('href="/"'), 'rowing page links back to entry page']
+            [rowing.includes('href="/"'), 'rowing page links back to entry page'],
+            [rowing.includes('data-rowing-map-host'), 'rowing page includes interactive map host'],
+            [rowing.includes('data-map-state="west"'), 'rowing page includes west map state'],
+            [rowing.includes('data-map-state="border"'), 'rowing page includes border map state'],
+            [rowing.includes('data-map-state="east"'), 'rowing page includes east map state'],
+            [rowing.includes('data-map-state="lg"'), 'rowing page includes LG map state'],
+            [rowing.includes('data-map-state="rar"'), 'rowing page includes RAR map state'],
+            [rowing.includes('data-map-state="rrc"'), 'rowing page includes RRC map state'],
+            [rowing.includes('/assets/east-west-map.js'), 'rowing page loads east-west map runtime'],
+            [rowing.includes('/assets/east-west-map-interactions.css'), 'rowing page loads east-west map CSS']
           ];
           for (const [ok, label] of checks) {
             if (!ok) {
