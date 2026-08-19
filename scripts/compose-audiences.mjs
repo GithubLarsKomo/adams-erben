@@ -75,7 +75,6 @@ function renderRowingPage(html) {
   hero.find('.lead').first().text('Adams Trainingssystem, Ratzeburg als Leistungszentrum, Ost und West, Ruderakademie und Zeitgeschichte: Diese Seite ist die zweite Ebene für alle, die nach dem Einstieg historisch und fachlich tiefer gehen wollen.');
   hero.find('.hero-actions').html(`
     <a class="button button-primary" href="#labor">Adams Labor entdecken</a>
-    <a class="button button-secondary" href="/#rudern-verstehen">Rudern vom Grund her verstehen</a>
   `);
   hero.find('.independence-note').text('Die historische und fachliche Vertiefung von Adams Erben. Unabhängig von Film, Verbänden und den genannten Institutionen.');
 
