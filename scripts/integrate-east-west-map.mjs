@@ -1,20 +1,70 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { access, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
 
 const root = process.cwd();
 const rowingPath = path.join(root, 'dist', 'rudern', 'index.html');
-const html = await readFile(rowingPath, 'utf8');
-const $ = cheerio.load(html, { decodeEntities: false });
+const mapCandidates = [
+  path.join(root, 'src', 'assets', 'images', 'ratzeburger-see.svg'),
+  path.join(root, 'src', 'assets', 'images', 'ratzeburger-see.web.semantic-final.svg')
+];
 
+async function firstExisting(paths) {
+  for (const candidate of paths) {
+    try {
+      await access(candidate);
+      return candidate;
+    } catch {
+      // try next candidate
+    }
+  }
+  return null;
+}
+
+const mapPath = await firstExisting(mapCandidates);
+if (!mapPath) {
+  throw new Error('[east-west-map] semantic map asset missing; expected src/assets/images/ratzeburger-see.svg');
+}
+
+const [html, rawSvg] = await Promise.all([
+  readFile(rowingPath, 'utf8'),
+  readFile(mapPath, 'utf8')
+]);
+
+const $ = cheerio.load(html, { decodeEntities: false });
 const mapFrame = $('.border-map-frame').first();
 if (!mapFrame.length) throw new Error('[east-west-map] .border-map-frame missing');
 
-const fallbackMap = mapFrame.find('img[src="/assets/images/ratzeburg-border-rowing-history.svg"]').first();
-if (!fallbackMap.length) throw new Error('[east-west-map] fallback historical map missing');
+const svgStart = rawSvg.indexOf('<svg');
+if (svgStart < 0) throw new Error('[east-west-map] semantic map asset does not contain <svg>');
+const svgMarkup = rawSvg.slice(svgStart);
+
+const requiredSvgIds = [
+  'lake',
+  'border-zone',
+  'routes',
+  'route-west',
+  'route-east',
+  'marker-lg-bootshaus',
+  'marker-rar',
+  'marker-rrc'
+];
+for (const id of requiredSvgIds) {
+  if (!svgMarkup.includes(`id="${id}"`)) {
+    throw new Error(`[east-west-map] semantic map asset missing #${id}`);
+  }
+}
 
 mapFrame.attr('data-rowing-map-host', '');
-fallbackMap.addClass('border-map-fallback');
+mapFrame.html(`<div class="border-map-inline" data-rowing-map data-active-state="west">${svgMarkup}</div>`);
+
+const inlineSvg = mapFrame.find('svg').first();
+inlineSvg.addClass('border-map-svg');
+inlineSvg.attr('role', 'img');
+inlineSvg.attr('aria-labelledby', 'rowing-map-title rowing-map-desc');
+inlineSvg.attr('preserveAspectRatio', inlineSvg.attr('preserveAspectRatio') || 'xMidYMid meet');
+inlineSvg.prepend('<desc id="rowing-map-desc">Karte des Ratzeburger Sees mit Trainingsrouten am West- und Ostufer, historischem DDR-Grenzraum sowie wichtigen Orten des Ratzeburger Rudersports.</desc>');
+inlineSvg.prepend('<title id="rowing-map-title">Trainingsrevier Ratzeburger See</title>');
 
 const stateAssignments = [
   ['.east-west-prologue .east-west-copy > p:nth-of-type(1)', 'lg'],
@@ -53,9 +103,7 @@ for (const state of expectedStates) {
   }
 }
 
-if (!$('[data-rowing-map-host]').length) throw new Error('[east-west-map] map host missing after integration');
-if (!$(`link[href="${cssHref}"]`).length) throw new Error('[east-west-map] interaction stylesheet missing');
-if (!$(`script[src="${scriptSrc}"]`).length) throw new Error('[east-west-map] interaction script missing');
+if (!$('[data-rowing-map-host] .border-map-inline svg').length) throw new Error('[east-west-map] inline semantic map missing after integration');
 
 await writeFile(rowingPath, $.html());
-console.log('[east-west-map] wired semantic map states and interactive map runtime');
+console.log(`[east-west-map] inlined semantic map from ${path.basename(mapPath)} and wired story states`);
