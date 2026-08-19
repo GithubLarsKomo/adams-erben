@@ -7,8 +7,9 @@ const variants = {
     nav: [
       ['#film', 'Adams Acht'],
       ['#ratzeburg', 'Ratzeburg'],
+      ['#rudern-verstehen', 'Rudern verstehen'],
       ['#stimmen', 'Stimmen'],
-      ['/rudern/', 'Mehr entdecken'],
+      ['/rudern/', 'Geschichte & Vertiefung'],
       ['#quick-finder', 'Rudern ausprobieren', 'nav-cta']
     ],
     ctaHref: '#quick-finder',
@@ -24,8 +25,7 @@ const variants = {
       ['#vorbild-rivale', 'Ost & West'],
       ['#geschichte', 'Einordnung'],
       ['#ruderakademie', 'Ruderakademie'],
-      ['#rudern-verstehen', 'Rudern verstehen'],
-      ['#stimmen', 'Stimmen'],
+      ['/#rudern-verstehen', 'Rudern verstehen'],
       ['#vereine', 'Verein finden', 'nav-cta']
     ],
     ctaHref: '#vereine',
