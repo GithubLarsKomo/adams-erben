@@ -1,0 +1,69 @@
+.border-map-frame[data-rowing-map-host]{width:min(100%,760px);margin-inline:auto;background:#f9fbfa}
+.border-map-inline{display:flex;justify-content:center;align-items:flex-start;width:100%;padding:clamp(.75rem,2vw,1.25rem);box-sizing:border-box;background:#f9fbfa}
+.border-map-svg{display:block;width:min(100%,34rem);height:auto;max-height:78vh;overflow:visible}
+.border-map-fallback{display:block}
+
+.border-map-inline #route-west,
+.border-map-inline #route-east,
+.border-map-inline #border-zone,
+.border-map-inline #marker-lg-bootshaus,
+.border-map-inline #marker-rar,
+.border-map-inline #marker-rrc{
+  transition:opacity 180ms ease,filter 180ms ease,stroke-width 180ms ease;
+}
+
+.border-map-inline #route-west,
+.border-map-inline #route-east,
+.border-map-inline #border-zone,
+.border-map-inline #marker-lg-bootshaus,
+.border-map-inline #marker-rar,
+.border-map-inline #marker-rrc{
+  cursor:pointer;
+}
+
+.border-map-inline[data-active-state="west"] #route-east{opacity:.28}
+.border-map-inline[data-active-state="west"] #route-west{stroke-width:.9 !important;filter:drop-shadow(0 0 .55px rgba(255,255,255,.85))}
+
+.border-map-inline[data-active-state="east"] #route-west{opacity:.28}
+.border-map-inline[data-active-state="east"] #route-east{stroke-width:.9 !important;filter:drop-shadow(0 0 .55px rgba(255,255,255,.85))}
+
+.border-map-inline[data-active-state="border"] #border-zone{opacity:1;filter:saturate(1.12) drop-shadow(0 0 .45px rgba(129,29,22,.24))}
+.border-map-inline:not([data-active-state="border"]) #border-zone{opacity:.72}
+
+.border-map-inline[data-active-state="lg"] #marker-lg-bootshaus,
+.border-map-inline[data-active-state="rar"] #marker-rar,
+.border-map-inline[data-active-state="rrc"] #marker-rrc,
+.border-map-inline #marker-lg-bootshaus:hover,
+.border-map-inline #marker-lg-bootshaus:focus-visible,
+.border-map-inline #marker-rar:hover,
+.border-map-inline #marker-rar:focus-visible,
+.border-map-inline #marker-rrc:hover,
+.border-map-inline #marker-rrc:focus-visible{
+  filter:drop-shadow(0 0 1.35px rgba(11,35,54,.55));
+}
+
+.border-map-inline #route-west:focus-visible,
+.border-map-inline #route-east:focus-visible,
+.border-map-inline #border-zone:focus-visible,
+.border-map-inline #marker-lg-bootshaus:focus-visible,
+.border-map-inline #marker-rar:focus-visible,
+.border-map-inline #marker-rrc:focus-visible{
+  outline:none;
+}
+
+[data-map-state]{scroll-margin-top:8rem}
+
+@media(max-width:760px){
+  .border-map-frame[data-rowing-map-host]{width:100%}
+  .border-map-inline{padding:.6rem}
+  .border-map-svg{width:min(100%,27rem);max-height:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .border-map-inline #route-west,
+  .border-map-inline #route-east,
+  .border-map-inline #border-zone,
+  .border-map-inline #marker-lg-bootshaus,
+  .border-map-inline #marker-rar,
+  .border-map-inline #marker-rrc{transition:none}
+}
