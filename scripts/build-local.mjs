@@ -7,5 +7,6 @@ await import('./split-audiences.mjs');
 await import('./postbuild-seo.mjs');
 await import('./apply-site-shell.mjs');
 await import('./integrate-east-west-story.mjs');
+await import('./integrate-east-west-map.mjs');
 await import('./validate-site-shell.mjs');
 await import('./validate-seo-output.mjs');
