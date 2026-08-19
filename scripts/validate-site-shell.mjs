@@ -46,10 +46,23 @@ for (const page of pages) {
     expect($('.header-find-club').attr('href') === expected.cta, `${label}: persistent CTA must target ${expected.cta}`);
   }
 
+  if (page.shellVariant === 'landing') {
+    expect($('#rudern-verstehen').length === 1, `${label}: Rudern-verstehen block must live on landing page`);
+    expect($('#stimmen').length === 1, `${label}: voices block must live on landing page`);
+    expect($('#stimmen .voice-grid > *').length === 6, `${label}: landing page must retain all six voices`);
+    expect($('#schubschlag').length === 1, `${label}: Schubschlag partial missing on landing page`);
+    expect($('#labor, #geschichte, #ruderakademie, #regatta, #vorbild-rivale').length === 0, `${label}: historical/depth sections leaked onto landing page`);
+    expect($('script[src="/assets/landing-page.js"]').length === 1, `${label}: external landing interactions missing`);
+  }
+
   if (page.shellVariant === 'rowing') {
     expect($('#vorbild-rivale').length === 1, `${label}: east-west story #vorbild-rivale missing after complete build`);
     expect($('#primary-navigation a[href="#vorbild-rivale"]').length === 1, `${label}: Ost & West navigation link missing after complete build`);
     expect($('link[href="/assets/vom-vorbild-zum-rivalen.css"]').length === 1, `${label}: east-west stylesheet missing after complete build`);
+    expect($('link[href="/assets/east-west-map.css"]').length === 1, `${label}: canonical east-west map stylesheet missing`);
+    expect($('#rudern-verstehen, #stimmen, #schubschlag').length === 0, `${label}: entry-level Rudern-verstehen/voices content leaked onto historical page`);
+    expect($('#labor').length === 1 && $('#geschichte').length === 1 && $('#ruderakademie').length === 1 && $('#regatta').length === 1, `${label}: historical depth composition incomplete`);
+    expect($('#primary-navigation a[href="/#rudern-verstehen"]').length === 1, `${label}: link back to Rudern verstehen missing`);
   }
 
   $('.site-header .primary-navigation a[href^="#"]').each((_, element) => {
@@ -84,5 +97,5 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`[site-shell] validated ${pages.length} product pages, in-page targets, retired-route isolation and CSS ownership`);
+  console.log(`[site-shell] validated ${pages.length} product pages, audience composition, in-page targets and CSS ownership`);
 }
