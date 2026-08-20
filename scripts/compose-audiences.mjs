@@ -17,6 +17,9 @@ function ensureAudienceStyles($) {
   if (!$('link[href="/assets/audience-pages.css"]').length) {
     $('head').append('<link rel="stylesheet" href="/assets/audience-pages.css">');
   }
+  if (!$('link[href="/assets/impeccable-slice1.css"]').length) {
+    $('head').append('<link rel="stylesheet" href="/assets/impeccable-slice1.css">');
+  }
 }
 
 function setCanonical($, url) {
@@ -105,7 +108,7 @@ function renderLandingPage(html) {
   setCanonical($, `${base}/`);
   setSocialPreview($, base);
 
-  for (const selector of ['.city-story', '#regatta', '#labor', '#geschichte', '#ruderakademie', '#foerderung']) {
+  for (const selector of ['#regatta', '#labor', '#geschichte', '#ruderakademie', '#foerderung']) {
     $(selector).remove();
   }
 
@@ -126,7 +129,7 @@ function renderLandingPage(html) {
         <label for="quick-location">Ort oder Postleitzahl</label>
         <div class="quick-finder-row">
           <input id="quick-location" type="search" autocomplete="postal-code" placeholder="z. B. Lübeck oder 23909">
-          <button class="button button-primary" type="submit">Verein in der Nähe finden</button>
+          <button class="button button-primary" type="submit">Verein finden</button>
         </div>
         <div class="quick-finder-secondary">
           <button class="button button-ghost button-small" id="quick-use-location" type="button">Standort verwenden</button>
@@ -167,7 +170,7 @@ function renderLandingPage(html) {
   steps.eq(1).find('h3').text('2. Verein kennenlernen');
   steps.eq(1).find('p').text('Öffne die Vereinswebsite oder frage direkt an, wenn der Verein einen freigegebenen Kontakt bereitstellt.');
   steps.eq(2).find('h3').text('3. Rudern ausprobieren');
-  journey.append('<p class="landing-final-cta"><a class="button button-primary" href="#quick-finder">Jetzt Verein in der Nähe finden</a></p>');
+  journey.append('<p class="landing-final-cta"><a class="button button-primary" href="#quick-finder">Jetzt Verein finden</a></p>');
 
   $('#ueber').before(`
     <section class="professional-link" aria-labelledby="professional-link-title">
@@ -187,7 +190,7 @@ function renderLandingPage(html) {
 
 function validateLanding(html) {
   const $ = cheerio.load(html);
-  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]'];
+  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]'];
   for (const selector of required) {
     if (!$(selector).length) throw new Error(`[audiences] landing page missing ${selector}`);
   }
