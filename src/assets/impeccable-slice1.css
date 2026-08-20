@@ -1,0 +1,158 @@
+/* Impeccable Slice 1 — landing hierarchy and editorial consolidation.
+   Authority: PRODUCT.md + DESIGN.md + docs/frontend-design-brief.md */
+
+:root {
+  --editorial-rule: rgba(11, 35, 54, .14);
+  --editorial-radius: 12px;
+}
+
+/* Ratzeburg becomes the reference open-editorial pattern on the beginner landing page. */
+.audience-page-landing .city-story {
+  padding-top: clamp(4.5rem, 8vw, 7rem);
+}
+
+.audience-page-landing .city-story .section-heading {
+  max-width: 760px;
+  margin-bottom: clamp(1.6rem, 3vw, 2.5rem);
+}
+
+.audience-page-landing .city-story .city-grid {
+  grid-template-columns: minmax(0, .92fr) minmax(320px, 1.08fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: start;
+  padding-top: clamp(1.5rem, 3vw, 2.4rem);
+  border-top: 1px solid var(--editorial-rule);
+}
+
+/* The tour is narrative content, not a generic card. */
+.audience-page-landing .city-story .story-card:not(.story-card-visual) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+.audience-page-landing .city-story .story-card:not(.story-card-visual) h3 {
+  margin-top: .35rem;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.08;
+}
+
+.audience-page-landing .city-story .story-card:not(.story-card-visual) p {
+  max-width: 42rem;
+}
+
+/* Kicker becomes quiet editorial metadata rather than another red signal. */
+.audience-page-landing .city-story .card-kicker {
+  color: var(--muted) !important;
+  letter-spacing: .1em;
+}
+
+/* The visual counterpart may be framed, but should read as an image field rather than a twin card. */
+.audience-page-landing .city-story .story-card-visual {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.audience-page-landing .city-story .story-card-visual .asset-placeholder,
+.audience-page-landing .city-story .story-card-visual .asset-media {
+  min-height: clamp(280px, 34vw, 430px);
+  border-radius: var(--editorial-radius);
+}
+
+.audience-page-landing .city-story .story-card-visual .asset-placeholder {
+  border: 1px solid var(--editorial-rule);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.84), rgba(220,235,240,.58)),
+    repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(11,35,54,.022) 12px, rgba(11,35,54,.022) 24px);
+}
+
+/* One clear primary action; contact methods become quiet text actions rather than pills. */
+.audience-page-landing .city-story .inline-actions {
+  grid-template-columns: 1fr;
+  gap: .75rem;
+}
+
+.audience-page-landing .city-story .inline-actions .button {
+  width: max-content;
+  max-width: 100%;
+}
+
+.audience-page-landing .city-story .inline-actions .text-link {
+  min-height: 0;
+  width: max-content;
+  max-width: 100%;
+  padding: .15rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--navy-2);
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: underline;
+  text-decoration-color: rgba(18,58,87,.28);
+  text-underline-offset: .2em;
+  white-space: normal;
+}
+
+.audience-page-landing .city-story .inline-actions .text-link:hover {
+  background: transparent;
+  color: var(--accent-dark);
+  text-decoration-color: currentColor;
+}
+
+.audience-page-landing .city-story .inline-actions .text-link::before {
+  display: none;
+  content: none;
+}
+
+/* The persistent red accent remains concentrated on true primary actions. */
+.audience-page-landing .city-story .button-primary {
+  box-shadow: none;
+}
+
+@media (max-width: 920px) {
+  .audience-page-landing .city-story .city-grid {
+    grid-template-columns: 1fr;
+    gap: 1.6rem;
+  }
+
+  .audience-page-landing .city-story .story-card-visual {
+    order: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .audience-page-landing .city-story {
+    padding-top: 4rem;
+  }
+
+  .audience-page-landing .city-story .city-grid {
+    padding-top: 1.25rem;
+  }
+
+  .audience-page-landing .city-story .story-card-visual .asset-placeholder,
+  .audience-page-landing .city-story .story-card-visual .asset-media {
+    min-height: 240px;
+  }
+}
+
+/* Reduced-motion is a global accessibility contract, not a component preference. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+}
