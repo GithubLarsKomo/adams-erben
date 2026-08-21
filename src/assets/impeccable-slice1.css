@@ -1,5 +1,5 @@
-/* Impeccable Slice 1 — landing hierarchy and editorial consolidation.
-   Authority: PRODUCT.md + DESIGN.md + docs/frontend-design-brief.md */
+/* Impeccable landing hierarchy and editorial consolidation.
+   Authority: PRODUCT.md + DESIGN.md + frontend design briefs. */
 
 :root {
   --editorial-rule: rgba(11, 35, 54, .14);
@@ -47,7 +47,6 @@
   letter-spacing: .1em;
 }
 
-/* The generated academy cross-link is editorial navigation, not a pill/control. */
 .city-story.impeccable-editorial-reference .city-academy-link {
   display: inline-flex !important;
   width: auto !important;
@@ -85,7 +84,6 @@
   box-shadow: none !important;
 }
 
-/* Until real before/after imagery is available, the placeholder should not dominate the whole section. */
 .city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder,
 .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
   min-height: 320px !important;
@@ -100,7 +98,6 @@
     repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(11,35,54,.022) 12px, rgba(11,35,54,.022) 24px);
 }
 
-/* One clear primary action; contact methods become quiet text actions rather than pills. */
 .city-story.impeccable-editorial-reference .story-card .inline-actions {
   display: grid !important;
   grid-template-columns: 1fr !important;
@@ -153,7 +150,6 @@
   box-shadow: none;
 }
 
-/* Treat the memorial preview as an editorial figure rather than another UI tile. */
 .city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) figure,
 .city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) .asset-media {
   margin: 1rem 0 0 !important;
@@ -175,6 +171,115 @@
   line-height: 1.45;
 }
 
+/* Slice 2A: one open historical depth transition instead of three floating cards + duplicate CTA. */
+.audience-page-landing .depth-teaser.impeccable-depth-transition {
+  margin-block: clamp(4.5rem, 8vw, 7rem);
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.audience-page-landing .impeccable-depth-transition .section-heading {
+  max-width: 800px;
+  margin-bottom: 1.5rem;
+}
+
+.audience-page-landing .depth-chapter-links {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-top: 1px solid var(--editorial-rule);
+}
+
+.audience-page-landing .depth-chapter-link {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(180px, .7fr) minmax(0, 1fr);
+  gap: clamp(.75rem, 2vw, 1.5rem);
+  align-items: baseline;
+  padding: 1.05rem 0;
+  border-bottom: 1px solid var(--editorial-rule);
+  color: inherit;
+  text-decoration: none;
+}
+
+.audience-page-landing .depth-chapter-link > span {
+  color: var(--muted);
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.audience-page-landing .depth-chapter-link > strong {
+  color: var(--navy, #0b2336);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.15;
+}
+
+.audience-page-landing .depth-chapter-link > small {
+  color: rgba(16, 32, 43, .76);
+  font-size: .93rem;
+  line-height: 1.5;
+}
+
+.audience-page-landing .depth-chapter-link:hover > strong,
+.audience-page-landing .depth-chapter-link:focus-visible > strong {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+
+.audience-page-landing .impeccable-depth-transition .depth-teaser-cta {
+  margin-top: 1.5rem;
+}
+
+/* Slice 2A: reassurance becomes a numbered editorial sequence, not another card grid. */
+.audience-page-landing .about.journey.impeccable-journey-sequence {
+  margin-block: clamp(4.5rem, 8vw, 7rem);
+}
+
+.audience-page-landing .impeccable-journey-sequence .section-heading {
+  max-width: 760px;
+}
+
+.audience-page-landing .impeccable-journey-sequence .principles {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 !important;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--editorial-rule);
+  border-bottom: 1px solid var(--editorial-rule);
+}
+
+.audience-page-landing .impeccable-journey-sequence .principles article {
+  min-width: 0;
+  padding: 1.35rem clamp(1rem, 2.5vw, 2rem) 1.45rem 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.audience-page-landing .impeccable-journey-sequence .principles article + article {
+  padding-left: clamp(1rem, 2.5vw, 2rem) !important;
+  border-left: 1px solid var(--editorial-rule) !important;
+}
+
+.audience-page-landing .impeccable-journey-sequence .principles h3 {
+  margin: 0 0 .5rem;
+  color: var(--navy, #0b2336);
+  font-size: 1.05rem;
+}
+
+.audience-page-landing .impeccable-journey-sequence .principles p {
+  margin: 0;
+  color: rgba(16, 32, 43, .76);
+}
+
+.audience-page-landing .impeccable-journey-sequence .landing-final-cta {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
 @media (max-width: 920px) {
   .city-story.impeccable-editorial-reference .city-grid {
     grid-template-columns: 1fr;
@@ -189,6 +294,28 @@
   .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
     min-height: 280px !important;
     max-height: none;
+  }
+
+  .audience-page-landing .depth-chapter-link {
+    grid-template-columns: 2.3rem 1fr;
+  }
+
+  .audience-page-landing .depth-chapter-link > small {
+    grid-column: 2;
+  }
+
+  .audience-page-landing .impeccable-journey-sequence .principles {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-page-landing .impeccable-journey-sequence .principles article,
+  .audience-page-landing .impeccable-journey-sequence .principles article + article {
+    padding: 1.15rem 0 !important;
+    border-left: 0 !important;
+  }
+
+  .audience-page-landing .impeccable-journey-sequence .principles article + article {
+    border-top: 1px solid var(--editorial-rule) !important;
   }
 }
 
@@ -205,9 +332,13 @@
   .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
     min-height: 230px !important;
   }
+
+  .audience-page-landing .depth-chapter-link {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    padding-block: .95rem;
+  }
 }
 
-/* Reduced-motion is a global accessibility contract, not a component preference. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
