@@ -149,22 +149,23 @@ function renderLandingPage(html) {
   $('#quick-finder').after(directory);
 
   const depthTeaser = `
-    <section class="depth-teaser" id="mehr-entdecken" aria-labelledby="depth-title">
+    <section class="depth-teaser impeccable-depth-transition" id="mehr-entdecken" aria-labelledby="depth-title">
       <div class="section-heading">
         <p class="eyebrow">Historisch tiefer einsteigen</p>
-        <h2 id="depth-title">Wer Karl Adams Wirkung genauer verstehen will, findet eine zweite Ebene.</h2>
-        <p>Adams Labor, Ratzeburg als Leistungszentrum, Ost und West, die Ruderakademie und historische Einordnung sind bewusst auf der Vertiefungsseite gebündelt.</p>
+        <h2 id="depth-title">Die Vertiefung beginnt dort, wo aus Rudern Zeitgeschichte wird.</h2>
+        <p>Wer Karl Adams Wirkung genauer verstehen will, findet auf der Vertiefungsseite Adams Labor, Ratzeburg als Leistungszentrum, die deutsch-deutsche Konkurrenz, Ruderakademie, Regatta, Quellen und historische Einordnung.</p>
       </div>
-      <div class="depth-teaser-grid">
-        <a class="depth-teaser-card" href="/rudern/#labor"><strong>Adams Labor</strong><span>Training, Material, Physiologie und Führung als zusammenhängendes System.</span></a>
-        <a class="depth-teaser-card" href="/rudern/#vorbild-rivale"><strong>Vom Vorbild zum Rivalen</strong><span>Wie sich west- und ostdeutsches Rudern beobachteten, lernten und bekämpften.</span></a>
-        <a class="depth-teaser-card" href="/rudern/#geschichte"><strong>Geschichte braucht Einordnung</strong><span>Sporthistorische Leistung und Zeitgeschichte gemeinsam betrachten.</span></a>
-      </div>
-      <a class="button button-secondary depth-teaser-cta" href="/rudern/">Rudern & Adams Erbe vertiefen</a>
+      <nav class="depth-chapter-links" aria-label="Kapitel der historischen Vertiefung">
+        <a class="depth-chapter-link" href="/rudern/#labor"><span>01</span><strong>Adams Labor</strong><small>Training, Material, Physiologie und Führung als zusammenhängendes System.</small></a>
+        <a class="depth-chapter-link" href="/rudern/#vorbild-rivale"><span>02</span><strong>Vom Vorbild zum Rivalen</strong><small>Wie sich west- und ostdeutsches Rudern beobachteten, lernten und bekämpften.</small></a>
+        <a class="depth-chapter-link" href="/rudern/#geschichte"><span>03</span><strong>Geschichte braucht Einordnung</strong><small>Sporthistorische Leistung und Zeitgeschichte gemeinsam betrachten.</small></a>
+      </nav>
+      <a class="button button-secondary depth-teaser-cta" href="/rudern/">Karl Adam & Rudergeschichte vertiefen</a>
     </section>`;
   $('#stimmen').after(depthTeaser);
 
   const journey = $('.about.journey');
+  journey.addClass('impeccable-journey-sequence');
   journey.find('#steps-title').text('Drei Schritte vom Kinosaal ins Ruderboot.');
   const steps = journey.find('.principles article');
   steps.eq(0).find('h3').text('1. Ort eingeben');
@@ -174,15 +175,7 @@ function renderLandingPage(html) {
   steps.eq(2).find('h3').text('3. Rudern ausprobieren');
   journey.append('<p class="landing-final-cta"><a class="button button-primary" href="#quick-finder">Jetzt Verein finden</a></p>');
 
-  $('#ueber').before(`
-    <section class="professional-link" aria-labelledby="professional-link-title">
-      <div>
-        <p class="eyebrow">Mehr Geschichte und Kontext</p>
-        <h2 id="professional-link-title">Die Vertiefung beginnt dort, wo aus Rudern Zeitgeschichte wird.</h2>
-        <p>Adams Labor, deutsch-deutsche Konkurrenz, Ruderakademie, Regatta, Quellen und historische Einordnung findest du gesammelt auf der Vertiefungsseite.</p>
-      </div>
-      <a class="button button-primary" href="/rudern/">Karl Adam & Rudergeschichte vertiefen</a>
-    </section>`);
+  $('.professional-link').remove();
 
   $('script[src="/assets/landing-page.js"]').remove();
   $('body').append('<script src="/assets/landing-page.js" defer></script>');
@@ -192,12 +185,15 @@ function renderLandingPage(html) {
 
 function validateLanding(html) {
   const $ = cheerio.load(html);
-  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story.impeccable-editorial-reference', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]'];
+  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story.impeccable-editorial-reference', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', '#mehr-entdecken.impeccable-depth-transition', '.about.journey.impeccable-journey-sequence', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]'];
   for (const selector of required) {
     if (!$(selector).length) throw new Error(`[audiences] landing page missing ${selector}`);
   }
   if ($('#stimmen .voice-grid > *').length !== 6) throw new Error('[audiences] landing page must retain all six voices');
   if (!$('#vereine').is('[hidden]')) throw new Error('[audiences] landing directory must be progressively disclosed');
+  if ($('#mehr-entdecken .depth-chapter-link').length !== 3) throw new Error('[audiences] Slice 2A depth transition must contain exactly three chapter links');
+  if ($('.professional-link').length) throw new Error('[audiences] duplicate professional depth link must not survive Slice 2A');
+  if ($('.about.journey .principles article').length !== 3) throw new Error('[audiences] landing journey must retain exactly three steps');
   for (const selector of ['#labor', '#geschichte', '#ruderakademie', '#regatta', '#foerderung', '#vorbild-rivale']) {
     if ($(selector).length) throw new Error(`[audiences] landing page unexpectedly contains historical/depth section ${selector}`);
   }
