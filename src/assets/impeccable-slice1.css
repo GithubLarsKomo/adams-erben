@@ -6,17 +6,17 @@
   --editorial-radius: 12px;
 }
 
-/* Ratzeburg becomes the reference open-editorial pattern on the beginner landing page. */
-.audience-page-landing .city-story {
+/* Explicitly tagged reference surface. This avoids relying on page-level cascade context. */
+.city-story.impeccable-editorial-reference {
   padding-top: clamp(4.5rem, 8vw, 7rem);
 }
 
-.audience-page-landing .city-story .section-heading {
+.city-story.impeccable-editorial-reference .section-heading {
   max-width: 760px;
   margin-bottom: clamp(1.6rem, 3vw, 2.5rem);
 }
 
-.audience-page-landing .city-story .city-grid {
+.city-story.impeccable-editorial-reference .city-grid {
   grid-template-columns: minmax(0, .92fr) minmax(320px, 1.08fr);
   gap: clamp(2rem, 5vw, 5rem);
   align-items: start;
@@ -24,72 +24,77 @@
   border-top: 1px solid var(--editorial-rule);
 }
 
-/* The tour is narrative content, not a generic card. */
-.audience-page-landing .city-story .story-card:not(.story-card-visual) {
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 0;
-  box-shadow: none;
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
-.audience-page-landing .city-story .story-card:not(.story-card-visual) h3 {
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) h3 {
   margin-top: .35rem;
   font-size: clamp(1.8rem, 3vw, 2.6rem);
   line-height: 1.08;
 }
 
-.audience-page-landing .city-story .story-card:not(.story-card-visual) p {
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) p {
   max-width: 42rem;
 }
 
-/* Kicker becomes quiet editorial metadata rather than another red signal. */
-.audience-page-landing .city-story .card-kicker {
+.city-story.impeccable-editorial-reference .card-kicker {
   color: var(--muted) !important;
   letter-spacing: .1em;
 }
 
-/* The visual counterpart may be framed, but should read as an image field rather than a twin card. */
-.audience-page-landing .city-story .story-card-visual {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+.city-story.impeccable-editorial-reference .story-card-visual {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-.audience-page-landing .city-story .story-card-visual .asset-placeholder,
-.audience-page-landing .city-story .story-card-visual .asset-media {
+.city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder,
+.city-story.impeccable-editorial-reference .story-card-visual .asset-media {
   min-height: clamp(280px, 34vw, 430px);
-  border-radius: var(--editorial-radius);
+  border-radius: var(--editorial-radius) !important;
 }
 
-.audience-page-landing .city-story .story-card-visual .asset-placeholder {
+.city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder {
   border: 1px solid var(--editorial-rule);
   background:
     linear-gradient(135deg, rgba(255,255,255,.84), rgba(220,235,240,.58)),
     repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(11,35,54,.022) 12px, rgba(11,35,54,.022) 24px);
 }
 
-/* One clear primary action; contact methods become quiet text actions rather than pills. */
-.audience-page-landing .city-story .inline-actions {
-  grid-template-columns: 1fr;
-  gap: .75rem;
+.city-story.impeccable-editorial-reference .story-card .inline-actions {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: .75rem !important;
 }
 
-.audience-page-landing .city-story .inline-actions .button {
+.city-story.impeccable-editorial-reference .story-card .inline-actions .button {
+  grid-column: 1 !important;
   width: max-content;
   max-width: 100%;
+  justify-self: start;
 }
 
-.audience-page-landing .city-story .inline-actions .text-link {
-  min-height: 0;
+.city-story.impeccable-editorial-reference .story-card .inline-actions .text-link[href^="tel:"],
+.city-story.impeccable-editorial-reference .story-card .inline-actions .text-link[href^="mailto:"] {
+  grid-column: 1 !important;
+  grid-row: auto !important;
+}
+
+.city-story.impeccable-editorial-reference .inline-actions .text-link {
+  min-height: 0 !important;
   width: max-content;
   max-width: 100%;
-  padding: .15rem 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  padding: .15rem 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   color: var(--navy-2);
   font-weight: 700;
   line-height: 1.35;
@@ -99,49 +104,47 @@
   white-space: normal;
 }
 
-.audience-page-landing .city-story .inline-actions .text-link:hover {
-  background: transparent;
+.city-story.impeccable-editorial-reference .inline-actions .text-link:hover {
+  background: transparent !important;
   color: var(--accent-dark);
   text-decoration-color: currentColor;
 }
 
-.audience-page-landing .city-story .inline-actions .text-link::before {
-  display: none;
-  content: none;
+.city-story.impeccable-editorial-reference .inline-actions .text-link::before {
+  display: none !important;
+  content: none !important;
 }
 
-/* The persistent red accent remains concentrated on true primary actions. */
-.audience-page-landing .city-story .button-primary {
+.city-story.impeccable-editorial-reference .button-primary {
   box-shadow: none;
 }
 
 @media (max-width: 920px) {
-  .audience-page-landing .city-story .city-grid {
+  .city-story.impeccable-editorial-reference .city-grid {
     grid-template-columns: 1fr;
     gap: 1.6rem;
   }
 
-  .audience-page-landing .city-story .story-card-visual {
+  .city-story.impeccable-editorial-reference .story-card-visual {
     order: 2;
   }
 }
 
 @media (max-width: 640px) {
-  .audience-page-landing .city-story {
+  .city-story.impeccable-editorial-reference {
     padding-top: 4rem;
   }
 
-  .audience-page-landing .city-story .city-grid {
+  .city-story.impeccable-editorial-reference .city-grid {
     padding-top: 1.25rem;
   }
 
-  .audience-page-landing .city-story .story-card-visual .asset-placeholder,
-  .audience-page-landing .city-story .story-card-visual .asset-media {
+  .city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder,
+  .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
     min-height: 240px;
   }
 }
 
-/* Reduced-motion is a global accessibility contract, not a component preference. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
