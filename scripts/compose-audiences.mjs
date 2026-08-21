@@ -20,6 +20,9 @@ function ensureAudienceStyles($) {
   if (!$('link[href="/assets/impeccable-slice1.css"]').length) {
     $('head').append('<link rel="stylesheet" href="/assets/impeccable-slice1.css">');
   }
+  if (!$('link[href="/assets/impeccable-slice2c.css"]').length) {
+    $('head').append('<link rel="stylesheet" href="/assets/impeccable-slice2c.css">');
+  }
 }
 
 function setCanonical($, url) {
@@ -113,6 +116,7 @@ function renderLandingPage(html) {
   }
 
   $('.city-story').first().addClass('impeccable-editorial-reference');
+  $('#rudern-verstehen .rowing-chapter-racing').first().addClass('impeccable-racing-open');
 
   const hero = $('.hero').first();
   hero.find('.hero-actions').html(`
@@ -185,7 +189,7 @@ function renderLandingPage(html) {
 
 function validateLanding(html) {
   const $ = cheerio.load(html);
-  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story.impeccable-editorial-reference', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', '#mehr-entdecken.impeccable-depth-transition', '.about.journey.impeccable-journey-sequence', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]'];
+  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story.impeccable-editorial-reference', '#rudern-verstehen', '#rudern-verstehen .rowing-chapter-racing.impeccable-racing-open', '#stimmen', '#schubschlag', '#vereine', '#mehr-entdecken.impeccable-depth-transition', '.about.journey.impeccable-journey-sequence', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]', 'link[href="/assets/impeccable-slice2c.css"]'];
   for (const selector of required) {
     if (!$(selector).length) throw new Error(`[audiences] landing page missing ${selector}`);
   }
@@ -194,6 +198,14 @@ function validateLanding(html) {
   if ($('#mehr-entdecken .depth-chapter-link').length !== 3) throw new Error('[audiences] Slice 2A depth transition must contain exactly three chapter links');
   if ($('.professional-link').length) throw new Error('[audiences] duplicate professional depth link must not survive Slice 2A');
   if ($('.about.journey .principles article').length !== 3) throw new Error('[audiences] landing journey must retain exactly three steps');
+
+  const racingChapter = $('#rudern-verstehen .rowing-chapter-racing.impeccable-racing-open');
+  if (racingChapter.find('.boat-compare-card').length !== 2) throw new Error('[audiences] Slice 2C-1 must retain both Skull/Riemen comparison cards');
+  if (!racingChapter.find('.eight-explainer .eight-scroll[tabindex="0"]').length) throw new Error('[audiences] Slice 2C-1 must retain keyboard-focusable Achter diagram');
+  if (racingChapter.find('.rowing-rhythm-grid > .rowing-panel').length !== 2) throw new Error('[audiences] Slice 2C-1 must retain weekly and seasonal training views');
+  if (!racingChapter.find('.race-strip .race-course').length || !racingChapter.find('.race-strip .race-record').length) throw new Error('[audiences] Slice 2C-1 must retain race course and world-best record');
+  if (racingChapter.find('.age-band .age-steps > div').length !== 5) throw new Error('[audiences] Slice 2C-1 must retain five age-spectrum steps');
+
   for (const selector of ['#labor', '#geschichte', '#ruderakademie', '#regatta', '#foerderung', '#vorbild-rivale']) {
     if ($(selector).length) throw new Error(`[audiences] landing page unexpectedly contains historical/depth section ${selector}`);
   }
