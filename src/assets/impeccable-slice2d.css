@@ -4,6 +4,37 @@
    Functional surfaces (quick finder, directory) stay bounded. Narrative/source
    surfaces should not compete with the primary Verein-finden conversion. */
 
+/* Hero: keep the photographic anchor, but give the editorial message enough width. */
+.audience-page-landing .hero {
+  grid-template-columns: minmax(0, 1.32fr) minmax(250px, .68fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+}
+
+.audience-page-landing .hero-copy {
+  min-width: 0;
+  max-width: 50rem;
+}
+
+.audience-page-landing .hero h1 {
+  max-width: 11.5ch;
+  font-size: clamp(2.8rem, 5.6vw, 5.2rem);
+  line-height: .98;
+}
+
+.audience-page-landing .hero-art-photo {
+  min-width: 0;
+  justify-self: stretch;
+}
+
+.audience-page-landing .hero-art-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
 /* Film is the narrative starting point, not a competing conversion card. */
 .audience-page-landing #film.story-film-bridge {
   margin-top: clamp(4.5rem, 8vw, 7rem);
@@ -54,7 +85,7 @@
   text-decoration-color: currentColor;
 }
 
-/* Voices remain bounded quote objects, but not playful chat bubbles. */
+/* Voices remain bounded quote objects, but not playful chat bubbles or a random masonry layout. */
 .audience-page-landing #stimmen {
   padding-top: clamp(4.5rem, 8vw, 7rem);
 }
@@ -65,12 +96,23 @@
 }
 
 .audience-page-landing #stimmen .voice-grid {
-  gap: clamp(.8rem, 2vw, 1.2rem);
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: clamp(1rem, 2vw, 1.35rem);
+  align-items: stretch;
   margin-top: 0;
 }
 
-.audience-page-landing #stimmen .voice-bubble {
-  min-height: 270px;
+.audience-page-landing #stimmen .voice-bubble,
+.audience-page-landing #stimmen .voice-bubble-wide,
+.audience-page-landing #stimmen .voice-bubble-entry,
+.audience-page-landing #stimmen .voice-bubble-adam,
+.audience-page-landing #stimmen .voice-bubble-life,
+.audience-page-landing #stimmen .voice-bubble-drive,
+.audience-page-landing #stimmen .voice-bubble-legacy {
+  grid-column: auto !important;
+  margin-top: 0 !important;
+  min-height: 250px;
   padding: clamp(1.3rem, 2.5vw, 1.8rem) !important;
   border: 1px solid rgba(11, 35, 54, .13) !important;
   border-radius: 12px !important;
@@ -174,18 +216,42 @@
 }
 
 @media (max-width: 920px) {
+  .audience-page-landing .hero {
+    grid-template-columns: 1fr !important;
+    gap: 1.6rem;
+  }
+
+  .audience-page-landing .hero h1 {
+    max-width: 12ch;
+    font-size: clamp(2.7rem, 8vw, 4.6rem);
+  }
+
+  .audience-page-landing .hero-art-photo {
+    width: min(100%, 34rem);
+    justify-self: start;
+  }
+
+  .audience-page-landing .hero-art-photo img {
+    aspect-ratio: 16 / 9;
+  }
+
   .audience-page-landing #film.story-film-bridge {
     grid-template-columns: 1fr;
     gap: 1.2rem;
   }
 
+  .audience-page-landing #stimmen .voice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
   .audience-page-landing #stimmen .voice-bubble,
+  .audience-page-landing #stimmen .voice-bubble-wide,
   .audience-page-landing #stimmen .voice-bubble-entry,
   .audience-page-landing #stimmen .voice-bubble-adam,
   .audience-page-landing #stimmen .voice-bubble-life,
   .audience-page-landing #stimmen .voice-bubble-drive,
   .audience-page-landing #stimmen .voice-bubble-legacy {
-    margin-top: 0 !important;
+    min-height: 0;
   }
 
   .audience-page-landing #ueber .principles {
@@ -204,18 +270,12 @@
 }
 
 @media (max-width: 640px) {
-  .audience-page-landing #stimmen .voice-grid {
-    grid-template-columns: 1fr;
+  .audience-page-landing .hero h1 {
+    max-width: 11ch;
+    font-size: clamp(2.55rem, 12vw, 3.7rem);
   }
 
-  .audience-page-landing #stimmen .voice-bubble,
-  .audience-page-landing #stimmen .voice-bubble-wide,
-  .audience-page-landing #stimmen .voice-bubble-entry,
-  .audience-page-landing #stimmen .voice-bubble-adam,
-  .audience-page-landing #stimmen .voice-bubble-life,
-  .audience-page-landing #stimmen .voice-bubble-drive,
-  .audience-page-landing #stimmen .voice-bubble-legacy {
-    grid-column: 1 !important;
-    min-height: 0;
+  .audience-page-landing #stimmen .voice-grid {
+    grid-template-columns: 1fr !important;
   }
 }
