@@ -48,14 +48,46 @@
 .race-strip-with-record .race-record-source img{display:block!important;flex:0 0 auto!important;width:auto!important;height:auto!important;max-width:118px!important;max-height:42px!important;margin:0!important;object-fit:contain!important;filter:brightness(0) invert(1)}
 .race-strip-with-record .race-record-source>span{display:inline-flex;align-items:center;margin-left:0;text-align:left;white-space:nowrap}
 
-/* Podcast tips are editorial crosslinks, not sponsor badges. */
-.listening-tip{max-width:100%;overflow-wrap:anywhere}
-.listening-tip-light{margin:1rem 0 0;padding:.8rem 0 0;border-top:1px solid rgba(11,35,54,.14);color:var(--muted);font-size:.82rem;line-height:1.5}
-.listening-tip-light a{color:var(--navy-2);font-weight:800}
+/* Podcast tips are one editorial crosslink pattern everywhere.
+   Only the foreground/rule colors change between light and dark surfaces. */
+.listening-tip{
+  max-width:100%;
+  margin:1rem 0 0;
+  padding:.8rem 0 0;
+  border-top:1px solid rgba(11,35,54,.12);
+  color:var(--muted);
+  font-size:.78rem;
+  font-weight:400;
+  line-height:1.45;
+  text-align:left;
+  overflow-wrap:anywhere;
+}
+.listening-tip strong{font-weight:700}
+.listening-tip a{
+  color:#415d6a;
+  font-weight:650;
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:.16em;
+}
+.listening-tip a:hover,.listening-tip a:focus-visible{color:var(--navy)}
+.listening-tip-light{color:var(--muted);border-top-color:rgba(11,35,54,.12)}
+.listening-tip-light a{color:#415d6a;font-weight:650}
+.listening-tip-center{text-align:left}
 .lab-card .listening-tip-material,.lab-card .listening-tip-training{margin-top:1rem}
-.age-copy .listening-tip-masters{color:var(--muted);border-top-color:rgba(11,35,54,.15)}
-.listening-tip-touring{margin-left:.15rem;margin-right:.15rem}
+.listening-tip-touring{margin-left:0;margin-right:0}
 .funding-options .listening-tip-volunteering{margin-top:1.1rem}
+
+/* On navy, preserve the same geometry/weight and change only contrast. */
+.rowing-chapter-racing .listening-tip{
+  border-top-color:rgba(255,255,255,.12);
+  color:#a9c1cb;
+}
+.rowing-chapter-racing .listening-tip strong{color:#d7e7ed}
+.rowing-chapter-racing .listening-tip a{color:#b7e6f1;font-weight:650}
+.rowing-chapter-racing .listening-tip a:hover,
+.rowing-chapter-racing .listening-tip a:focus-visible{color:#fff}
+.age-copy .listening-tip-masters{color:#a9c1cb;border-top-color:rgba(255,255,255,.12)}
 
 @media(max-width:920px){.source-link-card{grid-template-columns:86px minmax(0,1fr)}.source-link-card .button{grid-column:1/-1;justify-self:start}.source-link-card-world{grid-template-columns:82px minmax(0,1fr)}}
 @media(max-width:640px){.source-link-card{grid-template-columns:72px minmax(0,1fr);padding:.9rem}.source-link-card-logo{min-height:48px;padding:.25rem}.source-link-card-logo img{max-height:44px}.source-link-card .button{width:100%}#foerderung>.source-link-card-podcast{margin-bottom:2.25rem}.deutschlandachter-link{width:100%;align-items:flex-start}.deutschlandachter-logo{flex-basis:72px}.deutschlandachter-logo img{max-width:66px}.race-strip-with-record .race-record-source{align-items:center;flex-direction:row;flex-wrap:nowrap;gap:.75rem}.race-strip-with-record .race-record-source>span{margin-left:0;text-align:left;white-space:nowrap}.race-strip-with-record .race-record-source img{max-width:88px!important;max-height:34px!important}}
