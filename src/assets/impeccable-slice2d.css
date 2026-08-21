@@ -123,6 +123,14 @@
   box-shadow: none !important;
 }
 
+/* The six voices are intentionally not chronological; place the oldest voice first and the 36-year entry last. */
+.audience-page-landing #stimmen .voice-grid > :nth-child(1) { order: 6; }
+.audience-page-landing #stimmen .voice-grid > :nth-child(2) { order: 2; }
+.audience-page-landing #stimmen .voice-grid > :nth-child(3) { order: 3; }
+.audience-page-landing #stimmen .voice-grid > :nth-child(4) { order: 4; }
+.audience-page-landing #stimmen .voice-grid > :nth-child(5) { order: 5; }
+.audience-page-landing #stimmen .voice-grid > :nth-child(6) { order: 1; }
+
 .audience-page-landing #stimmen .voice-bubble::after {
   display: none !important;
   content: none !important;
