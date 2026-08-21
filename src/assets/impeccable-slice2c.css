@@ -210,10 +210,10 @@
   opacity: 1;
 }
 
-/* Age spectrum: keep the scale, remove the enclosing pale card and five mini-cards. */
+/* Age spectrum: an ordered progression reads more naturally as a vertical scale. */
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-band {
-  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
-  gap: clamp(2rem, 4.5vw, 3.5rem);
+  grid-template-columns: minmax(0, .72fr) minmax(320px, 1.28fr);
+  gap: clamp(2.5rem, 5vw, 4rem);
   align-items: start;
   margin-top: clamp(3rem, 5vw, 4.2rem);
   padding: clamp(2rem, 3.5vw, 2.6rem) 0 clamp(1rem, 2vw, 1.5rem) !important;
@@ -238,32 +238,42 @@
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps {
-  align-self: end;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-self: start;
   gap: 0 !important;
-  padding-top: .55rem;
+  padding-top: 0;
+  border-top: 1px solid rgba(183, 230, 241, .42);
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div,
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div:nth-child(5) {
-  min-height: 78px;
-  padding: 1rem .75rem !important;
+  display: grid;
+  grid-template-columns: minmax(120px, .42fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: baseline;
+  min-height: 0;
+  padding: .9rem 0 !important;
   border: 0 !important;
-  border-top: 1px solid rgba(183, 230, 241, .42) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, .10) !important;
   border-radius: 0 !important;
   background: transparent !important;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div + div {
-  border-left: 1px solid rgba(255, 255, 255, .09) !important;
+  border-left: 0 !important;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps strong {
   color: var(--white) !important;
+  font-size: .88rem;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps span {
-  margin-top: .35rem;
+  margin-top: 0;
   color: var(--racing-muted) !important;
+  font-size: .78rem;
+  line-height: 1.4;
 }
 
 @media (max-width: 920px) {
@@ -282,10 +292,6 @@
     padding-top: 1.7rem !important;
     border-top: 1px solid rgba(255, 255, 255, .09) !important;
   }
-
-  .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps {
-    padding-top: 0;
-  }
 }
 
 @media (max-width: 640px) {
@@ -294,12 +300,10 @@
     border-radius: 0;
   }
 
-  .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div + div {
-    border-left: 0 !important;
-  }
-
-  .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div {
-    min-height: 0;
-    border-top: 1px solid rgba(183, 230, 241, .32) !important;
+  .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div,
+  .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div:nth-child(5) {
+    grid-template-columns: minmax(88px, .42fr) minmax(0, 1fr);
+    gap: .75rem;
+    padding-block: .8rem !important;
   }
 }
