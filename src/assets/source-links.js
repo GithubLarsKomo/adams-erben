@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('img[src="/assets/images/schubschlag.webp"]').forEach((image) => {
+    image.src = '/assets/images/schubschlag.png';
+  });
+
   if (!document.querySelector('#world-best-time-styles')) {
     const style = document.createElement('style');
     style.id = 'world-best-time-styles';
@@ -127,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = podcast.querySelector('h3');
     const copyText = podcast.querySelector('.source-link-card-copy > p:last-child');
     if (logo) {
-      logo.src = '/assets/images/schubschlag.webp';
+      logo.src = '/assets/images/schubschlag.png';
       logo.alt = 'Schubschlag';
       logo.removeAttribute('onerror');
       logo.style.maxWidth = '150px';
