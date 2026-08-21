@@ -6,6 +6,7 @@ import { pages, retiredDetailPages } from './seo-pages.mjs';
 const root = process.cwd();
 const dist = path.join(root, 'dist');
 const failures = [];
+const previewMode = process.env.PREVIEW_MODE === '1';
 const retiredPaths = new Set(retiredDetailPages.map((page) => page.path));
 const variantExpectations = {
   landing: { skip: '#quick-finder', cta: '#quick-finder' },
@@ -48,9 +49,16 @@ for (const page of pages) {
 
   if (page.shellVariant === 'landing') {
     expect($('#rudern-verstehen').length === 1, `${label}: Rudern-verstehen block must live on landing page`);
-    expect($('#stimmen').length === 1, `${label}: voices block must live on landing page`);
-    expect($('#stimmen .voice-grid > *').length === 6, `${label}: landing page must retain all six voices`);
-    expect($('#schubschlag').length === 1, `${label}: Schubschlag partial missing on landing page`);
+
+    if (previewMode) {
+      expect($('#stimmen').length === 1, `${label}: preview must retain voices block`);
+      expect($('#stimmen .voice-grid > *').length === 6, `${label}: preview must retain all six voices`);
+      expect($('#schubschlag').length === 1, `${label}: preview Schubschlag partial missing`);
+    } else {
+      expect($('#stimmen').length === 0, `${label}: production must remove placeholder voices block`);
+      expect($('#schubschlag').length === 0, `${label}: production must remove Schubschlag nested in placeholder voices`);
+    }
+
     expect($('#labor, #geschichte, #ruderakademie, #regatta, #vorbild-rivale').length === 0, `${label}: historical/depth sections leaked onto landing page`);
     expect($('script[src="/assets/landing-page.js"]').length === 1, `${label}: external landing interactions missing`);
   }
@@ -97,5 +105,5 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`[site-shell] validated ${pages.length} product pages, audience composition, in-page targets and CSS ownership`);
+  console.log(`[site-shell] validated ${pages.length} product pages, audience composition, in-page targets and CSS ownership (${previewMode ? 'preview' : 'production'})`);
 }
