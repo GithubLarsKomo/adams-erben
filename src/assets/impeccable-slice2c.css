@@ -8,7 +8,16 @@
   --racing-rule: rgba(255, 255, 255, .15);
   --racing-copy: #d7e7ed;
   --racing-muted: #a9c1cb;
-  --racing-data: rgba(255, 255, 255, .07);
+  --racing-data: rgba(255, 255, 255, .045);
+  --racing-accent: #b7e6f1;
+}
+
+/* Dark-surface contrast rule from DESIGN.md: never use the dark red meta accent on navy. */
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .eight-explainer .card-kicker,
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel .card-kicker,
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-strip .card-kicker,
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .age-band .card-kicker {
+  color: var(--racing-accent) !important;
 }
 
 /* Skull vs Riemen remains the canonical bounded comparison pattern. */
@@ -18,8 +27,8 @@
 
 /* Achter: one instructional figure inside the chapter, not another card. */
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .eight-explainer {
-  margin-top: clamp(1.8rem, 4vw, 2.8rem);
-  padding: clamp(1.5rem, 3vw, 2rem) 0 0 !important;
+  margin-top: clamp(2rem, 4.5vw, 3.2rem);
+  padding: clamp(1.8rem, 3.5vw, 2.4rem) 0 0 !important;
   border: 0 !important;
   border-top: 1px solid var(--racing-rule) !important;
   border-radius: 0 !important;
@@ -28,17 +37,18 @@
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .eight-copy {
-  max-width: 760px;
+  max-width: 780px;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .eight-scroll {
-  margin-top: 1.25rem;
-  padding: 1rem 0 1.15rem;
+  margin-top: 1.45rem;
+  padding: 1.15rem 0 1.35rem;
   border-top: 1px solid rgba(255, 255, 255, .09);
   border-bottom: 1px solid rgba(255, 255, 255, .09);
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .diagram-caption {
+  margin-top: .8rem;
   color: var(--racing-muted);
 }
 
@@ -46,14 +56,14 @@
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-rhythm-grid {
   grid-template-columns: minmax(0, 1.12fr) minmax(280px, .88fr);
   gap: 0 !important;
-  margin-top: clamp(2rem, 4vw, 3rem);
-  padding-top: clamp(1.5rem, 3vw, 2rem);
+  margin-top: clamp(2.6rem, 5vw, 3.8rem);
+  padding: clamp(1.9rem, 3.5vw, 2.5rem) 0 clamp(2rem, 3.5vw, 2.6rem);
   border-top: 1px solid var(--racing-rule);
   border-bottom: 1px solid var(--racing-rule);
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel {
-  padding: 0 clamp(1.25rem, 3vw, 2.25rem) 1.7rem 0 !important;
+  padding: 0 clamp(1.5rem, 3vw, 2.5rem) 0 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
@@ -63,7 +73,7 @@
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel + .rowing-panel {
   padding-right: 0 !important;
-  padding-left: clamp(1.25rem, 3vw, 2.25rem) !important;
+  padding-left: clamp(1.5rem, 3vw, 2.5rem) !important;
   border-left: 1px solid var(--racing-rule) !important;
 }
 
@@ -74,6 +84,12 @@
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel-head {
   display: block;
+  margin-bottom: .8rem;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel h4 {
+  font-size: clamp(1.6rem, 2.5vw, 2.05rem);
+  line-height: 1.08;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel h4,
@@ -86,14 +102,21 @@
   color: var(--racing-copy) !important;
 }
 
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .week-line {
+  gap: .45rem;
+  margin-top: 1.25rem;
+}
+
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .week-line div {
-  min-height: 88px;
-  border-radius: 8px;
+  min-height: 92px;
+  padding: .85rem .65rem;
+  border-top: 1px solid rgba(183, 230, 241, .22);
+  border-radius: 3px;
   background: var(--racing-data) !important;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .week-line strong {
-  color: #b7e6f1 !important;
+  color: var(--racing-accent) !important;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .week-line span {
@@ -101,17 +124,22 @@
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .season-track {
+  margin-top: 1.2rem;
   border-left-color: rgba(183, 230, 241, .55);
 }
 
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .season-track div {
+  padding: .82rem 0 .82rem 1.1rem;
+}
+
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .season-track div::before {
-  background: #b7e6f1 !important;
+  background: var(--racing-accent) !important;
 }
 
 /* Race: the 0–2000 m line is the structure; no dark card within the dark chapter. */
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .race-strip {
-  margin-top: clamp(2rem, 4vw, 3rem);
-  padding: clamp(1.5rem, 3vw, 2rem) 0 0 !important;
+  margin-top: clamp(2.8rem, 5vw, 4rem);
+  padding: clamp(1.9rem, 3.5vw, 2.5rem) 0 0 !important;
   border: 0 !important;
   border-top: 1px solid var(--racing-rule) !important;
   border-radius: 0 !important;
@@ -119,13 +147,21 @@
   box-shadow: none !important;
 }
 
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-copy {
+  max-width: 760px;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-course {
+  margin-top: 1.9rem;
+}
+
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .race-mark::before {
   border-color: var(--navy) !important;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record {
-  margin-top: clamp(1.6rem, 3vw, 2.3rem) !important;
-  padding: clamp(1.4rem, 3vw, 2rem) 0 0 !important;
+  margin-top: clamp(2rem, 3.5vw, 2.8rem) !important;
+  padding: clamp(1.7rem, 3vw, 2.2rem) 0 0 !important;
   border: 0 !important;
   border-top: 1px solid rgba(255, 255, 255, .10) !important;
   border-radius: 0 !important;
@@ -139,22 +175,27 @@
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source {
+  margin-top: 1.25rem;
   box-shadow: none !important;
 }
 
 /* Age spectrum: keep the scale, remove the enclosing pale card and five mini-cards. */
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-band {
-  grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr);
-  gap: clamp(1.5rem, 4vw, 3rem);
-  align-items: end;
-  margin-top: clamp(2rem, 4vw, 3rem);
-  padding: clamp(1.5rem, 3vw, 2rem) 0 0 !important;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+  gap: clamp(2rem, 4.5vw, 3.5rem);
+  align-items: start;
+  margin-top: clamp(3rem, 5vw, 4.2rem);
+  padding: clamp(2rem, 3.5vw, 2.6rem) 0 clamp(1rem, 2vw, 1.5rem) !important;
   border: 0 !important;
   border-top: 1px solid var(--racing-rule) !important;
   border-radius: 0 !important;
   background: transparent !important;
   color: var(--white) !important;
   box-shadow: none !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .age-copy {
+  max-width: 34rem;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-copy h4 {
@@ -166,12 +207,15 @@
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps {
+  align-self: end;
   gap: 0 !important;
+  padding-top: .55rem;
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div,
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div:nth-child(5) {
-  padding: .8rem .65rem !important;
+  min-height: 78px;
+  padding: 1rem .75rem !important;
   border: 0 !important;
   border-top: 1px solid rgba(183, 230, 241, .42) !important;
   border-radius: 0 !important;
@@ -187,6 +231,7 @@
 }
 
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps span {
+  margin-top: .35rem;
   color: var(--racing-muted) !important;
 }
 
@@ -198,22 +243,32 @@
 
   .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel,
   .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel + .rowing-panel {
-    padding: 0 0 1.5rem !important;
+    padding: 0 0 1.8rem !important;
     border-left: 0 !important;
   }
 
   .audience-page-landing #rudern-verstehen .impeccable-racing-open .rowing-panel + .rowing-panel {
-    padding-top: 1.4rem !important;
+    padding-top: 1.7rem !important;
     border-top: 1px solid rgba(255, 255, 255, .09) !important;
+  }
+
+  .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps {
+    padding-top: 0;
   }
 }
 
 @media (max-width: 640px) {
+  .audience-page-landing #rudern-verstehen .impeccable-racing-open .week-line div {
+    min-height: 0;
+    border-radius: 0;
+  }
+
   .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div + div {
     border-left: 0 !important;
   }
 
   .audience-page-landing #rudern-verstehen .impeccable-racing-open .age-steps div {
+    min-height: 0;
     border-top: 1px solid rgba(183, 230, 241, .32) !important;
   }
 }
