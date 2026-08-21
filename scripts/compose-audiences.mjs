@@ -112,6 +112,8 @@ function renderLandingPage(html) {
     $(selector).remove();
   }
 
+  $('.city-story').first().addClass('impeccable-editorial-reference');
+
   const hero = $('.hero').first();
   hero.find('.hero-actions').html(`
     <a class="button button-primary" href="#quick-finder">Rudern ausprobieren</a>
@@ -190,7 +192,7 @@ function renderLandingPage(html) {
 
 function validateLanding(html) {
   const $ = cheerio.load(html);
-  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]'];
+  const required = ['#quick-finder', '#open-full-directory', '#film', '#ratzeburg', '.city-story.impeccable-editorial-reference', '#rudern-verstehen', '#stimmen', '#schubschlag', '#vereine', 'a[href="/rudern/"]', 'script[src="/assets/landing-page.js"]', 'link[href="/assets/impeccable-slice1.css"]'];
   for (const selector of required) {
     if (!$(selector).length) throw new Error(`[audiences] landing page missing ${selector}`);
   }
