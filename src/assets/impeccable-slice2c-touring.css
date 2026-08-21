@@ -1,0 +1,189 @@
+/* Impeccable Slice 2C-2 — touring explainer de-nesting.
+   Authority: PRODUCT.md + DESIGN.md + docs/frontend-design-brief-slice2c.md
+
+   Wanderrudern stays light and editorial. The diagram, facts and route examples
+   remain distinct learning objects, but their generic card shells are removed. */
+
+.audience-page-landing #rudern-verstehen .rowing-chapter-touring.impeccable-touring-open {
+  padding: 0 !important;
+  overflow: visible;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .rowing-chapter-intro {
+  max-width: 850px;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .rowing-kicker {
+  color: var(--accent-dark);
+}
+
+/* Gigboot: open editorial pair, while the diagram and four facts remain bounded learning objects. */
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-explainer {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  padding: clamp(2rem, 4vw, 3rem) 0 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(11, 35, 54, .15) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-visual {
+  border-radius: 14px;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-copy {
+  padding-top: .25rem;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-copy > p:not(.card-kicker) {
+  color: var(--muted) !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts {
+  gap: 0;
+  margin-top: 1.4rem;
+  border-top: 1px solid rgba(11, 35, 54, .12);
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts div {
+  padding: .9rem 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(11, 35, 54, .09);
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts div:nth-child(odd) {
+  padding-right: 1.25rem !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts div:nth-child(even) {
+  padding-left: 1.25rem !important;
+  border-left: 1px solid rgba(11, 35, 54, .08);
+}
+
+/* Schaalsee / Rhein / Bodensee: one open spectrum, not three floating cards. */
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 !important;
+  margin-top: clamp(2.8rem, 5vw, 4rem);
+  border-top: 1px solid rgba(11, 35, 54, .15);
+  border-bottom: 1px solid rgba(11, 35, 54, .15);
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card,
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card-local {
+  min-height: 300px;
+  padding: clamp(1.4rem, 3vw, 2rem) clamp(1.2rem, 2.5vw, 1.8rem) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--navy) !important;
+  box-shadow: none !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card + .touring-card {
+  border-left: 1px solid rgba(11, 35, 54, .10) !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-number {
+  display: block;
+  width: auto;
+  height: auto;
+  margin-bottom: .7rem;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card .card-kicker,
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card-local .card-kicker {
+  color: var(--accent-dark) !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card p:not(.card-kicker),
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card-local p:not(.card-kicker) {
+  color: var(--muted) !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .route-sketch,
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .river-lines,
+.audience-page-landing #rudern-verstehen .impeccable-touring-open .lake-mark {
+  opacity: .72;
+}
+
+/* Long distance races are a bridge back to competition, not another callout card. */
+.audience-page-landing #rudern-verstehen .distance-callout.impeccable-distance-open {
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding: clamp(2rem, 4vw, 3rem) 0 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(11, 35, 54, .15) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--navy) !important;
+  box-shadow: none !important;
+}
+
+.audience-page-landing #rudern-verstehen .distance-callout.impeccable-distance-open p:not(.card-kicker) {
+  color: var(--muted) !important;
+}
+
+.audience-page-landing #rudern-verstehen .distance-callout.impeccable-distance-open .distance-mark {
+  justify-items: stretch;
+  text-align: left;
+}
+
+.audience-page-landing #rudern-verstehen .distance-callout.impeccable-distance-open .distance-regattas {
+  width: 100%;
+}
+
+.audience-page-landing #rudern-verstehen .distance-callout.impeccable-distance-open .distance-regatta-link {
+  box-shadow: none !important;
+}
+
+@media (max-width: 920px) {
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-explainer,
+  .audience-page-landing #rudern-verstehen .distance-callout.impeccable-distance-open {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card,
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card-local {
+    min-height: 250px;
+    padding-inline: 0 !important;
+  }
+
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .touring-card + .touring-card {
+    border-left: 0 !important;
+    border-top: 1px solid rgba(11, 35, 54, .10) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts div:nth-child(odd),
+  .audience-page-landing #rudern-verstehen .impeccable-touring-open .gig-facts div:nth-child(even) {
+    padding-inline: 0 !important;
+    border-left: 0 !important;
+  }
+}
