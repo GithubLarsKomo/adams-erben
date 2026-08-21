@@ -17,8 +17,8 @@
 }
 
 .city-story.impeccable-editorial-reference .city-grid {
-  grid-template-columns: minmax(0, .92fr) minmax(320px, 1.08fr);
-  gap: clamp(2rem, 5vw, 5rem);
+  grid-template-columns: minmax(0, .96fr) minmax(320px, 1.04fr);
+  gap: clamp(2.25rem, 5vw, 4rem);
   align-items: start;
   padding-top: clamp(1.5rem, 3vw, 2.4rem);
   border-top: 1px solid var(--editorial-rule);
@@ -47,6 +47,36 @@
   letter-spacing: .1em;
 }
 
+/* The generated academy cross-link is editorial navigation, not a pill/control. */
+.city-story.impeccable-editorial-reference .city-academy-link {
+  display: inline-flex !important;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: .15rem 0 1.15rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--navy-2) !important;
+  font-size: .9rem;
+  font-weight: 750;
+  line-height: 1.4;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(18, 58, 87, .28) !important;
+  text-underline-offset: .2em;
+  white-space: normal;
+}
+
+.city-story.impeccable-editorial-reference .city-academy-link:hover {
+  color: var(--accent-dark) !important;
+  text-decoration-color: currentColor !important;
+}
+
+.city-story.impeccable-editorial-reference .city-academy-link::before {
+  display: none !important;
+  content: none !important;
+}
+
 .city-story.impeccable-editorial-reference .story-card-visual {
   padding: 0 !important;
   border: 0 !important;
@@ -55,9 +85,11 @@
   box-shadow: none !important;
 }
 
+/* Until real before/after imagery is available, the placeholder should not dominate the whole section. */
 .city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder,
 .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
-  min-height: clamp(280px, 34vw, 430px);
+  min-height: 320px !important;
+  max-height: 380px;
   border-radius: var(--editorial-radius) !important;
 }
 
@@ -68,10 +100,12 @@
     repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(11,35,54,.022) 12px, rgba(11,35,54,.022) 24px);
 }
 
+/* One clear primary action; contact methods become quiet text actions rather than pills. */
 .city-story.impeccable-editorial-reference .story-card .inline-actions {
   display: grid !important;
   grid-template-columns: 1fr !important;
-  gap: .75rem !important;
+  gap: .65rem !important;
+  margin-top: 1rem;
 }
 
 .city-story.impeccable-editorial-reference .story-card .inline-actions .button {
@@ -91,7 +125,7 @@
   min-height: 0 !important;
   width: max-content;
   max-width: 100%;
-  padding: .15rem 0 !important;
+  padding: .1rem 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
@@ -119,6 +153,28 @@
   box-shadow: none;
 }
 
+/* Treat the memorial preview as an editorial figure rather than another UI tile. */
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) figure,
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) .asset-media {
+  margin: 1rem 0 0 !important;
+  width: min(100%, 40rem);
+}
+
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) figure img,
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) .asset-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px !important;
+}
+
+.city-story.impeccable-editorial-reference .story-card:not(.story-card-visual) figcaption {
+  margin-top: .45rem;
+  color: var(--muted);
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
 @media (max-width: 920px) {
   .city-story.impeccable-editorial-reference .city-grid {
     grid-template-columns: 1fr;
@@ -127,6 +183,12 @@
 
   .city-story.impeccable-editorial-reference .story-card-visual {
     order: 2;
+  }
+
+  .city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder,
+  .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
+    min-height: 280px !important;
+    max-height: none;
   }
 }
 
@@ -141,10 +203,11 @@
 
   .city-story.impeccable-editorial-reference .story-card-visual .asset-placeholder,
   .city-story.impeccable-editorial-reference .story-card-visual .asset-media {
-    min-height: 240px;
+    min-height: 230px !important;
   }
 }
 
+/* Reduced-motion is a global accessibility contract, not a component preference. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
