@@ -174,9 +174,40 @@
   color: var(--racing-copy) !important;
 }
 
+/* The World Rowing source is evidence, not another CTA. Keep it legible but deliberately quiet. */
 .audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source {
-  margin-top: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  width: auto;
+  margin-top: 1.35rem;
+  padding: .25rem 0;
+  color: var(--racing-muted) !important;
+  font-size: .78rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-decoration: none;
+  opacity: .88;
   box-shadow: none !important;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source img {
+  width: 44px;
+  height: auto;
+  opacity: .78;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source:hover,
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source:focus-visible {
+  color: var(--white) !important;
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: .18em;
+}
+
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source:hover img,
+.audience-page-landing #rudern-verstehen .impeccable-racing-open .race-record-source:focus-visible img {
+  opacity: 1;
 }
 
 /* Age spectrum: keep the scale, remove the enclosing pale card and five mini-cards. */
