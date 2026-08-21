@@ -98,6 +98,7 @@
 .audience-page-landing #stimmen .voice-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  grid-auto-flow: row !important;
   gap: clamp(1rem, 2vw, 1.35rem);
   align-items: stretch;
   margin-top: 0;
@@ -110,7 +111,9 @@
 .audience-page-landing #stimmen .voice-bubble-life,
 .audience-page-landing #stimmen .voice-bubble-drive,
 .audience-page-landing #stimmen .voice-bubble-legacy {
+  grid-area: auto !important;
   grid-column: auto !important;
+  grid-row: auto !important;
   margin-top: 0 !important;
   min-height: 250px;
   padding: clamp(1.3rem, 2.5vw, 1.8rem) !important;
