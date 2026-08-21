@@ -23,6 +23,19 @@ Retain the established palette as the project basis:
 
 Red must be used more sparingly than in the current implementation. It is primarily reserved for high-value actions, selected emphasis and meaningful state or editorial accents. Do not repeat red decoratively merely to create visual variety.
 
+### Contrast rule for dark surfaces
+
+Dark red must **not** be used as small text, metadata, kicker or decorative accent directly on dark navy / deep-blue surfaces. The current dark-red-on-navy combination does not provide sufficient perceptual contrast for these roles and becomes especially weak at small sizes.
+
+On dark surfaces:
+
+- use light blue, warm off-white or another already established high-contrast light token for kickers, metadata, rules and instructional accents;
+- reserve red for a CTA only when the complete foreground/background combination is explicitly contrast-checked and the action hierarchy requires it;
+- do not rely on red to distinguish information inside a dark technical/editorial chapter;
+- prefer luminance contrast first; hue contrast alone is not sufficient.
+
+On light/off-white surfaces, red remains the principal accent and may be used for high-value actions and selected meaningful emphasis where contrast is sufficient.
+
 Existing token values are evidence and should be retained where they already satisfy contrast and hierarchy. Token changes should consolidate the system rather than create parallel shades.
 
 ## Typography
@@ -159,6 +172,10 @@ Confirmed on 2026-08-20:
 - Color: retain palette, use red more sparingly and functionally (`4B`).
 - Cards/radii: use cards only for semantic containers; reduce radius dependence (`5B`).
 - Motion: retain only minimal functional transitions (`6A`).
+
+Confirmed refinement on 2026-08-21:
+
+- Dark red is not an acceptable small-text/meta accent directly on dark navy surfaces; use established high-contrast light accents there and reserve red for contrast-checked high-value actions.
 
 ## Provenance
 
