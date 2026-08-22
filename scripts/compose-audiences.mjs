@@ -172,7 +172,7 @@ function renderLandingPage(html) {
       </nav>
       <a class="button button-secondary depth-teaser-cta" href="/rudern/">Karl Adam & Rudergeschichte vertiefen</a>
     </section>`;
-  $('#stimmen').after(depthTeaser);
+  $('#schubschlag').after(depthTeaser);
 
   const journey = $('.about.journey');
   journey.addClass('impeccable-journey-sequence');
