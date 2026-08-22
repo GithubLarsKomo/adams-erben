@@ -33,8 +33,7 @@ jobs:
           node --check scripts/postbuild-seo.mjs
           node --check scripts/seo-pages.mjs
           node --check scripts/apply-site-shell.mjs
-          node --check scripts/integrate-east-west-story.mjs
-          node --check scripts/integrate-east-west-map.mjs
+          node --check scripts/integrate-east-west.mjs
           node --check scripts/validate-site-shell.mjs
           node --check scripts/validate-seo-output.mjs
           node --check scripts/lib/site-shell.mjs
@@ -50,6 +49,8 @@ jobs:
           node --check src/assets/east-west-map.js
           node --check src/assets/nearest.js
           node --check src/assets/site-shell.js
+          node --check src/assets/landing-page.js
+          node --check src/assets/source-links.js
 
       - name: Club logo enrichment tests
         run: npm run test:logos
@@ -84,6 +85,8 @@ jobs:
             [landing.includes('href="/rudern/"'), 'landing link to rowing page'],
             [landing.includes('class="city-story"'), 'landing retains editorial Ratzeburg city story'],
             [landing.includes('/assets/impeccable-slice1.css'), 'landing loads impeccable slice styles'],
+            [landing.includes('/assets/impeccable-slice2c.css'), 'landing loads impeccable Slice 2C styles'],
+            [landing.includes('/assets/impeccable-slice2d.css'), 'landing loads impeccable Slice 2D styles'],
             [!landing.includes('id="labor"'), 'landing excludes full Adams Labor'],
             [rowing.includes('id="labor"'), 'rowing page includes Adams Labor'],
             [rowing.includes('id="rudern-verstehen"'), 'rowing page includes rowing explainer'],
@@ -97,7 +100,7 @@ jobs:
             [rowing.includes('data-map-state="rar"'), 'rowing page includes RAR map state'],
             [rowing.includes('data-map-state="rrc"'), 'rowing page includes RRC map state'],
             [rowing.includes('/assets/east-west-map.js'), 'rowing page loads east-west map runtime'],
-            [rowing.includes('/assets/east-west-map-interactions.css'), 'rowing page loads east-west map CSS']
+            [rowing.includes('/assets/east-west-map.css'), 'rowing page loads canonical east-west map CSS'],
           ];
           for (const [ok, label] of checks) {
             if (!ok) {
