@@ -56,10 +56,13 @@ function siteBase($) {
 function applySharedPartials($) {
   const voices = $('#stimmen');
   if (!voices.length) throw new Error('[audiences] #stimmen missing before composition');
-  voices.find('.podcast-feature').remove();
   const voiceGrid = voices.find('.voice-grid').first();
   if (!voiceGrid.length) throw new Error('[audiences] .voice-grid missing before Schubschlag insertion');
-  voiceGrid.after(schubschlagHtml);
+
+  // Schubschlag is editorial source content, not a placeholder voice. Keep it as
+  // a sibling so production can remove placeholder voices without deleting it.
+  $('#schubschlag').remove();
+  voices.after(schubschlagHtml);
 }
 
 function renderRowingPage(html) {
@@ -76,7 +79,7 @@ function renderRowingPage(html) {
   setCanonical($, `${base}/rudern/`);
   setSocialPreview($, base);
 
-  $('#film, #rudern-verstehen, #stimmen').remove();
+  $('#film, #rudern-verstehen, #stimmen, #schubschlag').remove();
 
   const hero = $('.hero').first();
   hero.find('.eyebrow').first().text('Rudern & Adams Erbe · Vertiefung');
@@ -196,6 +199,7 @@ function validateLanding(html) {
   for (const selector of required) {
     if (!$(selector).length) throw new Error(`[audiences] landing page missing ${selector}`);
   }
+  if (!$('#stimmen + #schubschlag').length) throw new Error('[audiences] Schubschlag must remain a standalone sibling after placeholder voices');
   if ($('#stimmen .voice-grid > *').length !== 6) throw new Error('[audiences] landing page must retain all six voices');
   if (!$('#vereine').is('[hidden]')) throw new Error('[audiences] landing directory must be progressively disclosed');
   if ($('#mehr-entdecken .depth-chapter-link').length !== 3) throw new Error('[audiences] Slice 2A depth transition must contain exactly three chapter links');
