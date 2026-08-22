@@ -73,8 +73,8 @@ function orderLandingVoices($) {
     throw new Error('[audiences] expected 36-year and 84-year voice cards before ordering');
   }
 
-  legacyVoice.detach();
-  entryVoice.detach();
+  legacyVoice.remove();
+  entryVoice.remove();
   voiceGrid.prepend(legacyVoice);
   voiceGrid.append(entryVoice);
 }
