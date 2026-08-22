@@ -54,7 +54,7 @@ const brandAssets = {
     fallback: 'https://www.rudern.de/sites/default/files/styles/content_full_desktop_1x/public/images/drv-logo.webp?itok=8KBhu-lW'
   },
   schubschlag: {
-    local: '/assets/images/schubschlag.webp',
+    local: '/assets/images/schubschlag.png',
     fallback: 'https://cdn.podcastcms.de/images/podcasts/315/2776815/schubschlag.png'
   }
 };
@@ -271,7 +271,7 @@ function validatePage($, desiredOrder) {
     ['.rrc-visual .asset-media-photo img[src="/assets/images/rrc-heute.webp"]', 'static RRC image'],
     ['.source-link-card-world img[src="/assets/images/world-rowing.png"]', 'World Rowing logo slot'],
     ['.source-link-card-drv img[src="/assets/images/drv.png"]', 'DRV logo slot'],
-    ['.source-link-card-podcast img[src="/assets/images/schubschlag.webp"]', 'Schubschlag logo slot'],
+    ['.source-link-card-podcast img[src="/assets/images/schubschlag.png"]', 'Schubschlag logo slot'],
     ['a[href="https://worldrowing.com/"]', 'World Rowing link'],
     ['a[href="https://www.rudern.de/service/vereinssuche"]', 'DRV club search link'],
     ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link'],

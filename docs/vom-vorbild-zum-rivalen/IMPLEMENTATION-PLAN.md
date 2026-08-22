@@ -489,7 +489,7 @@ Bestehende Komponente:
 
 Bestehendes Asset:
 
-`/assets/images/schubschlag.webp`
+`/assets/images/schubschlag.png`
 
 Bestehender CTA:
 
@@ -753,7 +753,7 @@ Kein Inhalt darf Animation benötigen. Falls dezente Übergänge ergänzt werden
 
 | Asset | Status | Einsatz | Blocker? |
 |---|---|---|---|
-| `schubschlag.webp` | vorhanden | Podcast-Brücke | nein |
+| `schubschlag.png` | vorhanden | Podcast-Brücke | nein |
 | `hoehe-mexiko.webp` | vorhanden | optionaler Höhen-/1968-Kontext | nein |
 | `rrc-heute.webp` | vorhanden | optionaler Ratzeburg-Kontext, nicht zwingend im Modul | nein |
 | `deutschlandachter.webp` | vorhanden | ggf. bestehende Deutschlandachter-Verlinkung, Rechtekontext beachten | nein |

@@ -122,7 +122,7 @@ const required = [
   ['.kremtz-turn', 'Kremtz turning point'],
   ['.east-west-bled', 'Bled turning-point card'],
   ['.east-west-mexico', 'Mexico dual-success card'],
-  ['.east-west-podcast img[src="/assets/images/schubschlag.webp"]', 'local Schubschlag asset'],
+  ['.east-west-podcast img[src="/assets/images/schubschlag.png"]', 'local Schubschlag asset'],
   ['a[href="https://www.podcast.de/podcast/2776815/schubschlag"]', 'Schubschlag link'],
   ['link[href="/assets/vom-vorbild-zum-rivalen.css"]', 'feature stylesheet'],
   ['link[href="/assets/east-west-map.css"]', 'canonical map stylesheet'],

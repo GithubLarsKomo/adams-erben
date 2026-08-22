@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('img[src="/assets/images/schubschlag.webp"]').forEach((image) => {
+  document.querySelectorAll('img[src="/assets/images/schubschlag.png"]').forEach((image) => {
     image.src = '/assets/images/schubschlag.png';
   });
 
