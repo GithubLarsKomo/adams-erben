@@ -49,14 +49,13 @@ for (const page of pages) {
 
   if (page.shellVariant === 'landing') {
     expect($('#rudern-verstehen').length === 1, `${label}: Rudern-verstehen block must live on landing page`);
+    expect($('#schubschlag').length === 1, `${label}: standalone Schubschlag source block missing`);
 
     if (previewMode) {
       expect($('#stimmen').length === 1, `${label}: preview must retain voices block`);
       expect($('#stimmen .voice-grid > *').length === 6, `${label}: preview must retain all six voices`);
-      expect($('#schubschlag').length === 1, `${label}: preview Schubschlag partial missing`);
     } else {
       expect($('#stimmen').length === 0, `${label}: production must remove placeholder voices block`);
-      expect($('#schubschlag').length === 0, `${label}: production must remove Schubschlag nested in placeholder voices`);
     }
 
     expect($('#labor, #geschichte, #ruderakademie, #regatta, #vorbild-rivale').length === 0, `${label}: historical/depth sections leaked onto landing page`);
