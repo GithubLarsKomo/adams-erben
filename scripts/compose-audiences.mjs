@@ -65,6 +65,20 @@ function applySharedPartials($) {
   voices.after(schubschlagHtml);
 }
 
+function orderLandingVoices($) {
+  const voiceGrid = $('#stimmen .voice-grid').first();
+  const entryVoice = voiceGrid.children('.voice-bubble-entry').first();
+  const legacyVoice = voiceGrid.children('.voice-bubble-legacy').first();
+  if (!entryVoice.length || !legacyVoice.length) {
+    throw new Error('[audiences] expected 36-year and 84-year voice cards before ordering');
+  }
+
+  legacyVoice.detach();
+  entryVoice.detach();
+  voiceGrid.prepend(legacyVoice);
+  voiceGrid.append(entryVoice);
+}
+
 function renderRowingPage(html) {
   const $ = cheerio.load(html, { decodeEntities: false });
   const base = siteBase($);
@@ -107,6 +121,7 @@ function renderLandingPage(html) {
   const $ = cheerio.load(html, { decodeEntities: false });
   const base = siteBase($);
   applySharedPartials($);
+  orderLandingVoices($);
   $('body').addClass('audience-page audience-page-landing').attr('data-shell-variant', 'landing');
   ensureAudienceStyles($);
 
@@ -201,6 +216,8 @@ function validateLanding(html) {
   }
   if (!$('#stimmen + #schubschlag').length) throw new Error('[audiences] Schubschlag must remain a standalone sibling after placeholder voices');
   if ($('#stimmen .voice-grid > *').length !== 6) throw new Error('[audiences] landing page must retain all six voices');
+  if (!/84 Jahre/.test($('#stimmen .voice-grid > :first-child').text())) throw new Error('[audiences] oldest voice must be first in DOM and visual order');
+  if (!/36 Jahre/.test($('#stimmen .voice-grid > :last-child').text())) throw new Error('[audiences] 36-year voice must be last in DOM and visual order');
   if (!$('#vereine').is('[hidden]')) throw new Error('[audiences] landing directory must be progressively disclosed');
   if ($('#mehr-entdecken .depth-chapter-link').length !== 3) throw new Error('[audiences] Slice 2A depth transition must contain exactly three chapter links');
   if ($('.professional-link').length) throw new Error('[audiences] duplicate professional depth link must not survive Slice 2A');
