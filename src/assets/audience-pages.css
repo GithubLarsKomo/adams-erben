@@ -214,6 +214,171 @@
   display: none;
 }
 
+/* Impeccable depth-page pass: /rudern/ is an editorial long read, not a stack of cards. */
+.audience-page-rowing .audience-intro-rowing {
+  grid-template-columns: minmax(0, 1fr) minmax(180px, .28fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: end;
+  margin-block: clamp(3rem, 6vw, 5rem);
+  padding: clamp(1.6rem, 3vw, 2.2rem) 0;
+  border-top: 1px solid rgba(11,35,54,.14);
+  border-bottom: 1px solid rgba(11,35,54,.10);
+  border-radius: 0;
+  background: transparent;
+}
+
+.audience-page-rowing .audience-intro-rowing > div {
+  max-width: 780px;
+}
+
+.audience-page-rowing .audience-intro-rowing .button-secondary {
+  justify-self: end;
+  width: max-content;
+  max-width: 100%;
+  min-height: 0;
+  padding: .2rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--navy-2, #123a57);
+  box-shadow: none;
+  text-decoration: underline;
+  text-decoration-color: rgba(18,58,87,.28);
+  text-underline-offset: .2em;
+}
+
+.audience-page-rowing .audience-intro-rowing .button-secondary:hover,
+.audience-page-rowing .audience-intro-rowing .button-secondary:focus-visible {
+  transform: none;
+  color: var(--accent-dark);
+  text-decoration-color: currentColor;
+}
+
+.audience-page-rowing #geschichte .history-grid {
+  gap: 0;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(11,35,54,.14);
+  border-bottom: 1px solid rgba(11,35,54,.10);
+}
+
+.audience-page-rowing #geschichte .book-card,
+.audience-page-rowing #geschichte .context-card {
+  padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1.4rem, 3vw, 2.4rem) clamp(1.7rem, 3vw, 2.25rem) 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.audience-page-rowing #geschichte .context-card {
+  padding-right: 0;
+  padding-left: clamp(1.4rem, 3vw, 2.4rem);
+  border-left: 1px solid rgba(11,35,54,.10);
+}
+
+.audience-page-rowing #geschichte .text-link,
+.audience-page-rowing #geschichte .deutschlandachter-link {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.audience-page-rowing #ruderakademie .academy-feature {
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.audience-page-rowing #ruderakademie .academy-media {
+  border-radius: 10px;
+}
+
+.audience-page-rowing #ruderakademie .academy-timeline {
+  gap: 0;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid rgba(11,35,54,.14);
+  border-bottom: 1px solid rgba(11,35,54,.10);
+}
+
+.audience-page-rowing #ruderakademie .academy-timeline article {
+  min-height: 0;
+  padding: 1.5rem clamp(1rem, 2.5vw, 2rem) 1.7rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.audience-page-rowing #ruderakademie .academy-timeline article + article {
+  padding-left: clamp(1rem, 2.5vw, 2rem);
+  border-left: 1px solid rgba(11,35,54,.10);
+}
+
+.audience-page-rowing #ruderakademie .academy-timeline article::before {
+  left: 0;
+  width: 42px;
+  height: 2px;
+}
+
+.audience-page-rowing #ruderakademie .academy-timeline article + article::before {
+  left: clamp(1rem, 2.5vw, 2rem);
+}
+
+.audience-page-rowing #ruderakademie .academy-network {
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding: clamp(1.6rem, 3vw, 2.2rem) 0 0;
+  border: 0;
+  border-top: 1px solid rgba(11,35,54,.14);
+  border-radius: 0;
+  background: transparent;
+}
+
+.audience-page-rowing #ruderakademie .academy-chips {
+  gap: .45rem 1.1rem;
+}
+
+.audience-page-rowing #ruderakademie .academy-chip,
+.audience-page-rowing #ruderakademie .academy-chip-highlight {
+  min-height: 0;
+  padding: .2rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--navy);
+  font-size: .82rem;
+  font-weight: 750;
+}
+
+.audience-page-rowing #ruderakademie .academy-chip + .academy-chip::before {
+  content: "·";
+  margin-right: 1.1rem;
+  color: var(--muted);
+}
+
+.audience-page-rowing #regatta .regatta-card {
+  padding: clamp(1.6rem, 3vw, 2.2rem) 0 0;
+  border: 0;
+  border-top: 1px solid rgba(11,35,54,.14);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.audience-page-rowing #regatta .regatta-media {
+  border-radius: 10px;
+}
+
+.audience-page-rowing #regatta .regatta-footer-grid {
+  margin-top: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.audience-page-rowing #regatta .regatta-note {
+  border-radius: 0;
+  background: transparent;
+}
+
+.audience-page-rowing .source-link-card {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
 @media (max-width: 920px) {
   .audience-intro-rowing,
   .quick-finder,
@@ -243,6 +408,58 @@
 
   .depth-teaser-grid {
     grid-template-columns: 1fr;
+  }
+
+  .audience-page-rowing .audience-intro-rowing {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .audience-page-rowing .audience-intro-rowing .button-secondary {
+    justify-self: start;
+  }
+
+  .audience-page-rowing #geschichte .history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-page-rowing #geschichte .book-card,
+  .audience-page-rowing #geschichte .context-card {
+    padding: 1.4rem 0;
+  }
+
+  .audience-page-rowing #geschichte .context-card {
+    border-left: 0;
+    border-top: 1px solid rgba(11,35,54,.10);
+  }
+
+  .audience-page-rowing #ruderakademie .academy-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .audience-page-rowing #ruderakademie .academy-timeline article,
+  .audience-page-rowing #ruderakademie .academy-timeline article + article {
+    padding: 1.3rem 0 1.45rem;
+    border-left: 0;
+  }
+
+  .audience-page-rowing #ruderakademie .academy-timeline article + article {
+    border-top: 1px solid rgba(11,35,54,.10);
+  }
+
+  .audience-page-rowing #ruderakademie .academy-timeline article::before,
+  .audience-page-rowing #ruderakademie .academy-timeline article + article::before {
+    left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .audience-page-rowing #regatta .regatta-timeline li {
+    padding: .9rem 0;
+    border: 0;
+    border-top: 1px solid rgba(11,35,54,.10);
+    border-radius: 0;
+    background: transparent;
   }
 }
 
