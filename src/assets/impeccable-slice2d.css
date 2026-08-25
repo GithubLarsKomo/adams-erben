@@ -1,3 +1,5 @@
+@import url('/assets/impeccable-rowing-final.css');
+
 /* Impeccable Slice 2D — final landing-page editorial polish.
    Authority: PRODUCT.md + DESIGN.md.
 
@@ -218,6 +220,216 @@
   border-left: 1px solid rgba(11, 35, 54, .10);
 }
 
+/* /rudern/: the hero already explains the second level; avoid repeating it below. */
+.audience-page-rowing .audience-intro-rowing {
+  display: none !important;
+}
+
+.audience-page-rowing .hero {
+  margin-bottom: clamp(4.5rem, 8vw, 7rem);
+}
+
+/* Ratzeburg city story: retain the image placeholder as an asset object, but open the narrative column. */
+.audience-page-rowing .city-story .city-grid {
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: start;
+  padding-top: clamp(1.5rem, 3vw, 2.4rem);
+  border-top: 1px solid rgba(11, 35, 54, .14);
+}
+
+.audience-page-rowing .city-story .story-card:not(.story-card-visual) {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.audience-page-rowing .city-story .story-card-visual {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.audience-page-rowing .city-story .story-card-visual .asset-placeholder,
+.audience-page-rowing .city-story .story-card-visual .asset-media {
+  border-radius: 12px !important;
+}
+
+.audience-page-rowing .city-story .city-academy-link {
+  min-height: 0 !important;
+  padding: .15rem 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--navy-2) !important;
+  box-shadow: none !important;
+  text-decoration: underline;
+  text-decoration-color: rgba(18, 58, 87, .28);
+  text-underline-offset: .2em;
+}
+
+.audience-page-rowing .city-story .inline-actions .text-link {
+  min-height: 0;
+  padding: .15rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--navy-2);
+  text-decoration: underline;
+  text-decoration-color: rgba(18, 58, 87, .28);
+  text-underline-offset: .2em;
+}
+
+.audience-page-rowing .city-story .inline-actions .text-link::before {
+  display: none;
+  content: none;
+}
+
+/* RRC is a living place in the story, not another large beige card. */
+.audience-page-rowing .rrc-card {
+  grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+  padding: clamp(1.7rem, 3vw, 2.5rem) 0 !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(11, 35, 54, .14) !important;
+  border-bottom: 1px solid rgba(11, 35, 54, .10) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.audience-page-rowing .rrc-visual {
+  min-height: 0;
+}
+
+.audience-page-rowing .rrc-visual img,
+.audience-page-rowing .rrc-visual figure,
+.audience-page-rowing .rrc-visual .asset-media {
+  border-radius: 10px !important;
+}
+
+.audience-page-rowing .rrc-copy .badge {
+  width: max-content;
+  max-width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: .7rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.audience-page-rowing .rrc-copy .button-secondary,
+.audience-page-rowing .rrc-copy .button-ghost {
+  min-height: 0;
+  padding: .2rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--navy-2);
+  text-decoration: underline;
+  text-decoration-color: rgba(18, 58, 87, .28);
+  text-underline-offset: .2em;
+}
+
+/* Ost & West: turn the chronology into a long read. Evidence stays bounded; chapters do not. */
+.audience-page-rowing #vorbild-rivale .source-legend {
+  margin-bottom: .5rem;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-chapter {
+  margin: 0;
+  padding: clamp(2.2rem, 5vw, 4rem) 0;
+  border: 0;
+  border-top: 1px solid rgba(11, 35, 54, .14);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-year {
+  min-height: 0;
+  margin-bottom: .75rem;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  font-size: .72rem;
+  letter-spacing: .1em;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-prologue,
+.audience-page-rowing #vorbild-rivale .east-west-reference,
+.audience-page-rowing #vorbild-rivale .east-west-koerner,
+.audience-page-rowing #vorbild-rivale .east-west-observation,
+.audience-page-rowing #vorbild-rivale .east-west-memory-story,
+.audience-page-rowing #vorbild-rivale .east-west-bled,
+.audience-page-rowing #vorbild-rivale .east-west-epilogue {
+  background: transparent;
+  border-color: rgba(11, 35, 54, .14);
+  box-shadow: none;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-copy > p,
+.audience-page-rowing #vorbild-rivale .east-west-copy h3,
+.audience-page-rowing #vorbild-rivale .east-west-source-row,
+.audience-page-rowing #vorbild-rivale .east-west-quote,
+.audience-page-rowing #vorbild-rivale .memory-callout,
+.audience-page-rowing #vorbild-rivale .archive-fact,
+.audience-page-rowing #vorbild-rivale .evidence-check,
+.audience-page-rowing #vorbild-rivale .kremtz-turn,
+.audience-page-rowing #vorbild-rivale .result-panel {
+  max-width: 900px;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-memory-story {
+  border-left: 3px solid #d5a14a;
+  padding-left: clamp(1.2rem, 3vw, 2rem);
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-epilogue {
+  border-top: 3px solid var(--accent);
+}
+
+/* Two chapters deserve a strong frame because they mark real shifts in the story. */
+.audience-page-rowing #vorbild-rivale .east-west-schubschlag,
+.audience-page-rowing #vorbild-rivale .east-west-mexico {
+  margin: clamp(2rem, 4vw, 3.5rem) 0;
+  padding: clamp(1.6rem, 4vw, 3rem);
+  border: 0;
+  border-radius: 14px;
+  background: var(--navy);
+  box-shadow: none;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-mexico {
+  background: radial-gradient(circle at 84% 24%, rgba(126,204,229,.16), transparent 24%), var(--navy);
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-schubschlag .east-west-year,
+.audience-page-rowing #vorbild-rivale .east-west-mexico .east-west-year {
+  color: #a9dceb;
+}
+
+.audience-page-rowing #vorbild-rivale .east-west-podcast {
+  border-radius: 10px;
+}
+
+.audience-page-rowing #vorbild-rivale .result-panel {
+  border-radius: 10px;
+  box-shadow: none;
+}
+
 @media (max-width: 920px) {
   .audience-page-landing .hero {
     grid-template-columns: 1fr !important;
@@ -270,6 +482,11 @@
   .audience-page-landing #ueber .principles article + article {
     border-top: 1px solid rgba(11, 35, 54, .10) !important;
   }
+
+  .audience-page-rowing .rrc-card,
+  .audience-page-rowing .city-story .city-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @media (max-width: 640px) {
@@ -280,5 +497,19 @@
 
   .audience-page-landing #stimmen .voice-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .audience-page-rowing #vorbild-rivale .east-west-chapter {
+    padding: 1.8rem 0;
+  }
+
+  .audience-page-rowing #vorbild-rivale .east-west-memory-story {
+    padding-left: 1rem;
+  }
+
+  .audience-page-rowing #vorbild-rivale .east-west-schubschlag,
+  .audience-page-rowing #vorbild-rivale .east-west-mexico {
+    padding: 1.25rem;
+    border-radius: 12px;
   }
 }
