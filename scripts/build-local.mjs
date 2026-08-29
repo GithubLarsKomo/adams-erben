@@ -9,3 +9,4 @@ await import('./apply-site-shell.mjs');
 await import('./integrate-east-west.mjs');
 await import('./validate-site-shell.mjs');
 await import('./validate-seo-output.mjs');
+await import('./make-simple.mjs');
